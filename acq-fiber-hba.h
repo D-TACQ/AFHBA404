@@ -43,6 +43,7 @@
 
 #include <asm/uaccess.h>  /* VERIFY_READ|WRITE */
 
+#define acq200_debug afhba_debug
 #include "acq200_debug.h"
 #include "lk-shim.h"
 

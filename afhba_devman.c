@@ -24,6 +24,29 @@
 
 #include "acq-fiber-hba.h"
 
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+
+struct proc_dir_entry *afhba_proc_root;
+
+int initProcFs(struct RTM_T_DEV *tdev)
+{
+	int rc = 0;
+
+	if (!afhba_proc_root){
+		afhba_proc_root = proc_mkdir("driver/afhba", NULL);
+		assert(afhba_proc_root);
+	}
+
+	tdev->proc_dir_root = proc_mkdir(tdev->name, afhba_proc_root);
+/*
+	if ((rc = addHostBufferProcFiles(tdev)) == 0 &&
+	    (rc = addAppBufferProcFiles(tdev))  == 0)
+		return 0;
+*/
+	return rc;
+}
+
 int afhba_registerDevice(struct RTM_T_DEV *tdev)
 {
 	dbg(2, "name %s", tdev->name);

@@ -43,6 +43,9 @@ LIST_HEAD(devices);
 #include <linux/module.h>
 #endif
 
+int afhba_debug = 0;
+module_param(afhba_debug, int, 0644);
+
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
 // D-TACQ changes the device ID to work around unwanted zomojo lspci listing */
