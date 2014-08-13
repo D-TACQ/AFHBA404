@@ -90,11 +90,7 @@ struct AFHBA_DEV {
 	} mappings[MAP_COUNT];
 
 	struct proc_dir_entry *proc_dir_root;
-	struct {
-		struct dentry* top;
-		struct dentry* loc;
-		struct dentry* rem;
-	} debug_dir;
+	struct dentry* debug_dir;
 	char *debug_names;
 };
 

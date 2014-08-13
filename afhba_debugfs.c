@@ -36,6 +36,12 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 {
 	char* pcursor, *pbase;
 	int ireg;
+	struct dentry* loc;
+	struct dentry* rem;
+
+	struct dentry* just_testing;
+	void* testbuf = kmalloc(4096, GFP_KERNEL);
+
 	if (!afhba_debug_root){
 		afhba_debug_root = debugfs_create_dir("afhba", 0);
 		if (!afhba_debug_root){
@@ -43,36 +49,43 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 			return;
 		}
 	}
-	adev->debug_dir.top = debugfs_create_dir(
+	adev->debug_dir = debugfs_create_dir(
 			afhba_devnames[adev->idx], afhba_debug_root);
-	if (!adev->debug_dir.top){
+	if (!adev->debug_dir){
 		dev_warn(pdev(adev), "failed create dir %s", afhba_devnames[adev->idx]);
 		return;
 	}
 	pbase = pcursor = adev->debug_names = kmalloc(4096, GFP_KERNEL);
 
-	adev->debug_dir.loc = debugfs_create_dir("LOC", adev->debug_dir.top);
-	if (!adev->debug_dir.loc){
+	loc = debugfs_create_dir("LOC", adev->debug_dir);
+	if (!loc){
 		dev_warn(pdev(adev), "failed create dir %s", "LOC");
 		return;
 	}
 	for (ireg = 0; ireg < 32; ++ireg){
-		NUM_REG_CREATE(adev->debug_dir.loc, LOC(adev), ireg*sizeof(u32));
+		NUM_REG_CREATE(loc, LOC(adev), ireg*sizeof(u32));
 	}
-	NUM_REG_CREATE(adev->debug_dir.loc, LOC(adev), 0x100*sizeof(u32));
+	NUM_REG_CREATE(loc, LOC(adev), 0x100*sizeof(u32));
 
-	adev->debug_dir.rem = debugfs_create_dir("REM", adev->debug_dir.top);
-	if (!adev->debug_dir.rem){
+	rem = debugfs_create_dir("REM", adev->debug_dir);
+	if (rem){
 		dev_warn(pdev(adev), "failed create dir %s", "REM");
 		return;
 	}
 	for (ireg = 0; ireg < 32; ++ireg){
-		NUM_REG_CREATE(adev->debug_dir.rem, REM(adev), ireg*sizeof(u32));
+		NUM_REG_CREATE(rem, REM(adev), ireg*sizeof(u32));
 	}
-	NUM_REG_CREATE(adev->debug_dir.rem, REM(adev), 0x100*sizeof(u32));
+	NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
+
+
+	just_testing = debugfs_create_dir("RAM", adev->debug_dir);
+
+	for (ireg = 0; ireg < 32; ++ireg){
+		NUM_REG_CREATE(just_testing, testbuf, ireg*sizeof(u32));
+	}
 }
 void afhba_removeDebugfs(struct AFHBA_DEV* adev)
 {
-	debugfs_remove_recursive(adev->debug_dir.top);
+	debugfs_remove_recursive(adev->debug_dir);
 	kfree(adev->debug_names);
 }
