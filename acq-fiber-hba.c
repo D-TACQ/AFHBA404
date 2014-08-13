@@ -244,6 +244,7 @@ void afhba_map(struct AFHBA_DEV *tdev)
 		}
 	}
 }
+
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	static struct file_operations afhba_fops = {
@@ -279,6 +280,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	}
 	afhba_map(tdev);
 	afhba_registerDevice(tdev);
+	afhba_createDebugfs(tdev);
 
 	tdev->class_dev = CLASS_DEVICE_CREATE(
 			afhba_device_class,			/* cls */
@@ -293,8 +295,13 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 }
 void afhba_remove (struct pci_dev *dev)
 {
-	/* @@todo ... work goes here */
+	struct AFHBA_DEV *tdev = afhba_lookupDevicePci(dev);
+
+	if (tdev){
+		afhba_removeDebugfs(tdev);
+	}
 	pci_disable_device(dev);
+
 }
 /*
  *

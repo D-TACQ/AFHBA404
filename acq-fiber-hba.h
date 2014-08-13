@@ -90,7 +90,12 @@ struct AFHBA_DEV {
 	} mappings[MAP_COUNT];
 
 	struct proc_dir_entry *proc_dir_root;
-
+	struct {
+		struct dentry* top;
+		struct dentry* loc;
+		struct dentry* rem;
+	} debug_dir;
+	char *debug_names;
 };
 
 
@@ -104,6 +109,11 @@ struct AFHBA_DEV_PATH {
 #define PSZ	  (sizeof (struct AFHBA_DEV_PATH))
 #define PD(file)  ((struct AFHBA_DEV_PATH *)(file)->private_data)
 #define DEV(file) (PD(file)->dev)
+
+#define pdev(adev) (&(adev)->pci_dev->dev)
+
+#define LOC(adev) ((adev)->mappings[0].va)
+#define REM(adev) ((adev)->mappings[1].va)
 
 #include "afhba_debugfs.h"
 
