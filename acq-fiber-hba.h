@@ -43,33 +43,68 @@
 
 #include <asm/uaccess.h>  /* VERIFY_READ|WRITE */
 
+
+#define MINOR_REGREAD	253
+#define MINOR_REMOTE	247
+
+#define MAXDEV	8	/* maximum expected devices .. */
+
 #define acq200_debug afhba_debug
 #include "acq200_debug.h"
 #include "lk-shim.h"
 
+struct AFHBA_DEV;
+
+
+
 #define MAP_COUNT	2
 
-#include "rtm-t-hostdrv.h"
+
 
 extern struct list_head devices;
 
-int afhba_registerDevice(struct RTM_T_DEV *tdev);
-void afhba_deleteDevice(struct RTM_T_DEV *tdev);
-struct RTM_T_DEV* afhba_lookupDevice(int major);
-struct RTM_T_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev);
-struct RTM_T_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev);
-struct RTM_T_DEV* afhba_lookupDev(struct device *dev);
+int afhba_registerDevice(struct AFHBA_DEV *tdev);
+void afhba_deleteDevice(struct AFHBA_DEV *tdev);
+struct AFHBA_DEV* afhba_lookupDevice(int major);
+struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev);
+struct AFHBA_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev);
+struct AFHBA_DEV* afhba_lookupDev(struct device *dev);
+
+struct AFHBA_DEV {
+	char name[16];
+	char mon_name[16];
+	char slot_name[16];
+	struct pci_dev *pci_dev;
+	struct CLASS_DEVICE *class_dev;
+	int idx;
+	int major;
+	struct list_head list;
+
+	struct PciMapping {
+		int bar;
+		u32 pa;
+		void* va;
+		unsigned len;
+		struct resource *region;
+		char name[32];
+	} mappings[MAP_COUNT];
+
+	struct proc_dir_entry *proc_dir_root;
+
+};
 
 
-struct RTM_T_DEV_PATH {
+struct AFHBA_DEV_PATH {
 	int minor;
-	struct RTM_T_DEV *dev;
+	struct AFHBA_DEV *dev;
 	struct list_head my_buffers;
 	void* private;
 };
 
-#define PSZ	  (sizeof (struct RTM_T_DEV_PATH))
-#define PD(file)  ((struct RTM_T_DEV_PATH *)(file)->private_data)
+#define PSZ	  (sizeof (struct AFHBA_DEV_PATH))
+#define PD(file)  ((struct AFHBA_DEV_PATH *)(file)->private_data)
 #define DEV(file) (PD(file)->dev)
+
+#include "afhba_debugfs.h"
 
 #endif /* ACQ_FIBER_HBA_H_ */

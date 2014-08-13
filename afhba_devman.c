@@ -29,7 +29,7 @@
 
 struct proc_dir_entry *afhba_proc_root;
 
-int initProcFs(struct RTM_T_DEV *tdev)
+int initProcFs(struct AFHBA_DEV *tdev)
 {
 	int rc = 0;
 
@@ -47,24 +47,21 @@ int initProcFs(struct RTM_T_DEV *tdev)
 	return rc;
 }
 
-int afhba_registerDevice(struct RTM_T_DEV *tdev)
+int afhba_registerDevice(struct AFHBA_DEV *tdev)
 {
 	dbg(2, "name %s", tdev->name);
 	list_add_tail(&tdev->list, &devices);
 	return initProcFs(tdev);
 }
 
-void afhba_deleteDevice(struct RTM_T_DEV *tdev)
+void afhba_deleteDevice(struct AFHBA_DEV *tdev)
 {
 	list_del(&tdev->list);
-	kfree(tdev->data_fifo_histo);
-	kfree(tdev->desc_fifo_histo);
-	kfree(tdev->hb);
 	kfree(tdev);
 }
-struct RTM_T_DEV* afhba_lookupDevice(int major)
+struct AFHBA_DEV* afhba_lookupDevice(int major)
 {
-	struct RTM_T_DEV *pos;
+	struct AFHBA_DEV *pos;
 
 	list_for_each_entry(pos, &devices, list){
 		if (pos->major == major){
@@ -75,9 +72,9 @@ struct RTM_T_DEV* afhba_lookupDevice(int major)
 	return 0;
 }
 
-struct RTM_T_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev)
+struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev)
 {
-	struct RTM_T_DEV *pos;
+	struct AFHBA_DEV *pos;
 
 	list_for_each_entry(pos, &devices, list){
 		if (pos->class_dev == dev){
@@ -88,9 +85,9 @@ struct RTM_T_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev)
 	return 0;
 }
 
-struct RTM_T_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev)
+struct AFHBA_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev)
 {
-	struct RTM_T_DEV *pos;
+	struct AFHBA_DEV *pos;
 
 	list_for_each_entry(pos, &devices, list){
 		if (pos->pci_dev == pci_dev){
@@ -101,9 +98,9 @@ struct RTM_T_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev)
 	return 0;
 }
 
-struct RTM_T_DEV* afhba_lookupDev(struct device *dev)
+struct AFHBA_DEV* afhba_lookupDev(struct device *dev)
 {
-	struct RTM_T_DEV *pos;
+	struct AFHBA_DEV *pos;
 
 	list_for_each_entry(pos, &devices, list){
 		if (&pos->pci_dev->dev == dev){

@@ -38,6 +38,9 @@ struct class* afhba_device_class;
 LIST_HEAD(devices);
 
 
+const char* afhba_devnames[MAXDEV];
+
+
 #ifndef EXPORT_SYMTAB
 #define EXPORT_SYMTAB
 #include <linux/module.h>
@@ -58,7 +61,7 @@ module_param(afhba_debug, int, 0644);
 #define REMOTE_BAR	1
 #define NO_BAR 		-1
 
-static int MAP2BAR(struct RTM_T_DEV *tdev, int imap)
+static int MAP2BAR(struct AFHBA_DEV *tdev, int imap)
 {
 	switch(imap){
 	case REMOTE_BAR:
@@ -87,7 +90,7 @@ static int minor2bar(int iminor)
 ssize_t bar_read(
 	struct file *file, char *buf, size_t count, loff_t *f_pos, int BAR)
 {
-	struct RTM_T_DEV *tdev = PD(file)->dev;
+	struct AFHBA_DEV *tdev = PD(file)->dev;
 	int ii;
 	int rc;
 	void *va = tdev->mappings[BAR].va;
@@ -122,7 +125,7 @@ ssize_t bar_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos,
 	int BAR, int OFFSET)
 {
-	struct RTM_T_DEV *tdev = PD(file)->dev;
+	struct AFHBA_DEV *tdev = PD(file)->dev;
 	int LEN = tdev->mappings[BAR].len;
 	u32 data;
 	void *va = tdev->mappings[BAR].va + OFFSET;
@@ -152,7 +155,7 @@ ssize_t bar_write(
 
 int afhba_open(struct inode *inode, struct file *file)
 {
-	struct RTM_T_DEV *tdev = afhba_lookupDevice(MAJOR(inode->i_rdev));
+	struct AFHBA_DEV *tdev = afhba_lookupDevice(MAJOR(inode->i_rdev));
 
 	dbg(2, "01");
 	if (tdev == 0){
@@ -187,7 +190,7 @@ ssize_t afhba_write(
 }
 int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
 {
-	struct RTM_T_DEV *tdev = PD(file)->dev;
+	struct AFHBA_DEV *tdev = PD(file)->dev;
 	int bar = minor2bar(PD(file)->minor);
 	unsigned long vsize = vma->vm_end - vma->vm_start;
 	unsigned long psize = tdev->mappings[bar].len;
@@ -216,12 +219,13 @@ int afhba_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
-void afhba_map(struct RTM_T_DEV *tdev)
+void afhba_map(struct AFHBA_DEV *tdev)
 {
 	struct pci_dev *dev = tdev->pci_dev;
 	int imap;
+	int nmappings = 0;
 
-	for (imap = 0; imap < MAP_COUNT; ++imap){
+	for (imap = 0; nmappings < MAP_COUNT; ++imap){
 		struct PciMapping* mp = tdev->mappings+imap;
 		int bar = MAP2BAR(tdev, imap);
 
@@ -236,6 +240,7 @@ void afhba_map(struct RTM_T_DEV *tdev)
 			mp->va = ioremap_nocache(mp->pa, mp->len);
 
 			dbg(2, "BAR %d va:%p", bar, mp->va);
+			++nmappings;
 		}
 	}
 }
@@ -249,7 +254,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		.mmap = afhba_mmap_bar
 	};
 
-	struct RTM_T_DEV *tdev = kzalloc(sizeof(struct RTM_T_DEV), GFP_KERNEL);
+	struct AFHBA_DEV *tdev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
 	int rc;
 	static int idx;
 	static u64 dma_mask = DMA_BIT_MASK(32);
@@ -258,7 +263,9 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	tdev->pci_dev = dev;
 	tdev->idx = idx++;
 	dev->dev.dma_mask = &dma_mask;
+
 	sprintf(tdev->name, "afhba.%d", tdev->idx);
+	afhba_devnames[tdev->idx] = tdev->name;
 	sprintf(tdev->mon_name, "afhba-mon.%d", tdev->idx);
 
 
@@ -278,9 +285,10 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 			NULL,					/* cls_parent */
 			tdev->idx,				/* "devt" */
 			&tdev->pci_dev->dev,			/* device */
-			"afhba.%d", tdev->idx);			/* fmt, idx */
+			tdev->name);
 
 	rc = pci_enable_device(dev);
+	dbg(1, "pci_enable_device returns %d", rc);
 	return 0;
 }
 void afhba_remove (struct pci_dev *dev)
@@ -325,6 +333,7 @@ int __init afhba_init_module(void)
 
 void afhba_exit_module(void)
 {
+	class_destroy(afhba_device_class);
 	pci_unregister_driver(&afhba_driver);
 }
 
