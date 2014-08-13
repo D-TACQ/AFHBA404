@@ -68,7 +68,7 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	NUM_REG_CREATE(loc, LOC(adev), 0x100*sizeof(u32));
 
 	rem = debugfs_create_dir("REM", adev->debug_dir);
-	if (rem){
+	if (!rem){
 		dev_warn(pdev(adev), "failed create dir %s", "REM");
 		return;
 	}
@@ -79,7 +79,10 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 
 
 	just_testing = debugfs_create_dir("RAM", adev->debug_dir);
-
+	if (!just_testing){
+		dev_warn(pdev(adev), "failed create dir %s", "REM");
+		return;
+	}
 	for (ireg = 0; ireg < 32; ++ireg){
 		NUM_REG_CREATE(just_testing, testbuf, ireg*sizeof(u32));
 	}
