@@ -38,9 +38,7 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	int ireg;
 	struct dentry* loc;
 	struct dentry* rem;
-
-	struct dentry* just_testing;
-	void* testbuf = kmalloc(4096, GFP_KERNEL);
+	int rembase;
 
 	if (!afhba_debug_root){
 		afhba_debug_root = debugfs_create_dir("afhba", 0);
@@ -55,14 +53,14 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 		dev_warn(pdev(adev), "failed create dir %s", afhba_devnames[adev->idx]);
 		return;
 	}
-	pbase = pcursor = adev->debug_names = kmalloc(4096, GFP_KERNEL);
+	pbase = pcursor = adev->debug_names = kmalloc(8192, GFP_KERNEL);
 
 	loc = debugfs_create_dir("LOC", adev->debug_dir);
 	if (!loc){
 		dev_warn(pdev(adev), "failed create dir %s", "LOC");
 		return;
 	}
-	for (ireg = 0; ireg < 32; ++ireg){
+	for (ireg = 0; ireg < 38; ++ireg){
 		NUM_REG_CREATE(loc, LOC(adev), ireg*sizeof(u32));
 	}
 	NUM_REG_CREATE(loc, LOC(adev), 0x100*sizeof(u32));
@@ -72,20 +70,12 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 		dev_warn(pdev(adev), "failed create dir %s", "REM");
 		return;
 	}
-	for (ireg = 0; ireg < 38; ++ireg){
-		NUM_REG_CREATE(rem, REM(adev), ireg*sizeof(u32));
+	for (rembase = 0; rembase <= 4; ++rembase){
+		for (ireg = 0; ireg <= 32; ++ireg){
+			NUM_REG_CREATE(rem, REM(adev), rembase*0x100+ireg*sizeof(u32));
+		}
 	}
 	NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
-
-
-	just_testing = debugfs_create_dir("RAM", adev->debug_dir);
-	if (!just_testing){
-		dev_warn(pdev(adev), "failed create dir %s", "REM");
-		return;
-	}
-	for (ireg = 0; ireg < 32; ++ireg){
-		NUM_REG_CREATE(just_testing, testbuf, ireg*sizeof(u32));
-	}
 }
 void afhba_removeDebugfs(struct AFHBA_DEV* adev)
 {
