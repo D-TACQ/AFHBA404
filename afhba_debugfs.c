@@ -72,7 +72,7 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 		dev_warn(pdev(adev), "failed create dir %s", "REM");
 		return;
 	}
-	for (ireg = 0; ireg < 32; ++ireg){
+	for (ireg = 0; ireg < 38; ++ireg){
 		NUM_REG_CREATE(rem, REM(adev), ireg*sizeof(u32));
 	}
 	NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
