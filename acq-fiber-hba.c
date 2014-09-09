@@ -61,6 +61,20 @@ module_param(afhba_debug, int, 0644);
 #define REMOTE_BAR	1
 #define NO_BAR 		-1
 
+struct HostBuffer {
+	int ibuf;
+	void *va;
+	u32 pa;
+	int len;
+	int req_len;
+	u32 descr;
+	struct list_head list;
+	enum BSTATE {
+		BS_EMPTY, BS_FILLING, BS_FULL, BS_FULL_APP }
+	bstate;
+	u32 timestamp;
+} G_hb;
+
 static int MAP2BAR(struct AFHBA_DEV *tdev, int imap)
 {
 	switch(imap){
@@ -245,6 +259,55 @@ void afhba_map(struct AFHBA_DEV *tdev)
 	}
 }
 
+int nbuffers = 1;
+int BUFFER_LEN = 0x100000;
+
+static int getOrder(int len)
+{
+	int order;
+	len /= PAGE_SIZE;
+
+	for (order = 0; 1 << order < len; ++order){
+		;
+	}
+	return order;
+}
+
+
+static void init_buffers(struct AFHBA_DEV* tdev)
+{
+	int ii;
+	int order = getOrder(BUFFER_LEN);
+	struct HostBuffer *hb = &G_hb;
+
+
+	dbg(1, "allocating %d buffers size:%d dev.dma_mask:%08llx",
+			nbuffers, BUFFER_LEN, *tdev->pci_dev->dev.dma_mask);
+
+	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers, ++hb){
+		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
+
+		if (!buf){
+			err("failed to allocate buffer %d", ii);
+			break;
+		}
+
+		dbg(3, "buffer %2d allocated at %p, map it", ii, buf);
+
+		hb->ibuf = ii;
+		hb->pa = dma_map_single(&tdev->pci_dev->dev, buf,
+				BUFFER_LEN, PCI_DMA_FROMDEVICE);
+		hb->va = buf;
+		hb->len = BUFFER_LEN;
+
+		dbg(3, "buffer %2d allocated, map done", ii);
+
+		hb->bstate = BS_EMPTY;
+
+		info("[%d] %p %08x %d %08x",
+		    ii, hb->va, hb->pa, hb->len, hb->descr);
+	}
+}
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	static struct file_operations afhba_fops = {
@@ -291,6 +354,8 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 
 	rc = pci_enable_device(dev);
 	dbg(1, "pci_enable_device returns %d", rc);
+
+	init_buffers(tdev);
 	return 0;
 }
 void afhba_remove (struct pci_dev *dev)

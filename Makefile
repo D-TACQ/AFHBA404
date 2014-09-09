@@ -30,3 +30,6 @@ afhba-objs = acq-fiber-hba.o afhba_devman.o afhba_debugfs.o
 modules: 
 	make -C $(KHEADERS) M=$(SRC)  modules
 
+mmap:
+	make -o mmap mmap.c -lpopt
+

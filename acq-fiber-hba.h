@@ -92,6 +92,9 @@ struct AFHBA_DEV {
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
 	char *debug_names;
+
+	int nbuffers;
+
 };
 
 
@@ -112,5 +115,25 @@ struct AFHBA_DEV_PATH {
 #define REM(adev) ((adev)->mappings[1].va)
 
 #include "afhba_debugfs.h"
+
+/* REGS */
+#define FPGA_REVISION_REG		0x0000	/* FPGA Revision Register */
+#define HOST_PCIE_CONTROL_REG 		0x0004	/* Host PCIe Control / Status Register */
+#define HOST_PCIE_INTERRUPT_REG 	0x0008	/* Host PCIe Interrupt Register Register */
+#define PCI_CONTROL_STATUS_REG 		0x000C	/* PCI Control / Status Register */
+#define PCIE_DEVICE_CONTROL_STATUS_REG 	0x0010	/* PCIe Control / Status Register */
+#define PCIE_LINK_CONTROL_STATUS_REG 	0x0014	/* PCIe Link Control / Status Register */
+#define HOST_TEST_REG 			0x0018	/* Host Test Register */
+#define HOST_COUNTER_REG 		0x001C	/* Heart Beat Counter */
+#define HOST_PCIE_DEBUG_REG 		0x0020	/* Host PCIe Debug Register */
+#define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
+#define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
+#define AURORA_CONTROL_REG 		0x0080	/* Aurora Control Register */
+#define AURORA_STATUS_REG 		0x0084	/* Aurora Status Register */
+#define SFP_I2C_DATA_REG 		0x0088	/* SFP I2C Control and Data Register */
+#define HOST_COMMS_FIFO_CONTROL_REG 	0x00C0	/* ACQ400 Receive Communications FIFO Control Register */
+#define HOST_COMMS_FIFO_STATUS_REG 	0x00C4	/* ACQ400 Receive Communications FIFO Status Register */
+#define ACQ400_COMMS_READ 		0x0400	/* ACQ400 Receive Communications FIFO data */
+
 
 #endif /* ACQ_FIBER_HBA_H_ */
