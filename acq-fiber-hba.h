@@ -70,6 +70,21 @@ struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev);
 struct AFHBA_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev);
 struct AFHBA_DEV* afhba_lookupDev(struct device *dev);
 
+struct HostBuffer {
+	int ibuf;
+	void *va;
+	u32 pa;
+	int len;
+	int req_len;
+	u32 descr;
+	struct list_head list;
+	enum BSTATE {
+		BS_EMPTY, BS_FILLING, BS_FULL, BS_FULL_APP }
+	bstate;
+	u32 timestamp;
+};
+
+
 struct AFHBA_DEV {
 	char name[16];
 	char mon_name[16];
@@ -94,7 +109,7 @@ struct AFHBA_DEV {
 	char *debug_names;
 
 	int nbuffers;
-
+	struct HostBuffer *hb;
 };
 
 
@@ -104,6 +119,7 @@ struct AFHBA_DEV_PATH {
 	struct list_head my_buffers;
 	void* private;
 };
+
 
 #define PSZ	  (sizeof (struct AFHBA_DEV_PATH))
 #define PD(file)  ((struct AFHBA_DEV_PATH *)(file)->private_data)

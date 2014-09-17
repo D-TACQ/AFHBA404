@@ -49,6 +49,8 @@ const char* afhba_devnames[MAXDEV];
 int afhba_debug = 0;
 module_param(afhba_debug, int, 0644);
 
+
+
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
 // D-TACQ changes the device ID to work around unwanted zomojo lspci listing */
@@ -61,19 +63,6 @@ module_param(afhba_debug, int, 0644);
 #define REMOTE_BAR	1
 #define NO_BAR 		-1
 
-struct HostBuffer {
-	int ibuf;
-	void *va;
-	u32 pa;
-	int len;
-	int req_len;
-	u32 descr;
-	struct list_head list;
-	enum BSTATE {
-		BS_EMPTY, BS_FILLING, BS_FULL, BS_FULL_APP }
-	bstate;
-	u32 timestamp;
-} G_hb;
 
 static int MAP2BAR(struct AFHBA_DEV *tdev, int imap)
 {
@@ -278,7 +267,7 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 {
 	int ii;
 	int order = getOrder(BUFFER_LEN);
-	struct HostBuffer *hb = &G_hb;
+	struct HostBuffer *hb = tdev->hb;
 
 
 	dbg(1, "allocating %d buffers size:%d dev.dma_mask:%08llx",
