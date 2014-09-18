@@ -276,7 +276,7 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 			nbuffers, BUFFER_LEN, *tdev->pci_dev->dev.dma_mask);
 
 	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers /*, ++hb @@todo */){
-		struct HostBuffer* hb = tdev->hb[ii];
+		struct HostBuffer* hb = &tdev->hb[ii];
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -298,7 +298,7 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 
 		info("[%d] %p %08x %d %08x", ii, hb->va, hb->pa, hb->len, hb->descr);
 
-		info("[%d] %p %08x %d %08x", ii, tdev->hb[0]->va, tdev->hb[0]->pa, tdev->hb[0]->len, tdev->hb[0]->descr);
+		info("[%d] %p %08x %d %08x", ii, tdev->hb[0].va, tdev->hb[0].pa, tdev->hb[0].len, tdev->hb[0].descr);
 	}
 }
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)

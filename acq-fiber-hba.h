@@ -109,7 +109,7 @@ struct AFHBA_DEV {
 	char *debug_names;
 
 	int nbuffers;
-	struct HostBuffer **hb;
+	struct HostBuffer *hb;
 };
 
 

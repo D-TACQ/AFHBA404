@@ -83,11 +83,9 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	if (adev->hb == 0){
 		err("bad hb"); return;
 	}
-	if (adev->hb[0] == 0){
-		err("bad hb"); return;
-	}
-	debugfs_create_x32("va", S_IRUGO, buf, (u32*)&(adev->hb[0]->va));
-	debugfs_create_x32("pa", S_IRUGO, buf, &(adev->hb[0]->pa));
+
+	debugfs_create_x32("va", S_IRUGO, buf, (u32*)&(adev->hb[0].va));
+	debugfs_create_x32("pa", S_IRUGO, buf, &(adev->hb[0].pa));
 }
 void afhba_removeDebugfs(struct AFHBA_DEV* adev)
 {
