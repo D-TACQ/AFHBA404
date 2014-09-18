@@ -331,6 +331,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		tdev->major = rc;
 	}
 	afhba_map(tdev);
+	init_buffers(tdev);
 	afhba_registerDevice(tdev);
 	afhba_createDebugfs(tdev);
 
@@ -344,7 +345,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	rc = pci_enable_device(dev);
 	dbg(1, "pci_enable_device returns %d", rc);
 
-	init_buffers(tdev);
+
 	return 0;
 }
 void afhba_remove (struct pci_dev *dev)
