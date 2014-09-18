@@ -267,13 +267,12 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 {
 	int ii;
 	int order = getOrder(BUFFER_LEN);
-	struct HostBuffer *hb = tdev->hb;
 
-
+	nbuffers = 1;
 	dbg(1, "allocating %d buffers size:%d dev.dma_mask:%08llx",
 			nbuffers, BUFFER_LEN, *tdev->pci_dev->dev.dma_mask);
 
-	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers, ++hb){
+	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers /*, ++hb @@todo */){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -283,18 +282,18 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 
 		dbg(3, "buffer %2d allocated at %p, map it", ii, buf);
 
-		hb->ibuf = ii;
-		hb->pa = dma_map_single(&tdev->pci_dev->dev, buf,
+		tdev->hb->ibuf = ii;
+		tdev->hb->pa = dma_map_single(&tdev->pci_dev->dev, buf,
 				BUFFER_LEN, PCI_DMA_FROMDEVICE);
-		hb->va = buf;
-		hb->len = BUFFER_LEN;
+		tdev->hb->va = buf;
+		tdev->hb->len = BUFFER_LEN;
 
 		dbg(3, "buffer %2d allocated, map done", ii);
 
-		hb->bstate = BS_EMPTY;
+		tdev->hb->bstate = BS_EMPTY;
 
 		info("[%d] %p %08x %d %08x",
-		    ii, hb->va, hb->pa, hb->len, hb->descr);
+		    ii, tdev->hb->va, tdev->hb->pa, tdev->hb->len, tdev->hb->descr);
 	}
 }
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
