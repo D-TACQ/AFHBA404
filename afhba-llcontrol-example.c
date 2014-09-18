@@ -63,7 +63,7 @@ void get_mapping() {
 
 void goRealTime(void)
 {
-	struct sched_param p;
+	struct sched_param p = {};
 	p.sched_priority = sched_fifo_priority;
 
 

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+log=${1:-llcontrol.log}
+
+hexdump -e '4/2 "%04x " 2/4 " %08x" "\n"' $log
