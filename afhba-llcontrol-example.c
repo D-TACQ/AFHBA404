@@ -83,6 +83,11 @@ void setup()
 {
 	get_mapping();
 	//goRealTime();
+	fp_log = fopen("llcontrol.log", "w");
+	if (fp_log == 0){
+		perror("llcontrol.log");
+		exit(1);
+	}
 }
 
 void run()
@@ -111,6 +116,7 @@ void run()
 close() {
 	munmap(host_buffer, HB_LEN);
 	close(fd);
+	fclose(fp_log);
 }
 int main(int argc, char* argv[])
 {
