@@ -5,7 +5,7 @@ echo 9 >/proc/sys/kernel/printk
 grep -q afhba /proc/modules
 if [ $? -ne 0 ]; then
 	echo ++loading module
-	/sbin/insmod afhba.ko afhba_debug=2
+	/sbin/insmod afhba.ko afhba_debug=1
 fi
 
 mount -t debugfs none /proc/sys/debug/

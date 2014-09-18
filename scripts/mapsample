@@ -1,0 +1,3 @@
+#!/bin/bash
+
+../mmap -f /dev/afhba.0.loc -l 0x1000 | hexdump -e '4/2 "%04x " 6/4 " %08x" "\n"' | head -n 1

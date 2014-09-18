@@ -1,0 +1,18 @@
+ID=0
+DEVROOT=/proc/sys/debug/afhba
+
+DEV=${DEVROOT}/afhba.${ID}
+
+
+set_sys() {
+	knob=$1;shift
+	logger -t set_sys ${DEV}/${knob} $*
+	echo $* >${DEV}/${knob}
+}
+
+get_sys() {
+	knob=$1
+	RB=$(cat ${DEV}/${knob})
+	logger -t get_sys ${DEV}/${knob} $RB
+	echo $RB 
+}

@@ -1,0 +1,61 @@
+#!/bin/bash
+# llc-test-harness: configure and start an llc process
+#!/bin/bash
+
+# MUST set remote ip-address
+REMIP=${1:-10.12.196.129}
+STREAMPID=0
+
+source afhba-common
+
+remote_cmd() {
+	SITE=$1;shift
+	echo $* | nc $REMIP 422$SITE
+}
+
+start_dma() { 
+	PA=$(get_sys BUF/pa)
+	echo buffer PA $PA
+	set_sys REM/0x0204 0x60
+	get_sys REM/0x0204
+	set_sys REM/0x0240 $PA
+	get_sys REM/0x0240
+	set_sys REM/0x0204 0x61	 					
+}
+
+stop_dma() {
+	set_sys REM/0x0204 0x60
+	set_sys REM/0x0204 0x10
+	set_sys REM/0x0204 0x60
+}
+
+init_706() {
+	remote_cmd 1 trg=1,1,1
+	remote_cmd 0 spad=1,7,0	
+	remote_cmd 0 run0 1
+}
+
+start_stream() {
+	echo run this on the zc706, type OK RTN when finished
+	echo 'nc localhost 4210 | pv >/dev/null' 
+#	nc $REMIP 4210 > /dev/null &
+#	STREAMPID=$!
+#	echo "stream started PID ${STREAMPID}"
+	read OK
+}
+
+
+cleanup() {
+#	kill ${STREAMPID}
+	stop_dma
+}
+
+start_dma
+init_706
+start_stream
+echo now view data perhaps using ./mapsample
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
