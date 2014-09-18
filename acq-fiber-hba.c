@@ -270,6 +270,8 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 
 	tdev->hb = kmalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
 
+	dbg(1, "allocated buffer store %p length %d",
+			tdev->hb, sizeof(struct HostBuffer)*nbuffers);
 	dbg(1, "allocating %d buffers size:%d dev.dma_mask:%08llx",
 			nbuffers, BUFFER_LEN, *tdev->pci_dev->dev.dma_mask);
 
@@ -295,6 +297,8 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 		hb->bstate = BS_EMPTY;
 
 		info("[%d] %p %08x %d %08x", ii, hb->va, hb->pa, hb->len, hb->descr);
+
+		info("[%d] %p %08x %d %08x", ii, tdev->hb[0]->va, tdev->hb[0]->pa, tdev->hb[0]->len, tdev->hb[0]->descr);
 	}
 }
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
