@@ -97,17 +97,30 @@ void run()
 	unsigned spad1_1;
 	unsigned tl1;
 	int sample;
+	int println = 0;
 
 	for (sample = 0; sample < nsamples; ++sample, tl0 = tl1){
 		while((tl1 = TLATCH) == tl0){
 			sched_yield();
 		}
 		if (sample%10000 == 0){
-			printf("[%d] %u\n", sample, tl1);
+			if (println == 0){
+				printf("[%d] ", sample);
+				println = 1;
+			}
+			printf("%u ", sample, tl1);
 		}
 		if (spad1_1 != spad1_0){
-			printf("[%d] %u => %u\n", sample, spad1_0, spad1_1);
+			if (println == 0){
+				printf("[%d] ", sample);
+				println = 1;
+			}
+			printf("%u => %u ", sample, spad1_0, spad1_1);
 			spad1_0 = spad1_1;
+		}
+		if (println){
+			printf("\n");
+			println = 0;
 		}
 		fwrite(host_buffer, sizeof(short), 8, fp_log);
 	}
