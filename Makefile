@@ -17,7 +17,7 @@ endif
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-
+all: modules apps
 
 KRNL ?= $(shell uname -r)
 # FEDORA:
@@ -30,8 +30,14 @@ afhba-objs = acq-fiber-hba.o afhba_devman.o afhba_debugfs.o
 modules: 
 	make -C $(KHEADERS) M=$(SRC)  modules
 
+
+apps: mmap afhba-llcontrol-example
+
 mmap:
 	make -o mmap mmap.c -lpopt
+	
+afhba-llcontrol-example:
+	make -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
 
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers
