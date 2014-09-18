@@ -36,18 +36,14 @@ init_706() {
 }
 
 start_stream() {
-	echo run this on the zc706, type OK RTN when finished
-	echo 'nc localhost 4210 | pv >/dev/null' 
-#	nc $REMIP 4210 > /dev/null &
-#	STREAMPID=$!
-#	echo "stream started PID ${STREAMPID}"
-	read OK
+	remote_cmd 0 streamtonowhered start
 }
 
 
 cleanup() {
 #	kill ${STREAMPID}
 	stop_dma
+	remote_cmd 0 streamtonowhered stop
 }
 
 stop_dma
