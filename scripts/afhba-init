@@ -38,7 +38,12 @@ enable_aurora() {
 
 
 
-[ -z TEST ] && loc_regs_test
+if [ ! -z TEST ]; then
+	loc_regs_test
+fi
 enable_aurora
-[ -z TEST ] && rem_regs_test
+if [ ! -z TEST ]; then
+	rem_regs_test
+fi
+
 
