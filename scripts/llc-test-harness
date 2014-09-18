@@ -50,6 +50,7 @@ cleanup() {
 	stop_dma
 }
 
+stop_dma
 start_dma
 init_706
 start_stream

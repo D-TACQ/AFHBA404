@@ -28,11 +28,14 @@ enable_aurora() {
 	get_sys LOC/0x0018
 	set_sys REM/0x0118 $(get_sys LOC/0x0018)
 	set_sys REM/0x010c 0x00000004
+	# just in case the previous run was not cleanly ended
+	set_sys REM/0x0204 0x00000010
+	set_sys REM/0x0204 0x00000060
 }
 
 
 
-loc_regs_test
+#loc_regs_test
 enable_aurora
-rem_regs_test
+#rem_regs_test
 
