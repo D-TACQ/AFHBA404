@@ -79,8 +79,8 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
 
 	buf = debugfs_create_dir("BUF", adev->debug_dir);
-	debugfs_create_x32("va", S_IRUGO, buf, (u32*)&(adev->hb->va));
-	debugfs_create_x32("pa", S_IRUGO, buf, &(adev->hb->pa));
+	debugfs_create_x32("va", S_IRUGO, buf, (u32*)&(adev->hb[0]->va));
+	debugfs_create_x32("pa", S_IRUGO, buf, &(adev->hb[0]->pa));
 }
 void afhba_removeDebugfs(struct AFHBA_DEV* adev)
 {

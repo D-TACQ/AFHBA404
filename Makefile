@@ -33,3 +33,12 @@ modules:
 mmap:
 	make -o mmap mmap.c -lpopt
 
+clean:
+	rm -f *.mod* *.o *.ko modules.order Module.symvers
+
+DC := $(shell date +%y%m%d%H%M)
+package: clean
+	git tag $(DC)
+	(cd ..;tar cvf AFHBA/release/afhba-$(DC).tar \
+		--exclude=release --exclude=SAFE AFHBA/* )
+	
