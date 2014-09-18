@@ -49,8 +49,6 @@ const char* afhba_devnames[MAXDEV];
 int afhba_debug = 0;
 module_param(afhba_debug, int, 0644);
 
-
-
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
 // D-TACQ changes the device ID to work around unwanted zomojo lspci listing */
@@ -63,6 +61,8 @@ module_param(afhba_debug, int, 0644);
 #define REMOTE_BAR	1
 #define NO_BAR 		-1
 
+int nbuffers = 1;
+int BUFFER_LEN = 0x100000;
 
 static int MAP2BAR(struct AFHBA_DEV *tdev, int imap)
 {
@@ -213,7 +213,27 @@ int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
 	}
 }
 
+int afhba_mmap_hb(struct file* file, struct vm_area_struct* vma)
+{
+	struct AFHBA_DEV *tdev = PD(file)->dev;
+	struct HostBuffer* hb = &tdev->hb[0];
+	unsigned long vsize = vma->vm_end - vma->vm_start;
+	unsigned long psize = BUFFER_LEN;
+	unsigned pfn = hb->pa >> PAGE_SHIFT;
 
+	dbg(2, "%c vsize %lu psize %lu %s",
+		'D', vsize, psize, vsize>psize? "EINVAL": "OK");
+
+	if (vsize > psize){
+		return -EINVAL;                   /* request too big */
+	}
+	if (io_remap_pfn_range(
+		vma, vma->vm_start, pfn, vsize, vma->vm_page_prot)){
+		return -EAGAIN;
+	}else{
+		return 0;
+	}
+}
 
 int afhba_release(struct inode *inode, struct file *file)
 {
@@ -248,8 +268,7 @@ void afhba_map(struct AFHBA_DEV *tdev)
 	}
 }
 
-int nbuffers = 1;
-int BUFFER_LEN = 0x100000;
+
 
 static int getOrder(int len)
 {
@@ -269,11 +288,6 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 	int order = getOrder(BUFFER_LEN);
 
 	tdev->hb = kmalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
-
-	dbg(1, "allocated buffer store %p length %d",
-			tdev->hb, sizeof(struct HostBuffer)*nbuffers);
-	dbg(1, "allocating %d buffers size:%d dev.dma_mask:%08llx",
-			nbuffers, BUFFER_LEN, *tdev->pci_dev->dev.dma_mask);
 
 	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers /*, ++hb @@todo */){
 		struct HostBuffer* hb = &tdev->hb[ii];
@@ -308,7 +322,8 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		.release = afhba_release,
 		.read = afhba_read,
 		.write = afhba_write,
-		.mmap = afhba_mmap_bar
+		//.mmap = afhba_mmap_bar
+		.mmap = afhba_mmap_hb
 	};
 
 	struct AFHBA_DEV *tdev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
