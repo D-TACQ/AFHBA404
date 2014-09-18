@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo 9 >/proc/sys/kernel/printk
+
+grep -q afhba /proc/modules
+if [ $? -ne 0 ]; then
+	echo ++loading module
+	/sbin/insmod afhba.ko afhba_debug=2
+fi
+
+mount -t debugfs none /proc/sys/debug/
+
+for md in $(grep afhba /proc/devices | awk '{print $1","$2 }')
+do
+	dn=${md#*,}
+	ma=${md%,*}
+	mknod /dev/$dn.loc c $ma 253
+	mknod /dev/$dn.rem c $ma 247
+done
