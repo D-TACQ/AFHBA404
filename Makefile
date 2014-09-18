@@ -31,7 +31,8 @@ modules:
 	make -C $(KHEADERS) M=$(SRC)  modules
 
 
-apps: mmap afhba-llcontrol-example
+APPS := mmap afhba-llcontrol-example
+apps: $(APPS)
 
 mmap:
 	cc -o mmap mmap.c -lpopt
@@ -40,7 +41,7 @@ afhba-llcontrol-example:
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
 
 clean:
-	rm -f *.mod* *.o *.ko modules.order Module.symvers
+	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS)
 
 DC := $(shell date +%y%m%d%H%M)
 package: clean
