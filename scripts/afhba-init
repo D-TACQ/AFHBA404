@@ -1,19 +1,22 @@
 #!/bin/bash
 
+
 source afhba-common
 
-loc_regs_test() {
-	set_sys LOC/0x0018 0x12345678
-	get_sys LOC/0x0018
-}
 
 walking_bit_test() 
 {
-	for pat in 0x1 0x2 0x4 0x8 0x10 0x20 0x40 0x80 0x100 0x10000000 0x20000000
+	for pat in 0x1 0x2 0x4 0x8 0x10 0x20 0x40 0x80 0x100 \
+			0x10000000 0x20000000 0x40000000 0x80000000
 	do
 		set_sys $1 $pat
 		echo test $1 write $pat read $(get_sys $1)
 	done
+}
+loc_regs_test() {
+	set_sys LOC/0x0018 0x12345678
+	get_sys LOC/0x0018
+	walking_bit_test LOC/0x0018
 }
 rem_regs_test() {
 	set_sys REM/0x0104 0x12345678
@@ -35,7 +38,7 @@ enable_aurora() {
 
 
 
-#loc_regs_test
+[ -z TEST ] && loc_regs_test
 enable_aurora
-#rem_regs_test
+[ -z TEST ] && rem_regs_test
 
