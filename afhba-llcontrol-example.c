@@ -22,7 +22,10 @@
 /* ------------------------------------------------------------------------- */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sched.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 
@@ -32,7 +35,9 @@
 #define LOG_FILE	"afhba.log"
 
 void* host_buffer;
-int nsamples		10000000		/* 10s at 1MSPS */
+int fd;
+int nsamples = 10000000;		/* 10s at 1MSPS */
+int sched_fifo_priority = 0;
 
 FILE* fp_log;
 
@@ -44,12 +49,15 @@ FILE* fp_log;
 #define SPAD1	(((volatile unsigned*)host_buffer)[3])   /* user signal from ACQ */
 
 void get_mapping() {
-	void *va = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, HB_FILE, 0);
-	if (va == (caddr_t)-1 ){
+	fd = open(HB_FILE, O_RDWR);
+	if (fd < 0){
+		perror("HB_FILE");
+		exit(errno);
+	}
+	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	if (host_buffer == (caddr_t)-1 ){
 		perror( "mmap" );
-	        _exit(errno);
-	}else{
-		host_buffer = va;
+	        exit(errno);
 	}
 }
 
@@ -87,7 +95,7 @@ void run()
 
 	for (sample = 0; sample < nsamples; ++sample, tl0 = tl1){
 		while((tl1 = TLATCH) == tl0){
-			yield();
+			sched_yield();
 		}
 		if (sample%10000 == 0){
 			printf("[%d] %u\n", sample, tl1);
@@ -99,9 +107,14 @@ void run()
 		fwrite(host_buffer, sizeof(short), 8, fp_log);
 	}
 }
+
+close() {
+	munmap(host_buffer, HB_LEN);
+	close(fd);
+}
 int main(int argc, char* argv[])
 {
-	ui(argc, argv[]);
+	ui(argc, argv);
 	setup();
 	run();
 }

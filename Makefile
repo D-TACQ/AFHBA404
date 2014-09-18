@@ -34,10 +34,10 @@ modules:
 apps: mmap afhba-llcontrol-example
 
 mmap:
-	make -o mmap mmap.c -lpopt
+	cc -o mmap mmap.c -lpopt
 	
 afhba-llcontrol-example:
-	make -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
+	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
 
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers
