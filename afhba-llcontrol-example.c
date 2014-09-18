@@ -82,7 +82,7 @@ void ui(int argc, char* argv[])
 void setup()
 {
 	get_mapping();
-	//goRealTime();
+	goRealTime();
 	fp_log = fopen("llcontrol.log", "w");
 	if (fp_log == 0){
 		perror("llcontrol.log");
