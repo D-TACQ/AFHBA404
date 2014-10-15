@@ -37,7 +37,7 @@ apps: $(APPS)
 mmap:
 	cc -o mmap mmap.c -lpopt
 	
-afhba-llcontrol-example:
+afhba-llcontrol-example: afhba-llcontrol-example.c
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
 
 clean:
