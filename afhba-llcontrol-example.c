@@ -80,6 +80,9 @@ void ui(int argc, char* argv[])
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
+	if (argc > 1){
+		nsamples = atoi(argv[1]);
+	}
 }
 
 void setup()
