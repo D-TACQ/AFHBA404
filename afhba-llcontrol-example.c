@@ -37,7 +37,7 @@
 void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
-int sched_fifo_priority = 0;
+int sched_fifo_priority = 1;
 
 FILE* fp_log;
 
@@ -63,8 +63,9 @@ void get_mapping() {
 
 void goRealTime(void)
 {
-	struct sched_param p;
+	struct sched_param p = {};
 	p.sched_priority = sched_fifo_priority;
+
 
 
 	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
@@ -76,7 +77,9 @@ void goRealTime(void)
 
 void ui(int argc, char* argv[])
 {
-	// this ui is kind of basic ..
+        if (getenv("RTPRIO")){
+		sched_fifo_priority = atoi(getenv("RTPRIO"));
+        }
 }
 
 void setup()
@@ -105,17 +108,17 @@ void run()
 		}
 		if (sample%10000 == 0){
 			if (println == 0){
-				printf("[%d] ", sample);
+				printf("[%10u] ", sample);
 				println = 1;
 			}
-			printf("%u ", sample, tl1);
+			printf("%10u ", tl1);
 		}
 		if (spad1_1 != spad1_0){
 			if (println == 0){
 				printf("[%d] ", sample);
 				println = 1;
 			}
-			printf("%u => %u ", sample, spad1_0, spad1_1);
+			printf("\t%u => %u ", sample, spad1_0, spad1_1);
 			spad1_0 = spad1_1;
 		}
 		if (println){
@@ -135,5 +138,7 @@ int main(int argc, char* argv[])
 {
 	ui(argc, argv);
 	setup();
+	printf("ready for data\n");
 	run();
+	printf("finished\n");
 }
