@@ -188,6 +188,8 @@ failed to set RT priority: Invalid argument
 
 The correspondance between SAMPLE and TLATCH is unbelievably good ..
 
+20141028: PGM notes : that was due to a coding error, the second value was simply "SAMPLE". Sorry 
+
 The data format:
 
 short ch[4], unsigned tlatch [other stuff ..]
@@ -202,6 +204,190 @@ ffff fff0 ffe5 ffe3 0000001a 00000051
 ffff fff1 ffe5 ffe3 0000001b 00000051
 ffff fff0 ffe5 ffe3 0000001c 00000051
 ffff fff0 ffe5 ffe3 0000001d 00000051
+
+New stuff: October 28 2014
+
+
+Monitor ./llc-test-harness
+Start a new terminal as root on the HOST:
+tail -f /var/log/messages
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x10
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 16:11:57 helium get_sys: /proc/sys/debug/afhba/afhba.0/BUF/pa 0x37400000
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 16:11:57 helium get_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x00000060
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0240 0x37400000
+Oct 28 16:11:57 helium get_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0240 0xdead0003
+Oct 28 16:11:57 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x61
+Oct 28 16:11:57 helium rem_cmd: 10.12.196.129 4221 trg=1,2,1
+Oct 28 16:11:58 helium rem_cmd: 10.12.196.129 4221 clk=0,0,0
+Oct 28 16:11:59 helium rem_cmd: 10.12.196.129 4221 clkdiv=250
+Oct 28 16:11:59 helium rem_cmd: 10.12.196.129 4220 spad=1,7,0
+Oct 28 16:12:00 helium rem_cmd: 10.12.196.129 4220 run0 1
+Oct 28 16:12:01 helium rem_cmd: 10.12.196.129 4220 streamtonowhered start
+Oct 28 16:12:16 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 16:12:16 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x10
+Oct 28 16:12:16 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 16:12:16 helium rem_cmd: 10.12.196.129 4220 streamtonowhered stop
+
+
+TESTING EXTERNAL CLOCK.
+
+Connect External Clock 0-5V, 1MHz to CLK input on TERM01.
+
+Run the llcontrol example in the normal way:
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+
+And run the test harness
+[root@helium scripts]# LLC_CLK=ext ./llc-test-harness 
+buffer PA 0x37400000
+0x00000060
+0xdead0003
+sitelist: 1
+sites: 1
+/usr/local/bin/procServ: spawning daemon process: 28827
+
+now view data perhaps using ./mapsample
+CTRL-C to quit
+
+What did the test harness do?
+
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x10
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 17:24:50 helium get_sys: /proc/sys/debug/afhba/afhba.0/BUF/pa 0x37400000
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x60
+Oct 28 17:24:50 helium get_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x00000060
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0240 0x37400000
+Oct 28 17:24:50 helium get_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0240 0xdead0003
+Oct 28 17:24:50 helium set_sys: /proc/sys/debug/afhba/afhba.0/REM/0x0204 0x61
+Oct 28 17:24:50 helium rem_cmd: 10.12.196.129 4221 trg=1,1,1
+Oct 28 17:24:50 helium rem_cmd: 10.12.196.129 4221 clk=1,2,1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Selects front panel CLOCK
+Oct 28 17:24:51 helium rem_cmd: 10.12.196.129 4221 clkdiv=1
+Oct 28 17:24:52 helium rem_cmd: 10.12.196.129 4220 spad=1,7,0
+Oct 28 17:24:53 helium rem_cmd: 10.12.196.129 4220 run0 1
+Oct 28 17:24:54 helium rem_cmd: 10.12.196.129 4220 streamtonowhered start
+
+Controller result:
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+ready for data
+[         0]          1 	0 => 0 
+[     10000]      10137 
+[     20000]      20247 
+[     30000]      30356 
+[     40000]      40458 
+
+
+
+TESTING EXTERNAL TRG
+
+Connect External Trigger, 0-5V, 1Hz to TRG input on TERM01
+
+Run the llcontrol example in the normal way:
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+...
+
+Run the test harness eg
+LLC_TRG=ext ./llc-test-harness
+
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+ready for data
+[         0]          1 	0 => 0 
+[     10000]      10019 
+[     20000]      20022 
+[     30000]      30025 
+[     40000]      40032 
+[     50000]      50040 
+[     60000]      60045 
+[     70000]      70051 
+[     80000]      80058 
+[     90000]      90065 
+finished
+
+We know it's using the EXTERNAL TRIGGER, because the software hangs when there's no trigger connected..
+
+
+
+
+REAL TIME PERFORMANCE.
+
+If the controller software is achieving perfect real time, then the SAMPLE will match TLATCH.
+
+This isn't happening!, which just goes to show, you can have an RTOS, but still not have hard real-time.
+To achieve perfect RT, users will still have to assign the control thread to core that has interrupts disabled.
+
+The latch count gives an idea of how far off we are:
+
+It's also easy to vary the sample rate to judge this.
+
+eg:
+
+100kHz:
+
+ [dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+
+[root@helium scripts]# LLC_CLK=ext EXTCLKDIV=10 ./llc-test-harness 
+buffer PA 0x37400000
+
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+ready for data
+[         0]          1 	0 => 0 
+[     10000]      10002 
+[     20000]      20002 
+[     30000]      30002 
+[     40000]      40002 
+[     50000]      50002 
+[     60000]      60002 
+[     70000]      70002 
+[     80000]      80002 
+[     90000]      90002 
+
+This is probably as good as it gets.
+
+500kHz:
+[root@helium scripts]# LLC_CLK=ext EXTCLKDIV=2 ./llc-test-harness
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+ready for data
+[         0]          1 	0 => 0 
+[     10000]      10040 
+[     20000]      20065 
+[     30000]      30091 
+[     40000]      40115 
+[     50000]      50141 
+[     60000]      60165 
+
+[dt100@helium AFHBA400]$ sudo RTPRIO=20 ./afhba-llcontrol-example 100000
+[root@helium scripts]# LLC_CLK=ext EXTCLKDIV=1 ./llc-test-harness 
+buffer PA 0x37400000
+0x00000060
+0xdead0003
+
+ready for data
+[         0]          1 	0 => 0 
+[     10000]      10138 
+[     20000]      20253 
+[     30000]      30361 
+[     40000]      40473 
+[     50000]      50582 
+[     60000]      60693 
+
+
+=> Almost no missing samples at 100kHz, 0.4% at 500kHz, 1.4% at 1MHz.
+In reality, I'd have thought if the control algorithm can't handle missing 1.4% of samples, it's probably not robust enough anyway?
+
+
+CLOCK MONITORING
+
+There is extensive clock monitoring available using EPICS (CSS gui available).
+Contact D-TACQ for info.
+
+
+
+
+
+
 
 
 
