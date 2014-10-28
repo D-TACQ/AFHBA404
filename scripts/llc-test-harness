@@ -4,12 +4,15 @@
 
 # MUST set remote ip-address
 REMIP=${1:-10.12.196.129}
+INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
 
 source afhba-common
 
 remote_cmd() {
 	SITE=$1;shift
+	logger -t rem_cmd $REMIP 422$SITE $*
 	echo $* | nc $REMIP 422$SITE
 }
 
@@ -30,7 +33,18 @@ stop_dma() {
 }
 
 init_706() {
-	remote_cmd 1 trg=1,1,1
+	if [ "$LLC_TRG" = "ext" ]; then
+		remote_cmd 1 trg=1,2,1
+	else
+		remote_cmd 1 trg=1,1,1
+	fi
+	if [ "$LLC_CLK" = "ext" ]; then
+		remote_cmd 1 clk=1,2,1
+		remote_cmd 1 clkdiv=$EXTCLKDIV
+	else
+		remote_cmd 1 clk=0,0,0
+		remote_cmd 1 clkdiv=$INTCLKDIV
+	fi
 	remote_cmd 0 spad=1,7,0	
 	remote_cmd 0 run0 1
 }
