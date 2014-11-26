@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+#include <string.h>
 
 #define HB_FILE "/dev/afhba.0.loc"
 #define HB_LEN	0x1000
@@ -38,6 +39,7 @@ void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int sched_fifo_priority = 1;
+int verbose;
 
 FILE* fp_log;
 
@@ -90,8 +92,16 @@ void ui(int argc, char* argv[])
 	}
 }
 
+typedef union AO420_SAMPLE {
+	short s[4];		/* find the channel data here 	*/
+	unsigned u[4];		/* find the TLATCH at u[2]	*/
+} Sample;
+
+Sample* sample_buf;
+
 void setup()
 {
+	sample_buf = calloc(nsamples, sizeof(Sample));
 	get_mapping();
 	goRealTime();
 	fp_log = fopen("llcontrol.log", "w");
@@ -101,13 +111,32 @@ void setup()
 	}
 }
 
+
+void print_samples()
+{
+	int sample;
+
+	for (sample = 0; sample < nsamples; ++sample){
+		if (verbose){
+			printf("[%8d] %02x %02x %02x %02x %8u\n",
+			sample, 
+			sample_buf[sample].s[0],
+			sample_buf[sample].s[1],
+			sample_buf[sample].s[2],
+			sample_buf[sample].s[3],
+			sample_buf[sample].u[2]);
+		}else{
+			if (sample%10000 == 0){
+				printf("[%8d] %8u\n", 
+					sample, sample_buf[sample].u[2]);
+			}		
+		}
+		
+	}
+}
 void run()
 {
 	unsigned tl0 = TLATCH;
-#if SHOW_SPAD1_SIGNALING 
-	unsigned spad1_0 = SPAD1;
-	unsigned spad1_1;
-#endif
 	unsigned tl1;
 	int sample;
 	int println = 0;
@@ -116,29 +145,13 @@ void run()
 		while((tl1 = TLATCH) == tl0){
 			sched_yield();
 		}
-		if (sample%10000 == 0){
-			if (println == 0){
-				printf("[%10u] ", sample);
-				println = 1;
-			}
-			printf("%10u ", tl1);
-		}
-#if SHOW_SPAD1_SIGNALING 
-		if (spad1_1 != spad1_0){
-			if (println == 0){
-				printf("[%d] ", sample);
-				println = 1;
-			}
-			printf("\t%u => %u ", sample, spad1_0, spad1_1);
-			spad1_0 = spad1_1;
-		}
-#endif
-		if (println){
-			printf("\n");
-			println = 0;
-		}
-		fwrite(host_buffer, sizeof(short), 8, fp_log);
+		/* minimum "control algorithm : copy to buffer */
+		memcpy(sample_buf+sample, host_buffer, sizeof(Sample));
 	}
+
+	/* save ALL IO until after the RT loop */
+	print_samples(sample_buf, nsamples);
+	fwrite(sample_buf, sizeof(Sample), nsamples, fp_log);
 }
 
 close() {

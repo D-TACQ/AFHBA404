@@ -41,9 +41,11 @@ init_706() {
 	if [ "$LLC_CLK" = "ext" ]; then
 		remote_cmd 1 clk=1,2,1
 		remote_cmd 1 clkdiv=$EXTCLKDIV
+		echo setting external clock / $EXTCLKDIV
 	else
 		remote_cmd 1 clk=0,0,0
 		remote_cmd 1 clkdiv=$INTCLKDIV
+		echo setting external clock / $INTCLKDIV
 	fi
 	remote_cmd 0 spad=1,7,0	
 	remote_cmd 0 run0 1
