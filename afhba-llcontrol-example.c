@@ -45,8 +45,8 @@ FILE* fp_log;
 #define CH02 (((volatile short*)host_buffer)[1])
 #define CH03 (((volatile short*)host_buffer)[2])
 #define CH04 (((volatile short*)host_buffer)[3])
-#define TLATCH (((volatile unsigned*)host_buffer)[2])	/* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)host_buffer)[3])   /* user signal from ACQ */
+#define TLATCH (((volatile unsigned*)host_buffer)[8])	/* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)host_buffer)[9])   /* user signal from ACQ */
 
 void get_mapping() {
 	fd = open(HB_FILE, O_RDWR);
@@ -128,7 +128,7 @@ void run()
 			printf("\n");
 			println = 0;
 		}
-		fwrite(host_buffer, sizeof(short), 8, fp_log);
+		fwrite(host_buffer, sizeof(short), 16+16, fp_log);
 	}
 }
 
