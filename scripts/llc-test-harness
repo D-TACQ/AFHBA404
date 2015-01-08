@@ -3,7 +3,7 @@
 #!/bin/bash
 
 # MUST set remote ip-address
-REMIP=${1:-10.12.196.129}
+REMIP=${1:-acq2106_001}
 INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
 EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0

@@ -3,6 +3,9 @@
 
 source afhba-common
 
+# reset the link
+set_sys LOC/0x0080 0x80008000
+set_sys LOC/0x0080 0x80000000
 
 walking_bit_test() 
 {

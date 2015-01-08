@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sched.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -38,20 +39,34 @@ void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int sched_fifo_priority = 1;
-
+int verbose;
 FILE* fp_log;
+void (*G_action)(void*);
 
+/* ACQ425 */
+
+#define NCHAN	16
+#define NSHORTS	32
+#define VI_LEN 	(NSHORTS*sizeof(short))
+#define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
+
+#if 0
+#warning MONITOR host_buffer
+#define CH01 (((volatile short*)host_buffer)[0])
 #define CH01 (((volatile short*)host_buffer)[0])
 #define CH02 (((volatile short*)host_buffer)[1])
 #define CH03 (((volatile short*)host_buffer)[2])
 #define CH04 (((volatile short*)host_buffer)[3])
-#define TLATCH (((volatile unsigned*)host_buffer)[8])	/* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)host_buffer)[9])   /* user signal from ACQ */
+#define TLATCH (((volatile unsigned*)host_buffer)[SPIX])	/* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)host_buffer)[SPIX+1])   /* user signal from ACQ */
+#else
+#define CH02 (((volatile short*)local_buffer)[1])
+#define CH03 (((volatile short*)local_buffer)[2])
+#define CH04 (((volatile short*)local_buffer)[3])
+#define TLATCH (((volatile unsigned*)local_buffer)[SPIX])	/* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)local_buffer)[SPIX+1])   /* user signal from ACQ */
+#endif
 
-/* SPAD SIGNALING is a feature where the ACQ can embed data for the HOST
- * This feature is currently unused and so should be disabled
- */
-#define SHOW_SPAD1_SIGNALING	0
 
 void get_mapping() {
 	fd = open(HB_FILE, O_RDWR);
@@ -80,13 +95,39 @@ void goRealTime(void)
 	}
 }
 
+void write_action(void *data)
+{
+	fwrite(data, sizeof(short), NSHORTS, fp_log);
+}
+
+void check_tlatch_action(void *local_buffer)
+{
+	static unsigned tl0;
+
+	unsigned tl1 = TLATCH;
+	if (tl1 != tl0+1){
+		printf("%d => %d\n", tl0, tl1);
+	}
+	tl0 = tl1;
+}
+
+
 void ui(int argc, char* argv[])
 {
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
+	if (getenv("VERBOSE")){
+		verbose = atoi(getenv("VERBOSE"));
+	}
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+	}
+	G_action = write_action;
+	if (getenv("ACTION")){
+		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
+			G_action = check_tlatch_action;
+		}
 	}
 }
 
@@ -101,43 +142,47 @@ void setup()
 	}
 }
 
-void run()
+void run(void (*action)(void*))
 {
-	unsigned tl0 = TLATCH;
-#if SHOW_SPAD1_SIGNALING 
+	short* local_buffer = calloc(NSHORTS, sizeof(short));
+	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned spad1_0 = SPAD1;
 	unsigned spad1_1;
-#endif
 	unsigned tl1;
 	int sample;
 	int println = 0;
 
-	for (sample = 0; sample < nsamples; ++sample, tl0 = tl1){
+	mlockall(MCL_CURRENT);
+	memset(host_buffer, 0, VI_LEN);
+
+	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
+		memcpy(local_buffer, host_buffer, VI_LEN);
 		while((tl1 = TLATCH) == tl0){
 			sched_yield();
+			memcpy(local_buffer, host_buffer, VI_LEN);
 		}
-		if (sample%10000 == 0){
-			if (println == 0){
-				printf("[%10u] ", sample);
-				println = 1;
+		if (verbose){
+			if (sample%10000 == 0){
+				if (println == 0){
+					printf("[%10u] ", sample);
+					println = 1;
+				}
+				printf("%10u ", tl1);
 			}
-			printf("%10u ", tl1);
-		}
-#if SHOW_SPAD1_SIGNALING 
-		if (spad1_1 != spad1_0){
-			if (println == 0){
-				printf("[%d] ", sample);
-				println = 1;
+			if (spad1_1 != spad1_0){
+				if (println == 0){
+					printf("[%d] ", sample);
+					println = 1;
+				}
+				printf("\t%u => %u ", sample, spad1_0, spad1_1);
+				spad1_0 = spad1_1;
 			}
-			printf("\t%u => %u ", sample, spad1_0, spad1_1);
-			spad1_0 = spad1_1;
+			if (println){
+				printf("\n");
+				println = 0;
+			}
 		}
-#endif
-		if (println){
-			printf("\n");
-			println = 0;
-		}
-		fwrite(host_buffer, sizeof(short), 16+16, fp_log);
+		action(local_buffer);
 	}
 }
 
@@ -151,6 +196,6 @@ int main(int argc, char* argv[])
 	ui(argc, argv);
 	setup();
 	printf("ready for data\n");
-	run();
+	run(G_action);
 	printf("finished\n");
 }

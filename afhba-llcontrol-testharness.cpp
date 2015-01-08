@@ -42,7 +42,7 @@ int nsamples = 10000000;		/* 10s at 1MSPS */
 int sched_fifo_priority = 1;
 int verbose;
 FILE* fp_log;
-char* action_name = "WriteAction";
+const char* action_name = "WriteAction";
 
 /* ACQ425 */
 
@@ -105,17 +105,6 @@ void goRealTime(void)
 void write_action(void *data)
 {
 	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-
-	unsigned tl1 = TLATCH;
-	if (tl1 != tl0+1){
-		printf("%d => %d\n", tl0, tl1);
-	}
-	tl0 = tl1;
 }
 
 
@@ -202,10 +191,32 @@ public:
         virtual ~WriteAction() {}
 };
 
+
 class CheckTlatchAction: public Action {
+	unsigned tl0;
+	int tstep;
+	int nsamples;
+	int nerrors;
 public:
-        virtual void onSample(void* sample) {};
-        virtual ~CheckTlatchAction() {}
+	CheckTlatchAction() : tl0(0), tstep(1), nsamples(0), nerrors(0)
+	{
+		if (getenv("TSTEP")){
+			tstep = atoi(getenv("TSTEP"));
+			printf("tstep set %d\n", tstep);
+		}
+	}
+        virtual void onSample(void* local_buffer) {
+		unsigned tl1 = TLATCH;
+		if (tl1 != tl0+tstep){
+			if (verbose && (verbose>1 || nerrors<5)) printf("%d => %d\n", tl0, tl1);
+			++nerrors;
+		}
+		tl0 = tl1;
+		++nsamples;
+	}
+        virtual ~CheckTlatchAction() {
+		printf("CheckTlatchAction: %d errors found in %d samples\n", nerrors, nsamples);
+	}
 };
 
 class NullAction: public Action {
