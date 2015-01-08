@@ -160,19 +160,7 @@ void run(Action* action)
 					printf("[%10u] ", sample);
 					println = 1;
 				}
-				printf("%10u ", tl1);
-			}
-			if (spad1_1 != spad1_0){
-				if (println == 0){
-					printf("[%d] ", sample);
-					println = 1;
-				}
-				printf("\t%u => %u ", sample, spad1_0, spad1_1);
-				spad1_0 = spad1_1;
-			}
-			if (println){
-				printf("\n");
-				println = 0;
+				printf("%10u\n", tl1);
 			}
 		}
 		action->onSample(local_buffer);
