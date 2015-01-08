@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #define HB_FILE "/dev/afhba.0.loc"
 #define HB_LEN	0x1000
@@ -41,7 +42,7 @@ int nsamples = 10000000;		/* 10s at 1MSPS */
 int sched_fifo_priority = 1;
 int verbose;
 FILE* fp_log;
-void (*G_action)(void*);
+const char* action_name = "WriteAction";
 
 /* ACQ425 */
 
@@ -67,6 +68,12 @@ void (*G_action)(void*);
 #define SPAD1	(((volatile unsigned*)local_buffer)[SPIX+1])   /* user signal from ACQ */
 #endif
 
+class Action {
+public:
+	Action() {}
+	virtual void onSample(void* sample) = 0;
+	virtual ~Action() {}
+};
 
 void get_mapping() {
 	fd = open(HB_FILE, O_RDWR);
@@ -100,17 +107,6 @@ void write_action(void *data)
 	fwrite(data, sizeof(short), NSHORTS, fp_log);
 }
 
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-
-	unsigned tl1 = TLATCH;
-	if (tl1 != tl0+1){
-		printf("%d => %d\n", tl0, tl1);
-	}
-	tl0 = tl1;
-}
-
 
 void ui(int argc, char* argv[])
 {
@@ -123,11 +119,8 @@ void ui(int argc, char* argv[])
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
 	}
-	G_action = write_action;
 	if (getenv("ACTION")){
-		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
-			G_action = check_tlatch_action;
-		}
+		action_name = getenv("ACTION");
 	}
 }
 
@@ -142,9 +135,9 @@ void setup()
 	}
 }
 
-void run(void (*action)(void*))
+void run(Action* action)
 {
-	short* local_buffer = calloc(NSHORTS, sizeof(short));
+	short* local_buffer = new short[NSHORTS];
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned spad1_0 = SPAD1;
 	unsigned spad1_1;
@@ -182,20 +175,78 @@ void run(void (*action)(void*))
 				println = 0;
 			}
 		}
-		action(local_buffer);
+		action->onSample(local_buffer);
 	}
 }
 
-close() {
+void closedown() {
 	munmap(host_buffer, HB_LEN);
 	close(fd);
 	fclose(fp_log);
 }
+
+class WriteAction: public Action {
+public:
+        virtual void onSample(void* sample) {};
+        virtual ~WriteAction() {}
+};
+
+
+class CheckTlatchAction: public Action {
+	unsigned tl0;
+	int tstep;
+	int nsamples;
+	int nerrors;
+public:
+	CheckTlatchAction() : tl0(0), tstep(1), nsamples(0), nerrors(0)
+	{
+		if (getenv("TSTEP")){
+			tstep = atoi(getenv("TSTEP"));
+			printf("tstep set %d\n", tstep);
+		}
+	}
+        virtual void onSample(void* local_buffer) {
+		unsigned tl1 = TLATCH;
+		if (tl1 != tl0+tstep){
+			if (verbose && (verbose>1 || nerrors<5)) printf("%d => %d\n", tl0, tl1);
+			++nerrors;
+		}
+		tl0 = tl1;
+		++nsamples;
+	}
+        virtual ~CheckTlatchAction() {
+		printf("CheckTlatchAction: %d errors found in %d samples\n", nerrors, nsamples);
+	}
+};
+
+class NullAction: public Action {
+	int nsamples;
+public:
+	NullAction() : nsamples(0) {}
+        virtual void onSample(void* sample) {
+
+	};
+        virtual ~NullAction() {
+		printf("NullAction: nsamples:%d\n", nsamples);
+	}
+};
+
 int main(int argc, char* argv[])
 {
 	ui(argc, argv);
+
+	Action *action;
+	if (strcmp(action_name, "WriteAction") == 0){
+		action = new WriteAction;
+	}else if (strcmp(action_name, "CheckTlatchAction") == 0){
+		action = new CheckTlatchAction;
+	}else{
+		action = new NullAction;
+	}
 	setup();
 	printf("ready for data\n");
-	run(G_action);
+	run(action);
 	printf("finished\n");
+	delete action;
+	closedown();
 }

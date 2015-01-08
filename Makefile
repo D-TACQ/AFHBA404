@@ -31,7 +31,7 @@ modules:
 	make -C $(KHEADERS) M=$(SRC)  modules
 
 
-APPS := mmap afhba-llcontrol-example
+APPS := mmap afhba-llcontrol-example afhba-llcontrol-testharness
 apps: $(APPS)
 
 mmap:
@@ -39,6 +39,9 @@ mmap:
 	
 afhba-llcontrol-example: afhba-llcontrol-example.c
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
+
+afhba-llcontrol-testharness: afhba-llcontrol-testharness.cpp
+	$(CXX) -o afhba-llcontrol-testharness afhba-llcontrol-testharness.cpp -lpopt	
 
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS)
