@@ -163,7 +163,7 @@ void run(Action* action)
 				printf("%10u\n", tl1);
 			}
 		}
-		action->onSample(local_buffer);
+		if (sample) action->onSample(local_buffer);
 	}
 }
 
