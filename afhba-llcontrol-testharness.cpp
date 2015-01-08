@@ -223,14 +223,14 @@ public:
 		buffer = new char[::nsamples*VI_LEN];
 	}
         virtual void onSample(void* sample) {
-        	memcpy(buffer+cursor*VI_LEN, sample, VI_LEN);
+        	memcpy(buffer+cursor, sample, VI_LEN);
         	cursor += VI_LEN;
         }
         virtual ~WriteAction() {
         	Action* checkAction = new CheckTlatchAction;
         	for (int ic2 = 0; ic2 < cursor; ic2 += VI_LEN){
-        		checkAction->onSample(buffer+ic2*VI_LEN);
-        		fwrite(buffer+ic2*VI_LEN, 1, VI_LEN, fp_log);
+        		checkAction->onSample(buffer+ic2);
+        		fwrite(buffer+ic2, 1, VI_LEN, fp_log);
         	}
         	printf("wrote %d bytes\n", ::nsamples*VI_LEN);
         }
