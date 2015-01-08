@@ -48,6 +48,11 @@ FILE* fp_log;
 #define TLATCH (((volatile unsigned*)host_buffer)[8])	/* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)host_buffer)[9])   /* user signal from ACQ */
 
+/* SPAD SIGNALING is a feature where the ACQ can embed data for the HOST
+ * This feature is currently unused and so should be disabled
+ */
+#define SHOW_SPAD1_SIGNALING	0
+
 void get_mapping() {
 	fd = open(HB_FILE, O_RDWR);
 	if (fd < 0){
@@ -99,8 +104,10 @@ void setup()
 void run()
 {
 	unsigned tl0 = TLATCH;
+#if SHOW_SPAD1_SIGNALING 
 	unsigned spad1_0 = SPAD1;
 	unsigned spad1_1;
+#endif
 	unsigned tl1;
 	int sample;
 	int println = 0;
@@ -116,6 +123,7 @@ void run()
 			}
 			printf("%10u ", tl1);
 		}
+#if SHOW_SPAD1_SIGNALING 
 		if (spad1_1 != spad1_0){
 			if (println == 0){
 				printf("[%d] ", sample);
@@ -124,6 +132,7 @@ void run()
 			printf("\t%u => %u ", sample, spad1_0, spad1_1);
 			spad1_0 = spad1_1;
 		}
+#endif
 		if (println){
 			printf("\n");
 			println = 0;
