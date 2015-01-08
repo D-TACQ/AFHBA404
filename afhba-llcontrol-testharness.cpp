@@ -202,7 +202,7 @@ public:
 		unsigned tl1 = TLATCH;
 		if (tl1 != tl0+tstep){
 			if (verbose && (verbose>1 || nerrors<5 || nerrors%1000 == 0)){
-				printf("%10d/%10d : %d => %d\n", nsamples, nerrors, tl0, tl1);
+				printf("%10d/%-10d : %d => %d\n", nerrors, nsamples, tl0, tl1);
 			}
 			++nerrors;
 		}
@@ -227,11 +227,12 @@ public:
         	cursor += VI_LEN;
         }
         virtual ~WriteAction() {
-        	Action* checkAction = new CheckTlatchAction;
+        	Action * checkAction = new CheckTlatchAction;
         	for (int ic2 = 0; ic2 < cursor; ic2 += VI_LEN){
         		checkAction->onSample(buffer+ic2);
         		fwrite(buffer+ic2, 1, VI_LEN, fp_log);
         	}
+        	delete checkAction;
         	printf("wrote %d bytes\n", ::nsamples*VI_LEN);
         }
 };
