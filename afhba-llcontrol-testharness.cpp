@@ -185,13 +185,6 @@ void closedown() {
 	fclose(fp_log);
 }
 
-class WriteAction: public Action {
-public:
-        virtual void onSample(void* sample) {};
-        virtual ~WriteAction() {}
-};
-
-
 class CheckTlatchAction: public Action {
 	unsigned tl0;
 	int tstep;
@@ -208,7 +201,9 @@ public:
         virtual void onSample(void* local_buffer) {
 		unsigned tl1 = TLATCH;
 		if (tl1 != tl0+tstep){
-			if (verbose && (verbose>1 || nerrors<5)) printf("%d => %d\n", tl0, tl1);
+			if (verbose && (verbose>1 || nerrors<5 || nerrors%1000 == 0)){
+				printf("%10d/%10d : %d => %d\n", nsamples, nerrors, tl0, tl1);
+			}
 			++nerrors;
 		}
 		tl0 = tl1;
@@ -218,6 +213,30 @@ public:
 		printf("CheckTlatchAction: %d errors found in %d samples\n", nerrors, nsamples);
 	}
 };
+
+
+class WriteAction: public Action {
+	char* buffer;
+	int cursor;
+public:
+	WriteAction(): cursor(0) {
+		buffer = new char[::nsamples*VI_LEN];
+	}
+        virtual void onSample(void* sample) {
+        	memcpy(buffer+cursor*VI_LEN, sample, VI_LEN);
+        	cursor += VI_LEN;
+        }
+        virtual ~WriteAction() {
+        	Action* checkAction = new CheckTlatchAction;
+        	for (int ic2 = 0; ic2 < cursor; ic2 += VI_LEN){
+        		checkAction->onSample(buffer+ic2*VI_LEN);
+        		fwrite(buffer+ic2*VI_LEN, 1, VI_LEN, fp_log);
+        	}
+        	printf("wrote %d bytes\n", ::nsamples*VI_LEN);
+        }
+};
+
+
 
 class NullAction: public Action {
 	int nsamples;
