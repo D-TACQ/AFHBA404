@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1003";
+char afhba__driver_version[] = "B1011";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -55,7 +55,9 @@ module_param(afhba_debug, int, 0644);
 #define PCI_DEVICE_ID_DTACQ_PCIE  0xadc1
 
 #define PCI_SUBVID_DTACQ	0xd1ac
-#define PCI_SUBDID_FHBA_4G	0x4101
+#define PCI_SUBDID_FHBA_2G	0x4100
+#define PCI_SUBDID_FHBA_4G_OLD	0x4101
+#define PCI_SUBDID_FHBA_4G	0x4102
 
 #define REGS_BAR	0
 #define REMOTE_BAR	1
@@ -331,7 +333,16 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	static int idx;
 	static u64 dma_mask = DMA_BIT_MASK(32);
 
-
+	printk("AFHBA: subdevice : %04x\n", ent->subdevice);
+	if (ent->subdevice == PCI_SUBDID_FHBA_2G){
+		err("AFHBA 2G FIRMWARE detected %04x", ent->subdevice);
+		printk("AFHBA 2G FIRMWARE detected %04x\n", ent->subdevice);
+		return -1;
+	}else if (ent->subdevice == PCI_SUBDID_FHBA_4G_OLD){
+		err("AFHBA 4G OBSOLETE FIRMWARE detected %04x", ent->subdevice);
+		printk("AFHBA 4G OBSOLETE FIRMWARE detected %04x\n", ent->subdevice);
+		return -1;
+	}
 	tdev->pci_dev = dev;
 	tdev->idx = idx++;
 	dev->dev.dma_mask = &dma_mask;
@@ -384,7 +395,9 @@ void afhba_remove (struct pci_dev *dev)
  */
 static struct pci_device_id afhba_pci_tbl[] = {
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_XILINX_PCIE,
-		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G, 0 },
+		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_2G, 0 },
+	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_XILINX_PCIE,
+		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G_OLD, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
 		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G, 0 },
         { }

@@ -23,9 +23,9 @@ loc_regs_test() {
 	walking_bit_test LOC/0x0018
 }
 rem_regs_test() {
-	set_sys REM/0x0104 0x12345678
-	get_sys REM/0x0104
-	walking_bit_test REM/0x0104
+	set_sys REM/0x1004 0x12345678
+	get_sys REM/0x1004
+	walking_bit_test REM/0x1004
 }
 
 link_is_up() {
@@ -43,14 +43,14 @@ enable_aurora() {
 	set_sys LOC/0x0080 0x80000000
 	wait_link_up
 	# next : why?
-	set_sys REM/0x0104 0x12345678
+	set_sys REM/0x1004 0x12345678
 	# set completer ID	
 	get_sys LOC/0x0018
-	set_sys REM/0x0118 $(get_sys LOC/0x0018)
-	set_sys REM/0x010c 0x00000004
+	set_sys REM/0x1018 $(get_sys LOC/0x0018)
+	set_sys REM/0x100c 0x00000004
 	# just in case the previous run was not cleanly ended
-	set_sys REM/0x0204 0x00000010
-	set_sys REM/0x0204 0x00000060
+	set_sys REM/0x2004 0x00000010
+	set_sys REM/0x2004 0x00000060
 }
 
 

@@ -19,17 +19,17 @@ remote_cmd() {
 start_dma() { 
 	PA=$(get_sys BUF/pa)
 	echo buffer PA $PA
-	set_sys REM/0x0204 0x60
-	get_sys REM/0x0204
-	set_sys REM/0x0240 $PA
-	get_sys REM/0x0240
-	set_sys REM/0x0204 0x61	 					
+	set_sys REM/0x2004 0x60
+	get_sys REM/0x2004
+	set_sys REM/0x2040 $PA
+	get_sys REM/0x2040
+	set_sys REM/0x2004 0x61	 					
 }
 
 stop_dma() {
-	set_sys REM/0x0204 0x60
-	set_sys REM/0x0204 0x10
-	set_sys REM/0x0204 0x60
+	set_sys REM/0x2004 0x60
+	set_sys REM/0x2004 0x10
+	set_sys REM/0x2004 0x60
 }
 
 init_706() {

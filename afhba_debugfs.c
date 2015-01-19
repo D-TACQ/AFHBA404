@@ -73,10 +73,10 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	}
 	for (rembase = 0; rembase <= 4; ++rembase){
 		for (ireg = 0; ireg <= 32; ++ireg){
-			NUM_REG_CREATE(rem, REM(adev), rembase*0x100+ireg*sizeof(u32));
+			NUM_REG_CREATE(rem, REM(adev), rembase*0x1000+ireg*sizeof(u32));
 		}
 	}
-	NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
+	//NUM_REG_CREATE(rem, REM(adev), 0x100*sizeof(u32));
 
 	buf = debugfs_create_dir("BUF", adev->debug_dir);
 
