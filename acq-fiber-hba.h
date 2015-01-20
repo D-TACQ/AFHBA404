@@ -84,6 +84,7 @@ struct HostBuffer {
 	u32 timestamp;
 };
 
+struct AFHBA_STREAM_DEV;
 
 struct AFHBA_DEV {
 	char name[16];
@@ -108,10 +109,13 @@ struct AFHBA_DEV {
 	struct dentry* debug_dir;
 	char *debug_names;
 
-	int nbuffers;
 	struct HostBuffer *hb;
+
+	struct AFHBA_STREAM_DEV* stream_dev;
 };
 
+extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
+extern int afhba_stream_drv_del(struct AFHBA_DEV* adev);
 
 struct AFHBA_DEV_PATH {
 	int minor;
@@ -129,6 +133,8 @@ struct AFHBA_DEV_PATH {
 
 #define LOC(adev) ((adev)->mappings[0].va)
 #define REM(adev) ((adev)->mappings[1].va)
+
+
 
 #include "afhba_debugfs.h"
 

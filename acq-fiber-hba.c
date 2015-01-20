@@ -49,6 +49,9 @@ const char* afhba_devnames[MAXDEV];
 int afhba_debug = 0;
 module_param(afhba_debug, int, 0644);
 
+int ll_mode_only = 1;
+module_param(ll_mode_only, int, 0444);
+
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
 // D-TACQ changes the device ID to work around unwanted zomojo lspci listing */
@@ -63,7 +66,6 @@ module_param(afhba_debug, int, 0644);
 #define REMOTE_BAR	1
 #define NO_BAR 		-1
 
-int nbuffers = 1;
 int BUFFER_LEN = 0x100000;
 
 static int MAP2BAR(struct AFHBA_DEV *tdev, int imap)
@@ -289,9 +291,9 @@ static void init_buffers(struct AFHBA_DEV* tdev)
 	int ii;
 	int order = getOrder(BUFFER_LEN);
 
-	tdev->hb = kmalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
+	tdev->hb = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
 
-	for (ii = 0; ii < nbuffers; ++ii, ++tdev->nbuffers /*, ++hb @@todo */){
+	for (ii = 0; ii < 1; ++ii){
 		struct HostBuffer* hb = &tdev->hb[ii];
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
@@ -328,7 +330,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		.mmap = afhba_mmap_hb
 	};
 
-	struct AFHBA_DEV *tdev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
+	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
 	int rc;
 	static int idx;
 	static u64 dma_mask = DMA_BIT_MASK(32);
@@ -343,34 +345,37 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		printk("AFHBA 4G OBSOLETE FIRMWARE detected %04x\n", ent->subdevice);
 		return -1;
 	}
-	tdev->pci_dev = dev;
-	tdev->idx = idx++;
+	adev->pci_dev = dev;
+	adev->idx = idx++;
 	dev->dev.dma_mask = &dma_mask;
 
-	sprintf(tdev->name, "afhba.%d", tdev->idx);
-	afhba_devnames[tdev->idx] = tdev->name;
-	sprintf(tdev->mon_name, "afhba-mon.%d", tdev->idx);
+	sprintf(adev->name, "afhba.%d", adev->idx);
+	afhba_devnames[adev->idx] = adev->name;
+	sprintf(adev->mon_name, "afhba-mon.%d", adev->idx);
 
 
-	rc = register_chrdev(0, tdev->name, &afhba_fops);
+	rc = register_chrdev(0, adev->name, &afhba_fops);
 	if (rc < 0){
 		err("can't get major");
-		kfree(tdev);
+		kfree(adev);
 		return rc;
 	}else{
-		tdev->major = rc;
+		adev->major = rc;
 	}
-	afhba_map(tdev);
-	init_buffers(tdev);
-	afhba_registerDevice(tdev);
-	afhba_createDebugfs(tdev);
+	afhba_map(adev);
+	init_buffers(adev);
+	afhba_registerDevice(adev);
+	afhba_createDebugfs(adev);
 
-	tdev->class_dev = CLASS_DEVICE_CREATE(
+	if (!ll_mode_only){
+		afhba_stream_drv_init(adev);
+	}
+	adev->class_dev = CLASS_DEVICE_CREATE(
 			afhba_device_class,			/* cls */
 			NULL,					/* cls_parent */
-			tdev->idx,				/* "devt" */
-			&tdev->pci_dev->dev,			/* device */
-			tdev->name);
+			adev->idx,				/* "devt" */
+			&adev->pci_dev->dev,			/* device */
+			adev->name);
 
 	rc = pci_enable_device(dev);
 	dbg(1, "pci_enable_device returns %d", rc);

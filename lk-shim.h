@@ -33,7 +33,7 @@ use KERNEL_VERSION(a,b,c) to select on different kernels
 
 #elif LINUX_VERSION_CODE > KERNEL_VERSION(2,6,30)
 #ifdef EXPORT_SYMTAB		/* main module */
-#pragma message "Kernel > 2.6.30 .. building current version"
+//#pragma message "Kernel > 2.6.30 .. building current version"
 #endif
 
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2,6,18)
