@@ -38,7 +38,7 @@ mmap:
 	cc -o mmap mmap.c -lpopt
 	
 clean:
-	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS)
+	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
 package: clean
