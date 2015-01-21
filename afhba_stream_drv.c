@@ -165,11 +165,11 @@ static int _afs_dma_started(struct AFHBA_DEV *adev, int shl)
 }
 
 
-static int afs_push_dma_started(struct AFHBA_DEV *adev)
+static inline int afs_push_dma_started(struct AFHBA_DEV *adev)
 {
 	return _afs_dma_started(adev, DMA_CTRL_PUSH_SHL);
 }
-static int afs_pull_dma_started(struct AFHBA_DEV *adev)
+static inline int afs_pull_dma_started(struct AFHBA_DEV *adev)
 {
 	return _afs_dma_started(adev, DMA_CTRL_PULL_SHL);
 }
