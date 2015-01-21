@@ -8,6 +8,17 @@
 #ifndef AFHBA_STREAM_DRV_H_
 #define AFHBA_STREAM_DRV_H_
 
+
+/* idea by John: make it a multiple of 3 to handle 96ch align case */
+#define NBUFFERS	66
+
+#define NBUFFERS_FIFO	NBUFFERS
+
+#define NBUFFERS_MASK	127
+
+#define BUFFER_LEN	0x100000
+
+
 #define NSTATES		4
 #define N_DRV_STATES	3
 
@@ -29,6 +40,17 @@
 	(((pa)&AFDMAC_DESC_ADDR_MASK)|	\
 	((((pages)-1) << AFDMAC_DESC_LEN_SHL)&AFDMAC_DESC_LEN_MASK)| \
 	(id))
+
+/* we wanted an elegant multi-vector solution, but we can only have one int */
+#define MSI_DMA		0
+#ifdef MSI_BLOCK_WORKS
+#define MSI_UART	1
+#else
+#define MSI_UART	0
+#endif
+
+enum { PS_OFF, PS_PLEASE_STOP, PS_STOP_DONE };
+
 
 
 struct AFHBA_STREAM_DEV {
@@ -82,6 +104,47 @@ struct AFHBA_STREAM_DEV {
 
 	wait_queue_head_t return_waitq;
 
+	u32 dma_regs[DMA_REGS_COUNT];
+
+	unsigned pid;		/* pid of dma_read process */
+	int req_len;		/* request len .. not part of job ? */
+	void (* onStop)(struct AFHBA_DEV *adev);
 };
+#define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
+
+void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value);
+u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
+
+#define DMA_CTRL_WR(adev, value) \
+	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) = value)
+
+#define DMA_CTRL_CLR(adev, bits) \
+	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) &= ~(bits))
+
+#define DMA_CTRL_SET(adev, bits) \
+	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) |= (bits))
+
+#define DMA_CTRL_RD(adev) MIRROR(adev, DMA_CTRL)
+
+
+#define DMA_TEST_WR(adev, value) \
+	_afs_write_dmareg(adev, DMA_TEST, MIRROR(adev, DMA_CTRL)), value)
+
+#define DMA_TEST_RD(adev) \
+	_afs_read_reg(adev, DMA_TEST)
+
+#define DMA_DATA_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DATA_FIFSTA)
+#define DMA_DESC_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DESC_FIFSTA)
+#define DMA_PUSH_DESC_STA_RD(adev) _afs_read_dmareg(adev, DMA_PUSH_DESC_STA)
+#define DMA_PULL_DESC_STA_RD(adev) _afs_read_dmareg(adev, DMA_PULL_DESC_STA)
+
+
+#define EMPTY1	0xee11ee11
+#define EMPTY2  0x22ee22ee
+
+#define RTDMAC_DATA_FIFO_CNT	0x1000
+#define RTDMAC_DESC_FIFO_CNT	0x1000
+
+#define HB_ENTRY(plist)	list_entry(plist, struct HostBuffer, list)
 
 #endif /* AFHBA_STREAM_DRV_H_ */

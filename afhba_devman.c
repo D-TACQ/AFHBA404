@@ -35,7 +35,8 @@ int initProcFs(struct AFHBA_DEV *tdev)
 
 	if (!afhba_proc_root){
 		afhba_proc_root = proc_mkdir("driver/afhba", NULL);
-		assert(afhba_proc_root);
+		WARN_ON(afhba_proc_root);
+		return -1;
 	}
 
 	tdev->proc_dir_root = proc_mkdir(tdev->name, afhba_proc_root);
@@ -47,17 +48,17 @@ int initProcFs(struct AFHBA_DEV *tdev)
 	return rc;
 }
 
-int afhba_registerDevice(struct AFHBA_DEV *tdev)
+int afhba_registerDevice(struct AFHBA_DEV *adev)
 {
-	dbg(2, "name %s", tdev->name);
-	list_add_tail(&tdev->list, &devices);
-	return initProcFs(tdev);
+	dev_dbg(pdev(adev), "name %s", adev->name);
+	list_add_tail(&adev->list, &devices);
+	return initProcFs(adev);
 }
 
-void afhba_deleteDevice(struct AFHBA_DEV *tdev)
+void afhba_deleteDevice(struct AFHBA_DEV *adev)
 {
-	list_del(&tdev->list);
-	kfree(tdev);
+	list_del(&adev->list);
+	kfree(adev);
 }
 struct AFHBA_DEV* afhba_lookupDevice(int major)
 {
@@ -72,7 +73,7 @@ struct AFHBA_DEV* afhba_lookupDevice(int major)
 	return 0;
 }
 
-struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev)
+struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct device *dev)
 {
 	struct AFHBA_DEV *pos;
 

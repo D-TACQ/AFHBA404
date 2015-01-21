@@ -44,21 +44,33 @@
 #include <asm/uaccess.h>  /* VERIFY_READ|WRITE */
 
 
-#define MINOR_REGREAD	253
-#define MINOR_REMOTE	247
+#ifdef CONFIG_KERNEL_ASSERTS
+/* kgdb stuff */
+#define assert(p) KERNEL_ASSERT(#p, p)
+#else
+#define assert(p) do {	\
+	if (!(p)) {	\
+		printk(KERN_CRIT "BUG at %s:%d assert(%s)\n",	\
+		       __FILE__, __LINE__, #p);			\
+		BUG();	\
+	}		\
+} while (0)
+#endif
+
 
 #define MAXDEV	8	/* maximum expected devices .. */
 
-#define acq200_debug afhba_debug
-#include "acq200_debug.h"
-#include "lk-shim.h"
 
 struct AFHBA_DEV;
 
 
+#include "afhba_minor.h"
+#include "afhba_debugfs.h"
+#include "rtm-t_ioctl.h"		/* retain previous API */
+
+#define REGS_BAR	0		/* @@todo assumed */
 
 #define MAP_COUNT	2
-
 
 
 extern struct list_head devices;
@@ -66,9 +78,10 @@ extern struct list_head devices;
 int afhba_registerDevice(struct AFHBA_DEV *tdev);
 void afhba_deleteDevice(struct AFHBA_DEV *tdev);
 struct AFHBA_DEV* afhba_lookupDevice(int major);
-struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct CLASS_DEVICE *dev);
+struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct device *dev);
 struct AFHBA_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev);
 struct AFHBA_DEV* afhba_lookupDev(struct device *dev);
+int afhba_release(struct inode *inode, struct file *file);
 
 struct HostBuffer {
 	int ibuf;
@@ -91,7 +104,7 @@ struct AFHBA_DEV {
 	char mon_name[16];
 	char slot_name[16];
 	struct pci_dev *pci_dev;
-	struct CLASS_DEVICE *class_dev;
+	struct device *class_dev;
 	int idx;
 	int major;
 	struct list_head list;
@@ -112,10 +125,13 @@ struct AFHBA_DEV {
 	struct HostBuffer *hb;
 
 	struct AFHBA_STREAM_DEV* stream_dev;
+	struct file_operations* stream_fops;
 };
 
 extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
 extern int afhba_stream_drv_del(struct AFHBA_DEV* adev);
+extern void afhba_create_sysfs_class(struct AFHBA_DEV *adev);
+void afhba_remove_sysfs_class(struct AFHBA_DEV *adev);
 
 struct AFHBA_DEV_PATH {
 	int minor;
@@ -136,7 +152,6 @@ struct AFHBA_DEV_PATH {
 
 
 
-#include "afhba_debugfs.h"
 
 /* REGS */
 #define FPGA_REVISION_REG		0x0000	/* FPGA Revision Register */
@@ -156,6 +171,40 @@ struct AFHBA_DEV_PATH {
 #define HOST_COMMS_FIFO_CONTROL_REG 	0x00C0	/* ACQ400 Receive Communications FIFO Control Register */
 #define HOST_COMMS_FIFO_STATUS_REG 	0x00C4	/* ACQ400 Receive Communications FIFO Status Register */
 #define ACQ400_COMMS_READ 		0x0400	/* ACQ400 Receive Communications FIFO data */
+
+
+#define DMA_BASE			0x2000
+enum DMA_REGS {
+	DMA_TEST,
+	DMA_CTRL,
+	DMA_DATA_FIFSTA,
+	DMA_DESC_FIFSTA,
+	DMA_PUSH_DESC_STA,
+	DMA_PULL_DESC_STA,
+	DMA_REGS_COUNT,
+};
+
+
+
+#define DMA_PUSH_DESC_FIFO		0x2040
+#define DMA_PULL_DESC_FIFO		0x2080
+
+
+
+#define DMA_CTRL_PULL_SHL		16
+#define DMA_CTRL_PUSH_SHL		0
+
+#define DMA_CTRL_EN			0x0001
+#define DMA_CTRL_FIFO_RST		0x0010
+#define DMA_CTRL_LOW_LAT		0x0020
+#define DMA_CTRL_RECYCLE		0x0040
+
+
+#define DMA_DESCR_ADDR			0xfffffc00
+#define DMA_DESCR_INTEN			0x00000100
+#define DMA_DESCR_LEN			0x000000f0
+#define DMA_DESCR_ID			0x0000000f
+
 
 
 #endif /* ACQ_FIBER_HBA_H_ */

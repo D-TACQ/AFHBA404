@@ -30,7 +30,7 @@ struct dentry* afhba_debug_root;
 	sprintf(pcursor, "0x%04lx", reg);				\
 	debugfs_create_x32(pcursor, S_IRUGO|S_IWUGO, dir, va+(reg));    \
 	pcursor += strlen(pcursor) + 1;					\
-	assert(pcursor-pbase < 4096)
+	if (pcursor-pbase >= 4096) { WARN_ON(true); return; }
 
 void afhba_createDebugfs(struct AFHBA_DEV* adev)
 {
@@ -81,7 +81,7 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	buf = debugfs_create_dir("BUF", adev->debug_dir);
 
 	if (adev->hb == 0){
-		err("bad hb"); return;
+		dev_err(pdev(adev), "bad hb"); return;
 	}
 
 	debugfs_create_x64("va", S_IRUGO, buf, (u64*)&(adev->hb[0].va));
