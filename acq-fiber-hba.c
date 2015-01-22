@@ -295,39 +295,33 @@ static int getOrder(int len)
 
 static void init_buffers(struct AFHBA_DEV* adev)
 {
-	int ii;
 	int order = getOrder(BUFFER_LEN);
+	int ii = 0;
+	struct HostBuffer* hb = adev->hb1 = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
+	void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
-	adev->hb1 = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
-
-	for (ii = 0; ii < 1; ++ii){
-		struct HostBuffer* hb = adev->hb1;
-		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
-
-		if (!buf){
-			dev_err(pdev(adev), "failed to allocate buffer %d", ii);
-			break;
-		}
-
-		dev_dbg(pdev(adev), "buffer %2d allocated at %p, map it", ii, buf);
-
-		hb->ibuf = ii;
-		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				BUFFER_LEN, PCI_DMA_FROMDEVICE);
-		hb->va = buf;
-		hb->len = BUFFER_LEN;
-
-		dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
-
-		hb->bstate = BS_EMPTY;
-
-		dev_info(pdev(adev), "[%d] %p %08x %d %08x", ii, hb->va, hb->pa, hb->len, hb->descr);
-
-		dev_info(pdev(adev), "[%d] %p %08x %d %08x", ii,
-				adev->hb1->va, adev->hb1->pa,
-				adev->hb1->len, adev->hb1->descr);
+	if (!buf){
+		dev_err(pdev(adev), "failed to allocate buffer %d", ii);
+		return;
 	}
+
+	dev_dbg(pdev(adev), "buffer %2d allocated at %p, map it", ii, buf);
+
+	hb->ibuf = 0;
+	hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
+			BUFFER_LEN, PCI_DMA_FROMDEVICE);
+	hb->va = buf;
+	hb->len = BUFFER_LEN;
+
+	dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
+
+	hb->bstate = BS_EMPTY;
+
+	dev_info(pdev(adev), "hb1 [%d] %p %08x %d %08x", ii,
+			adev->hb1->va, adev->hb1->pa,
+			adev->hb1->len, adev->hb1->descr);
 }
+
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	static struct file_operations afhba_fops = {

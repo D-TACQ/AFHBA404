@@ -403,12 +403,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	int order = getOrder(BUFFER_LEN);
 	int ii;
 
-	dev_info(pdev(adev), "afs_init_buffers() 01");
+	dev_dbg(pdev(adev), "afs_init_buffers() 01");
 
 	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*NBUFFERS, GFP_KERNEL);
-
-	dev_info(pdev(adev), "afs_init_buffers() 10");
-
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
 	INIT_LIST_HEAD(&sdev->bp_full.list);
@@ -461,7 +458,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	mutex_unlock(&sdev->list_mutex);
 
 	init_histo_buffers(sdev);
-	dev_info(pdev(adev), "afs_init_buffers() 99");
+	dev_dbg(pdev(adev), "afs_init_buffers() 99");
 	return 0;
 }
 
@@ -1144,10 +1141,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	printk(KERN_DEBUG "sdev set %p\n", adev->stream_dev);
-	dev_info(pdev(adev), "Hello sdev=%p", adev->stream_dev);
 	afs_init_buffers(adev);
-	printk(KERN_DEBUG, "back from afs_init_buffers\n");
 	hook_interrupts(adev);
 	startWork(adev);
 	adev->stream_fops = &afs_fops;
