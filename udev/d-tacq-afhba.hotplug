@@ -1,0 +1,76 @@
+#!/bin/bash
+
+DN=$1
+DEVPATH=/sys/$2
+DEVICE=$DEVPATH/device
+DATADIR=/dev/rtm-t.$DN.data
+
+echo rtm-t-makenodes $1 $2
+
+if [ "$2" = "" ]; then
+	echo USAGES $0 DN PATH
+	exit 1;
+fi
+
+mm=$(cat $DEVPATH/dev)
+MAJOR=${mm%:*}
+
+MINOR_DMAREAD=254
+MINOR_REGREAD=253
+MINOR_DATA_FIFO=252
+MINOR_DESC_FIFO=251
+MINOR_UART=250
+MINOR_PBI=249
+MINOR_FIFO=248
+
+# set user to standard dt100 if available
+# searching passwd only effective on systems using /etc/passwd ..
+grep -q dt100 /etc/passwd || /usr/bin/id dt100 2>/dev/null 1>/dev/null
+if [ $? -eq 0 ]; then
+    DT100_UID=dt100
+    DT100_GRP=dt100
+else
+    DT100_UID=root
+    DT100_GRP=root
+fi
+
+ln -s $DEVICE /dev/rtm-t.$DN.ctrl
+mkdir -p $DATADIR
+
+ACQTYPE=ACQ196
+
+if [ -e /dev/rtm-t.$DN.ctrl/acqtype ]; then
+	if [ "$(cat /dev/rtm-t.$DN.ctrl/acqtype)" = "AO32" ]; then
+		ACQTYPE=AO32
+	fi
+fi
+
+mknod /dev/rtm-t.${DN}			c $MAJOR $MINOR_DMAREAD
+mknod /dev/rtm-t.${DN}.regs		c $MAJOR $MINOR_REGREAD
+mknod /dev/rtm-t.${DN}.fifo_histo.data	c $MAJOR $MINOR_DATA_FIFO
+mknod /dev/rtm-t.${DN}.fifo_histo.desc	c $MAJOR $MINOR_DESC_FIFO
+mknod /dev/rtm-t.${DN}.uart		c $MAJOR $MINOR_UART
+
+if [ "$ACQTYPE" = "AO32" ]; then
+	mknod /dev/rtm-t.${DN}.pbi		c $MAJOR $MINOR_PBI
+fi
+
+mknod /dev/rtm-t.${DN}.fifo		c $MAJOR $MINOR_FIFO
+
+let NBUFFERS=$(cat /sys/module/afhba/parameters/nbuffers)
+
+echo NBUFFERS set $NBUFFERS
+
+let hb=0
+while [ $hb -lt $NBUFFERS ]
+do
+	HBX=$(printf "%02d" ${hb})
+	mknod ${DATADIR}/hb${HBX} c ${MAJOR} $hb
+	let hb=$hb+1
+done
+
+chown -R ${DT100_UID}.${DT100_GID} /dev/rtm-t.${DN}*
+chmod -R ug+rw /dev/rtm-t.${DN}*
+
+
+

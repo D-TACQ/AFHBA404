@@ -1,0 +1,2 @@
+KERNEL=="afhba.?", ACTION=="add", PROGRAM="d-tacq-afhba.hotplug %n %p"
+
