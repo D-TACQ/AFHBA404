@@ -399,9 +399,15 @@ static void init_histo_buffers(struct AFHBA_STREAM_DEV* sdev)
 int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	int ii;
+	struct HostBuffer *hb;
 	int order = getOrder(BUFFER_LEN);
-	struct HostBuffer *hb = sdev->hbx;
+	int ii;
+
+	dev_info(pdev(adev), "afs_init_buffers() 01");
+
+	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*NBUFFERS, GFP_KERNEL);
+
+	dev_info(pdev(adev), "afs_init_buffers() 10");
 
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
@@ -415,7 +421,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			NBUFFERS, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
 
-	for (ii = 0; ii < NBUFFERS; ++ii, ++sdev->nbuffers, ++hb){
+	for (hb = sdev->hbx, ii = 0; ii < NBUFFERS; ++ii, ++sdev->nbuffers, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -446,6 +452,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 		    ii, hb->va, hb->pa, hb->len, hb->descr);
 		list_add_tail(&hb->list, &sdev->bp_empties.list);
 	}
+	sdev->nbuffers = NBUFFERS;
 	sdev->init_descriptors = init_descriptors_ht;
 	sdev->init_descriptors(sdev);
 	init_waitqueue_head(&sdev->work.w_waitq);
@@ -454,6 +461,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	mutex_unlock(&sdev->list_mutex);
 
 	init_histo_buffers(sdev);
+	dev_info(pdev(adev), "afs_init_buffers() 99");
 	return 0;
 }
 
@@ -1134,8 +1142,12 @@ static struct file_operations afs_fops = {
 
 int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
-	adev->stream_dev = kzalloc(GFP_KERNEL, sizeof(struct AFHBA_STREAM_DEV));
+	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
+
+	printk(KERN_DEBUG "sdev set %p\n", adev->stream_dev);
+	dev_info(pdev(adev), "Hello sdev=%p", adev->stream_dev);
 	afs_init_buffers(adev);
+	printk(KERN_DEBUG, "back from afs_init_buffers\n");
 	hook_interrupts(adev);
 	startWork(adev);
 	adev->stream_fops = &afs_fops;

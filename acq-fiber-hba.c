@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1011";
+char afhba__driver_version[] = "B1015";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -427,7 +427,7 @@ int __init afhba_init_module(void)
 {
 	int rc;
 
-	printk(KERN_INFO "%s %s %s %s\n%s",
+	printk(KERN_INFO "%s %s %s %s\n%s\n",
 	     afhba_driver_name, afhba__driver_string,
 	     afhba__driver_version,
 	     __DATE__,
