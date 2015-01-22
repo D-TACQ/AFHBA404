@@ -427,7 +427,7 @@ int __init afhba_init_module(void)
 {
 	int rc;
 
-	dev_info(0, "%s %s %s %s\n%s",
+	printk(KERN_INFO "%s %s %s %s\n%s",
 	     afhba_driver_name, afhba__driver_string,
 	     afhba__driver_version,
 	     __DATE__,
