@@ -107,12 +107,12 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 	int ii;
 
 	for (ii = 0; ii < sdev->nbuffers; ++ii){
-		u32 descr = sdev->hb[ii].descr;
+		u32 descr = sdev->hbx[ii].descr;
 
 		descr &= ~AFDMAC_DESC_LEN_MASK;
 		descr |= getAFDMAC_Order(sdev->buffer_len)<< AFDMAC_DESC_LEN_SHL;
 		descr |= AFDMAC_DESC_EOT;
-		sdev->hb[ii].descr = descr;
+		sdev->hbx[ii].descr = descr;
 	}
 }
 
@@ -151,9 +151,10 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	dev_dbg(pdev(adev), "ibuf %d", idesc);
 /* change descr status .. */
-	write_descr(adev, DMA_PUSH_DESC_FIFO, adev->hb[idesc].descr);
+	write_descr(adev, DMA_PUSH_DESC_FIFO, sdev->hbx[idesc].descr);
 }
 
 
@@ -276,11 +277,12 @@ static void queue_free_buffers(struct AFHBA_DEV *adev)
 
 struct HostBuffer* hb_from_descr(struct AFHBA_DEV *adev, u32 inflight_descr)
 {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int ii;
 
 	for (ii = 0; ii < nbuffers; ++ii){
-		if (adev->hb[ii].descr == inflight_descr){
-			return &adev->hb[ii];
+		if (sdev->hbx[ii].descr == inflight_descr){
+			return &sdev->hbx[ii];
 		}
 	}
 	return 0;
@@ -399,7 +401,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	int ii;
 	int order = getOrder(BUFFER_LEN);
-	struct HostBuffer *hb = sdev->hb;
+	struct HostBuffer *hb = sdev->hbx;
 
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
@@ -703,8 +705,8 @@ int afs_histo_open(struct inode *inode, struct file *file, unsigned *histo)
 int afs_reset_buffers(struct AFHBA_DEV *adev)
 /* handle with care! */
 {
-	struct HostBuffer *hb = adev->hb;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct HostBuffer *hb = sdev->hbx;
 	int ii;
 
 	if (mutex_lock_interruptible(&sdev->list_mutex)){
@@ -754,7 +756,7 @@ int afs_dma_open(struct inode *inode, struct file *file)
 	sdev->req_len = min(sdev->buffer_len, BUFFER_LEN);
 
 	for (ii = 0; ii != nbuffers; ++ii){
-		sdev->hb[ii].req_len = sdev->req_len;
+		sdev->hbx[ii].req_len = sdev->req_len;
 	}
 
 	if ((file->f_flags & O_NONBLOCK) != 0){
@@ -977,9 +979,9 @@ ssize_t afs_dma_write(
 			dev_err(pdev(adev), "ID > NBUFFERS");
 			rc = -101;
 			goto write99;
-		}else if (sdev->hb[id].bstate != BS_FULL_APP){
+		}else if (sdev->hbx[id].bstate != BS_FULL_APP){
 			dev_err(pdev(adev), "STATE != BS_FULL_APP %d",
-					sdev->hb[id].bstate);
+					sdev->hbx[id].bstate);
 			rc = -102;
 			goto write99;
 		}else{
@@ -1058,7 +1060,7 @@ int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 
 	int ibuf = PD(vma->vm_file)->minor&NBUFFERS_MASK;
-	struct HostBuffer *hb = &sdev->hb[ibuf];
+	struct HostBuffer *hb = &sdev->hbx[ibuf];
 	unsigned long vsize = vma->vm_end - vma->vm_start;
 	unsigned long psize = hb->len;
 	unsigned pfn = hb->pa >> PAGE_SHIFT;
@@ -1137,6 +1139,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	hook_interrupts(adev);
 	startWork(adev);
 	adev->stream_fops = &afs_fops;
+	afs_init_procfs(adev);
 	return 0;
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)

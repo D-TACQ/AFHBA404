@@ -122,7 +122,7 @@ struct AFHBA_DEV {
 	struct dentry* debug_dir;
 	char *debug_names;
 
-	struct HostBuffer *hb;
+	struct HostBuffer *hb1;		/* single hb for LLC */
 
 	struct AFHBA_STREAM_DEV* stream_dev;
 	struct file_operations* stream_fops;

@@ -71,7 +71,10 @@ struct AFHBA_STREAM_DEV {
 
 	int nbuffers;
 	int buffer_len;
-	struct HostBuffer *hb;
+	struct HostBuffer *hbx;		/* streaming host buffers [nbuffers] */
+
+
+	struct proc_dir_entry *proc_dir_root;
 
 	struct JOB {
 		unsigned buffers_demand;
@@ -147,4 +150,5 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 
 #define HB_ENTRY(plist)	list_entry(plist, struct HostBuffer, list)
 
+int afs_init_procfs(struct AFHBA_DEV *adev);
 #endif /* AFHBA_STREAM_DRV_H_ */

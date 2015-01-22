@@ -226,7 +226,7 @@ int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
 int afhba_mmap_hb(struct file* file, struct vm_area_struct* vma)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
-	struct HostBuffer* hb = &adev->hb[0];
+	struct HostBuffer* hb = adev->hb1;
 	unsigned long vsize = vma->vm_end - vma->vm_start;
 	unsigned long psize = BUFFER_LEN;
 	unsigned pfn = hb->pa >> PAGE_SHIFT;
@@ -298,10 +298,10 @@ static void init_buffers(struct AFHBA_DEV* adev)
 	int ii;
 	int order = getOrder(BUFFER_LEN);
 
-	adev->hb = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
+	adev->hb1 = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
 
 	for (ii = 0; ii < 1; ++ii){
-		struct HostBuffer* hb = &adev->hb[ii];
+		struct HostBuffer* hb = adev->hb1;
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -323,7 +323,9 @@ static void init_buffers(struct AFHBA_DEV* adev)
 
 		dev_info(pdev(adev), "[%d] %p %08x %d %08x", ii, hb->va, hb->pa, hb->len, hb->descr);
 
-		dev_info(pdev(adev), "[%d] %p %08x %d %08x", ii, adev->hb[0].va, adev->hb[0].pa, adev->hb[0].len, adev->hb[0].descr);
+		dev_info(pdev(adev), "[%d] %p %08x %d %08x", ii,
+				adev->hb1->va, adev->hb1->pa,
+				adev->hb1->len, adev->hb1->descr);
 	}
 }
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)

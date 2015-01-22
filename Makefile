@@ -26,7 +26,8 @@ KRNL ?= $(shell uname -r)
 KHEADERS := /usr/src/kernels/$(KRNL)/
 
 afhba-objs = acq-fiber-hba.o \
-	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o
+	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
+	afs_procfs.o
 
 modules: 
 	make -C $(KHEADERS) M=$(SRC)  modules
