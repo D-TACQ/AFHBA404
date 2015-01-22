@@ -66,7 +66,7 @@ int acq200_debug = 0;
 
 int maxlen = RTM_T_Device::MAXLEN;
 
-#define PARAMETERS		"/sys/module/rtm_t/parameters/"
+#define PARAMETERS		"/sys/module/afhba/parameters/"
 #define BUFFER_LEN 		PARAMETERS "buffer_len"
 #define NBUFFERS		PARAMETERS "nbuffers"
 #define TRANSFER_BUFFERS 	PARAMETERS "transfer_buffers"
