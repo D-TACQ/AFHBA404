@@ -24,6 +24,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /* ------------------------------------------------------------------------- */
 
+#include <linux/seq_file.h>
 #include <linux/proc_fs.h>
 
 #include "acq-fiber-hba.h"
