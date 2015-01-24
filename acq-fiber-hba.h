@@ -126,6 +126,8 @@ struct AFHBA_DEV {
 
 	struct AFHBA_STREAM_DEV* stream_dev;
 	struct file_operations* stream_fops;
+
+	struct platform_device *hba_sfp_i2c[2];
 };
 
 extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
@@ -150,6 +152,9 @@ struct AFHBA_DEV_PATH {
 #define LOC(adev) ((adev)->mappings[0].va)
 #define REM(adev) ((adev)->mappings[1].va)
 
+#define REGS_BAR	0
+#define REMOTE_BAR	1
+#define NO_BAR 		-1
 
 
 
@@ -171,6 +176,27 @@ struct AFHBA_DEV_PATH {
 #define HOST_COMMS_FIFO_CONTROL_REG 	0x00C0	/* ACQ400 Receive Communications FIFO Control Register */
 #define HOST_COMMS_FIFO_STATUS_REG 	0x00C4	/* ACQ400 Receive Communications FIFO Status Register */
 #define ACQ400_COMMS_READ 		0x0400	/* ACQ400 Receive Communications FIFO data */
+
+
+#define RTMT_I2C_W(R)			((R)+8)
+
+
+#define SFP_I2C_SCL1_R		0
+#define SFP_I2C_SDA1_R		1
+#define	SFP_I2C_SCL1_W		8
+#define SFP_I2C_SDA1_W		9
+#define SFP_I2C_SCL2_R		16
+#define SFP_I2C_SDA2_R		17
+#define	SFP_I2C_SCL2_W		24
+#define SFP_I2C_SDA2_W		25
+
+#define AFHBA_SPI_BUSY		(1<<31)
+#define AFHBA_SPI_CTL_START	(1<<7)
+#define AFHBA_SPI_CS		(1<<0)
+#define AFHBA_SPI_HOLD		(1<<1)
+#define AFHBA_SPI_WP		(1<<2)
+
+
 
 
 #define DMA_BASE			0x2000
@@ -205,6 +231,16 @@ enum DMA_REGS {
 #define DMA_DESCR_LEN			0x000000f0
 #define DMA_DESCR_ID			0x0000000f
 
+void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);
+u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff);
+
+
+int i2c_hba_sfp_init(void);
+void i2c_hba_sfp_exit(void);
+
+
+int afhba_sfp_i2c_create(struct AFHBA_DEV *adev);
+int afhba_sfp_i2c_remove(struct AFHBA_DEV *adev);
 
 
 #endif /* ACQ_FIBER_HBA_H_ */

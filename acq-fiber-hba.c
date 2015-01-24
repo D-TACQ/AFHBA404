@@ -62,9 +62,6 @@ module_param(ll_mode_only, int, 0444);
 #define PCI_SUBDID_FHBA_4G_OLD	0x4101
 #define PCI_SUBDID_FHBA_4G	0x4102
 
-#define REGS_BAR	0
-#define REMOTE_BAR	1
-#define NO_BAR 		-1
 
 int BUFFER_LEN = 0x100000;
 
@@ -367,6 +364,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	init_buffers(adev);
 	afhba_registerDevice(adev);
 	afhba_createDebugfs(adev);
+	afhba_sfp_i2c_create(adev);
 
 	if (!ll_mode_only){
 		afhba_stream_drv_init(adev);
@@ -389,6 +387,7 @@ void afhba_remove (struct pci_dev *dev)
 	struct AFHBA_DEV *adev = afhba_lookupDevicePci(dev);
 
 	if (adev){
+		afhba_sfp_i2c_remove(adev);
 		afhba_removeDebugfs(adev);
 		afhba_remove_sysfs_class(adev);
 	}
@@ -429,11 +428,13 @@ int __init afhba_init_module(void)
 
 	afhba_device_class = class_create(THIS_MODULE, "afhba");
 	rc = pci_register_driver(&afhba_driver);
+	i2c_hba_sfp_init();
 	return rc;
 }
 
 void afhba_exit_module(void)
 {
+	i2c_hba_sfp_exit();
 	class_destroy(afhba_device_class);
 	pci_unregister_driver(&afhba_driver);
 }

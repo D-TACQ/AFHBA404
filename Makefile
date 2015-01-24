@@ -1,4 +1,6 @@
-obj-m := afhba.o
+obj-m += afhba.o
+obj-m += spi-bitbang.o
+obj-m += spi.o
 
 SRC := $(shell pwd)
 
@@ -11,6 +13,7 @@ else
 SPI_SUPPORT=
 endif
 
+EXTRA_CFLAGS += -DCONFIG_SPI
 
 # default build is the local kernel.
 # build other kernels like this example:
@@ -27,7 +30,8 @@ KHEADERS := /usr/src/kernels/$(KRNL)/
 
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
-	afs_procfs.o
+	afhba_core.o afhba_i2c_bus.o afhba_spi.o \
+	afs_procfs.o 
 
 modules: 
 	make -C $(KHEADERS) M=$(SRC)  modules

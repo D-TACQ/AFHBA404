@@ -127,14 +127,14 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 static void write_descr(struct AFHBA_DEV *adev, unsigned offset, u32 descr)
 {
 	dev_dbg(pdev(adev), "offset:%04x %p = %08x", offset,
-			adev->mappings[REGS_BAR].va+offset, descr);
-	writel(descr, adev->mappings[REGS_BAR].va+offset);
+			adev->mappings[REMOTE_BAR].va+offset, descr);
+	writel(descr, adev->mappings[REMOTE_BAR].va+offset);
 }
 
 void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 
 {
-	u32* dma_regs = (u32*)(adev->mappings[REGS_BAR].va + DMA_BASE);
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
 	dev_dbg(pdev(adev), "%p = %08x", va, value);
 	writel(value, va);
@@ -142,7 +142,7 @@ void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 
 u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 {
-	u32* dma_regs = (u32*)(adev->mappings[REGS_BAR].va + DMA_BASE);
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
 	dev_dbg(pdev(adev), "%p = %08x", va, value);
