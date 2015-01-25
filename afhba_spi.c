@@ -36,6 +36,8 @@
 #include <linux/vmalloc.h>
 #include <linux/mm.h>
 
+#include <linux/module.h>
+#include <linux/moduleparam.h>
 /*
 #include <asm/mach/flash.h>
 */
@@ -316,4 +318,55 @@ err_register:
 err_nomem:
 	return rc;
 }
+
+void afhba_spi_master_remove(struct AFHBA_DEV *adev)
+{
+	dev_warn(pdev(adev), "stub");
+}
+
+static int afhba_spi_init_devices(void)
+/* proper use of kernel device model would avoid this */
+{
+	struct AFHBA_DEV *pos;
+	int device_count = 0;
+
+	list_for_each_entry(pos, &afhba_devices, list){
+		afhba_spi_master_init(pos);
+		++device_count;
+	}
+	return device_count;
+}
+
+static int afhba_spi_remove_devices(void)
+/* proper use of kernel device model would avoid this */
+{
+	struct AFHBA_DEV *pos;
+	int device_count = 0;
+
+	list_for_each_entry(pos, &afhba_devices, list){
+		afhba_spi_master_remove(pos);
+		++device_count;
+	}
+	return device_count;
+}
+
+
+static int afhba_spi_init(void)
+{
+	/* no platform device driver */
+	afhba_spi_init_devices();
+
+	return 0;
+}
+module_init(afhba_spi_init);
+
+static void afhba_spi_exit(void)
+{
+	afhba_spi_remove_devices();
+}
+module_exit(afhba_spi_exit);
+
+MODULE_AUTHOR("Peter Milne <peter.milne@d-tacq.com");
+MODULE_DESCRIPTION("ACQ-FIBER-HBA SPI flash driver");
+MODULE_LICENSE("GPL");
 

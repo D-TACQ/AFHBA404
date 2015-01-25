@@ -27,18 +27,29 @@
 
 #include "acq-fiber-hba.h"
 
+/* this fragment of code is linked into >1 module
+ * debugs individually switched from module params
+ * do not use dev_dbg - multiple instances same file..
+ */
+int reg_access_verbose;
+module_param(reg_access_verbose, int, 0644);
+
+#define VBS1	(reg_access_verbose >= 1)
+#define VBS2	(reg_access_verbose >= 2)
+
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
 	void* va = adev->mappings[REGS_BAR].va + regoff;
-	dev_dbg(pdev(adev), "%p = %08x", va + regoff, value);
+	if (VBS1) dev_info(pdev(adev), "%p = %08x", va + regoff, value);
 	writel(value, va);
-	dev_dbg(pdev(adev), "%p : %08x", va, readl(va + regoff));
+	if (VBS2) dev_info(pdev(adev), "%p : %08x", va, readl(va + regoff));
 }
 
 u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff)
 {
 	void* va = adev->mappings[REGS_BAR].va + regoff;
 	u32 rv = readl(va + regoff);
-	dev_dbg(pdev(adev), "%p = %08x", va + regoff, rv);
+	if (VBS1) dev_info(pdev(adev), "%p = %08x", va + regoff, rv);
 	return rv;
 }
+

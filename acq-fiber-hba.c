@@ -35,7 +35,7 @@ char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 struct class* afhba_device_class;
 
-LIST_HEAD(devices);
+LIST_HEAD(afhba_devices);
 
 
 const char* afhba_devnames[MAXDEV];
@@ -364,7 +364,6 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	init_buffers(adev);
 	afhba_registerDevice(adev);
 	afhba_createDebugfs(adev);
-	afhba_sfp_i2c_create(adev);
 
 	if (!ll_mode_only){
 		afhba_stream_drv_init(adev);
@@ -387,7 +386,6 @@ void afhba_remove (struct pci_dev *dev)
 	struct AFHBA_DEV *adev = afhba_lookupDevicePci(dev);
 
 	if (adev){
-		afhba_sfp_i2c_remove(adev);
 		afhba_removeDebugfs(adev);
 		afhba_remove_sysfs_class(adev);
 	}
@@ -428,13 +426,11 @@ int __init afhba_init_module(void)
 
 	afhba_device_class = class_create(THIS_MODULE, "afhba");
 	rc = pci_register_driver(&afhba_driver);
-	i2c_hba_sfp_init();
 	return rc;
 }
 
 void afhba_exit_module(void)
 {
-	i2c_hba_sfp_exit();
 	class_destroy(afhba_device_class);
 	pci_unregister_driver(&afhba_driver);
 }

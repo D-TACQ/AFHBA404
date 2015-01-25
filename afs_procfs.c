@@ -31,7 +31,7 @@
 #include "afhba_stream_drv.h"
 
 extern int nbuffers;
-extern struct list_head devices;
+extern struct list_head afhba_devices;
 
 struct proc_dir_entry *afs_proc_root;
 

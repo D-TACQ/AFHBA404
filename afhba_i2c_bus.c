@@ -34,7 +34,7 @@
 #include <linux/moduleparam.h>
 #include <linux/platform_device.h>
 
-#include <linux/slab.h>
+//#include <linux/slab.h>
 #include "acq-fiber-hba.h"
 
 struct AFHBA_DEV;	/* opaque structure */
@@ -261,30 +261,13 @@ static int __exit i2c_hba_sfp_remove(struct platform_device *pdev)
 
 static struct platform_driver i2c_hba_sfp_driver = {
 	.driver		= {
-		.name	= "i2c-hba_sfp",
+		.name	= "i2c_hba_sfp",
 		.owner	= THIS_MODULE,
 	},
 	.remove	= __exit_p(i2c_hba_sfp_remove),
 	.probe  = i2c_hba_sfp_probe
 };
 
-int i2c_hba_sfp_init(void)
-{
-	int ret;
-
-	//ret = platform_driver_probe(&i2c_hba_sfp_driver, i2c_hba_sfp_probe);
-	ret = platform_driver_register(&i2c_hba_sfp_driver);
-	if (ret)
-		printk(KERN_ERR "i2c-hba_sfp: probe failed: %d\n", ret);
-
-	return ret;
-}
-
-
-void i2c_hba_sfp_exit(void)
-{
-	platform_driver_unregister(&i2c_hba_sfp_driver);
-}
 
 static struct i2c_gpio_platform_data rtm_t_i2c_gpio_data_templates[] = {
 	{
@@ -350,4 +333,53 @@ int afhba_sfp_i2c_remove(struct AFHBA_DEV *adev)
 	return 0;
 }
 
+static int afhba_sfp_init_devices(void)
+/* proper use of kernel device model would avoid this */
+{
+	struct AFHBA_DEV *pos;
+	int device_count = 0;
 
+	list_for_each_entry(pos, &afhba_devices, list){
+		afhba_sfp_i2c_create(pos);
+		++device_count;
+	}
+	return device_count;
+}
+
+static int afhba_sfp_remove_devices(void)
+/* proper use of kernel device model would avoid this */
+{
+	struct AFHBA_DEV *pos;
+	int device_count = 0;
+
+	list_for_each_entry(pos, &afhba_devices, list){
+		afhba_sfp_i2c_remove(pos);
+		++device_count;
+	}
+	return device_count;
+}
+
+static int afhba_i2c_sfp_init(void)
+{
+	int ret;
+
+	//ret = platform_driver_probe(&i2c_hba_sfp_driver, i2c_hba_sfp_probe);
+	ret = platform_driver_register(&i2c_hba_sfp_driver);
+	if (ret)
+		printk(KERN_ERR "i2c-hba_sfp: probe failed: %d\n", ret);
+	afhba_sfp_init_devices();
+
+	return ret;
+}
+module_init(afhba_i2c_sfp_init);
+
+static void afhba_i2c_sfp_exit(void)
+{
+	afhba_sfp_remove_devices();
+	platform_driver_unregister(&i2c_hba_sfp_driver);
+}
+module_exit(afhba_i2c_sfp_exit);
+
+MODULE_AUTHOR("Peter Milne <peter.milne@d-tacq.com");
+MODULE_DESCRIPTION("ACQ-FIBER-HBA I2C driver");
+MODULE_LICENSE("GPL");

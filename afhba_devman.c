@@ -27,7 +27,7 @@
 int afhba_registerDevice(struct AFHBA_DEV *adev)
 {
 	dev_dbg(pdev(adev), "name %s", adev->name);
-	list_add_tail(&adev->list, &devices);
+	list_add_tail(&adev->list, &afhba_devices);
 	return 0;
 }
 
@@ -40,7 +40,7 @@ struct AFHBA_DEV* afhba_lookupDevice(int major)
 {
 	struct AFHBA_DEV *pos;
 
-	list_for_each_entry(pos, &devices, list){
+	list_for_each_entry(pos, &afhba_devices, list){
 		if (pos->major == major){
 			return pos;
 		}
@@ -53,7 +53,7 @@ struct AFHBA_DEV *afhba_lookupDeviceFromClass(struct device *dev)
 {
 	struct AFHBA_DEV *pos;
 
-	list_for_each_entry(pos, &devices, list){
+	list_for_each_entry(pos, &afhba_devices, list){
 		if (pos->class_dev == dev){
 			return pos;
 		}
@@ -66,7 +66,7 @@ struct AFHBA_DEV* afhba_lookupDevicePci(struct pci_dev *pci_dev)
 {
 	struct AFHBA_DEV *pos;
 
-	list_for_each_entry(pos, &devices, list){
+	list_for_each_entry(pos, &afhba_devices, list){
 		if (pos->pci_dev == pci_dev){
 			return pos;
 		}
@@ -79,7 +79,7 @@ struct AFHBA_DEV* afhba_lookupDev(struct device *dev)
 {
 	struct AFHBA_DEV *pos;
 
-	list_for_each_entry(pos, &devices, list){
+	list_for_each_entry(pos, &afhba_devices, list){
 		if (&pos->pci_dev->dev == dev){
 			return pos;
 		}

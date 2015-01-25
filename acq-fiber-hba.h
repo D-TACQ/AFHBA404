@@ -73,7 +73,7 @@ struct AFHBA_DEV;
 #define MAP_COUNT	2
 
 
-extern struct list_head devices;
+extern struct list_head afhba_devices;
 
 int afhba_registerDevice(struct AFHBA_DEV *tdev);
 void afhba_deleteDevice(struct AFHBA_DEV *tdev);
@@ -233,14 +233,6 @@ enum DMA_REGS {
 
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff);
-
-
-int i2c_hba_sfp_init(void);
-void i2c_hba_sfp_exit(void);
-
-
-int afhba_sfp_i2c_create(struct AFHBA_DEV *adev);
-int afhba_sfp_i2c_remove(struct AFHBA_DEV *adev);
 
 
 #endif /* ACQ_FIBER_HBA_H_ */
