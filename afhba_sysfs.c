@@ -28,6 +28,141 @@
 #include "afhba_stream_drv.h"
 
 
+static char* getDataFifoStat(u32 stat, char buf[], int maxbuf)
+{
+	int cursor = 0;
+
+
+	cursor += sprintf(buf+cursor, "%4d ",
+			(stat&DMA_DATA_FIFO_COUNT)>>DMA_DATA_FIFO_COUNT_SHL);
+
+	if ((stat & DMA_DATA_FIFO_EMPTY) != 0){
+		cursor += sprintf(buf+cursor, "EMPTY ");
+	}
+	if ((stat & DMA_DATA_FIFO_FULL) != 0){
+		cursor += sprintf(buf+cursor, "FULL ");
+	}
+	if ((stat & DMA_DATA_FIFO_UNDER) != 0){
+		cursor += sprintf(buf+cursor, "UNDER ");
+	}
+	if ((stat & DMA_DATA_FIFO_OVER) != 0){
+		cursor += sprintf(buf+cursor, "EMPTY ");
+	}
+	strcat(buf, "\n");
+	assert(cursor < maxbuf);
+	return buf;
+}
+
+#define DATA_FIFO_STAT(DIR, SHL) 					\
+static ssize_t show_data_fifo_stat_##DIR(				\
+	struct device * dev,						\
+	struct device_attribute *attr,					\
+	char * buf)							\
+{									\
+	char flags[80];							\
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	u32 stat = (DMA_DATA_FIFSTA_RD(adev) >> SHL)&0xffff;		\
+	getDataFifoStat(stat, flags, 80);				\
+	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
+}									\
+									\
+static DEVICE_ATTR(data_fifo_stat_##DIR, S_IRUGO, show_data_fifo_stat_##DIR, 0)
+
+DATA_FIFO_STAT(pull, DMA_CTRL_PULL_SHL);
+DATA_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
+
+#define DESC_FIFO_STAT(DIR, SHL) 					\
+static ssize_t show_desc_fifo_stat_##DIR(				\
+	struct device * dev,						\
+	struct device_attribute *attr,					\
+	char * buf)							\
+{									\
+	char flags[80];							\
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	u32 stat = (DMA_DESC_FIFSTA_RD(adev) >> SHL)&0xffff;		\
+	getDataFifoStat(stat, flags, 80);				\
+	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
+}									\
+									\
+static DEVICE_ATTR(desc_fifo_stat_##DIR, S_IRUGO, show_desc_fifo_stat_##DIR, 0)
+
+DESC_FIFO_STAT(pull, DMA_CTRL_PULL_SHL);
+DESC_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
+
+static char* getDmaCtrl(u32 stat, char buf[], int maxbuf)
+{
+	int cursor = 0;
+
+
+	if ((stat & DMA_CTRL_EN) != 0){
+		cursor += sprintf(buf+cursor, "ENABLE ");
+	}
+	if ((stat & DMA_CTRL_FIFO_RST) != 0){
+		cursor += sprintf(buf+cursor, "RESET ");
+	}
+	if ((stat & DMA_CTRL_LOW_LAT) != 0){
+		cursor += sprintf(buf+cursor, "LOWLAT ");
+	}
+	if ((stat & DMA_CTRL_RECYCLE) != 0){
+		cursor += sprintf(buf+cursor, "RECYCLE ");
+	}
+	strcat(buf, "\n");
+	assert(cursor < maxbuf);
+	return buf;
+}
+
+#define DMA_CTRL(DIR, SHL) 						\
+static ssize_t show_dma_ctrl_##DIR(					\
+	struct device * dev,						\
+	struct device_attribute *attr,					\
+	char * buf)							\
+{									\
+	char flags[80];							\
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	u32 stat = (DMA_CTRL_RD(adev) >> SHL)&0xffff;			\
+	getDmaCtrl(stat, flags, 80);					\
+	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
+}									\
+									\
+static DEVICE_ATTR(dma_ctrl_##DIR, S_IRUGO, show_dma_ctrl_##DIR, 0)
+
+DMA_CTRL(pull, DMA_CTRL_PULL_SHL);
+DMA_CTRL(push, DMA_CTRL_PUSH_SHL);
+
+static char* getDesc(u32 descr, char buf[], int maxbuf)
+{
+	int cursor = 0;
+
+	cursor += sprintf(buf+cursor, "pa=%08x ", descr&DMA_DESCR_ADDR);
+
+	if ((descr & DMA_DESCR_INTEN) != 0){
+		cursor += sprintf(buf+cursor, "INTEN ");
+	}
+	cursor += sprintf(buf+cursor, "lenb=%08x ", DMA_DESCR_LEN_BYTES(descr));
+	cursor += sprintf(buf+cursor, "id=%x\n", descr&DMA_DESCR_ID);
+	assert(cursor < maxbuf);
+	return buf;
+}
+
+#define DMA_LATEST(DIR, RD) 						\
+static ssize_t show_dma_latest_##DIR(					\
+	struct device * dev,						\
+	struct device_attribute *attr,					\
+	char * buf)							\
+{									\
+	char flags[80];							\
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	u32 descr = RD(adev);						\
+	getDesc(descr, flags, 80);					\
+	return sprintf(buf, "0x%08x %s\n", descr, flags);		\
+}									\
+									\
+static DEVICE_ATTR(dma_latest_##DIR##_desc, S_IRUGO, show_dma_latest_##DIR, 0)
+
+DMA_LATEST(pull, DMA_PULL_DESC_STA_RD);
+DMA_LATEST(push, DMA_PUSH_DESC_STA_RD);
+
+
 static ssize_t show_job(
 	struct device *dev,
 	struct device_attribute *attr,
@@ -189,6 +324,14 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_job.attr,
 	&dev_attr_reset_buffers.attr,
 	&dev_attr_aurora.attr,
+	&dev_attr_data_fifo_stat_push.attr,
+	&dev_attr_data_fifo_stat_pull.attr,
+	&dev_attr_desc_fifo_stat_push.attr,
+	&dev_attr_desc_fifo_stat_pull.attr,
+	&dev_attr_dma_ctrl_push.attr,
+	&dev_attr_dma_ctrl_pull.attr,
+	&dev_attr_dma_latest_push_desc.attr,
+	&dev_attr_dma_latest_pull_desc.attr,
 	NULL
 };
 

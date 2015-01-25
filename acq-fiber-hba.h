@@ -245,6 +245,15 @@ enum DMA_REGS {
 #define DMA_DESCR_LEN			0x000000f0
 #define DMA_DESCR_ID			0x0000000f
 
+#define DMA_DATA_FIFO_EMPTY		0x0001
+#define DMA_DATA_FIFO_FULL		0x0002
+#define DMA_DATA_FIFO_UNDER		0x0004
+#define DMA_DATA_FIFO_OVER		0x0008
+#define DMA_DATA_FIFO_COUNT		0xfff0
+#define DMA_DATA_FIFO_COUNT_SHL		4
+
+#define DMA_DESCR_LEN_BYTES(descr)	((1<<((descr&DMA_DESCR_LEN)>>4))*1024)
+
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff);
 

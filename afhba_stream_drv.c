@@ -237,6 +237,7 @@ static int queue_next_free_buffer(struct AFHBA_DEV *adev)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int rc = 0;
 
+	dev_dbg(pdev(adev), "queue_next_free_buffer()");
 	if (mutex_lock_interruptible(&sdev->list_mutex)){
 		return -ERESTARTSYS;
 	}
@@ -573,10 +574,16 @@ static void check_fifo_status(struct AFHBA_DEV* adev)
 #endif
 }
 
+int job_is_go(struct JOB* job)
+{
+	return !job->please_stop && job->buffers_queued < job->buffers_demand;
+}
 static int afs_isr_work(void *arg)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)arg;
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+	struct JOB* job = &sdev->job;
+
 	int loop_count = 0;
 /* this is going to be the top RT process */
 	struct sched_param param = { .sched_priority = 10 };
@@ -594,32 +601,30 @@ static int afs_isr_work(void *arg)
 
 		if (!timeout || loop_count%10 == 0){
 			dev_dbg(pdev(adev), "TIMEOUT? %d queue_free_buffers() ? %d",
-			    timeout,
-			    !sdev->job.please_stop &&
-			    sdev->job.buffers_queued < sdev->job.buffers_demand);
+			    timeout, job_is_go(job)  );
 		}
-	        if (!sdev->job.please_stop &&
-	        		sdev->job.buffers_queued < sdev->job.buffers_demand){
+	        if (job_is_go(job)){
 			if (!afs_push_dma_started(adev)){
 				afs_start_dma(adev);
 			}
+			dev_dbg(pdev(adev), "queue_free_buffers");
 			queue_free_buffers(adev);
 		}
 
 
-		if (sdev->job.buffers_demand > 0 ){
+		if (job->buffers_demand > 0 ){
 			if (queue_full_buffers(adev) > 0){
 				wake_up_interruptible(&sdev->return_waitq);
 			}
 		}
 
 		spin_lock(&sdev->job_lock);
-		switch(sdev->job.please_stop){
+		switch(job->please_stop){
 		case PS_STOP_DONE:
 			break;
 		case PS_PLEASE_STOP:
 			afs_stop_dma(adev);
-			sdev->job.please_stop = PS_STOP_DONE;
+			job->please_stop = PS_STOP_DONE;
 			break;
 		default:
 			if (afs_push_dma_started(adev)){
