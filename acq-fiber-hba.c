@@ -375,6 +375,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 			&adev->pci_dev->dev,			/* device */
 			adev->name);
 	afhba_create_sysfs_class(adev);
+	afhba_create_sysfs(adev);
 	rc = pci_enable_device(dev);
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 
@@ -387,6 +388,7 @@ void afhba_remove (struct pci_dev *dev)
 
 	if (adev){
 		afhba_removeDebugfs(adev);
+		afhba_remove_sysfs(adev);
 		afhba_remove_sysfs_class(adev);
 	}
 	pci_disable_device(dev);

@@ -134,6 +134,8 @@ extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
 extern int afhba_stream_drv_del(struct AFHBA_DEV* adev);
 extern void afhba_create_sysfs_class(struct AFHBA_DEV *adev);
 void afhba_remove_sysfs_class(struct AFHBA_DEV *adev);
+void afhba_create_sysfs(struct AFHBA_DEV *adev);
+void afhba_remove_sysfs(struct AFHBA_DEV *adev);
 
 struct AFHBA_DEV_PATH {
 	int minor;
@@ -196,7 +198,19 @@ struct AFHBA_DEV_PATH {
 #define AFHBA_SPI_HOLD		(1<<1)
 #define AFHBA_SPI_WP		(1<<2)
 
+#define AFHBA_AURORA_CTRL_RESET		(1<<31)
+#define AFHBA_AURORA_CTRL_CLR		(1<<7)
+#define AFHBA_AURORA_CTRL_PWR_DWN	(1<<4)
+#define AFHBA_AURORA_CTRL_LOOPBACK	(0x7)
 
+#define AFHBA_AURORA_STAT_SFP_PRESENTn	(1<<31)
+#define AFHBA_AURORA_STAT_SFP_LOS	(1<<30)
+#define AFHBA_AURORA_STAT_SFP_TX_FAULT  (1<<29)
+#define AFHBA_AURORA_STAT_HARD_ERR	(1<<6)
+#define AFHBA_AURORA_STAT_SOFT_ERR	(1<<5)
+#define AFHBA_AURORA_STAT_FRAME_ERR	(1<<4)
+#define AFHBA_AURORA_STAT_CHANNEL_UP	(1<<1)
+#define AFHBA_AURORA_STAT_LANE_UP	(1<<0)
 
 
 #define DMA_BASE			0x2000
