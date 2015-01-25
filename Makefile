@@ -16,9 +16,8 @@ all: modules apps spi_support
 
 KRNL ?= $(shell uname -r)
 # FEDORA:
-# KHEADERS := /lib/modules/$(KRNL)/build
-# SCI LIN:
-KHEADERS := /usr/src/kernels/$(KRNL)/
+KHEADERS := /lib/modules/$(KRNL)/build
+
 
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
@@ -39,9 +38,9 @@ apps: $(APPS)
 mmap:
 	cc -o mmap mmap.c -lpopt
 
-spi_support:
-	make -C $(KHEADERS) M=$(KHEADERS)/drivers/spi obj-m="spi.o spi_bitbang.o" modules
-	make -C $(KHEADERS) M=$(SRC)/mtd/devices obj-m=m25p80.o modules
+spi_support: 
+	echo make -C $(KHEADERS) M=$(KHEADERS)/drivers/spi obj-m="spi.o spi_bitbang.o" modules
+	echo make -C $(KHEADERS) M=$(SRC)/mtd/devices obj-m=m25p80.o modules
 	
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
