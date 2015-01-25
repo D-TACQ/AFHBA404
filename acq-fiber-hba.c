@@ -438,6 +438,8 @@ void afhba_exit_module(void)
 module_init(afhba_init_module);
 module_exit(afhba_exit_module);
 
+EXPORT_SYMBOL_GPL(afhba_devices);
+
 MODULE_DEVICE_TABLE(pci, afhba_pci_tbl);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Peter.Milne@d-tacq.com");

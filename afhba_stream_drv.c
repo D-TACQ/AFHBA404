@@ -403,7 +403,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	int order = getOrder(BUFFER_LEN);
 	int ii;
 
-	dev_dbg(pdev(adev), "afs_init_buffers() 01");
+	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
 	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*NBUFFERS, GFP_KERNEL);
         INIT_LIST_HEAD(&sdev->bp_empties.list);
