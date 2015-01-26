@@ -252,6 +252,7 @@ static int getKnob(const char* knob, unsigned* value)
 static void calc_maxlen(int devnum)
 {
 	char knob[80];
+	FILE *fp;
 /*
 	snprintf(knob, 80, "/dev/rtm-t.%d.ctrl/lowlat", devnum);
 	FILE *fp = fopen(knob, "r");
