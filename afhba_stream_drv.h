@@ -112,8 +112,19 @@ struct AFHBA_STREAM_DEV {
 	unsigned pid;		/* pid of dma_read process */
 	int req_len;		/* request len .. not part of job ? */
 	void (* onStop)(struct AFHBA_DEV *adev);
+
+	int comms_init_done;
 };
 #define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
+
+void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value);
+u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff);
+
+#define PCI_REG_WRITE(adev, regoff, value) \
+	_afs_write_pcireg(adev, regoff, value)
+
+#define PCI_REG_READ(adev, regoff) \
+	_afs_read_pcireg(adev, regoff)
 
 void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);

@@ -92,7 +92,7 @@ DESC_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
 static char* getDmaCtrl(u32 stat, char buf[], int maxbuf)
 {
 	int cursor = 0;
-
+	buf[0] = '\0';
 
 	if ((stat & DMA_CTRL_EN) != 0){
 		cursor += sprintf(buf+cursor, "ENABLE ");
@@ -310,10 +310,11 @@ static ssize_t show_aurora##SFPN(					\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	u32 stat = afhba_read_reg(afhba_lookupDev(dev), AURORA_STATUS_REG); \
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG); 		\
+	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_CLR); \
 	return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }									\
-									\
 									\
 static DEVICE_ATTR(aurora, S_IRUGO|S_IWUGO, show_aurora##SFPN, store_aurora##SFPN);
 

@@ -167,9 +167,12 @@ struct AFHBA_DEV_PATH {
 #define PCI_CONTROL_STATUS_REG 		0x000C	/* PCI Control / Status Register */
 #define PCIE_DEVICE_CONTROL_STATUS_REG 	0x0010	/* PCIe Control / Status Register */
 #define PCIE_LINK_CONTROL_STATUS_REG 	0x0014	/* PCIe Link Control / Status Register */
-#define HOST_TEST_REG 			0x0018	/* Host Test Register */
-#define HOST_COUNTER_REG 		0x001C	/* Heart Beat Counter */
-#define HOST_PCIE_DEBUG_REG 		0x0020	/* Host PCIe Debug Register */
+#define PCIE_CONF_REG 			0x0018	/* Host PCIe Configuration Reg */
+#define PCIE_BUFFER_CTRL_REG		0x001C
+#define HOST_TEST_REG			0x0020
+#define HOST_COUNTER_REG 		0x0024	/* Heart Beat Counter */
+#define HOST_PCIE_DEBUG_REG 		0x0028	/* Host PCIe Debug Register */
+
 #define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
 #define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
 #define AURORA_CONTROL_REG 		0x0080	/* Aurora Control Register */
@@ -198,7 +201,7 @@ struct AFHBA_DEV_PATH {
 #define AFHBA_SPI_HOLD		(1<<1)
 #define AFHBA_SPI_WP		(1<<2)
 
-#define AFHBA_AURORA_CTRL_RESET		(1<<31)
+#define AFHBA_AURORA_CTRL_ENA	(1<<31)
 #define AFHBA_AURORA_CTRL_CLR		(1<<7)
 #define AFHBA_AURORA_CTRL_PWR_DWN	(1<<4)
 #define AFHBA_AURORA_CTRL_LOOPBACK	(0x7)
@@ -212,6 +215,19 @@ struct AFHBA_DEV_PATH {
 #define AFHBA_AURORA_STAT_CHANNEL_UP	(1<<1)
 #define AFHBA_AURORA_STAT_LANE_UP	(1<<0)
 
+
+#define PCIE_BASE			0x1000
+
+enum PCIE_REGS {
+	PCIE_CNTRL = 1,
+	PCIE_INTR,
+	PCI_CSR,
+	PCIE_DEV_CSR,
+	PCIE_LINK_CSR,
+	PCIE_CONF,
+	PCIE_BUFFER_CTRL
+
+};
 
 #define DMA_BASE			0x2000
 enum DMA_REGS {
@@ -253,6 +269,7 @@ enum DMA_REGS {
 #define DMA_DATA_FIFO_COUNT_SHL		4
 
 #define DMA_DESCR_LEN_BYTES(descr)	((1<<((descr&DMA_DESCR_LEN)>>4))*1024)
+
 
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff);

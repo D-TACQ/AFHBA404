@@ -76,6 +76,9 @@ int transfer_buffers = 0x7fffffff;
 module_param(transfer_buffers, int, 0664);
 MODULE_PARM_DESC(transfer_buffers, "number of buffers to transfer");
 
+int aurora_to_ms = 1000;
+module_param(aurora_to_ms, int, 0644);
+MODULE_PARM_DESC(aurora_to_ms, "timeout on aurora connect");
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -149,6 +152,23 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
 
+void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value)
+
+{
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + PCIE_BASE);
+	void* va = &dma_regs[regoff];
+	dev_dbg(pdev(adev), "%p = %08x", va, value);
+	writel(value, va);
+}
+
+u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
+{
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + PCIE_BASE);
+	void* va = &dma_regs[regoff];
+	u32 value = readl(va);
+	dev_dbg(pdev(adev), "%p = %08x", va, value);
+	return adev->stream_dev->dma_regs[regoff] = value;
+}
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -175,6 +195,47 @@ static inline int afs_pull_dma_started(struct AFHBA_DEV *adev)
 	return _afs_dma_started(adev, DMA_CTRL_PULL_SHL);
 }
 
+static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
+{
+	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
+}
+
+static int _afs_comms_init(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+	int to = 0;
+	u32 completer_id;
+	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
+
+	while(!afs_aurora_lane_up(adev)){
+		msleep(1);
+		if (++to > aurora_to_ms){
+			return 0;
+		}
+	}
+	PCI_REG_WRITE(adev, PCIE_CNTRL, 0x12345678);
+	completer_id = afhba_read_reg(adev, PCIE_CONF_REG);
+	dev_info(pdev(adev), "set remove completer id:0x%08x", completer_id);
+	PCI_REG_WRITE(adev, PCIE_CONF, completer_id);
+	PCI_REG_WRITE(adev, PCI_CSR, 4);
+	return sdev->comms_init_done = true;
+}
+
+static int afs_comms_init(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+
+	if (afs_aurora_lane_up(adev)){
+		if (!sdev->comms_init_done){
+			_afs_comms_init(adev);
+		}
+		return sdev->comms_init_done;
+	}else{
+		dev_dbg(pdev(adev), "aurora lane down");
+		return sdev->comms_init_done = false;
+	}
+}
 
 /* @@todo : dma implement PUSH only */
 
@@ -603,7 +664,14 @@ static int afs_isr_work(void *arg)
 			dev_dbg(pdev(adev), "TIMEOUT? %d queue_free_buffers() ? %d",
 			    timeout, job_is_go(job)  );
 		}
+		if (!afs_comms_init(adev)){
+			if (job_is_go(job)){
+				dev_warn(pdev(adev), "job is go but aurora is down");
+			}
+			continue;
+		}
 	        if (job_is_go(job)){
+
 			if (!afs_push_dma_started(adev)){
 				afs_start_dma(adev);
 			}
