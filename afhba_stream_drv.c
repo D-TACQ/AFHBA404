@@ -206,11 +206,19 @@ static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
+static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
+{
+	int ireg;
+
+	for (ireg = 0; ireg < 8; ++ireg){
+		PCI_REG_WRITE(adev, ireg, afhba_read_reg(adev, ireg*sizeof(u32)));
+	}
+}
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	int to = 0;
-	u32 completer_id;
+
 	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
 
 	while(!afs_aurora_lane_up(adev)){
@@ -219,11 +227,8 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 			return 0;
 		}
 	}
-	PCI_REG_WRITE(adev, PCIE_CNTRL, 0x12345678);
-	completer_id = afhba_read_reg(adev, PCIE_CONF_REG);
-	dev_info(pdev(adev), "set remove completer id:0x%08x", completer_id);
-	PCI_REG_WRITE(adev, PCIE_CONF, completer_id);
-	PCI_REG_WRITE(adev, PCI_CSR, 4);
+
+	_afs_pcie_mirror_init(adev);
 	return sdev->comms_init_done = true;
 }
 
