@@ -312,7 +312,11 @@ static ssize_t show_aurora##SFPN(					\
 	char flags[80];							\
 	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
 	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG); 		\
-	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_CLR); \
+	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){				\
+		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);	\
+		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR); \
+		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl); \
+	} \
 	return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }									\
 									\
