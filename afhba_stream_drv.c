@@ -210,7 +210,7 @@ static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 {
 	int ireg;
 
-	for (ireg = 0; ireg < 8; ++ireg){
+	for (ireg = PCIE_CNTRL; ireg <= PCIE_BUFFER_CTRL; ++ireg){
 		PCI_REG_WRITE(adev, ireg, afhba_read_reg(adev, ireg*sizeof(u32)));
 	}
 }
