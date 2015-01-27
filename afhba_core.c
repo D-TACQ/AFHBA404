@@ -40,7 +40,7 @@ module_param(reg_access_verbose, int, 0644);
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
 	void* va = adev->mappings[REGS_BAR].va + regoff;
-	if (VBS1) dev_info(pdev(adev), "%p = %08x", va, value);
+	if (VBS1) dev_info(pdev(adev), "afhba_write_reg %04x = %08x", regoff, value);
 	writel(value, va);
 	if (VBS2) dev_info(pdev(adev), "%p : %08x", va, readl(va));
 }
@@ -49,7 +49,7 @@ u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff)
 {
 	void* va = adev->mappings[REGS_BAR].va + regoff;
 	u32 rv = readl(va);
-	if (VBS1) dev_info(pdev(adev), "%p = %08x", va, rv);
+	if (VBS1) dev_info(pdev(adev), "afhba_read_reg %04x = %08x", regoff, rv);
 	return rv;
 }
 
