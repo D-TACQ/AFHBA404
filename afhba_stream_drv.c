@@ -127,10 +127,12 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 	if (copy_from_user(src, dest, len)) { return -EFAULT; }
 
 
-static void write_descr(struct AFHBA_DEV *adev, unsigned offset, u32 descr)
+static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 {
-	dev_dbg(pdev(adev), "offset:%04x %p = %08x", offset,
-			adev->mappings[REMOTE_BAR].va+offset, descr);
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 descr = sdev->hbx[idesc].descr;
+
+	dev_dbg(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
 	writel(descr, adev->mappings[REMOTE_BAR].va+offset);
 }
 
@@ -176,10 +178,8 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	dev_dbg(pdev(adev), "ibuf %d", idesc);
 /* change descr status .. */
-	write_descr(adev, DMA_PUSH_DESC_FIFO, sdev->hbx[idesc].descr);
+	write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
 }
 
 
@@ -308,7 +308,6 @@ static int queue_next_free_buffer(struct AFHBA_DEV *adev)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int rc = 0;
 
-	dev_dbg(pdev(adev), "queue_next_free_buffer()");
 	if (mutex_lock_interruptible(&sdev->list_mutex)){
 		return -ERESTARTSYS;
 	}
@@ -661,7 +660,7 @@ static int afs_isr_work(void *arg)
 	int please_check_fifo = 0;
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
-
+	afs_comms_init(adev);
 
 	for ( ; 1; ++loop_count){
 		int timeout = wait_event_interruptible_timeout(
@@ -674,18 +673,19 @@ static int afs_isr_work(void *arg)
 			dev_dbg(pdev(adev), "TIMEOUT? %d queue_free_buffers() ? %d",
 			    timeout, job_is_go(job)  );
 		}
+#if HARDWARE_IS_GOOD
 		if (!afs_comms_init(adev)){
 			if (job_is_go(job)){
 				dev_warn(pdev(adev), "job is go but aurora is down");
 			}
 			continue;
 		}
+#endif
 	        if (job_is_go(job)){
 
 			if (!afs_push_dma_started(adev)){
 				afs_start_dma(adev);
 			}
-			dev_dbg(pdev(adev), "queue_free_buffers");
 			queue_free_buffers(adev);
 		}
 
