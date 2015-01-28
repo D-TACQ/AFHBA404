@@ -80,6 +80,10 @@ int aurora_to_ms = 1000;
 module_param(aurora_to_ms, int, 0644);
 MODULE_PARM_DESC(aurora_to_ms, "timeout on aurora connect");
 
+int aurora_monitor = 0;
+module_param(aurora_monitor, int, 0644);
+MODULE_PARM_DESC(aurora_monitor, "enable to check cable state in run loop, disable for debug");
+
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
 
@@ -673,14 +677,14 @@ static int afs_isr_work(void *arg)
 			dev_dbg(pdev(adev), "TIMEOUT? %d queue_free_buffers() ? %d",
 			    timeout, job_is_go(job)  );
 		}
-#if HARDWARE_IS_GOOD
-		if (!afs_comms_init(adev)){
+
+		if (aurora_monitor && !afs_comms_init(adev)){
 			if (job_is_go(job)){
 				dev_warn(pdev(adev), "job is go but aurora is down");
 			}
 			continue;
 		}
-#endif
+
 	        if (job_is_go(job)){
 
 			if (!afs_push_dma_started(adev)){
