@@ -1,5 +1,5 @@
 ID=0
-DEVROOT=/proc/sys/debug/afhba
+DEVROOT=/sys/kernel/debug/afhba
 
 DEV=${DEVROOT}/afhba.${ID}
 
