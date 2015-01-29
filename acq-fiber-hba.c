@@ -360,10 +360,14 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	}else{
 		adev->major = rc;
 	}
+
 	afhba_map(adev);
 	init_buffers(adev);
 	afhba_registerDevice(adev);
 	afhba_createDebugfs(adev);
+
+	rc = pci_enable_device(dev);
+	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 
 	if (!ll_mode_only){
 		afhba_stream_drv_init(adev);
@@ -376,11 +380,8 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 			adev->name);
 	afhba_create_sysfs_class(adev);
 	afhba_create_sysfs(adev);
-	rc = pci_enable_device(dev);
-	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 
-
-	return 0;
+	return rc;
 }
 void afhba_remove (struct pci_dev *dev)
 {
