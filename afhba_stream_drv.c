@@ -236,7 +236,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	return sdev->comms_init_done = true;
 }
 
-static int afs_comms_init(struct AFHBA_DEV *adev)
+int afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
@@ -250,6 +250,7 @@ static int afs_comms_init(struct AFHBA_DEV *adev)
 		return sdev->comms_init_done = false;
 	}
 }
+
 
 /* @@todo : dma implement PUSH only */
 

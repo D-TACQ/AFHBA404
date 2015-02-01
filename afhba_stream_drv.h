@@ -163,5 +163,6 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 
 int afs_init_procfs(struct AFHBA_DEV *adev);
 int afs_reset_buffers(struct AFHBA_DEV *adev);
+int afs_comms_init(struct AFHBA_DEV *adev);
 
 #endif /* AFHBA_STREAM_DRV_H_ */

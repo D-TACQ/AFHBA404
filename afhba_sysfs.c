@@ -324,6 +324,37 @@ static DEVICE_ATTR(aurora, S_IRUGO|S_IWUGO, show_aurora##SFPN, store_aurora##SFP
 
 AURORA(0);
 
+static ssize_t store_comms_init(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	int init;
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
+	if (sscanf(buf, "%d", &init) == 1 && init==1){
+		sdev->comms_init_done = false;
+		afs_comms_init(adev);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static ssize_t show_comms_init(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+
+	sprintf(buf, "%d\n", sdev->comms_init_done);
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(comms_init, S_IRUGO|S_IWUGO, show_comms_init, store_comms_init);
+
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
 	&dev_attr_job.attr,
@@ -337,6 +368,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_dma_ctrl_pull.attr,
 	&dev_attr_dma_latest_push_desc.attr,
 	&dev_attr_dma_latest_pull_desc.attr,
+	&dev_attr_comms_init.attr,
 	NULL
 };
 
