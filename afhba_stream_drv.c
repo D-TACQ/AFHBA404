@@ -481,7 +481,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
-	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*NBUFFERS, GFP_KERNEL);
+	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
 	INIT_LIST_HEAD(&sdev->bp_full.list);
@@ -492,9 +492,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 	sdev->buffer_len = BUFFER_LEN;
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
-			NBUFFERS, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
+			nbuffers, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
 
-	for (hb = sdev->hbx, ii = 0; ii < NBUFFERS; ++ii, ++sdev->nbuffers, ++hb){
+	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++sdev->nbuffers, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -525,7 +525,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 		    ii, hb->va, hb->pa, hb->len, hb->descr);
 		list_add_tail(&hb->list, &sdev->bp_empties.list);
 	}
-	sdev->nbuffers = NBUFFERS;
+	sdev->nbuffers = nbuffers;
 	sdev->init_descriptors = init_descriptors_ht;
 	sdev->init_descriptors(sdev);
 	init_waitqueue_head(&sdev->work.w_waitq);
