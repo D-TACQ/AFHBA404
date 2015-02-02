@@ -591,8 +591,6 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 	if (rc < 0){
 		dev_err(pdev(adev), "pci_enable_msi FAILED");
 		return rc;
-	}else{
-		nvec = 1;
 	}
 
 	for (iv = 0; iv < nvec; ++iv){
