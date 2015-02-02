@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DN=${1:-1}
+
+mkdir -p /mnt/afhba.$DN
+echo checking aurora is up ..
+echo stream to /mnt/afhba.$DN 
+RECYCLE=1 RTM_DEVNUM=$DN ./STREAM/rtm-t-stream-disk
+
