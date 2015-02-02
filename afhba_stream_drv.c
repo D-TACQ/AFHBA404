@@ -560,22 +560,46 @@ static irqreturn_t afs_rx_isr(int irq, void *data)
        return IRQ_HANDLED;
 }
 
+static irqreturn_t afs_null_isr(int irq, void* data)
+{
+	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
+	dev_info(pdev(adev), "afs_null_isr %d", irq);
+	return IRQ_HANDLED;
+}
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
 	struct pci_dev *dev = adev->pci_dev;
-	int rc = pci_enable_msi(dev);
+	int rc;
+	int nvec;
+	int iv;
 
 	dev_dbg(pdev(adev), "%d IRQ %d", __LINE__, dev->irq);
+
+	rc = pci_enable_msi_block(dev, nvec = 4);
+	if (rc < 0){
+		dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
+		rc = pci_enable_msi(dev);
+		nvec = 1;
+	}
 
 	if (rc < 0){
 		dev_err(pdev(adev), "pci_enable_msi FAILED");
 		return rc;
+	}else{
+		nvec = 1;
 	}
 
 	rc = request_irq(dev->irq+MSI_DMA, afs_rx_isr,
-			 MSI_DMA==MSI_UART?IRQF_SHARED: 0, adev->name, adev);
+			 	IRQF_SHARED, adev->name, adev);
 	if (rc){
 		dev_err(pdev(adev), "request_irq %d failed", dev->irq+MSI_DMA);
+	}
+
+	for (iv = 1; iv < nvec; ++iv){
+		rc = request_irq(dev->irq+iv, afs_null_isr, IRQF_SHARED, adev->name, adev);
+		if (rc){
+			dev_err(pdev(adev), "request_irq %d failed", dev->irq+iv);
+		}
 	}
 
 	return rc;
