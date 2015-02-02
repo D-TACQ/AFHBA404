@@ -5,7 +5,7 @@ DN=${1:-0}
 mkdir -p /mnt/afhba.$DN
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.0.ctrl/aurora
-if [ $? -ne 0];then
+if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
