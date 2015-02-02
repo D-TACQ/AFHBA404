@@ -563,12 +563,18 @@ static irqreturn_t afs_rx_isr(int irq, void *data)
 static irqreturn_t afs_null_isr(int irq, void* data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
+
 	dev_info(pdev(adev), "afs_null_isr %d", irq);
 	return IRQ_HANDLED;
 }
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
 	struct pci_dev *dev = adev->pci_dev;
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+
+	static const char* irq_names[4] = {
+		"%s-dma", "%s-line", "%s-ppnf", "%s-spare"
+	};
 	int rc;
 	int nvec;
 	int iv;
@@ -589,16 +595,24 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 		nvec = 1;
 	}
 
-	rc = request_irq(dev->irq+MSI_DMA, afs_rx_isr,
-			 	IRQF_SHARED, adev->name, adev);
+	for (iv = 0; iv < nvec; ++iv){
+		snprintf(sdev->irq_names[iv], 32, irq_names[iv], adev->name);
+	}
+
+	rc = request_irq(dev->irq+0, afs_rx_isr,
+			 	IRQF_SHARED, sdev->irq_names[0], adev);
 	if (rc){
-		dev_err(pdev(adev), "request_irq %d failed", dev->irq+MSI_DMA);
+		dev_err(pdev(adev), "request_irq %d failed", dev->irq+0);
 	}
 
 	for (iv = 1; iv < nvec; ++iv){
-		rc = request_irq(dev->irq+iv, afs_null_isr, IRQF_SHARED, adev->name, adev);
+		rc = request_irq(dev->irq+iv, afs_null_isr, IRQF_SHARED,
+				sdev->irq_names[iv], adev);
 		if (rc){
 			dev_err(pdev(adev), "request_irq %d failed", dev->irq+iv);
+		}else{
+			dev_info(pdev(adev), "request_irq %s %d OK",
+					sdev->irq_names[iv], dev->irq+iv);
 		}
 	}
 
