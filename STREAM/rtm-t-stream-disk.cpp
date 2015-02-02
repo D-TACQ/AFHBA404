@@ -81,6 +81,7 @@ int RECYCLE = 0;		/* accumulate by default */
 int NO_OVERWRITE = 0;		/* refuse to allow buffer overwrite */
 int MAXINT = 999999;
 int PUT_DATA = 0;
+int NBUFS = 0;			/* !=) ? stop after this many buffers */
 
 
 /* number of buffers to transfer - set on command line or use module knob. */
@@ -227,6 +228,10 @@ static int stream()
 					perror("write failed");
 					return -1;
 				}
+				if (NBUFS && nbuf >= NBUFS){
+					printf("NBUFS %d reached, quitting now\n", NBUFS);
+					goto all_done;
+				}
 			}
 		}else{
 			perror("read error");
@@ -235,7 +240,7 @@ static int stream()
 
 		iter = ++iter&MAXITER_MASK;
 	}
-
+all_done:
 	DIAG("all done\n");
 	return 0;
 }
@@ -378,7 +383,9 @@ static void init_defaults(int argc, char* argv[])
 	if (getenv("OUTROOT")){
 		OUTROOT=getenv("OUTROOT");
 	}
-
+	if (getenv("NBUFS")){
+		NBUFS=atoi(getenv("NBUFS"));
+	}
 	if (getenv("RECYCLE")){
 		RECYCLE=atol(getenv("RECYCLE"));
 	}
