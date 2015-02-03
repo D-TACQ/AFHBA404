@@ -213,7 +213,7 @@ static int i2c_hba_sfp_probe(struct platform_device *pdev)
 	bit_data->data = pdev;
 
 	adap->owner = THIS_MODULE;
-	snprintf(adap->name, sizeof(adap->name), "i2c-hba_sfp%d", pdev->id);
+	snprintf(adap->name, sizeof(adap->name), "i2c_hba_sfp%d", pdev->id);
 	adap->algo_data = bit_data;
 	adap->dev.parent = &pdev->dev;
 
@@ -293,7 +293,7 @@ static int afhba_sfp_i2c_create1(struct AFHBA_DEV *adev, int ch)
 	int rc;
 	struct platform_device* pd =
 			kzalloc(2*sizeof(struct platform_device), GFP_KERNEL);
-	pd->name = "i2c-hba_sfp";
+	pd->name = "i2c_hba_sfp";
 	pd->id = adev->idx*2+CHIX(ch);
 	pd->dev.platform_data = &rtm_t_i2c_gpio_data_templates[CHIX(ch)];
 	/** HACK ALERT */

@@ -70,6 +70,9 @@ struct afhba_spi {
 	int sent_reset;
 };
 
+#undef dev_dbg
+#warning pgmwashere modify dev_dbg to be always ON
+#define dev_dbg	dev_info
 
 static inline void afhba_spi_write_ctl(struct afhba_spi *hw, u32 value)
 {
@@ -254,9 +257,9 @@ static struct flash_platform_data rtm_t_flash_data = {
 	.type		        = "m25p64"
 };
 */
-static struct flash_platform_data rtm_t_flash_data = {
-	.name			= "rtm-t-flash",
-	.type			= "W25Q64"
+static struct flash_platform_data afhba_flash_data = {
+	.name			= "afhba-flash",
+	.type			= "w25q64"
 };
 static struct spi_board_info rtm_t_spi_devices[] = {
 	{	/* DataFlash chip */
@@ -266,7 +269,7 @@ static struct spi_board_info rtm_t_spi_devices[] = {
 		.chip_select	= 0,
 		.max_speed_hz	= 15 * 1000 * 1000,
 		.mode = SPI_CS_HIGH,
-		.platform_data = &rtm_t_flash_data
+		.platform_data = &afhba_flash_data
 	},
 };
 
@@ -299,10 +302,14 @@ int afhba_spi_master_init(struct AFHBA_DEV *adev)
 	hw->bitbang.chipselect     = rtm_t_spi_chipsel;
 	hw->bitbang.txrx_bufs      = rtm_t_spi_txrx;
 	hw->bitbang.master->setup  = rtm_t_spi_setup;
+	hw->bitbang.flags = SPI_CS_HIGH;
 
 	/* register our spi controller */
 
+	dev_dbg(dev, "call spi_bitbang_start()");
 	rc = spi_bitbang_start(&hw->bitbang);
+	dev_dbg(dev, "back from spi_bitbang_start()");
+
 	if (rc) {
 		dev_err(dev, "Failed to register SPI master\n");
 		goto err_register;
