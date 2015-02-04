@@ -84,6 +84,10 @@ int aurora_monitor = 0;
 module_param(aurora_monitor, int, 0644);
 MODULE_PARM_DESC(aurora_monitor, "enable to check cable state in run loop, disable for debug");
 
+int eot_interrupt = 1;
+module_param(eot_interrupt, int, 0644);
+MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: interrupt interval");
+
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
 
@@ -118,7 +122,22 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 
 		descr &= ~AFDMAC_DESC_LEN_MASK;
 		descr |= getAFDMAC_Order(sdev->buffer_len)<< AFDMAC_DESC_LEN_SHL;
-		descr |= AFDMAC_DESC_EOT;
+		switch(eot_interrupt){
+		case 0:
+			descr &= ~AFDMAC_DESC_EOT;
+			break;
+		case 1:
+			descr |= AFDMAC_DESC_EOT;
+			break;
+		default:
+			if (ii%eot_interrupt == 0){
+				descr |= AFDMAC_DESC_EOT;
+			}else{
+				descr &= ~AFDMAC_DESC_EOT;
+			}
+			break;
+		}
+
 		sdev->hbx[ii].descr = descr;
 	}
 }
@@ -136,6 +155,10 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 descr = sdev->hbx[idesc].descr;
 
+	if (sdev->job.buffers_queued < 5){
+		dev_info(pdev(adev), "write_descr(%d) [%d] offset:%04x = %08x",
+				sdev->job.buffers_queued, idesc, offset, descr);
+	}
 	dev_dbg(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
 	writel(descr, adev->mappings[REMOTE_BAR].va+offset);
 }
@@ -334,12 +357,12 @@ static void queue_free_buffers(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB *job = &sdev->job;
-	unsigned queued = job->buffers_queued;
-	int in_queue =  queued - (job->buffers_received+job->buffers_discarded);
+	int in_queue =  job->buffers_queued -
+			(job->buffers_received+job->buffers_discarded);
 
-	while (queued < job->buffers_demand){
+	while (job->buffers_queued < job->buffers_demand){
 		if (queue_next_free_buffer(adev)){
-	                ++queued;
+	                ++job->buffers_queued;
 		        ++in_queue;
 		}else{
 			if (in_queue == 0){
@@ -348,7 +371,6 @@ static void queue_free_buffers(struct AFHBA_DEV *adev)
 			break;
 		}
         }
-        job->buffers_queued = queued;
 }
 
 struct HostBuffer* hb_from_descr(struct AFHBA_DEV *adev, u32 inflight_descr)
