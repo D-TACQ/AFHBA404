@@ -20,7 +20,7 @@ int next(int ii){
 int hbfarm(void)
 {
 	unsigned lw[8];
-	int ii = 0;
+	int ii = next(0);
 	while(fread(lw, sizeof(unsigned), 8, stdin) == 8){
 		fwrite(lw, sizeof(unsigned), 8, fp_out[ii]);
 		ii = next(ii);	
