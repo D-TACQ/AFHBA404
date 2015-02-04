@@ -11,7 +11,7 @@ const char* outroot = ".";
 
 int next(int ii){
 	if (++ii > 4) ii = 1;
-	if (fp_out[ii] = 0){
+	if (fp_out[ii] == 0){
 		return next(ii);		/* recursion : woohoo! */
 	}
 	return ii;
