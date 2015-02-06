@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <strings.h>
 
 FILE *fp_out[5];	/* index from 1 */
 
@@ -28,6 +28,12 @@ int hbfarm(FILE *fin)
 	}
 }
 
+char* chomp(char* str) {
+	char *nl;
+	for (; nl = rindex(str, '\n'); ){
+		*nl = '\0';
+	}
+}
 int main(int argc, char* argv[])
 {
 	int sinks = 0;
@@ -78,7 +84,7 @@ int main(int argc, char* argv[])
 	}
 	if (names_on_stdin){
 		char fname[80];
-		while (fgets(fname, 80, stdin)){
+		while (fgets(fname, 80, stdin) && chomp(fname)){
 			FILE *fp = fopen(fname, "r");
 			if (fp == 0){
 				perror(fname);
