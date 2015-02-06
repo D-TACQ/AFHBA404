@@ -33,6 +33,7 @@ char* chomp(char* str) {
 	for (; nl = rindex(str, '\n'); ){
 		*nl = '\0';
 	}
+	return str;
 }
 int main(int argc, char* argv[])
 {
