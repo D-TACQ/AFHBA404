@@ -8,6 +8,7 @@ FILE *fp_out[5];	/* index from 1 */
 
 const char* process;
 const char* outroot = ".";
+int names_on_stdin;
 
 int next(int ii){
 	if (++ii > 4) ii = 1;
@@ -17,11 +18,11 @@ int next(int ii){
 	return ii;
 }
 
-int hbfarm(void)
+int hbfarm(FILE *fin)
 {
 	unsigned lw[8];
 	int ii = next(0);
-	while(fread(lw, sizeof(unsigned), 8, stdin) == 8){
+	while(fread(lw, sizeof(unsigned), 8, fin) == 8){
 		fwrite(lw, sizeof(unsigned), 8, fp_out[ii]);
 		ii = next(ii);	
 	}
@@ -40,6 +41,9 @@ int main(int argc, char* argv[])
 	}
 	if (getenv("OUTROOT")){
 		outroot = getenv("OUTROOT");
+	}
+	if (getenv("NAMES_ON_STDIN")){
+		names_on_stdin = 1;
 	}
 
 	for (ii = 1; ii < argc; ++ii){
@@ -72,7 +76,20 @@ int main(int argc, char* argv[])
 		fprintf(stderr, "must specify 1 or more sinks\n");
 		return 1;
 	}
-	return hbfarm();
+	if (names_on_stdin){
+		char fname[80];
+		while (fgets(fname, 80, stdin)){
+			FILE *fp = fopen(fname, "r");
+			if (fp == 0){
+				perror(fname);
+				return -1;
+			}
+			hbfarm(fp);
+			fclose(fp);
+		}
+	}else{
+		return hbfarm(stdin);
+	}
 }
 
 
