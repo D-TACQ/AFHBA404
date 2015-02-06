@@ -3,4 +3,4 @@
 PATH=$PATH:/usr/local/bin
 
 export HBFARM_PROCESS=checkramp
-RECYCLE=1 ./STREAM/rtm-t-stream-disk | cat - | hbfarm425 1 2
+RECYCLE=1 ./STREAM/rtm-t-stream-disk | xargs cat - | hbfarm425 1 2
