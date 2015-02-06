@@ -58,7 +58,7 @@ int MAXITER_MASK       = 0x7fffffff;
 
 int NELEMS = RTM_T_Device::MAXBUF;
 int USLEEP = 0;
-int VERBOSE = 1;
+int VERBOSE = 0;
 
 int SSIZE = sizeof(short) * 96;
 
@@ -80,7 +80,7 @@ int CYCLE;
 int RECYCLE = 0;		/* accumulate by default */
 int NO_OVERWRITE = 0;		/* refuse to allow buffer overwrite */
 int MAXINT = 999999;
-int PUT_DATA = 0;
+int PUT_DATA = 1;		/* output name of data buffer, not id */
 int NBUFS = 0;			/* !=) ? stop after this many buffers */
 
 
