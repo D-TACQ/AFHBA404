@@ -277,16 +277,6 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 
 /* @@todo : dma implement PUSH only */
 
-static void afs_stop_dma(struct AFHBA_DEV *adev)
-{
-	/** @@todo
-	as_write_reg(tdev, RTMT_H_FCR,
-		      tdev->regs.H_FCR &= ~RTMT_D_FCR_PCIE_DATAON);
-	*/
-	DMA_CTRL_CLR(adev, DMA_CTRL_EN);
-}
-
-
 static void afs_dma_reset(struct AFHBA_DEV *adev)
 {
 	DMA_CTRL_CLR(adev, DMA_CTRL_EN);
@@ -299,6 +289,12 @@ static void afs_start_dma(struct AFHBA_DEV *adev)
 {
 	DMA_CTRL_SET(adev, DMA_CTRL_EN);
 }
+
+static void afs_stop_dma(struct AFHBA_DEV *adev)
+{
+	DMA_CTRL_CLR(adev, DMA_CTRL_EN);
+}
+
 #define RTDMAC_DATA_FIFO_CNT	0x1000
 #define RTDMAC_DESC_FIFO_CNT	0x1000
 
@@ -745,11 +741,10 @@ static int afs_isr_work(void *arg)
 		}
 
 	        if (job_is_go(job)){
-
+	        	queue_free_buffers(adev);
 			if (!afs_push_dma_started(adev)){
 				afs_start_dma(adev);
 			}
-			queue_free_buffers(adev);
 		}
 
 
@@ -780,6 +775,7 @@ static int afs_isr_work(void *arg)
 		}
 	}
 
+	afs_stop_dma(adev);
 	return 0;
 }
 
