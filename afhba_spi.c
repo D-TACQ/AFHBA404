@@ -70,10 +70,6 @@ struct afhba_spi {
 	int sent_reset;
 };
 
-#undef dev_dbg
-#warning pgmwashere modify dev_dbg to be always ON
-#define dev_dbg	dev_info
-
 static inline void afhba_spi_write_ctl(struct afhba_spi *hw, u32 value)
 {
 	struct AFHBA_DEV *adev = hw->adev;
