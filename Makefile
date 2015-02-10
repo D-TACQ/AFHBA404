@@ -49,12 +49,10 @@ xiloader:
 
 
 spi_support: 
-	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi-bitbang.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd  obj-m="mtd.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd/devices obj-m=m25p80.o modules
 	cp ./linux/drivers/mtd/devices/m25p80.ko .
-	cp ./linux/drivers/spi/spi.ko .
 	cp ./linux/drivers/spi/spi-bitbang.ko .
 	cp ./linux/drivers/mtd/mtd.ko .
 
