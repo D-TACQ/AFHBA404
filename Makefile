@@ -13,7 +13,11 @@ EXTRA_CFLAGS += -DCONFIG_SPI
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-all: modules apps spi_support mtd-utils
+all: modules apps 
+
+flash: spi_support 
+
+flash_clean: spi_clean
 
 KRNL ?= $(shell uname -r)
 # FEDORA:
@@ -38,8 +42,7 @@ apps: $(APPS)
 
 
 mtd-utils:
-	cd mtd-utils
-	$(MAKE)
+	cd mtd-utils && $(MAKE)
 
 mmap:
 	cc -o mmap mmap.c -lpopt
@@ -48,7 +51,7 @@ xiloader:
 	cc -o xiloader xiloader.c -lpopt
 
 
-spi_support: 
+spi_support: mtd-utils
 	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi-bitbang.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd  obj-m="mtd.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd/devices obj-m=m25p80.o modules
@@ -60,6 +63,7 @@ spi_clean:
 	make -C $(KHEADERS) M=$(LDRV)/spi clean
 	make -C $(KHEADERS) M=$(LDRV)/mtd clean
 	make -C $(KHEADERS) M=$(LDRV)/mtd/devices clean
+	cd mtd-utils && $(MAKE) clean
 	
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
