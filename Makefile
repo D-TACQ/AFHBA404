@@ -41,8 +41,9 @@ APPS := mmap xiloader
 apps: $(APPS)
 
 
-mtd-utils:
+flasherase:
 	cd mtd-utils && $(MAKE)
+	cp mtd-utils/flash_erase .
 
 mmap:
 	cc -o mmap mmap.c -lpopt
@@ -51,7 +52,7 @@ xiloader:
 	cc -o xiloader xiloader.c -lpopt
 
 
-spi_support: mtd-utils
+spi_support: flasherase
 	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi-bitbang.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd  obj-m="mtd.o" modules
 	make -C $(KHEADERS) M=$(LDRV)/mtd/devices obj-m=m25p80.o modules
@@ -69,7 +70,7 @@ clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
-package: clean
+package: clean spi_clean
 	git tag $(DC)
 	(cd ..;tar cvf AFHBA/release/afhba-$(DC).tar \
 		--exclude=release --exclude=SAFE AFHBA/* )
