@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cp ./udev/d-tacq-afhba.hotplug /lib/udev
+cp ./udev/20-afhba.rules /etc/udev/rules.d
+
