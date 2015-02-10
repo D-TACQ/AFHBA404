@@ -1,0 +1,63 @@
+#!/bin/bash
+
+MODE=$1
+SRC=$2
+LUN=${3:-0}
+
+usage() {
+	echo $*
+	echo "USAGE: afhba-flash-update MODE SRC [lun]"
+	echo "MODE: verify / program"
+	exit 1;
+}
+
+is_valid_src() {
+	echo Validating SRC $SRC
+	./xiloader $SRC
+	[ $? -eq  0 ] || usage "+++ ERROR +++ SRC $SRC not valid"
+}
+
+[ "x$SRC" != "x" ] || usage "+++ ERROR +++ SRC file not found"
+is_valid_src $SRC
+
+STRIP=$SRC.strip
+./xiloader -R -L -o $STRIP $SRC
+
+LEN=$(ls -l $STRIP | awk '{ print $5 }')
+echo RAW file $STRIP is $LEN bytes
+ 
+MTD=/dev/mtd${LUN}
+
+[ -e $MTD ]  || usage "+++ ERROR +++ FLASH device $MTD not found"
+
+readback() {
+	let bc="$LEN/4096 + 1"
+	echo "   reading $bc pages from $MTD ..."
+	dd if=$MTD bs=4096 count=$bc of=flash.$LUN
+	echo "   copy $LEN bytes to  flash.$LUN.strip"
+	dd if=flash.$LUN bs=1 count=$LEN of=flash.$LUN.strip
+	ls -l flash.$LUN.strip
+}
+
+verify() {
+	readback
+	ls -l $STRIP flash.$LUN.strip
+	cmp $STRIP flash.$LUN.strip
+	if [ $? -ne 0 ]; then
+		echo "+++ ERROR +++ Verify fail "
+	else
+		echo " It's ALL GOOD !"	
+	fi
+}
+case $MODE in
+verify)
+	verify;;
+program)
+	./flash_erase $MTD 0 0
+	echo programming ..
+	cat $STRIP > $MTD
+	verify
+	;;
+*)
+	usage "+++ERROR+++ in valid mode"	
+esac
