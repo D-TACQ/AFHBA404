@@ -21,7 +21,7 @@ is_valid_src() {
 is_valid_src $SRC
 
 STRIP=$SRC.strip
-./xiloader -R -L -o $STRIP $SRC
+./xiloader -R -L -o $STRIP $SRC 2>/dev/null
 
 LEN=$(ls -l $STRIP | awk '{ print $5 }')
 echo RAW file $STRIP is $LEN bytes
@@ -35,13 +35,13 @@ readback() {
 	echo "   reading $bc pages from $MTD ..."
 	dd if=$MTD bs=4096 count=$bc of=flash.$LUN
 	echo "   copy $LEN bytes to  flash.$LUN.strip"
-	dd if=flash.$LUN bs=1 count=$LEN of=flash.$LUN.strip
+	dd if=flash.$LUN bs=1 count=$LEN of=flash.$LUN.strip 2>/dev/null
 	ls -l flash.$LUN.strip
 }
 
 verify() {
 	readback
-	ls -l $STRIP flash.$LUN.strip
+	ls -l $STRIP 
 	cmp $STRIP flash.$LUN.strip
 	if [ $? -ne 0 ]; then
 		echo "+++ ERROR +++ Verify fail "
