@@ -1,0 +1,21 @@
+#!/bin/sh
+
+KRNL=$(uname -r)
+KDEV=/lib/modules/$KRNL/source
+SRC=~/rpmbuild/BUILD/kernel-3.10.33/linux-3.10.33.x86_64/
+
+mkdir -p linux/drivers/spi linux/drivers/mtd/devices
+cp $SRC/drivers/spi/spi-bitbang.c linux/drivers/spi
+cp $SRC/drivers/spi/Makefile linux/drivers/spi
+
+make -C $KDEV M=$PWD/linux/drivers/spi obj-m="spi-bitbang.o" modules
+
+cp linux/drivers/spi/*.ko .
+
+cp -a $SRC/drivers/mtd linux/drivers
+make -C $KDEV M=$PWD/linux/drivers/mtd/ -obj-m=mtd.o modules
+make -C $KDEV M=$PWD/linux/drivers/mtd/devices obj-m=m25p80.o modules 
+
+cp linux/drivers/mtd/mtd.ko linux/drivers/mtd/devices/m25p80.ko .
+
+
