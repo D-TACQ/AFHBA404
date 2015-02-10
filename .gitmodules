@@ -1,0 +1,3 @@
+[submodule "mtd-utils"]
+	path = mtd-utils
+	url = git://git.infradead.org/mtd-utils.git

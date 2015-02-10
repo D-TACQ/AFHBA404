@@ -13,7 +13,7 @@ EXTRA_CFLAGS += -DCONFIG_SPI
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-all: modules apps spi_support
+all: modules apps spi_support mtd-utils
 
 KRNL ?= $(shell uname -r)
 # FEDORA:
@@ -33,8 +33,13 @@ modules:
 	make -C $(KHEADERS) M=$(SRC)  modules
 
 
-APPS := mmap
+APPS := mmap xiloader
 apps: $(APPS)
+
+
+mtd-utils:
+	cd mtd-utils
+	$(MAKE)
 
 mmap:
 	cc -o mmap mmap.c -lpopt
