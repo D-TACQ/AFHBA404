@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+
+/sbin/insmod afhbasfp.ko  
+/sbin/insmod spi-bitbang.ko 
+/sbin/insmod mtd.ko 
+/sbin/insmod m25p80.ko
+/sbin/insmod afhbaspi.ko
+
