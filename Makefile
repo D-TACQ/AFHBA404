@@ -72,6 +72,6 @@ clean:
 DC := $(shell date +%y%m%d%H%M)
 package: clean spi_clean
 	git tag $(DC)
-	(cd ..;tar cvf AFHBA/release/afhba-$(DC).tar \
+	(cd ..;tar cvzf AFHBA/release/afhba-$(DC).tgz \
 		--exclude=release --exclude=SAFE AFHBA/* )
 	
