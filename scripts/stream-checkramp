@@ -3,7 +3,16 @@
 DN=${1:-0}
 PATH=$PATH:/usr/local/bin
 
+echo checking aurora is up ..
+grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
+if [ $? -ne 0 ];then
+	echo aurora lane NOT up, quit
+	exit 1
+fi
+echo stream to /mnt/afhba.$DN 
+mkdir -p /mnt/afhba.$DN
 export HBFARM_PROCESS=checkramp
 export NAMES_ON_STDIN=1
 
-RECYCLE=1 ./STREAM/rtm-t-stream-disk $DN | hbfarm425 1 2
+RTM_DEVNUM=$DN RECYCLE=1 OUTROOT=/mnt/afhba.$DN ./STREAM/rtm-t-stream-disk | \
+	hbfarm425 1 2
