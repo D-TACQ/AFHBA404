@@ -263,12 +263,21 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
+
 	if (afs_aurora_lane_up(adev)){
+		if (!sdev->link_up){
+			info(pdev(adev), "aurora link up!");
+			sdev->link_up = true;
+		}
 		if (!sdev->comms_init_done){
 			_afs_comms_init(adev);
 		}
 		return sdev->comms_init_done;
 	}else{
+		if (sdev->link_up){
+			info(pdev(adev), "aurora link down!");
+			sdev->link_up = false;
+		}
 		dev_dbg(pdev(adev), "aurora lane down");
 		return sdev->comms_init_done = false;
 	}

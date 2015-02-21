@@ -128,6 +128,8 @@ struct AFHBA_DEV {
 	struct file_operations* stream_fops;
 
 	struct platform_device *hba_sfp_i2c[2];
+
+	int link_up;
 };
 
 extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
