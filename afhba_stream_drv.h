@@ -116,6 +116,8 @@ struct AFHBA_STREAM_DEV {
 	int comms_init_done;
 
 	char irq_names[4][32];
+
+	bool aurora_fail_detected;
 };
 #define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
 
