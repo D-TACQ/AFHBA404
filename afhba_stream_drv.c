@@ -476,11 +476,14 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			++nrx;
 		}
 	}
-	if (ifilling > NBUFFERS){
-		dev_warn(pdev(adev), "ifilling > NBUFFERS?");
-		ifilling = 0;
+
+	if (nrx){
+		if (ifilling > NBUFFERS){
+			dev_warn(pdev(adev), "ifilling > NBUFFERS?");
+			ifilling = 0;
+		}
+		job->catchup_histo[ifilling]++;
 	}
-	job->catchup_histo[ifilling]++;
 
 	mutex_unlock(&sdev->list_mutex);
 	return nrx;
