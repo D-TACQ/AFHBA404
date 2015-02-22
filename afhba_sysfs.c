@@ -163,46 +163,6 @@ DMA_LATEST(pull, DMA_PULL_DESC_STA_RD);
 DMA_LATEST(push, DMA_PUSH_DESC_STA_RD);
 
 
-static ssize_t show_job(
-	struct device *dev,
-	struct device_attribute *attr,
-	char *buf)
-{
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	struct JOB *job = &sdev->job;
-	int bstates[NSTATES] = { 0, };
-	int ii;
-	int data_rate = job->rx_rate*sdev->req_len;
-
-	if (data_rate > 0x100000){
-		data_rate /= 0x100000;
-	}
-	for (ii = 0; ii != sdev->nbuffers; ++ii){
-		bstates[sdev->hbx[ii].bstate]++;
-	}
-
-
-	return sprintf(buf,
-		"dev=%s idx=%d demand=%d queued=%d "
-		"rx=%d rx_rate=%d int_rate=%d "
-		"MBPS=%d "
-		"BS_EMPTY=%-2d BS_FILLING=%-2d BS_FULL=%-2d BS_FULL_APP=%-2d "
-		"STATUS=%s ERRORS=%d\n",
-		       adev->name, adev->idx,
-		       job->buffers_demand,
-		       job->buffers_queued,
-		       job->buffers_received,
-		       job->rx_rate,  job->int_rate,
-		       data_rate,
-		       bstates[0], bstates[1], bstates[2], bstates[3],
-		       job->please_stop==PS_PLEASE_STOP? "PLEASE_STOP":
-		       job->please_stop==PS_STOP_DONE? "STOP_DONE": "",
-		       job->errors
-		);
-}
-
-static DEVICE_ATTR(job, S_IRUGO, show_job, 0);
 
 
 static ssize_t store_reset_buffers(
@@ -355,9 +315,25 @@ static ssize_t show_comms_init(
 
 static DEVICE_ATTR(comms_init, S_IRUGO|S_IWUGO, show_comms_init, store_comms_init);
 
+
+static ssize_t show_inflight(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct JOB *job = &sdev->job;
+
+	sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(inflight, S_IRUGO, show_inflight, 0);
+
+
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
-	&dev_attr_job.attr,
+	&dev_attr_inflight.attr,
 	&dev_attr_reset_buffers.attr,
 	&dev_attr_aurora.attr,
 	&dev_attr_data_fifo_stat_push.attr,

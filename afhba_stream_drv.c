@@ -84,9 +84,10 @@ int aurora_monitor = 0;
 module_param(aurora_monitor, int, 0644);
 MODULE_PARM_DESC(aurora_monitor, "enable to check cable state in run loop, disable for debug");
 
-int eot_interrupt = 1;
+int eot_interrupt = 0;
 module_param(eot_interrupt, int, 0644);
 MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: interrupt interval");
+
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -460,6 +461,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 				return_empty(adev, first);
 				first = 0;
 				if (stop_on_skipped_buffer){
+					dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
 					sdev->job.please_stop = PS_PLEASE_STOP;
 				}
 			}

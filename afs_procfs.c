@@ -231,6 +231,66 @@ static int addAppBufferProcFiles(struct AFHBA_DEV *adev)
 	return -1;
 }
 
+static int job_proc_show(struct seq_file *m, void *v)
+ {
+	struct file *file = (struct file *)m->private;
+	struct AFHBA_DEV *adev = PDE_DATA(file_inode(file));
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct JOB *job = &sdev->job;
+	int bstates[NSTATES] = { 0, };
+	int ii;
+	int data_rate = job->rx_rate*sdev->req_len;
+
+	if (data_rate > 0x100000){
+		data_rate /= 0x100000;
+	}
+	for (ii = 0; ii != sdev->nbuffers; ++ii){
+		bstates[sdev->hbx[ii].bstate]++;
+	}
+
+
+        seq_printf(m,
+        	"dev=%s idx=%d demand=%d queued=%d "
+        	"rx=%d rx_rate=%d int_rate=%d "
+        	"MBPS=%d "
+        	"BS_EMPTY=%-2d BS_FILLING=%-2d BS_FULL=%-2d BS_FULL_APP=%-2d "
+        	"STATUS=%s ERRORS=%d\n",
+        	       adev->name, adev->idx,
+        	       job->buffers_demand,
+        	       job->buffers_queued,
+        	       job->buffers_received,
+        	       job->rx_rate,  job->int_rate,
+        	       data_rate,
+        	       bstates[0], bstates[1], bstates[2], bstates[3],
+        	       job->please_stop==PS_PLEASE_STOP? "PLEASE_STOP":
+        	       job->please_stop==PS_STOP_DONE? "STOP_DONE": "",
+        	       job->errors
+        	);
+         return 0;
+ }
+
+static int job_proc_open(struct inode *inode, struct file *file)
+{
+        return single_open(file, job_proc_show, file);
+}
+static int addJobProcFile(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	static struct file_operations job_proc_fops = {
+		.owner = THIS_MODULE,
+		.open = job_proc_open,
+		.read = seq_read,
+		.llseek = seq_lseek,
+		.release = single_release
+	};
+	if (proc_create_data("Job", S_IRUGO,
+			sdev->proc_dir_root, &job_proc_fops, adev) != 0){
+		return 0;
+	}else{
+		dev_err(pdev(adev), "Failed to create entry");
+		return -1;
+	}
+}
 int afs_init_procfs(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -244,8 +304,10 @@ int afs_init_procfs(struct AFHBA_DEV *adev)
 	sdev->proc_dir_root = proc_mkdir(adev->name, afs_proc_root);
 
 	if ((rc = addHostBufferProcFiles(adev)) == 0 &&
-	    (rc = addAppBufferProcFiles(adev))  == 0)
+	    (rc = addAppBufferProcFiles(adev))  == 0 &&
+	    (rc = addJobProcFile(adev) == 0) == 0){
 		return 0;
+	}
 
 	return rc;
 }
