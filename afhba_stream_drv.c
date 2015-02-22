@@ -39,7 +39,7 @@
 
 
 
-int RX_TO = 10*HZ;
+int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
 MODULE_PARM_DESC(RX_TO, "RX timeout (jiffies) [0.1Hz]");
 
