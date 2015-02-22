@@ -244,12 +244,17 @@ static int job_proc_show(struct seq_file *m, void *v)
 	if (data_rate > 0x100000){
 		data_rate /= 0x100000;
 	}
-	for (ii = 0; ii != sdev->nbuffers; ++ii){
-		bstates[sdev->hbx[ii].bstate]++;
+
+	for (ii = 0; ii != nbuffers; ++ii){
+		int bs = sdev->hbx[ii].bstate;
+		if (bs < 0 || bs > NSTATES-1){
+			dev_warn(pdev(adev), "bstate[%d] %d out of range", bs);
+		}else{
+			bstates[bs]++;
+		}
 	}
 
-
-        seq_printf(m,
+        ii = seq_printf(m,
         	"dev=%s idx=%d demand=%d queued=%d "
         	"rx=%d rx_rate=%d int_rate=%d "
         	"MBPS=%d "
@@ -266,7 +271,7 @@ static int job_proc_show(struct seq_file *m, void *v)
         	       job->please_stop==PS_STOP_DONE? "STOP_DONE": "",
         	       job->errors
         	);
-         return 0;
+        return 0;
  }
 
 static int job_proc_open(struct inode *inode, struct file *file)
