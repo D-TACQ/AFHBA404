@@ -88,6 +88,8 @@ struct AFHBA_STREAM_DEV {
 		unsigned int_rate;
 		unsigned errors;
 		unsigned buffers_discarded;
+
+		unsigned catchup_histo[NBUFFERS];
 	}
 		job;
 	spinlock_t job_lock;

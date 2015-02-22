@@ -16,6 +16,8 @@
 #define MINOR_DESC_FIFO 251
 #define MINOR_UART	250
 
+
 #define MINOR_REMOTE	247
+#define MINOR_CATCHUP_HISTO	246
 
 #endif /* AFHAB_MINOR_H_ */

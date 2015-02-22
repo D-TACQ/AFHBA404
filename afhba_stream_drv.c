@@ -437,6 +437,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 	struct HostBuffer* hb;
 	struct HostBuffer* tmp;
 	struct HostBuffer* first = 0;
+	struct JOB *job = &sdev->job;
 	int nrx = 0;
 	int ifilling = 0;
 
@@ -456,13 +457,13 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			}
 		}else{
 			if (ifilling > 1 && first && hb != first){
-				sdev->job.buffers_discarded++;
+				job->buffers_discarded++;
 				report_stuck_buffer(adev, first->ibuf);
 				return_empty(adev, first);
 				first = 0;
 				if (stop_on_skipped_buffer){
 					dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
-					sdev->job.please_stop = PS_PLEASE_STOP;
+					job->please_stop = PS_PLEASE_STOP;
 				}
 			}
 			if (buffer_debug){
@@ -471,10 +472,15 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 
 			hb->bstate = BS_FULL;
 			list_move_tail(&hb->list, &sdev->bp_full.list);
-			sdev->job.buffers_received++;
+			job->buffers_received++;
 			++nrx;
 		}
 	}
+	if (ifilling > NBUFFERS){
+		dev_warn(pdev(adev), "ifilling > NBUFFERS?");
+		ifilling = 0;
+	}
+	job->catchup_histo[ifilling]++;
 
 	mutex_unlock(&sdev->list_mutex);
 	return nrx;
@@ -799,8 +805,7 @@ ssize_t afs_histo_read(
 	struct file *file, char *buf, size_t count, loff_t *f_pos)
 {
 	unsigned *the_histo = PD(file)->private;
-	int maxentries = PD(file)->minor == MINOR_DATA_FIFO ?
-		RTDMAC_DATA_FIFO_CNT: RTDMAC_DESC_FIFO_CNT;
+	int maxentries = PD(file)->private2;
 	unsigned cursor = *f_pos;	/* f_pos counts in entries */
 	int rc;
 
@@ -851,10 +856,11 @@ static int rtm_t_start_stream(struct AFHBA_DEV *adev, unsigned buffers_demand)
 	return 0;
 }
 
-int afs_histo_open(struct inode *inode, struct file *file, unsigned *histo)
+int afs_histo_open(struct inode *inode, struct file *file, unsigned *histo, int hcount)
 {
 	file->f_op = &afs_fops_histo;
 	PD(file)->private = histo;
+	PD(file)->private2 = hcount;
 	return 0;
 }
 
@@ -1267,10 +1273,16 @@ int afs_open(struct inode *inode, struct file *file)
 		return afs_dma_open(inode, file);
 	case MINOR_DATA_FIFO:
 		return afs_histo_open(
-				inode, file, adev->stream_dev->data_fifo_histo);
+			inode, file,
+			adev->stream_dev->data_fifo_histo, RTDMAC_DATA_FIFO_CNT);
 	case MINOR_DESC_FIFO:
 		return afs_histo_open(
-				inode, file, adev->stream_dev->desc_fifo_histo);
+			inode, file,
+			adev->stream_dev->desc_fifo_histo, RTDMAC_DESC_FIFO_CNT);
+	case MINOR_CATCHUP_HISTO:
+		return afs_histo_open(
+			inode, file,
+			adev->stream_dev->job.catchup_histo, NBUFFERS);
 	default:
 		if (PD(file)->minor <= NBUFFERS_MASK){
 			return 0;

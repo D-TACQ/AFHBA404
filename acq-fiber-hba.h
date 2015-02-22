@@ -144,6 +144,7 @@ struct AFHBA_DEV_PATH {
 	struct AFHBA_DEV *dev;
 	struct list_head my_buffers;
 	void* private;
+	int private2;
 };
 
 

@@ -22,6 +22,7 @@ MINOR_DESC_FIFO=251
 MINOR_UART=250
 MINOR_PBI=249
 MINOR_FIFO=248
+MINOR_CATCHUP_HISTO=246
 
 # set user to standard dt100 if available
 # searching passwd only effective on systems using /etc/passwd ..
@@ -49,6 +50,7 @@ mknod /dev/rtm-t.${DN}			c $MAJOR $MINOR_DMAREAD
 mknod /dev/rtm-t.${DN}.regs		c $MAJOR $MINOR_REGREAD
 mknod /dev/rtm-t.${DN}.fifo_histo.data	c $MAJOR $MINOR_DATA_FIFO
 mknod /dev/rtm-t.${DN}.fifo_histo.desc	c $MAJOR $MINOR_DESC_FIFO
+mknod /dev/rtm-t.${DN}.catchup_histo	c $MAJOR $MINOR_CATCHUP_HISTO
 mknod /dev/rtm-t.${DN}.uart		c $MAJOR $MINOR_UART
 
 if [ "$ACQTYPE" = "AO32" ]; then
