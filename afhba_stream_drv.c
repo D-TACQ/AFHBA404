@@ -210,6 +210,30 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 	write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
 }
 
+static void afs_load_llc_single_dma(
+	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel, u32 pa, unsigned len)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	u32 dma_desc = pa==RTM_T_USE_HOSTBUF? sdev->hbx[0].pa: pa;
+	u32 len64 = (len/64 + len%64!=0);
+	u32 offset = dma_sel==DMA_PUSH_SEL?
+			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+
+	len64 <<= AFDMAC_DESC_LEN_SHL;
+	len64 &= AFDMAC_DESC_LEN_MASK;
+
+	dma_desc &= AFDMAC_DESC_ADDR_MASK;
+	dma_desc |= len64;
+	dma_desc |= sdev->shot&AFDMAC_DESC_ID_MASK;
+
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
+
+	DMA_CTRL_WR(adev, dma_ctrl);
+	afs_dma_reset(adev, dma_sel);
+	writel(dma_desc, adev->mappings[REMOTE_BAR].va+offset);
+	afs_start_dma(adev, dma_sel);
+}
 
 static int _afs_dma_started(struct AFHBA_DEV *adev, int shl)
 {
@@ -219,14 +243,11 @@ static int _afs_dma_started(struct AFHBA_DEV *adev, int shl)
 }
 
 
-static inline int afs_push_dma_started(struct AFHBA_DEV *adev)
+static inline int afs_dma_started(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
-	return _afs_dma_started(adev, DMA_CTRL_PUSH_SHL);
+	return _afs_dma_started(adev, dma_pp(dma_sel, DMA_CTRL_PUSH_SHL));
 }
-static inline int afs_pull_dma_started(struct AFHBA_DEV *adev)
-{
-	return _afs_dma_started(adev, DMA_CTRL_PULL_SHL);
-}
+
 
 static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 {
@@ -283,25 +304,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 }
 
 
-/* @@todo : dma implement PUSH only */
 
-static void afs_dma_reset(struct AFHBA_DEV *adev)
-{
-	DMA_CTRL_CLR(adev, DMA_CTRL_EN);
-	DMA_CTRL_SET(adev, DMA_CTRL_FIFO_RST);
-	DMA_CTRL_CLR(adev, DMA_CTRL_FIFO_RST);
-	//DMA_CTRL_SET(adev, DMA_CTRL_EN);
-}
-
-static void afs_start_dma(struct AFHBA_DEV *adev)
-{
-	DMA_CTRL_SET(adev, DMA_CTRL_EN);
-}
-
-static void afs_stop_dma(struct AFHBA_DEV *adev)
-{
-	DMA_CTRL_CLR(adev, DMA_CTRL_EN);
-}
 
 #define RTDMAC_DATA_FIFO_CNT	0x1000
 #define RTDMAC_DESC_FIFO_CNT	0x1000
@@ -760,8 +763,8 @@ static int afs_isr_work(void *arg)
 
 	        if (job_is_go(job)){
 	        	queue_free_buffers(adev);
-			if (!afs_push_dma_started(adev)){
-				afs_start_dma(adev);
+			if (!afs_dma_started(adev, DMA_PUSH_SEL)){
+				afs_start_dma(adev, DMA_PUSH_SEL);
 			}
 		}
 
@@ -777,11 +780,11 @@ static int afs_isr_work(void *arg)
 		case PS_STOP_DONE:
 			break;
 		case PS_PLEASE_STOP:
-			afs_stop_dma(adev);
+			afs_stop_dma(adev, DMA_PUSH_SEL);
 			job->please_stop = PS_STOP_DONE;
 			break;
 		default:
-			if (afs_push_dma_started(adev)){
+			if (afs_dma_started(adev, DMA_PUSH_SEL)){
 				please_check_fifo = 1;
 			}
 		}
@@ -793,7 +796,7 @@ static int afs_isr_work(void *arg)
 		}
 	}
 
-	afs_stop_dma(adev);
+	afs_stop_dma(adev, DMA_PUSH_SEL);
 	return 0;
 }
 
@@ -841,7 +844,7 @@ static int rtm_t_start_stream(struct AFHBA_DEV *adev, unsigned buffers_demand)
 	struct JOB *job = &sdev->job;
 
 	dev_dbg(pdev(adev), "01");
-	afs_dma_reset(adev);
+	afs_dma_reset(adev, DMA_PUSH_SEL);
 	memset(job, 0, sizeof(struct JOB));
 
 	job->buffers_demand = buffers_demand;
@@ -896,6 +899,31 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 	return 0;
 }
 
+
+void afs_stop_llc_push(struct AFHBA_DEV *adev)
+{
+	afs_dma_reset(adev, DMA_PUSH_SEL);
+}
+
+void afs_stop_llc_pull(struct AFHBA_DEV *adev)
+{
+	afs_dma_reset(adev, DMA_PULL_SEL);
+}
+long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	sdev->onStopPush = afs_stop_llc_push;
+	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
+	return 0;
+}
+long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	sdev->onStopPull = afs_stop_llc_pull;
+	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
+	return 0;
+}
+
 int afs_dma_open(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
@@ -916,6 +944,8 @@ int afs_dma_open(struct inode *inode, struct file *file)
 	if (sdev->pid != current->pid){
 		return -EBUSY;
 	}
+
+	sdev->shot++;
 
 	if (sdev->buffer_len == 0) sdev->buffer_len = BUFFER_LEN;
 	sdev->req_len = min(sdev->buffer_len, BUFFER_LEN);
@@ -962,9 +992,13 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	sdev->job.please_stop = PS_PLEASE_STOP;
 	sdev->job.buffers_demand = 0;
 
-	if (sdev->onStop){
-		sdev->onStop(adev);
-		sdev->onStop = 0;
+	if (sdev->onStopPull){
+		sdev->onStopPull(adev);
+		sdev->onStopPull = 0;
+	}
+	if (sdev->onStopPush){
+		sdev->onStopPush(adev);
+		sdev->onStopPush = 0;
 	}
 	sdev->pid = 0;
 	return afhba_release(inode, file);
@@ -1073,8 +1107,8 @@ ssize_t afs_dma_read_poll(
 		return 0;
 	}
 
-	if (!afs_push_dma_started(adev)){
-		afs_start_dma(adev);
+	if (!afs_dma_started(adev, DMA_PUSH_SEL)){
+		afs_start_dma(adev, DMA_PUSH_SEL);
 	}
 	if (queue_full_buffers(adev)){
 		list_for_each_entry_safe(hb, tmp, &sdev->bp_full.list, list){
@@ -1183,7 +1217,7 @@ write99:
 	return rc;
 }
 
-long  afs_dma_ioctl(struct file *file,
+long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
@@ -1198,19 +1232,17 @@ long  afs_dma_ioctl(struct file *file,
 		COPY_FROM_USER(&my_transfer_buffers, varg, sizeof(u32));
 		return rtm_t_start_stream(adev, my_transfer_buffers);
 	}
-	/*
-	case RTM_T_START_LLC: {
-		struct LLC_DEF llc_def;
-		COPY_FROM_USER(&llc_def, varg, sizeof(struct LLC_DEF));
-		rtm_t_start_llc(adev, &llc_def);
-		return 0;
-	} case RTM_T_START_AOLLC: {
-		struct AO_LLC_DEF ao_llc_def;
-		COPY_FROM_USER(&ao_llc_def, varg, sizeof(struct AO_LLC_DEF));
-		rtm_t_start_aollc(adev, &ao_llc_def);
-		return 0;
-
-	} */ default:
+	case AFHBA_START_AI_LLC : {
+		struct XLLC_DEF xllc_def;
+		COPY_FROM_USER(&xllc_def, varg, sizeof(struct XLLC_DEF));
+		return afs_start_ai_llc(adev, &xllc_def);
+	}
+	case AFHBA_START_AO_LLC : {
+		struct XLLC_DEF xllc_def;
+		COPY_FROM_USER(&xllc_def, varg, sizeof(struct XLLC_DEF));
+		return afs_start_ao_llc(adev, &xllc_def);
+	}
+	default:
 		return -ENOTTY;
 	}
 
@@ -1223,8 +1255,9 @@ int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	int minor = PD(vma->vm_file)->minor;
 
-	int ibuf = PD(vma->vm_file)->minor&NBUFFERS_MASK;
+	int ibuf = minor<=NBUFFERS_MASK? minor&NBUFFERS_MASK: 0;
 	struct HostBuffer *hb = &sdev->hbx[ibuf];
 	unsigned long vsize = vma->vm_end - vma->vm_start;
 	unsigned long psize = hb->len;

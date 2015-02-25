@@ -249,6 +249,13 @@ enum DMA_REGS {
 
 
 
+enum DMA_SEL {
+	DMA_PUSH_SEL = 0x1,
+	DMA_PULL_SEL = 0x2,
+	DMA_BOTH_SEL = 0x3
+};
+
+
 #define DMA_PUSH_DESC_FIFO		0x2040
 #define DMA_PULL_DESC_FIFO		0x2080
 
@@ -276,6 +283,19 @@ enum DMA_REGS {
 #define DMA_DATA_FIFO_COUNT_SHL		4
 
 #define DMA_DESCR_LEN_BYTES(descr)	((1<<((descr&DMA_DESCR_LEN)>>4))*1024)
+
+
+static inline u32 dma_pp(enum DMA_SEL dma_sel, u32 bits)
+{
+	u32 xx = 0;
+	if ((dma_sel&DMA_PUSH_SEL) != 0){
+		xx |= bits << DMA_CTRL_PUSH_SHL;
+	}
+	if ((dma_sel&DMA_PULL_SEL) != 0){
+		xx |= bits << DMA_CTRL_PULL_SHL;
+	}
+	return xx;
+}
 
 
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);

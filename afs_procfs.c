@@ -248,7 +248,7 @@ static int job_proc_show(struct seq_file *m, void *v)
 	for (ii = 0; ii != nbuffers; ++ii){
 		int bs = sdev->hbx[ii].bstate;
 		if (bs < 0 || bs > NSTATES-1){
-			dev_warn(pdev(adev), "bstate[%d] %d out of range", bs);
+			dev_warn(pdev(adev), "bstate[%d] %d out of range", ii, bs);
 		}else{
 			bstates[bs]++;
 		}

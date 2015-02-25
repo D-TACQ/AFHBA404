@@ -113,13 +113,16 @@ struct AFHBA_STREAM_DEV {
 
 	unsigned pid;		/* pid of dma_read process */
 	int req_len;		/* request len .. not part of job ? */
-	void (* onStop)(struct AFHBA_DEV *adev);
+	void (* onStopPull)(struct AFHBA_DEV *adev);
+	void (* onStopPush)(struct AFHBA_DEV *adev);
 
 	int comms_init_done;
 
 	char irq_names[4][32];
 
 	bool aurora_fail_detected;
+
+	int shot;
 };
 #define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
 
@@ -153,6 +156,25 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define DMA_TEST_RD(adev) \
 	_afs_read_reg(adev, DMA_TEST)
 
+static inline void afs_dma_reset(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
+{
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
+	//DMA_CTRL_SET(adev, DMA_CTRL_EN);
+}
+
+static inline void afs_start_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
+{
+	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+}
+
+static inline void afs_stop_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
+{
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+}
+
+
 #define DMA_DATA_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DATA_FIFSTA)
 #define DMA_DESC_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DESC_FIFSTA)
 #define DMA_PUSH_DESC_STA_RD(adev) _afs_read_dmareg(adev, DMA_PUSH_DESC_STA)
@@ -166,6 +188,8 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define RTDMAC_DESC_FIFO_CNT	0x1000
 
 #define HB_ENTRY(plist)	list_entry(plist, struct HostBuffer, list)
+
+
 
 int afs_init_procfs(struct AFHBA_DEV *adev);
 int afs_reset_buffers(struct AFHBA_DEV *adev);

@@ -42,6 +42,11 @@ struct AO_LLC_DEF
 			         *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
 };
 
+struct XLLC_DEF {
+	unsigned len;     /**< length in bytes - will round up to next %64 */
+	u32 pa;		  /**< SRC or DST buffer PA - round to 1K
+	 	 	   *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
+};
 
 #define RTM_T_USE_HOSTBUF	0
 
@@ -54,7 +59,14 @@ struct AO_LLC_DEF
 
 
 #define RTM_T_START_STREAM_MAX	_IOW(DMAGIC,   3, u32)
-/**< iotcl Start Hight Throughput Streaming specify max buffers. */
+/**< ioctl Start High Throughput Streaming specify max buffers. */
 
 #define RTM_T_START_AOLLC	_IOW(DMAGIC,   4, struct AO_LLC_DEF)
+
+#define AFHBA_START_AI_LLC	_IOW(DMAGIC,   5, struct XLLC_DEF)
+/**< ioctl ACQ2106 Start Low Latency Control Inbound */
+
+#define AFHBA_START_AO_LLC	_IOW(DMAGIC,   6, struct XLLC_DEF)
+/**< ioctl ACQ2106 Start Low Latency Control Outbound */
+
 #endif /* __RTM_T_IOCTL_H__ */

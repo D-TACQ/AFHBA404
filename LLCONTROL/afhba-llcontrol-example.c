@@ -27,10 +27,18 @@
 #include <sched.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 
-#define HB_FILE "/dev/afhba.0.loc"
+/* Kludge alert */
+typedef unsigned       u32;
+typedef unsigned short u16;
+typedef unsigned char  u8;
+
+
+#include "../rtm-t_ioctl.h"
+#define HB_FILE "/dev/rtm-t.%d"
 #define HB_LEN	0x1000
 
 #define LOG_FILE	"afhba.log"
@@ -38,10 +46,13 @@
 void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
+int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
 int sched_fifo_priority = 1;
 int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
+
+
 
 /* ACQ425 */
 
@@ -67,6 +78,10 @@ void (*G_action)(void*);
 #define SPAD1	(((volatile unsigned*)local_buffer)[SPIX+1])   /* user signal from ACQ */
 #endif
 
+struct XLLC_DEF xllc_def = {
+		.pa = RTM_T_USE_HOSTBUF,
+		.len = VI_LEN
+};
 
 void get_mapping() {
 	fd = open(HB_FILE, O_RDWR);
@@ -120,8 +135,15 @@ void ui(int argc, char* argv[])
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
+	/* own PA eg from GPU */
+	if (getenv("PA_BUF")){
+		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
+	}
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+	}
+	if (argc > 2){
+		samples_buffer = atoi(argv[2]);
 	}
 	G_action = write_action;
 	if (getenv("ACTION")){
@@ -138,6 +160,18 @@ void setup()
 	fp_log = fopen("llcontrol.log", "w");
 	if (fp_log == 0){
 		perror("llcontrol.log");
+		exit(1);
+	}
+
+	xllc_def.len = samples_buffer*VI_LEN;
+	if (xllc_def.len > 16*64){
+		xllc_def.len = 16*64;
+		samples_buffer = xllc_def.len/VI_LEN;
+		fprintf(stderr, "WARNING: samples_buffer clipped to %d\n", samples_buffer);
+	}
+
+	if (ioctl(fd, AFHBA_START_AI_LLC, &xllc_def)){
+		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
 	}
 }

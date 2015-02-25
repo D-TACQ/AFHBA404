@@ -309,8 +309,7 @@ static ssize_t show_comms_init(
 {
 	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
 
-	sprintf(buf, "%d\n", sdev->comms_init_done);
-	return strlen(buf);
+	return sprintf(buf, "%d\n", sdev->comms_init_done);
 }
 
 static DEVICE_ATTR(comms_init, S_IRUGO|S_IWUGO, show_comms_init, store_comms_init);
@@ -324,11 +323,22 @@ static ssize_t show_inflight(
 	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
 	struct JOB *job = &sdev->job;
 
-	sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
-	return strlen(buf);
+	return sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
 }
 
 static DEVICE_ATTR(inflight, S_IRUGO, show_inflight, 0);
+
+static ssize_t show_shot(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	return sprintf(buf, "%d\n", sdev->shot);
+}
+
+static DEVICE_ATTR(shot, S_IRUGO, show_shot, 0);
+
 
 
 static const struct attribute *dev_attrs[] = {
@@ -345,6 +355,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_dma_latest_push_desc.attr,
 	&dev_attr_dma_latest_pull_desc.attr,
 	&dev_attr_comms_init.attr,
+	&dev_attr_shot.attr,
 	NULL
 };
 
