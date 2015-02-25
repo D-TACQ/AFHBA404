@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AMON=${AMON:-0}
+AMON=${AMON:-1}
 
 DDB=/sys/kernel/debug/dynamic_debug
 [ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
