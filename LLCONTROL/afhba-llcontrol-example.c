@@ -89,7 +89,7 @@ void get_mapping() {
 	sprintf(fname, HB_FILE, devnum);
 	fd = open(fname, O_RDWR);
 	if (fd < 0){
-		perror("fname");
+		perror(fname);
 		exit(errno);
 	}
 	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
