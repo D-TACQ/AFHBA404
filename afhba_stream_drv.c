@@ -216,6 +216,14 @@ static void afs_init_dma_clr(struct AFHBA_DEV *adev)
 	DMA_CTRL_CLR(adev, dma_pp(DMA_BOTH_SEL, DMA_CTRL_EN));
 }
 
+static void afs_configure_streaming_dma(
+		struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
+{
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
+	DMA_CTRL_WR(adev, dma_ctrl);
+}
+
 static void afs_load_llc_single_dma(
 	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel, u32 pa, unsigned len)
 {
@@ -275,6 +283,9 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR);
 		dev_warn(pdev(adev), "aurora error: s:0x%08x m:0x%08x e:0x%08x",
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+		return 1;
+	}else{
+		return 0;
 	}
 }
 
@@ -789,6 +800,7 @@ static int afs_isr_work(void *arg)
 	        if (job_is_go(job)){
 	        	queue_free_buffers(adev);
 			if (!afs_dma_started(adev, DMA_PUSH_SEL)){
+				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
 				afs_start_dma(adev, DMA_PUSH_SEL);
 			}
 		}
