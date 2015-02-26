@@ -162,7 +162,6 @@ static inline void afs_dma_reset(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
 	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
-	//DMA_CTRL_SET(adev, DMA_CTRL_EN);
 }
 
 static inline void afs_start_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)

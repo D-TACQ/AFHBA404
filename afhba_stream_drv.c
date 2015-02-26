@@ -243,7 +243,6 @@ static void afs_load_llc_single_dma(
 		len64, dma_desc, dma_ctrl);
 
 	DMA_CTRL_WR(adev, dma_ctrl);
-	afs_dma_reset(adev, dma_sel);
 	writel(dma_desc, adev->mappings[REMOTE_BAR].va+offset);
 	afs_start_dma(adev, dma_sel);
 }
@@ -915,17 +914,20 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 
 void afs_stop_llc_push(struct AFHBA_DEV *adev)
 {
+	dev_info(pdev(adev), "afs_stop_llc_push()");
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 }
 
 void afs_stop_llc_pull(struct AFHBA_DEV *adev)
 {
+	dev_info(pdev(adev), "afs_stop_llc_pull()");
 	afs_dma_reset(adev, DMA_PULL_SEL);
 }
 long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	sdev->onStopPush = afs_stop_llc_push;
+	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
 }
@@ -933,6 +935,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	sdev->onStopPull = afs_stop_llc_pull;
+	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
 }
