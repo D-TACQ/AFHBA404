@@ -51,6 +51,7 @@ int sched_fifo_priority = 1;
 int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
+int devnum = 0;
 
 
 
@@ -84,9 +85,11 @@ struct XLLC_DEF xllc_def = {
 };
 
 void get_mapping() {
-	fd = open(HB_FILE, O_RDWR);
+	char fname[80];
+	sprintf(fname, HB_FILE, devnum);
+	fd = open(fname, O_RDWR);
 	if (fd < 0){
-		perror("HB_FILE");
+		perror("fname");
 		exit(errno);
 	}
 	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
@@ -134,6 +137,9 @@ void ui(int argc, char* argv[])
         }
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
+	}
+	if (getenv("DEVNUM")){
+		devnum = atoi(getenv("DEVNUM"));
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
