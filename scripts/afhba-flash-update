@@ -25,6 +25,8 @@ STRIP=$SRC.strip
 
 LEN=$(ls -l $STRIP | awk '{ print $5 }')
 echo RAW file $STRIP is $LEN bytes
+
+let NBLOCKS="$LEN/4096+1"
  
 MTD=/dev/mtd${LUN}
 
@@ -53,7 +55,8 @@ case $MODE in
 verify)
 	verify;;
 program)
-	./flash_erase $MTD 0 0
+	echo ./flash_erase $MTD 0 $NBLOCKS
+	./flash_erase $MTD 0 $NBLOCKS
 	echo programming ..
 	cat $STRIP > $MTD
 	verify
