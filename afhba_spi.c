@@ -288,7 +288,7 @@ int afhba_spi_master_init(struct AFHBA_DEV *adev)
 	memset(hw, 0, sizeof(struct afhba_spi));
 
 	hw->master = spi_master_get(master);
-	hw->master->bus_num = 0;
+	hw->master->bus_num = adev->idx;
 //	hw->pdata = pdev->dev.platform_data;
 	hw->dev = dev;
 	hw->adev = adev;
