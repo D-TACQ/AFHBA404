@@ -255,7 +255,7 @@ enum DMA_SEL {
 	DMA_BOTH_SEL = 0x3
 };
 
-static const char* sDMA_SEL(enum DMA_SEL dma_sel)
+inline static const char*  sDMA_SEL(enum DMA_SEL dma_sel)
 {
 	switch(dma_sel){
 	case DMA_PUSH_SEL: return "PUSH";

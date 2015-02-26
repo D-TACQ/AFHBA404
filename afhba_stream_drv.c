@@ -232,6 +232,10 @@ static void afs_load_llc_single_dma(
 
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
 
+	dev_info(pdev(adev),
+		"afs_load_llc_single_dma len64:%08x dma_desc:%08x dma_ctrl:%08x",
+		len64, dma_desc, dma_ctrl);
+
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_dma_reset(adev, dma_sel);
 	writel(dma_desc, adev->mappings[REMOTE_BAR].va+offset);
