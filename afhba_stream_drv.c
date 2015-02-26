@@ -216,11 +216,11 @@ static void afs_load_llc_single_dma(
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	u32 dma_desc = pa==RTM_T_USE_HOSTBUF? sdev->hbx[0].pa: pa;
-	u32 len64 = ((len/64-1) + len%64!=0);
+	u32 len64 = ((len/64-1) + (len%64!=0));
 	u32 offset = dma_sel==DMA_PUSH_SEL?
 			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
 
-	dev_info(pdev(adev), "afs_load_llc_single_dma %s 0x%08x %d",
+	dev_dbg(pdev(adev), "afs_load_llc_single_dma %s 0x%08x %d",
 			sDMA_SEL(dma_sel), pa, len);
 
 	len64 <<= AFDMAC_DESC_LEN_SHL;
@@ -232,7 +232,7 @@ static void afs_load_llc_single_dma(
 
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
 
-	dev_info(pdev(adev),
+	dev_dbg(pdev(adev),
 		"afs_load_llc_single_dma len64:%08x dma_desc:%08x dma_ctrl:%08x",
 		len64, dma_desc, dma_ctrl);
 
