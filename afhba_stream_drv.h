@@ -147,7 +147,8 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define DMA_CTRL_SET(adev, bits) \
 	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) |= (bits))
 
-#define DMA_CTRL_RD(adev) MIRROR(adev, DMA_CTRL)
+#define DMA_CTRL_RD(adev) \
+	(MIRROR(adev, DMA_CTRL) = _afs_read_dmareg(adev, DMA_CTRL))
 
 
 #define DMA_TEST_WR(adev, value) \
