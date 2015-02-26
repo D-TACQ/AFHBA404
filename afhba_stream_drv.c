@@ -1282,7 +1282,8 @@ static struct file_operations afs_fops_dma = {
 	.release = afs_dma_release,
 	.read = afs_dma_read,
 	.write = afs_dma_write,
-	.unlocked_ioctl = afs_dma_ioctl
+	.unlocked_ioctl = afs_dma_ioctl,
+	.mmap = afs_mmap_host
 };
 
 static struct file_operations afs_fops_dma_poll = {
@@ -1290,7 +1291,8 @@ static struct file_operations afs_fops_dma_poll = {
 	.release = afs_dma_release,
 	.read = afs_dma_read_poll,
 	.write = afs_dma_write,
-	.unlocked_ioctl = afs_dma_ioctl
+	.unlocked_ioctl = afs_dma_ioctl,
+	.mmap = afs_mmap_host
 };
 
 
