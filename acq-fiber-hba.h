@@ -255,6 +255,15 @@ enum DMA_SEL {
 	DMA_BOTH_SEL = 0x3
 };
 
+static const char* sDMA_SEL(enum DMA_SEL dma_sel)
+{
+	switch(dma_sel){
+	case DMA_PUSH_SEL: return "PUSH";
+	case DMA_PULL_SEL: return "PULL";
+	case DMA_BOTH_SEL: return "PUSHPULL";
+	default:	   return "none";
+	}
+}
 
 #define DMA_PUSH_DESC_FIFO		0x2040
 #define DMA_PULL_DESC_FIFO		0x2080
