@@ -267,6 +267,17 @@ static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
+static int afs_aurora_errors(struct AFHBA_DEV *adev)
+{
+	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
+		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);
+		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR);
+		dev_warn(pdev(adev), "aurora error: s:0x%08x m:0x%08x e:0x%08x",
+			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+	}
+}
+
 static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 {
 	int ireg;
@@ -296,6 +307,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 int afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+
 	if (afs_aurora_lane_up(adev)){
 		if (!adev->link_up){
 			dev_info(pdev(adev), "aurora link up!");
@@ -304,6 +316,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 		if (!sdev->comms_init_done){
 			_afs_comms_init(adev);
 		}
+		afs_aurora_errors(adev);
 		return sdev->comms_init_done;
 	}else{
 		if (adev->link_up){
