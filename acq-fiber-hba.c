@@ -386,7 +386,7 @@ void afhba_remove (struct pci_dev *dev)
 	struct AFHBA_DEV *adev = afhba_lookupDevicePci(dev);
 
 	if (adev){
-		afhba_stream_drv_del(struct AFHBA_DEV* adev)
+		afhba_stream_drv_del(adev);
 		afhba_removeDebugfs(adev);
 		afhba_remove_sysfs(adev);
 		afhba_remove_sysfs_class(adev);
