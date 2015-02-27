@@ -281,9 +281,26 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);
 		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR);
-		dev_warn(pdev(adev), "aurora error: s:0x%08x m:0x%08x e:0x%08x",
+		if (++adev->aurora_error_count==1){
+			dev_info(pdev(adev),
+			"aurora initial s:0x%08x m:0x%08x e:0x%08x",
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
-		return 1;
+		}else{
+			dev_warn(pdev(adev),
+			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x",
+			adev->aurora_error_count,
+			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+		}
+		stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
+			dev_err(pdev(adev),
+			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
+			adev->aurora_error_count,
+			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+			return -1;
+		}else{
+			return 1;
+		}
 	}else{
 		return 0;
 	}

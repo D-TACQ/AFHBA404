@@ -130,6 +130,7 @@ struct AFHBA_DEV {
 	struct platform_device *hba_sfp_i2c[2];
 
 	int link_up;
+	int aurora_error_count;
 };
 
 extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
