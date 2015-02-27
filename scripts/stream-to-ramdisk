@@ -10,5 +10,6 @@ if [ $? -ne 0 ];then
 	exit 1
 fi
 echo stream to /mnt/afhba.$DN 
-RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN ./STREAM/rtm-t-stream-disk
+export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN 
+exec ./STREAM/rtm-t-stream-disk
 

@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1023";
+char afhba__driver_version[] = "B1024";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -52,6 +52,10 @@ module_param(afhba_debug, int, 0644);
 /* deprecated: only retained for load script compatibility */
 int ll_mode_only = 1;
 module_param(ll_mode_only, int, 0444);
+
+int fake_it = 0;
+module_param(fake_it, int, 0444);
+
 
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
@@ -261,6 +265,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 		struct PciMapping* mp = adev->mappings+imap;
 		int bar = MAP2BAR(adev, imap);
 
+
 		if (VALID_BAR(bar)){
 			snprintf(mp->name, SZM1(mp->name), "afhba.%d.%d", adev->idx, bar);
 
@@ -269,7 +274,13 @@ void afhba_map(struct AFHBA_DEV *adev)
 			mp->len = pci_resource_len(dev, bar);
 			mp->region = request_mem_region(
 					mp->pa, mp->len, mp->name);
-			mp->va = ioremap_nocache(mp->pa, mp->len);
+
+			if (fake_it){
+				mp->va = kzalloc(mp->len, GFP_KERNEL);
+				dev_warn(pdev(adev), "fake_it using memory for BAR%d", bar);
+			}else{
+				mp->va = ioremap_nocache(mp->pa, mp->len);
+			}
 
 			dev_dbg(pdev(adev), "BAR %d va:%p", bar, mp->va);
 			++nmappings;
