@@ -49,6 +49,7 @@ const char* afhba_devnames[MAXDEV];
 int afhba_debug = 0;
 module_param(afhba_debug, int, 0644);
 
+/* deprecated: only retained for load script compatibility */
 int ll_mode_only = 1;
 module_param(ll_mode_only, int, 0444);
 

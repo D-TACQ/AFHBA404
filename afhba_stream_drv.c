@@ -840,17 +840,19 @@ static int afs_isr_work(void *arg)
 
 static void startWork(struct AFHBA_DEV *adev)
 {
-	adev->stream_dev->work.w_task = kthread_run(afs_isr_work, adev, adev->name);
-	adev->stream_dev->work.mon_task = kthread_run(as_mon, adev, adev->mon_name);
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	sdev->work.w_task = kthread_run(afs_isr_work, adev, adev->name);
+	sdev->work.mon_task = kthread_run(as_mon, adev, adev->mon_name);
 }
 
 static void stopWork(struct AFHBA_DEV *adev)
 {
-	if (adev->work.w_task){
-		kthread_stop(adev->work.w_task);
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->work.w_task){
+		kthread_stop(sdev->work.w_task);
 	}
-	if (adev->work.mon_task){
-		kthread_stop(adev->work.mon_task);
+	if (sdev->work.mon_task){
+		kthread_stop(sdev->work.mon_task);
 	}
 }
 
