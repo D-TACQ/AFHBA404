@@ -369,9 +369,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	rc = pci_enable_device(dev);
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 
-	if (!ll_mode_only){
-		afhba_stream_drv_init(adev);
-	}
+	afhba_stream_drv_init(adev);
 	adev->class_dev = device_create(
 			afhba_device_class,			/* cls */
 			NULL,					/* cls_parent */
@@ -388,6 +386,7 @@ void afhba_remove (struct pci_dev *dev)
 	struct AFHBA_DEV *adev = afhba_lookupDevicePci(dev);
 
 	if (adev){
+		afhba_stream_drv_del(struct AFHBA_DEV* adev)
 		afhba_removeDebugfs(adev);
 		afhba_remove_sysfs(adev);
 		afhba_remove_sysfs_class(adev);
