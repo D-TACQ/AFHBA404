@@ -1425,16 +1425,10 @@ static struct file_operations afs_fops = {
 	.release = afhba_release,
 };
 
-extern int fake_it;
-
 int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	if (fake_it){
-		dev_warn(pdev(adev), "faking it...");
-		afhba_write_reg(adev, AURORA_STATUS_REG, AFHBA_AURORA_STAT_LANE_UP);
-	}
 	dev_info(pdev(adev), "afhba_stream_drv_init()");
 	afs_init_dma_clr(adev);
 	afs_init_buffers(adev);
