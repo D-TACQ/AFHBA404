@@ -977,6 +977,19 @@ void afs_stop_llc_pull(struct AFHBA_DEV *adev)
 	dev_info(pdev(adev), "afs_stop_llc_pull()");
 	afs_dma_reset(adev, DMA_PULL_SEL);
 }
+
+void afs_stop_stream_push(struct AFHBA_DEV *adev)
+{
+	dev_info(pdev(adev), "afs_stop_stream_push()");
+	afs_dma_reset(adev, DMA_PUSH_SEL);
+}
+
+void afs_stop_stream_pull(struct AFHBA_DEV *adev)
+{
+	dev_info(pdev(adev), "afs_stop_stream_pull()");
+	afs_dma_reset(adev, DMA_PULL_SEL);
+}
+
 long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1042,7 +1055,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	struct HostBuffer *hb;
 	struct HostBuffer *tmp;
 
-	dev_dbg(pdev(adev), "01 %s %d %p<-%p->%p",
+	dev_dbg(pdev(adev), "afs_dma_release() 01 %s %d %p<-%p->%p",
 		adev->name, PD(file)->minor,
 		PD(file)->my_buffers.prev,
 		&PD(file)->my_buffers,
@@ -1095,6 +1108,10 @@ ssize_t afs_dma_read(
 		list_empty(&sdev->bp_full.list)	){
 		dev_dbg(pdev(adev), "job done");
 		return 0;
+	}
+
+	if (sdev->onStopPush == 0){
+		sdev->onStopPush = afs_stop_stream_push;
 	}
 
 	if (*f_pos == 0){
