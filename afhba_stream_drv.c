@@ -844,6 +844,16 @@ static void startWork(struct AFHBA_DEV *adev)
 	adev->stream_dev->work.mon_task = kthread_run(as_mon, adev, adev->mon_name);
 }
 
+static void stopWork(struct AFHBA_DEV *adev)
+{
+	if (adev->work.w_task){
+		kthread_stop(adev->work.w_task);
+	}
+	if (adev->work.mon_task){
+		kthread_stop(adev->work.mon_task);
+	}
+}
+
 ssize_t afs_histo_read(
 	struct file *file, char *buf, size_t count, loff_t *f_pos)
 {
@@ -1393,5 +1403,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)
 {
+	afs_init_dma_clr(adev);
+	stopWork(adev);
 	return 0;
 }
