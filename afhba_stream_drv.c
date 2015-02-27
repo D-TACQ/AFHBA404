@@ -1395,6 +1395,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
+	dev_info(pdev(adev), "afhba_stream_drv_init()");
 	afs_init_dma_clr(adev);
 	afs_init_buffers(adev);
 	hook_interrupts(adev);
@@ -1405,6 +1406,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)
 {
+	dev_info(pdev(adev), "afhba_stream_drv_del()");
 	afs_init_dma_clr(adev);
 	stopWork(adev);
 	return 0;
