@@ -133,6 +133,9 @@ struct AFHBA_DEV {
 	int aurora_error_count;
 };
 
+#define SZM1(field)	(sizeof(field)-1)
+
+
 extern int afhba_stream_drv_init(struct AFHBA_DEV* adev);
 extern int afhba_stream_drv_del(struct AFHBA_DEV* adev);
 extern void afhba_create_sysfs_class(struct AFHBA_DEV *adev);

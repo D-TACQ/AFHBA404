@@ -262,7 +262,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 		int bar = MAP2BAR(adev, imap);
 
 		if (VALID_BAR(bar)){
-			sprintf(mp->name, "afhba.%d.%d", adev->idx, bar);
+			snprintf(mp->name, SZM1(mp->name), "afhba.%d.%d", adev->idx, bar);
 
 			mp->pa = pci_resource_start(dev,bar)&
 						PCI_BASE_ADDRESS_MEM_MASK;
@@ -336,7 +336,11 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	static int idx;
 	static u64 dma_mask = DMA_BIT_MASK(32);
 
-	printk("AFHBA: subdevice : %04x\n", ent->subdevice);
+	adev->pci_dev = dev;
+	adev->idx = idx++;
+	dev->dev.dma_mask = &dma_mask;
+
+	dev_info(pdev(adev), "AFHBA: subdevice : %04x\n", ent->subdevice);
 	if (ent->subdevice == PCI_SUBDID_FHBA_2G){
 		dev_err(pdev(adev), "AFHBA 2G FIRMWARE detected %04x", ent->subdevice);
 		return -1;
@@ -344,13 +348,10 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		dev_err(pdev(adev), "AFHBA 4G OBSOLETE FIRMWARE detected %04x", ent->subdevice);
 		return -1;
 	}
-	adev->pci_dev = dev;
-	adev->idx = idx++;
-	dev->dev.dma_mask = &dma_mask;
 
-	sprintf(adev->name, "afhba.%d", adev->idx);
+	snprintf(adev->name, SZM1(adev->name), "afhba.%d", adev->idx);
 	afhba_devnames[adev->idx] = adev->name;
-	sprintf(adev->mon_name, "afhba-mon.%d", adev->idx);
+	snprintf(adev->mon_name, SZM1(adev->name), "afhba-mon.%d", adev->idx);
 
 
 	rc = register_chrdev(0, adev->name, &afhba_fops);
