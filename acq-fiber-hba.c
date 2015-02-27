@@ -53,9 +53,6 @@ module_param(afhba_debug, int, 0644);
 int ll_mode_only = 1;
 module_param(ll_mode_only, int, 0444);
 
-int fake_it = 0;
-module_param(fake_it, int, 0444);
-
 
 #define PCI_VENDOR_ID_XILINX      0x10ee
 #define PCI_DEVICE_ID_XILINX_PCIE 0x0007
@@ -274,13 +271,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 			mp->len = pci_resource_len(dev, bar);
 			mp->region = request_mem_region(
 					mp->pa, mp->len, mp->name);
-
-			if (fake_it){
-				mp->va = kzalloc(mp->len, GFP_KERNEL);
-				dev_warn(pdev(adev), "fake_it using memory for BAR%d", bar);
-			}else{
-				mp->va = ioremap_nocache(mp->pa, mp->len);
-			}
+			mp->va = ioremap_nocache(mp->pa, mp->len);
 
 			dev_dbg(pdev(adev), "BAR %d va:%p", bar, mp->va);
 			++nmappings;
