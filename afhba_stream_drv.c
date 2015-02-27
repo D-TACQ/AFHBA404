@@ -586,7 +586,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			nbuffers, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
 
-	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++sdev->nbuffers, ++hb){
+	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -952,7 +952,7 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 
 
 
-	for (ii = 0; ii < nbuffers; ++ii, ++sdev->nbuffers, ++hb){
+	for (ii = 0; ii < nbuffers; ++ii, ++hb){
 		hb->bstate = BS_EMPTY;
 		list_add_tail(&hb->list, &sdev->bp_empties.list);
 	}
