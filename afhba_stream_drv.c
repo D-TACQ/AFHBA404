@@ -791,6 +791,7 @@ static int afs_isr_work(void *arg)
 /* this is going to be the top RT process */
 	struct sched_param param = { .sched_priority = 10 };
 	int please_check_fifo = 0;
+	int job_is_go_but_aurora_is_down = 0;
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
 	afs_comms_init(adev);
@@ -808,11 +809,13 @@ static int afs_isr_work(void *arg)
 		}
 
 		if (aurora_monitor && !afs_comms_init(adev)){
-			if (job_is_go(job)){
+			if (job_is_go(job) && !job_is_go_but_aurora_is_down){
 				dev_warn(pdev(adev), "job is go but aurora is down");
+				job_is_go_but_aurora_is_down = 1;
 			}
 			continue;
 		}
+		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
 	        	queue_free_buffers(adev);
