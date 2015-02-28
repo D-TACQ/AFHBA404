@@ -372,6 +372,8 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 
 	rc = pci_enable_device(dev);
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
+	dev_info(pdev(adev), "FPGA revision: %08x",
+			afhba_read_reg(adev, FPGA_REVISION_REG));
 
 	afhba_stream_drv_init(adev);
 	adev->class_dev = device_create(
