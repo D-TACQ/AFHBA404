@@ -41,7 +41,7 @@ typedef unsigned char  u8;
 #define HB_FILE "/dev/rtm-t.%d"
 #define HB_LEN	0x1000
 
-#define LOG_FILE	"afhba.log"
+#define LOG_FILE	"afhba.%d.log"
 
 void* host_buffer;
 int fd;
@@ -62,22 +62,13 @@ int devnum = 0;
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
 
-#if 0
-#warning MONITOR host_buffer
-#define CH01 (((volatile short*)host_buffer)[0])
 #define CH01 (((volatile short*)host_buffer)[0])
 #define CH02 (((volatile short*)host_buffer)[1])
 #define CH03 (((volatile short*)host_buffer)[2])
 #define CH04 (((volatile short*)host_buffer)[3])
 #define TLATCH (((volatile unsigned*)host_buffer)[SPIX])	/* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)host_buffer)[SPIX+1])   /* user signal from ACQ */
-#else
-#define CH02 (((volatile short*)local_buffer)[1])
-#define CH03 (((volatile short*)local_buffer)[2])
-#define CH04 (((volatile short*)local_buffer)[3])
-#define TLATCH (((volatile unsigned*)local_buffer)[SPIX])	/* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)local_buffer)[SPIX+1])   /* user signal from ACQ */
-#endif
+
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -161,11 +152,13 @@ void ui(int argc, char* argv[])
 
 void setup()
 {
+	char logfile[80];
+	sprintf(logfile, LOG_FILE, devnum);
 	get_mapping();
 	goRealTime();
-	fp_log = fopen("llcontrol.log", "w");
+	fp_log = fopen(logfile, "w");
 	if (fp_log == 0){
-		perror("llcontrol.log");
+		perror(logfile);
 		exit(1);
 	}
 
