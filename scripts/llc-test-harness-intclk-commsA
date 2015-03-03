@@ -1,0 +1,57 @@
+#!/bin/bash
+# llc-test-harness: configure and start an llc process
+#!/bin/bash
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_004}
+INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+STREAMPID=0
+
+source afhba-common
+
+remote_cmd() {
+	SITE=$1;shift
+	let PORT="4220+$SITE"
+	logger -t rem_cmd $REMIP $PORT $*
+	echo $* | nc $REMIP $PORT
+}
+
+init_acq2106A() {
+	if [ "$LLC_TRG" = "ext" ]; then
+		remote_cmd 1 trg=1,2,1
+	else
+		remote_cmd 1 trg=1,1,1
+	fi
+	if [ "$LLC_CLK" = "ext" ]; then
+		remote_cmd 1 clk=1,2,1
+		remote_cmd 1 clkdiv=$EXTCLKDIV
+		echo setting external clock / $EXTCLKDIV
+	else
+		remote_cmd 1 clk=0,0,0
+		remote_cmd 1 clkdiv=$INTCLKDIV
+		echo setting internal clock / $INTCLKDIV
+	fi
+	#remote_cmd 0 spad=1,7,0	
+	remote_cmd 0 spad=1,8,0	
+	remote_cmd 13 aggregator sites=1
+	remote_cmd 13 spad=1
+	echo NOT DONE	remote_cmd 0 run0 1
+}
+
+start_stream() {
+	remote_cmd 0 streamtonowhered start
+}
+
+
+cleanup() {
+	remote_cmd 0 streamtonowhered stop
+}
+
+init_acq2106A
+start_stream
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+

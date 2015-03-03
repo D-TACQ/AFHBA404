@@ -1,0 +1,14 @@
+#!/bin/bash
+
+AMON=${AMON:-1}
+
+DDB=/sys/kernel/debug/dynamic_debug
+[ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
+echo 9 > /proc/sys/kernel/printk
+#echo file afhba_stream_drv.c +p >$DDB/control
+
+/sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
+	aurora_monitor=$AMON nbuffers=64 eot_interrupt=1 WORK_TO=1
+
+#echo file afhba_stream_drv.c +p >$DDB/control
+

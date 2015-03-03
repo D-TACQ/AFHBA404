@@ -1,0 +1,14 @@
+#!/bin/bash
+
+IRQ=${1:-afhba}
+forsleep grep --line-buffered $IRQ /proc/interrupts | \
+	awk '{ print $1" "$2+$3+$4+$5; fflush(stdout) }' | \
+	awk 'NR==1 { navg=5; next }
+	     NR==2 { start=$2 } 
+	     NR==3 { acc=$2-start }
+	     { printf "%s ", $2!=0? "+": "0" } 	
+	     NR%navg==1 { 
+			new = 0.4*($2-start)/navg + 0.6*acc; 
+			printf "%.1f\n", new; acc = new; 
+			start=$2
+	     }'
