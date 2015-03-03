@@ -20,7 +20,7 @@ endif
 all: apps
 
 
-APPS := afhba-llcontrol-example afhba-llcontrol-testharness check-tlatch
+APPS := afhba-llcontrol-example afhba-llcontrol-zcopy afhba-llcontrol-testharness check-tlatch
 apps: $(APPS)
 
 	

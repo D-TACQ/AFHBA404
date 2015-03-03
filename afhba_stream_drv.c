@@ -1005,7 +1005,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	sdev->onStopPull = afs_stop_llc_pull;
-	afs_dma_reset(adev, DMA_PUSH_SEL);
+	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
 }

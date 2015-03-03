@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------- *
- * afhba-llcontrol-example.c
+ * afhba-llcontrol-zcopy.c
  * simple llcontrol example, but feeds AO from AI same buffer, no copy
  * ------------------------------------------------------------------------- *
  *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd
