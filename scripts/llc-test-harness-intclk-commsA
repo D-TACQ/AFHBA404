@@ -2,6 +2,8 @@
 # llc-test-harness: configure and start an llc process
 #!/bin/bash
 
+[ -d scripts ] && cd scripts
+
 # MUST set remote ip-address
 REMIP=${1:-acq2106_004}
 INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
@@ -9,43 +11,39 @@ EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
 
 source afhba-common
-
-remote_cmd() {
-	SITE=$1;shift
-	let PORT="4220+$SITE"
-	logger -t rem_cmd $REMIP $PORT $*
-	echo $* | nc $REMIP $PORT
-}
+# site definitions SC: system controller, CA: commsA, AI: AI
+SC=0
+CA=13
+AI=1
 
 init_acq2106A() {
 	if [ "$LLC_TRG" = "ext" ]; then
-		remote_cmd 1 trg=1,2,1
+		remote_cmd $AI trg=1,2,1
 	else
-		remote_cmd 1 trg=1,1,1
+		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd 1 clk=1,2,1
-		remote_cmd 1 clkdiv=$EXTCLKDIV
+		remote_cmd $AI clk=1,2,1
+		remote_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
-		remote_cmd 1 clk=0,0,0
-		remote_cmd 1 clkdiv=$INTCLKDIV
+		remote_cmd $AI clk=0,0,0
+		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	#remote_cmd 0 spad=1,7,0	
-	remote_cmd 0 spad=1,8,0	
-	remote_cmd 13 aggregator sites=1
-	remote_cmd 13 spad=1
+	remote_cmd $SC spad=1,8,0	
+	remote_cmd $CA aggregator sites=1
+	remote_cmd $CA spad=1
 	echo NOT DONE	remote_cmd 0 run0 1
 }
 
 start_stream() {
-	remote_cmd 0 streamtonowhered start
+	remote_cmd $SC streamtonowhered start
 }
 
 
 cleanup() {
-	remote_cmd 0 streamtonowhered stop
+	remote_cmd $SC streamtonowhered stop
 }
 
 init_acq2106A

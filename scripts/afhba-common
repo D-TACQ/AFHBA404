@@ -16,3 +16,12 @@ get_sys() {
 	logger -t get_sys ${DEV}/${knob} $RB
 	echo $RB 
 }
+
+remote_cmd() {
+        SITE=$1;shift
+        let PORT="4220+$SITE"
+        logger -t rem_cmd $REMIP $PORT $*
+        echo $* | nc $REMIP $PORT
+}
+
+

@@ -2,59 +2,57 @@
 # llc-test-harness-intclk-AI1-AO4-zcopy
 # AI+AO llc with zerocopy on one fiber. Basic LLC test
 
+[ -d scripts ] && cd scripts
+
 # MUST set remote ip-address
 REMIP=${1:-acq2106_003}
 INTCLKDIV=${INTCLKDIV:-1000}		# 100M/100 = 1MHz
 EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
 
+# site definitions SC: system controller, CB: commsB, AI: AI, AO : AO
+SC=0
+CB=12
 AI=1
 AO=4
 
 source afhba-common
 
-remote_cmd() {
-	SITE=${1:-0};shift
-	let PORT="4220+$SITE"
-	logger -t rem_cmd $REMIP $PORT $*
-	echo $* | nc $REMIP $PORT
-}
-
 init_2106() {
 	if [ "$LLC_TRG" = "ext" ]; then
-		remote_cmd 1 trg=1,2,1
+		remote_cmd $AI trg=1,2,1
 	else
-		remote_cmd 1 trg=1,1,1
+		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd 1 clk=1,2,1
-		remote_cmd 1 clkdiv=$EXTCLKDIV
+		remote_cmd $AI clk=1,2,1
+		remote_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
-		remote_cmd 1 clk=0,0,0
-		remote_cmd 1 clkdiv=$INTCLKDIV
+		remote_cmd $AI clk=0,0,0
+		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd 0 distributor sites=$AO comms=1 on
-	remote_cmd $AOlotide 256
+	remote_cmd $SC distributor sites=$AO comms=1 on
+	remote_cmd $AO lotide 256
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
 
-	remote_cmd 0 spad=1,7,0	
-	remote_cmd 0 run0 1
-	remote_cmd 12 aggregator sites=1 on
-	remote_cmd 12 spad 1
+	remote_cmd $SC spad=1,7,0	
+	remote_cmd $SC run0 1
+	remote_cmd $CB aggregator sites=1 on
+	remote_cmd $CB spad 1
 	
 }
 
 start_stream() {
-	remote_cmd 0 streamtonowhered start
+	remote_cmd $SC streamtonowhered start
 }
 
 
 cleanup() {
 #	kill ${STREAMPID}
-	remote_cmd 0 streamtonowhered stop
+	remote_cmd $SC streamtonowhered stop
 }
 
 init_2106
