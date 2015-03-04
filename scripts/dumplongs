@@ -1,2 +1,3 @@
-hexdump -ve '8/4 "%08x " "\n"' $*
+COLS=${COLS:-8}
+hexdump -ve $COLS'/4 "%08x " "\n"' $*
 
