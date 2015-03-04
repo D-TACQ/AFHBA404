@@ -1,0 +1,8 @@
+*.o
+*.o.cmd
+*.ko
+modules.order
+*.ko.cmd
+*.mod.c
+*.strip
+
