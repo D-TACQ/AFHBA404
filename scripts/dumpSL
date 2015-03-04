@@ -1,0 +1,3 @@
+CHAN=${CHAN:-16}
+hexdump -ve $CHAN'/2 "%04x " 8/4 " %08x" "\n"' $* | awk '{ printf "%08d %s\n", NR, $0 }'
+
