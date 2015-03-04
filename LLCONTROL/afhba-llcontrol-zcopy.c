@@ -53,6 +53,8 @@ int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
+int dummy_first_loop;
+/* potentially good for cache fill, but sets initial value zero */
 
 
 
@@ -67,9 +69,8 @@ int devnum = 0;
 #define CH02 (((volatile short*)host_buffer)[1])
 #define CH03 (((volatile short*)host_buffer)[2])
 #define CH04 (((volatile short*)host_buffer)[3])
-#define TLATCH (((volatile unsigned*)host_buffer)[SPIX])	/* actually, sample counter */
+#define TLATCH (&((volatile unsigned*)host_buffer)[SPIX])      /* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)host_buffer)[SPIX+1])   /* user signal from ACQ */
-
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -114,7 +115,7 @@ void check_tlatch_action(void *local_buffer)
 {
 	static unsigned tl0;
 
-	unsigned tl1 = TLATCH;
+	unsigned tl1 = *TLATCH;
 	if (tl1 != tl0+1){
 		printf("%d => %d\n", tl0, tl1);
 	}
@@ -136,6 +137,9 @@ void ui(int argc, char* argv[])
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
 		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
+	}
+	if (getenv("DUMMY_FIRST_LOOP")){
+		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
@@ -192,10 +196,13 @@ void run(void (*action)(void*))
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
+	if (!dummy_first_loop){
+		*TLATCH = tl0;
+	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
 		memcpy(local_buffer, host_buffer, VI_LEN);
-		while((tl1 = TLATCH) == tl0){
+		while((tl1 = *TLATCH) == tl0){
 			sched_yield();
 			memcpy(local_buffer, host_buffer, VI_LEN);
 		}
