@@ -21,7 +21,8 @@ all: apps
 
 
 APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
-	afhba-llcontrol-testharness check-tlatch afhba-llcontrol-cpucopy
+	afhba-llcontrol-testharness check-tlatch afhba-llcontrol-cpucopy \
+	afhba-llcontrol-two-fiber
 	
 apps: $(APPS)
 
