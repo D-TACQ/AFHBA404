@@ -184,14 +184,19 @@ void setup()
 	}
 }
 
+void print_sample(unsigned sample, unsigned tl)
+{
+	if (sample%10000 == 0){
+		printf("[%10u] %10u\n", sample, tl);
+	}
+}
+
 void run(void (*action)(void*))
 {
 	short* local_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
-	unsigned spad1_0 = SPAD1;
-	unsigned spad1_1;
 	unsigned tl1;
-	int sample;
+	unsigned sample;
 	int println = 0;
 
 	mlockall(MCL_CURRENT);
@@ -206,28 +211,11 @@ void run(void (*action)(void*))
 			sched_yield();
 			memcpy(local_buffer, host_buffer, VI_LEN);
 		}
-		if (verbose){
-			if (sample%10000 == 0){
-				if (println == 0){
-					printf("[%10u] ", sample);
-					println = 1;
-				}
-				printf("%10u ", tl1);
-			}
-			if (spad1_1 != spad1_0){
-				if (println == 0){
-					printf("[%d] ", sample);
-					println = 1;
-				}
-				printf("\t%u => %u ", sample, spad1_0, spad1_1);
-				spad1_0 = spad1_1;
-			}
-			if (println){
-				printf("\n");
-				println = 0;
-			}
-		}
 		action(local_buffer);
+
+		if (verbose){
+			print_sample(sample, tl1);
+		}
 	}
 }
 
