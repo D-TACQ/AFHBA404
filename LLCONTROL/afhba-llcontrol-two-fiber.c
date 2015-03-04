@@ -216,12 +216,13 @@ void setup()
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x\n", ao_def.pa);
+	printf("AI buf pa: 0x%08x\n", ai_def.pa);
+
 	if (ioctl(dev_ao.fd, AFHBA_START_AO_LLC, &ao_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x\n", ai_def.pa);
+	printf("AO buf pa: 0x%08x\n", ao_def.pa);
 }
 
 void print_sample(unsigned sample, unsigned tl)
