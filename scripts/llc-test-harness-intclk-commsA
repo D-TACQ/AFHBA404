@@ -34,7 +34,7 @@ init_acq2106A() {
 	remote_cmd $SC spad=1,8,0	
 	remote_cmd $CA aggregator sites=1
 	remote_cmd $CA spad=1
-	echo NOT DONE	remote_cmd 0 run0 1
+	remote_cmd $SC run0 1
 }
 
 start_stream() {
