@@ -91,8 +91,8 @@ struct Device {
 	void* mapping;
 };
 
-struct Device dev_ai;
-struct Device dev_ao;
+struct Device dev_ai = { .devnum = 0 };
+struct Device dev_ao = { .devnum = 1 };
 short* ao_buffer;
 short *ai_buffer;
 
