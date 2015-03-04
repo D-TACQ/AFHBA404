@@ -201,7 +201,7 @@ void setup()
 	get_mapping(&dev_ai);
 	ai_buffer = host_buffer = dev_ai.mapping;
 
-	get_mapping(&dev_ai);
+	get_mapping(&dev_ao);
 	ao_buffer = dev_ao.mapping;
 
 	ai_def.len = samples_buffer*VI_LEN;
