@@ -63,10 +63,12 @@ struct XLLC_DEF {
 
 #define RTM_T_START_AOLLC	_IOW(DMAGIC,   4, struct AO_LLC_DEF)
 
-#define AFHBA_START_AI_LLC	_IOW(DMAGIC,   5, struct XLLC_DEF)
-/**< ioctl ACQ2106 Start Low Latency Control Inbound */
+#define AFHBA_START_AI_LLC	_IOWR(DMAGIC,   5, struct XLLC_DEF)
+/**< ioctl ACQ2106 Start Low Latency Control Inbound
+ * outputs actual pa used
+ */
 
-#define AFHBA_START_AO_LLC	_IOW(DMAGIC,   6, struct XLLC_DEF)
+#define AFHBA_START_AO_LLC	_IOWR(DMAGIC,   6, struct XLLC_DEF)
 /**< ioctl ACQ2106 Start Low Latency Control Outbound */
 
 #endif /* __RTM_T_IOCTL_H__ */

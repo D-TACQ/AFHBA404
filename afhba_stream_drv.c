@@ -147,9 +147,11 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 
 
 
-#define COPY_FROM_USER(src, dest, len) \
-	if (copy_from_user(src, dest, len)) { return -EFAULT; }
+#define COPY_FROM_USER(to, from, len) \
+	if (copy_from_user(to, from, len)) { return -EFAULT; }
 
+#define COPY_TO_USER(to, from, len) \
+	if (copy_to_user(to, from, len)) { return -EFAULT; }
 
 static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 {
@@ -229,10 +231,10 @@ static void afs_load_llc_single_dma(
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
-	u32 dma_desc = pa==RTM_T_USE_HOSTBUF? sdev->hbx[0].pa: pa;
 	u32 len64 = ((len/64-1) + (len%64!=0));
 	u32 offset = dma_sel==DMA_PUSH_SEL?
 			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	u32 dma_desc;
 
 	dev_dbg(pdev(adev), "afs_load_llc_single_dma %s 0x%08x %d",
 			sDMA_SEL(dma_sel), pa, len);
@@ -240,7 +242,7 @@ static void afs_load_llc_single_dma(
 	len64 <<= AFDMAC_DESC_LEN_SHL;
 	len64 &= AFDMAC_DESC_LEN_MASK;
 
-	dma_desc &= AFDMAC_DESC_ADDR_MASK;
+	dma_desc = pa&AFDMAC_DESC_ADDR_MASK;
 	dma_desc |= len64;
 	dma_desc |= sdev->shot&AFDMAC_DESC_ID_MASK;
 
@@ -997,6 +999,10 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	sdev->onStopPush = afs_stop_llc_push;
+
+	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
+		xllc_def->pa = sdev->hbx[0].pa;
+	}
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
@@ -1005,6 +1011,9 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	sdev->onStopPull = afs_stop_llc_pull;
+	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
+		xllc_def->pa = sdev->hbx[0].pa;
+	}
 	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
@@ -1324,13 +1333,19 @@ long afs_dma_ioctl(struct file *file,
 	}
 	case AFHBA_START_AI_LLC : {
 		struct XLLC_DEF xllc_def;
+		long rc;
 		COPY_FROM_USER(&xllc_def, varg, sizeof(struct XLLC_DEF));
-		return afs_start_ai_llc(adev, &xllc_def);
+		rc =  afs_start_ai_llc(adev, &xllc_def);
+		COPY_TO_USER(varg, &xllc_def, sizeof(struct XLLC_DEF));
+		return rc;
 	}
 	case AFHBA_START_AO_LLC : {
 		struct XLLC_DEF xllc_def;
+		long rc;
 		COPY_FROM_USER(&xllc_def, varg, sizeof(struct XLLC_DEF));
-		return afs_start_ao_llc(adev, &xllc_def);
+		rc = afs_start_ao_llc(adev, &xllc_def);
+		COPY_TO_USER(varg, &xllc_def, sizeof(struct XLLC_DEF));
+		return rc;
 	}
 	default:
 		return -ENOTTY;
