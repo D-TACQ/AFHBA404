@@ -54,10 +54,8 @@ cleanup() {
 	remote_cmd $SC streamtonowhered stop
 }
 
-if [ "x$COMMS_ONLY" = "xYES" ]; then
-	init_comms
-	exit 0
-fi
+init_comms
+[ "x$COMMS_ONLY" = "xYES" ] && 	exit 0
 init_acq2106A
 start_stream
 echo CTRL-C to quit
