@@ -189,11 +189,10 @@ void run(void (*action)(void*))
 	memset(host_buffer, 0, VI_LEN);
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
-		memcpy(local_buffer, host_buffer, VI_LEN);
-		while((tl1 = TLATCH) == tl0){
+		while((tl1 = TLATCH) == tl0){   
 			sched_yield();
-			memcpy(local_buffer, host_buffer, VI_LEN);
 		}
+		memcpy(local_buffer, host_buffer, VI_LEN);
 		if (verbose){
 			if (sample%10000 == 0){
 				if (println == 0){
