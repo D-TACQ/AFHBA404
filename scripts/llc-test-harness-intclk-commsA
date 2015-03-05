@@ -11,11 +11,21 @@ EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
 
 source afhba-common
-# site definitions SC: system controller, CA: commsA, AI: AI
+# site definitions SC: system controller, CX: commsA, AI: AI
 SC=0
-CA=13
+CX=${CX:-13}
 AI=1
 
+# optional COMMS=A, COMMS=B arg works as well.
+case $COMMS in
+A)	CX=13;;
+B)	CX=12;;
+esac
+
+init_comms() {
+	remote_cmd $CX aggregator sites=1
+	remote_cmd $CX spad=1
+}
 init_acq2106A() {
 	if [ "$LLC_TRG" = "ext" ]; then
 		remote_cmd $AI trg=1,2,1
@@ -32,8 +42,6 @@ init_acq2106A() {
 		echo setting internal clock / $INTCLKDIV
 	fi
 	remote_cmd $SC spad=1,8,0	
-	remote_cmd $CA aggregator sites=1
-	remote_cmd $CA spad=1
 	remote_cmd $SC run0 1
 }
 
@@ -46,6 +54,10 @@ cleanup() {
 	remote_cmd $SC streamtonowhered stop
 }
 
+if [ "x$COMMS_ONLY" = "xYES" ]; then
+	init_comms
+	exit 0
+fi
 init_acq2106A
 start_stream
 echo CTRL-C to quit
