@@ -1,6 +1,7 @@
 #!/bin/bash
 # llc-test-harness: configure and start an llc process
-#!/bin/bash
+
+echo DEPRECATED: DO NO USE; exit 1
 
 # MUST set remote ip-address
 REMIP=${1:-acq2106_004}

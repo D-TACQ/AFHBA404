@@ -1,0 +1,68 @@
+#!/bin/bash
+# high throughput streaming test harness
+#!/bin/bash
+
+[ -d scripts ] && cd scripts
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_004}
+INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+STREAMPID=0
+
+source afhba-common
+# site definitions SC: system controller, CX: commsA, AI: AI
+SC=0
+CA=13
+CB=12
+# master AI
+AI=1
+
+SITES=1,2,3,4
+
+
+init_comms() {	
+	cx=$1
+	sites=$2
+	
+	remote_cmd $cx spad=0
+	remote_cmd $cs sites=$sites
+}
+
+init_acq2106A() {
+	if [ "$LLC_TRG" = "ext" ]; then
+		remote_cmd $AI trg=1,2,1
+	else
+		remote_cmd $AI trg=1,1,1
+	fi
+	if [ "$LLC_CLK" = "ext" ]; then
+		remote_cmd $AI clk=1,2,1
+		remote_cmd $AI clkdiv=$EXTCLKDIV
+		echo setting external clock / $EXTCLKDIV
+	else
+		remote_cmd $AI clk=0,0,0
+		remote_cmd $AI clkdiv=$INTCLKDIV
+		echo setting internal clock / $INTCLKDIV
+	fi
+	remote_cmd $SC spad=0,0,0
+	init_comms $CA 1,2
+	init_comms $CB 3,4
+	remote_cmd $SC run0 $SITES
+}
+
+start_stream() {
+	remote_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+	remote_cmd $SC streamtonowhered stop
+}
+
+init_acq2106A
+start_stream
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
