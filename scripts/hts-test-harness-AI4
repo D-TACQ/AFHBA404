@@ -9,6 +9,7 @@ REMIP=${1:-acq2106_004}
 INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
 EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
+SIMULATE=${SIMULATE:-0}
 
 source afhba-common
 # site definitions SC: system controller, CX: commsA, AI: AI
@@ -44,10 +45,12 @@ init_acq2106A() {
 		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
+	remote_cmd $AI simulate=$SIMULATE
 	remote_cmd $SC spad=0,0,0
 	init_comms $CA 1,2
 	init_comms $CB 3,4
 	remote_cmd $SC run0 $SITES
+	remote_cmd $SC decimate=20
 }
 
 start_stream() {
