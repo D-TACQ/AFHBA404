@@ -80,6 +80,8 @@ struct XLLC_DEF xllc_def = {
 #define AO_CHAN	32
 #define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
 
+#define DO_IX	(16)		/* longwords */
+
 
 /* SPLIT single HB into 2
  * [0] : AI
@@ -204,6 +206,13 @@ void print_sample(unsigned sample, unsigned tl)
 	}
 }
 
+void copy_tlatch_to_do32(void *ao, void *ai)
+{
+	unsigned* dox = (unsigned *)ao;
+	unsigned* tlx = (unsigned *)ai;
+
+	dox[DO_IX] = tlx[SPIX];
+}
 void control(short *ao, short *ai)
 {
 	int ii;
@@ -211,6 +220,7 @@ void control(short *ao, short *ai)
 		ao[ii] = ai[0];
 		ao[ii+1] = ai[1];
 	}
+	copy_tlatch_to_do32(ao, ai);
 }
 
 void run(void (*action)(void*))
