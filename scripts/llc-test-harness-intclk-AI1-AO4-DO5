@@ -15,6 +15,7 @@ SC=0
 CB=12
 AI=1
 AO=4
+DO=5
 
 source afhba-common
 
@@ -33,14 +34,18 @@ init_2106() {
 		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-# pad is 15 but needs new logic
-#	remote_cmd $SC distributor sites=$AO,5 comms=1 pad=15 on
 	remote_cmd $SC distributor sites=$AO,5 comms=1 pad=16 on
 	remote_cmd $AO lotide 256
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
+        remote_cmd $AO twos_comp_encoding=1       
+        remote_cmd $DO lotide 256
+        remote_cmd $DO clk=1,2,1
+        remote_cmd $DO byte_is_output=1,1,1,1
+        remote_cmd $DO mode=1
 
-	remote_cmd $SC spad=1,7,0	
+
+	remote_cmd $SC spad=1,8,0	
 	remote_cmd $SC run0 1
 	remote_cmd $CB aggregator sites=1 on
 	remote_cmd $CB spad 1
