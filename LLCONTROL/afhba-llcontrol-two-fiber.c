@@ -55,7 +55,8 @@ void (*G_action)(void*);
 int dummy_first_loop;
 /* potentially good for cache fill, but sets initial value zero */
 
-
+short* ao_buffer;
+int has_do32;
 
 /* ACQ425 */
 
@@ -79,9 +80,11 @@ struct XLLC_DEF ai_def = {
 #define AO_CHAN	32
 #define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
 
+#define DO_IX	(16)		/* longwords */
+
 struct XLLC_DEF ao_def = {
 		.pa = RTM_T_USE_HOSTBUF,
-		.len = VI_LEN
+		.len = VO_LEN
 };
 
 struct Device {
@@ -168,6 +171,9 @@ void ui(int argc, char* argv[])
 	if (getenv("PA_AO_BUF")){
 		ao_def.pa = strtoul(getenv("PA_AO_BUF"), 0, 0);
 	}
+	if (getenv("DO32")){
+		has_do32 = atoi(getenv("DO32"));
+	}
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
@@ -232,12 +238,22 @@ void print_sample(unsigned sample, unsigned tl)
 	}
 }
 
+void copy_tlatch_to_do32(void *ao, void *ai)
+{
+	unsigned* dox = (unsigned *)ao;
+	unsigned* tlx = (unsigned *)ai;
+
+	dox[DO_IX] = tlx[SPIX];
+}
 void control(short *ao, short *ai)
 {
 	int ii;
 	for (ii = 0; ii < AO_CHAN; ii += 2){
 		ao[ii] = ai[0];
 		ao[ii+1] = ai[1];
+	}
+	if (has_do32){
+		copy_tlatch_to_do32(ao, ai);
 	}
 }
 
