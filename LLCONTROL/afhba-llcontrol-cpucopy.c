@@ -57,6 +57,7 @@ int dummy_first_loop;
 /* potentially good for cache fill, but sets initial value zero */
 
 short* ao_buffer;
+int has_do32;
 
 /* ACQ425 */
 
@@ -149,6 +150,9 @@ void ui(int argc, char* argv[])
 	if (getenv("PA_BUF")){
 		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
 	}
+	if (getenv("DO32")){
+		has_do32 = atoi(getenv("DO32"));
+	}
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
@@ -191,6 +195,9 @@ void setup()
 	}
 	printf("AI buf pa: 0x%08x\n", xllc_def.pa);
 	xllc_def.pa += HB_LEN;
+	if (has_do32){
+		xllc_def.len += 64;
+	}
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
@@ -220,7 +227,9 @@ void control(short *ao, short *ai)
 		ao[ii] = ai[0];
 		ao[ii+1] = ai[1];
 	}
-	copy_tlatch_to_do32(ao, ai);
+	if (has_do32){
+		copy_tlatch_to_do32(ao, ai);
+	}
 }
 
 void run(void (*action)(void*))
