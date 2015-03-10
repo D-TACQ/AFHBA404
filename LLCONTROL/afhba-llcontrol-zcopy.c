@@ -78,7 +78,7 @@ struct XLLC_DEF xllc_def = {
 };
 
 #define AO_CHAN	32
-#define VO_LEN  (AO_CHAN*sizeof(short) + has_do32?sizeof(unsigned):0)
+#define VO_LEN  (AO_CHAN*sizeof(short) + (has_do32?sizeof(unsigned):0))
 
 void get_mapping() {
 	char fname[80];
