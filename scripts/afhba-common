@@ -23,5 +23,3 @@ remote_cmd() {
         logger -t rem_cmd $REMIP $PORT $*
         echo $* | nc $REMIP $PORT
 }
-
-
