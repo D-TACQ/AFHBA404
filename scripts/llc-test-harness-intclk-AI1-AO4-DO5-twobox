@@ -1,0 +1,86 @@
+#!/bin/bash
+# llc-test-harness-intclk-AI1-AO4-DO5 using two boxes
+# AI+AO llc with zerocopy on one fiber. Basic LLC test
+
+[ -d scripts ] && cd scripts
+
+# MUST set remote ip-address
+INBOX=${1:-acq2106_004}
+OUTBOX=${2:-acq2106_003}
+INTCLKDIV=${INTCLKDIV:-1000}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+STREAMPID=0
+
+# site definitions SC: system controller, CB: commsB, AI: AI, AO : AO
+SC=0
+CB=12
+AI=1
+AO=4
+DO=5
+
+source afhba-common
+
+in_cmd() {
+	REMIP=$INBOX remote_cmd $*
+}
+
+out_cmd() {
+	REMIP=$OUTBOX remote_cmd $*
+}
+
+init_2106() {
+	if [ "$LLC_TRG" = "ext" ]; then
+		in_cmd $AI trg=1,2,1
+		out_cmd $AO trg=1,2,1
+	else
+		in_cmd $AI trg=1,1,1
+		out_cmd $AO trg=1,1,1
+	fi
+	if [ "$LLC_CLK" = "ext" ]; then
+		in_cmd $AI clk=1,2,1
+		in_cmd $AI clkdiv=$EXTCLKDIV
+		echo setting external clock / $EXTCLKDIV
+	else
+		in_cmd $AI clk=0,0,0
+		in_cmd $AI clkdiv=$INTCLKDIV
+		echo setting internal clock / $INTCLKDIV
+	fi
+	out_cmd $SC distributor sites=$AO,$DO comms=1 pad=15 on
+	out_cmd $AO lotide 256
+	out_cmd $AO clk=1,2,1
+	out_cmd $AO clkdiv=1 
+        out_cmd $AO twos_comp_encoding=1       	
+	
+        out_cmd $DO lotide 256
+        out_cmd $DO clk=1,2,1
+        out_cmd $DO byte_is_output=1,1,1,1
+        out_cmd $DO mode=1
+
+
+	in_cmd $SC spad=1,8,0	
+	in_cmd $SC run0 1
+	in_cmd $CB aggregator sites=1 on
+	in_cmd $CB spad 1
+	
+}
+
+start_stream() {
+	in_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+#	kill ${STREAMPID}
+	echo "remote_cmd $SC distributor off"
+	out_cmd $SC distributor off
+	in_cmd $SC streamtonowhered stop
+}
+
+init_2106
+start_stream
+echo now view data perhaps using ./mapsample
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
