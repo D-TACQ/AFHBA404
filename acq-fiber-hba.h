@@ -227,7 +227,19 @@ struct AFHBA_DEV_PATH {
 	AFHBA_AURORA_STAT_HARD_ERR|AFHBA_AURORA_STAT_SOFT_ERR|\
 	AFHBA_AURORA_STAT_FRAME_ERR)
 
+/* BAR1 register definitions: enums are long-word offsets */
+#define ZYNQ_BASE			0x0000
+
+enum ZYNQ_REGS {
+	Z_MOD_ID,		/* 0x0000 */
+	Z_DMA_CTRL,		/* 0x0004 */
+	Z_COMMS_HB,		/* 0x0008 */
+	Z_AURORA_CTRL,		/* 0x000C */
+	Z_AURORA_SR,		/* 0x0010 */
+	Z_IDENT			/* 0x0014 */
+};
 #define PCIE_BASE			0x1000
+
 
 enum PCIE_REGS {
 	PCIE_CNTRL = 1,

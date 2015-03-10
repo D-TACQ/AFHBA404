@@ -166,6 +166,16 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 	writel(descr, adev->mappings[REMOTE_BAR].va+offset);
 }
 
+u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
+{
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + ZYNQ_BASE);
+	void* va = &dma_regs[regoff];
+	u32 value = readl(va);
+	dev_dbg(pdev(adev), "_afs_read_dmareg %04lx = %08x",
+			va-adev->mappings[REMOTE_BAR].va, value);
+	return adev->stream_dev->dma_regs[regoff] = value;
+}
+
 void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 
 {
@@ -1443,6 +1453,45 @@ static struct file_operations afs_fops = {
 	.release = afhba_release,
 };
 
+static ssize_t show_zmod_id(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_MOD_ID));
+}
+
+static DEVICE_ATTR(z_mod_id, S_IRUGO, show_zmod_id, 0);
+
+static ssize_t show_z_ident(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_IDENT));
+}
+
+static DEVICE_ATTR(z_ident, S_IRUGO, show_z_ident, 0);
+
+static const struct attribute *dev_attrs[] = {
+	&dev_attr_z_mod_id.attr,
+	&dev_attr_z_ident.attr,
+	NULL
+};
+
+
+void afs_create_sysfs(struct AFHBA_DEV *adev)
+{
+	int rc = sysfs_create_files(&adev->pci_dev->dev.kobj, dev_attrs);
+	if (rc){
+		dev_err(pdev(adev), "failed to create files");
+		return;
+	}
+}
+
+
 int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
@@ -1454,6 +1503,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	startWork(adev);
 	adev->stream_fops = &afs_fops;
 	afs_init_procfs(adev);
+	afs_create_sysfs(adev);
 	return 0;
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)
