@@ -236,6 +236,15 @@ static void afs_configure_streaming_dma(
 	DMA_CTRL_WR(adev, dma_ctrl);
 }
 
+static void afs_dma_set_recycle(
+		struct AFHBA_DEV *adev, enum DMA_SEL dma_sel, int enable)
+{
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	DMA_CTRL_WR(adev, dma_ctrl);
+}
+
 static void afs_load_llc_single_dma(
 	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel, u32 pa, unsigned len)
 {
@@ -983,6 +992,9 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 
 void afs_stop_llc_push(struct AFHBA_DEV *adev)
 {
+	dev_info(pdev(adev), "afs_dma_set_recycle(0)");
+	msleep(1);
+	afs_dma_set_recycle(adev, DMA_PUSH_SEL, 0);
 	dev_info(pdev(adev), "afs_stop_llc_push()");
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 }
