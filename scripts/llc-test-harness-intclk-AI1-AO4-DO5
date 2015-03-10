@@ -38,8 +38,7 @@ init_2106() {
 	remote_cmd $AO lotide 256
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
-        remote_cmd $AO twos_comp_encoding=1       
-	remote_cmd $AO playloop_length=0
+        remote_cmd $AO twos_comp_encoding=1       	
 	
         remote_cmd $DO lotide 256
         remote_cmd $DO clk=1,2,1
