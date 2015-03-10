@@ -56,7 +56,7 @@ int devnum = 0;
 int dummy_first_loop;
 /* potentially good for cache fill, but sets initial value zero */
 
-
+int has_do32;
 
 /* ACQ425 */
 
@@ -76,6 +76,9 @@ struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
 		.len = VI_LEN
 };
+
+#define AO_CHAN	32
+#define VO_LEN  (AO_CHAN*sizeof(short) + has_do32?sizeof(unsigned):0)
 
 void get_mapping() {
 	char fname[80];
@@ -138,6 +141,9 @@ void ui(int argc, char* argv[])
 	if (getenv("PA_BUF")){
 		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
 	}
+	if (getenv("DO32")){
+		has_do32 = atoi(getenv("DO32"));
+	}
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
@@ -178,6 +184,7 @@ void setup()
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
 	}
+	xllc_def.len = VO_LEN;
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
