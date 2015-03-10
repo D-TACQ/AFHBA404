@@ -34,7 +34,7 @@ init_2106() {
 		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$AO,5 comms=1 pad=15 on
+	remote_cmd $SC distributor sites=$AO,$DO comms=1 pad=15 on
 	remote_cmd $AO lotide 256
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
