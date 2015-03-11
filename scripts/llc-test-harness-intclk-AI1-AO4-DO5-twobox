@@ -51,6 +51,7 @@ init_2106() {
 		out_cmd $AO clkdiv=$aodiv
 		echo setting internal clock / $INTCLKDIV
 	fi
+	out_cmd $SC distributor sites=$AO,$DO comms=1 pad=15 off
 	out_cmd $SC distributor sites=$AO,$DO comms=1 pad=15 on
 	out_cmd $AO lotide 256	
         out_cmd $AO twos_comp_encoding=1       	
