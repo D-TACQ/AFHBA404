@@ -105,6 +105,9 @@ ie
 AFHBA device 0 is connected to acq2106_004 portA
 AFHBA device 1 is connected to acq2106_003 portB
 
+ACQ2106_004 has AI in site 1
+ACQ2106_003 has AO in site 4, DO in site 5
+
 DEV_AI=0 DEV_AO=1 DO32=1 ./LLCONTROL/afhba-llcontrol-two-fiber
 INTCLKDIV=250 /scripts/llc-test-harness-intclk-AI1-AO4-DO5-twobox
 

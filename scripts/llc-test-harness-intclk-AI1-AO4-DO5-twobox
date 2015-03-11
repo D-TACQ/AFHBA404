@@ -12,7 +12,9 @@ EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
 
 # site definitions SC: system controller, CB: commsB, AI: AI, AO : AO
+# AI uses commsA, AO uses commsB
 SC=0
+AICX=13
 CB=12
 AI=1
 AO=4
@@ -64,8 +66,8 @@ init_2106() {
 
 	in_cmd $SC spad=1,8,0	
 	in_cmd $SC run0 1
-	in_cmd $CB aggregator sites=1 on
-	in_cmd $CB spad 1
+	in_cmd $AICX aggregator sites=1 on
+	in_cmd $AICX spad 1
 	
 }
 
