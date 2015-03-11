@@ -37,16 +37,18 @@ init_2106() {
 		out_cmd $AO trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		in_cmd $AI clk=1,2,1
+		in_cmd $AI clk=1,0,1
 		in_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
-		out_cmd $AO clk=1,2,1
+		out_cmd $AO clk=1,0,1
 		out_cmd $AO clkdiv=$EXTCLKDIV
 	else
 		in_cmd $AI clk=0,0,0
 		in_cmd $AI clkdiv=$INTCLKDIV
 		out_cmd $AO clk=0,0,0
-		out_cmd $AO clkdiv=$INTCLKDIV
+		let aodiv="$INTCLKDIV*2/3"
+		echo "setting clkdiv $aodiv"	
+		out_cmd $AO clkdiv=$aodiv
 		echo setting internal clock / $INTCLKDIV
 	fi
 	out_cmd $SC distributor sites=$AO,$DO comms=1 pad=15 on
@@ -68,8 +70,11 @@ init_2106() {
 
 start_stream() {
 	in_cmd $SC streamtonowhered start
+	if [ "$LLC_TRG" != "ext" ]; then
+		out_cmd $SC soft_trigger
+	fi
 }
-
+	
 
 cleanup() {
 #	kill ${STREAMPID}
