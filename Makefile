@@ -13,11 +13,11 @@ EXTRA_CFLAGS += -DCONFIG_SPI
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-all: modules apps 
+all: modules apps llc_support
 
 flash: spi_support 
 
-flash_clean: spi_clean
+flash_clean: spi_clean llc_clean
 
 KRNL ?= $(shell uname -r)
 # FEDORA:
@@ -51,6 +51,8 @@ mmap:
 xiloader:
 	cc -o xiloader xiloader.c -lpopt
 
+llc_support:
+	cd LLCONTROL && $(MAKE)
 
 spi_support: flasherase
 	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi-bitbang.o" modules
@@ -65,8 +67,11 @@ spi_clean:
 	make -C $(KHEADERS) M=$(LDRV)/mtd clean
 	make -C $(KHEADERS) M=$(LDRV)/mtd/devices clean
 	cd mtd-utils && $(MAKE) clean
+
+llc_clean:
+	cd LLCONTROL && $(MAKE) clean
 	
-clean:
+clean: llc_clean spi_clean
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
