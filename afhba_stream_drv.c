@@ -355,7 +355,8 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 			return 0;
 		}
 	}
-
+	/* ... now make _sure_ it's up .. */
+	msleep(MSLEEP_TO);
 	_afs_pcie_mirror_init(adev);
 	return sdev->comms_init_done = true;
 }
