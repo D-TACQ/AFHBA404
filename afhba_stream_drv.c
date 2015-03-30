@@ -872,8 +872,8 @@ static int afs_isr_work(void *arg)
 			afs_stop_dma(adev, DMA_PUSH_SEL);
 			job->please_stop = PS_STOP_DONE;
 			break;
-		default:
 /*
+  		default:
 			please_check_fifo = job_is_go(job) &&
 				afs_dma_started(adev, DMA_PUSH_SEL);
 */
