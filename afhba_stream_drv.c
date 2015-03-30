@@ -88,6 +88,9 @@ int eot_interrupt = 0;
 module_param(eot_interrupt, int, 0644);
 MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: interrupt interval");
 
+int aurora_status_read_count = 0;
+module_param(aurora_status_read_count, int, 0644);
+MODULE_PARM_DESC(aurora_status_read_count, "number of amon polls");
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -293,6 +296,7 @@ static inline int afs_dma_started(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 {
 	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+	++aurora_status_read_count;
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
@@ -335,6 +339,9 @@ static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 		PCI_REG_WRITE(adev, ireg, afhba_read_reg(adev, ireg*sizeof(u32)));
 	}
 }
+
+#define MSLEEP_TO 10
+
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
@@ -343,8 +350,8 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
 
 	while(!afs_aurora_lane_up(adev)){
-		msleep(1);
-		if (++to > aurora_to_ms){
+		msleep(to += MSLEEP_TO);
+		if (to > aurora_to_ms){
 			return 0;
 		}
 	}
@@ -862,9 +869,8 @@ static int afs_isr_work(void *arg)
 			job->please_stop = PS_STOP_DONE;
 			break;
 		default:
-			if (afs_dma_started(adev, DMA_PUSH_SEL)){
-				please_check_fifo = 1;
-			}
+			please_check_fifo = job_is_go(job) &&
+				afs_dma_started(adev, DMA_PUSH_SEL);
 		}
 		spin_unlock(&sdev->job_lock);
 
