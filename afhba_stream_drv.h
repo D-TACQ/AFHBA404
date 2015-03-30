@@ -90,6 +90,7 @@ struct AFHBA_STREAM_DEV {
 		unsigned buffers_discarded;
 
 		unsigned catchup_histo[NBUFFERS];
+		int dma_started;
 	}
 		job;
 	spinlock_t job_lock;

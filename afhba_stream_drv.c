@@ -847,9 +847,13 @@ static int afs_isr_work(void *arg)
 
 	        if (job_is_go(job)){
 	        	queue_free_buffers(adev);
-			if (!afs_dma_started(adev, DMA_PUSH_SEL)){
+	        	if (!job->dma_started){
 				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
 				afs_start_dma(adev, DMA_PUSH_SEL);
+
+				spin_lock(&sdev->job_lock);
+				job->dma_started = 1;
+				spin_unlock(&sdev->job_lock);
 			}
 		}
 
@@ -869,8 +873,10 @@ static int afs_isr_work(void *arg)
 			job->please_stop = PS_STOP_DONE;
 			break;
 		default:
+/*
 			please_check_fifo = job_is_go(job) &&
 				afs_dma_started(adev, DMA_PUSH_SEL);
+*/
 		}
 		spin_unlock(&sdev->job_lock);
 
