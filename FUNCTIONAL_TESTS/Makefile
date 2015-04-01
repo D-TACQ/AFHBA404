@@ -2,7 +2,7 @@
 all: hbfarm425 checkramp
 
 clean:
-	rm hbfarm425 checkramp
+	rm -f hbfarm425 checkramp
 
 
 install:
