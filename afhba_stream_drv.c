@@ -1532,6 +1532,9 @@ static ssize_t show_z_ident(
 
 static DEVICE_ATTR(z_ident, S_IRUGO, show_z_ident, 0);
 
+
+
+
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_z_mod_id.attr,
 	&dev_attr_z_ident.attr,

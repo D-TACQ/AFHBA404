@@ -339,6 +339,31 @@ static ssize_t show_shot(
 
 static DEVICE_ATTR(shot, S_IRUGO, show_shot, 0);
 
+static ssize_t show_latstat(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	unsigned ls1 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_1);
+	unsigned ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
+	return sprintf(buf, "%5d %5d %5d %5d\n",
+			ls1>>16, ls1&0x0ffff, ls2>>16, ls2&0x0ffff);
+}
+
+static DEVICE_ATTR(latstat, S_IRUGO, show_latstat, 0);
+
+static ssize_t show_fpga_rev(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, FPGA_REVISION_REG));
+}
+
+static DEVICE_ATTR(fpga_rev, S_IRUGO, show_fpga_rev, 0);
+
 
 
 static const struct attribute *dev_attrs[] = {
@@ -356,6 +381,8 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_dma_latest_pull_desc.attr,
 	&dev_attr_comms_init.attr,
 	&dev_attr_shot.attr,
+	&dev_attr_latstat.attr,
+	&dev_attr_fpga_rev.attr,
 	NULL
 };
 

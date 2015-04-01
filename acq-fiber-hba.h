@@ -180,6 +180,9 @@ struct AFHBA_DEV_PATH {
 #define HOST_COUNTER_REG 		0x0024	/* Heart Beat Counter */
 #define HOST_PCIE_DEBUG_REG 		0x0028	/* Host PCIe Debug Register */
 
+#define HOST_PCIE_LATSTATS_1		0x0030
+#define HOST_PCIE_LATSTATS_2		0x0034
+
 #define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
 #define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
 #define AURORA_CONTROL_REG 		0x0080	/* Aurora Control Register */
