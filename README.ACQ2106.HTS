@@ -1,0 +1,103 @@
+README.ACQ2106.HTS
+
+High Throughput Streaming
+
+Use Case:
+
+ACQ2106+4xACQ425-16-2000 
+
+Initial:
+========
+./scripts/load
+dmesg -c  ** see bootlog at end
+There's automated AMON (Aurora MONitor) polling to handle link up, link down.
+
+Examples stream to a ramdisk. To set up the ramdisk:
+./scripts/mount-ramdisk
+
+
+
+Running a shot:
+===============
+
+The data rate is too high for a single AFHBA, use two cables, two AFHBA
+
+./scripts/stream-to-ramdisk
+./scripts/stream-to-ramdisk 1
+SIMULATE=0 ./scripts/hts-test-harness-AI4
+
+With data validation:
+./scripts/stream-checkramp
+./scripts/stream-checkramp 1
+SIMULATE=1 ./scripts/hts-test-harness-AI4
+
+
+
+Example Bootlog with 2 x AFHBA in one chassis
+=============================================
+afhba D-TACQ ACQ-FIBER-HBA Driver for ACQ400 B1026 Apr  1 2015
+Copyright (c) 2010/2014 D-TACQ Solutions Ltd
+afhba 0000:0c:00.0: AFHBA: subdevice : 4102
+afhba 0000:0c:00.0: hb1 [0] ffff880037900000 37900000 1048576 00000000
+afhba 0000:0c:00.0: FPGA revision: ac01000b
+afhba 0000:0c:00.0: afhba_stream_drv_init(1003)
+afhba 0000:0c:00.0: irq 98 for MSI/MSI-X
+afhba 0000:0c:00.0: irq 99 for MSI/MSI-X
+afhba 0000:0c:00.0: irq 100 for MSI/MSI-X
+afhba 0000:0c:00.0: irq 101 for MSI/MSI-X
+afhba 0000:0c:00.0: request_irq afhba.0-line 99 OK
+afhba 0000:0c:00.0: request_irq afhba.0-ppnf 100 OK
+afhba 0000:0c:00.0: request_irq afhba.0-spare 101 OK
+afhba 0000:06:00.0: AFHBA: subdevice : 4102
+afhba 0000:06:00.0: hb1 [0] ffff880072000000 72000000 1048576 00000000
+afhba 0000:06:00.0: FPGA revision: ac01000b
+afhba 0000:06:00.0: afhba_stream_drv_init(1003)
+afhba 0000:06:00.0: irq 102 for MSI/MSI-X
+afhba 0000:06:00.0: irq 103 for MSI/MSI-X
+afhba 0000:06:00.0: irq 104 for MSI/MSI-X
+afhba 0000:06:00.0: irq 105 for MSI/MSI-X
+afhba 0000:06:00.0: request_irq afhba.1-line 103 OK
+afhba 0000:06:00.0: request_irq afhba.1-ppnf 104 OK
+afhba 0000:06:00.0: request_irq afhba.1-spare 105 OK
+afhba 0000:0c:00.0: aurora link up!
+afhba 0000:06:00.0: aurora link up!
+afhba 0000:0c:00.0: [0] Z_IDENT 1:0x21b60007 2:0x21b60007 acq2106_007.commsB
+afhba 0000:0c:00.0: aurora initial s:0x00002567 m:0x60000070 e:0x00000060
+afhba 0000:06:00.0: [1] Z_IDENT 1:0x21a60007 2:0x21a60007 acq2106_007.commsA
+afhba 0000:06:00.0: aurora initial s:0x00002967 m:0x60000070 e:0x00000060
+
+Example Interrupt listing:
+=========================
+[root@endor ~]# grep afhba /proc/interrupts  | cut -c-20,70-
+  98:       9278     0  IR-PCI-MSI-edge      afhba.0-dma
+  99:          0     0  IR-PCI-MSI-edge      afhba.0-line
+ 100:          0     0  IR-PCI-MSI-edge      afhba.0-ppnf
+ 101:          0     0  IR-PCI-MSI-edge      afhba.0-spare
+ 102:       9278     0  IR-PCI-MSI-edge      afhba.1-dma
+ 103:          0     0  IR-PCI-MSI-edge      afhba.1-line
+ 104:          0     0  IR-PCI-MSI-edge      afhba.1-ppnf
+ 105:          0     0  IR-PCI-MSI-edge      afhba.1-spare
+
+
+Example Link Fail and restart
+=============================
+
+afhba 0000:0c:00.0: aurora link down!
+afhba 0000:0c:00.0: job is go but aurora is down
+afhba 0000:0c:00.0: afs_stop_stream_push()
+afhba 0000:06:00.0: afs_stop_stream_push()
+afhba 0000:0c:00.0: aurora link up!
+afhba 0000:0c:00.0: [0] Z_IDENT 1:0xdeadc0de 2:0x21b60007 acq2106_007.commsB
+
+stream-to-ramdisk processes will time out. 
+The controller ./scripts/hts-test-harness-AI4 can be <ctrl-C> aborted and re-run without problem.
+
+
+FAQ:
+===
+
+1. Runs for a few seconds and FAILS?
+In our experience, if we forget to mount the ramdisk, data is streamed to the local disk instead. The high data rate overwhelms the disk and the computer can lock up completely.
+
+You may see a message like "RT Throttling set" .. that's a sure sign that the disk system is working too hard..
+
