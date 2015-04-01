@@ -37,7 +37,7 @@
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
 
-#define REVID	"1001"
+#define REVID	"1002"
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -342,12 +342,40 @@ static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 
 #define MSLEEP_TO 10
 
+static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
+{
+	if ((z_ident&0x21060000) == 0x21060000){
+		snprintf(buf, maxbuf, "acq2106_%03d.comms%X",
+				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
+static int _afs_check_read(struct AFHBA_DEV *adev)
+{
+	unsigned z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
+	unsigned z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
+
+	if (z_ident2 == 0xffffffff || (z_ident2&0x0ffff) == 0xdead0000){
+		dev_err(pdev(adev), "ERROR reading Z_IDENT %08x, please reboot now", z_ident2);
+		return -1;
+	}else{
+		char buf[80];
+		int valid_id = is_valid_z_ident(z_ident2, buf, 80);
+
+		dev_info(pdev(adev), "Z_IDENT 1:0x%08x 2:0x%08x %s",
+			z_ident1, z_ident2, valid_id? buf: "ID NOT VALID");
+		return 0;
+	}
+}
+
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	int to = 0;
-	unsigned z_ident1;
-	unsigned z_ident2;
+
 
 	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
 
@@ -361,13 +389,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	msleep(MSLEEP_TO);
 	_afs_pcie_mirror_init(adev);
 
-	z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
-	z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
-	dev_info(pdev(adev), "Z_IDENT 1:0x%08x 2:0x%08x", z_ident1, z_ident2);
-	if (z_ident2 == 0xffffffff || (z_ident2&0x0ffff) == 0xdead0000){
-		dev_err(pdev(adev), "ERROR reading Z_IDENT %08x, please reboot now", z_ident2);
-	}
-	return sdev->comms_init_done = true;
+	return sdev->comms_init_done = _afs_check_read(adev) == 0;
 }
 
 int afs_comms_init(struct AFHBA_DEV *adev)
