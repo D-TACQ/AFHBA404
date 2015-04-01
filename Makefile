@@ -38,7 +38,7 @@ modules:
 
 
 APPS := mmap xiloader
-apps: $(APPS)
+apps: $(APPS) llc_support stream functional_tests
 
 
 flasherase:
@@ -53,6 +53,12 @@ xiloader:
 
 llc_support:
 	cd LLCONTROL && $(MAKE)
+
+stream:
+	cd STREAM && $(MAKE)
+
+functional_tests:
+	cd FUNCTIONAL_TESTS && $(MAKE)
 
 spi_support: flasherase
 	make -C $(KHEADERS) M=$(LDRV)/spi  obj-m="spi-bitbang.o" modules
@@ -70,8 +76,14 @@ spi_clean:
 
 llc_clean:
 	cd LLCONTROL && $(MAKE) clean
+
+stream_clean:
+	cd STREAM && $(MAKE) clean
+
+functional_tests_clean:
+	cd FUNCTIONAL_TESTS && $(MAKE) clean
 	
-clean: llc_clean spi_clean
+clean: llc_clean stream_clean functional_tests_clean
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
