@@ -37,7 +37,7 @@
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
 
-#define REVID	"1002"
+#define REVID	"1003"
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -365,8 +365,9 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 		char buf[80];
 		int valid_id = is_valid_z_ident(z_ident2, buf, 80);
 
-		dev_info(pdev(adev), "Z_IDENT 1:0x%08x 2:0x%08x %s",
-			z_ident1, z_ident2, valid_id? buf: "ID NOT VALID");
+		dev_info(pdev(adev), "[%d] Z_IDENT 1:0x%08x 2:0x%08x %s",
+			adev->idx, z_ident1, z_ident2,
+			valid_id? buf: "ID NOT VALID");
 		return 0;
 	}
 }
