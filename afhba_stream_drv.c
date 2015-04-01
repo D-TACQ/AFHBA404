@@ -346,6 +346,8 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	int to = 0;
+	unsigned z_ident1;
+	unsigned z_ident2;
 
 	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
 
@@ -358,6 +360,13 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	/* ... now make _sure_ it's up .. */
 	msleep(MSLEEP_TO);
 	_afs_pcie_mirror_init(adev);
+
+	z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
+	z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
+	dev_info(pdev(adev), "Z_IDENT 1:0x%08x 2:0x%08x", z_ident1, z_ident2);
+	if (z_ident2 == 0xffffffff || (z_ident2&0x0ffff) == 0xdead0000){
+		dev_err(pdev(adev), "ERROR reading Z_IDENT %08x, please reboot now", z_ident2);
+	}
 	return sdev->comms_init_done = true;
 }
 
