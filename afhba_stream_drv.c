@@ -37,7 +37,7 @@
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
 
-
+#define REVID	"1001"
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -1530,7 +1530,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init()");
+	dev_info(pdev(adev), "afhba_stream_drv_init(%s)", REVID);
 	afs_init_dma_clr(adev);
 	afs_init_buffers(adev);
 	hook_interrupts(adev);
