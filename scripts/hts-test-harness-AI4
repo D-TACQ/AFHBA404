@@ -27,7 +27,7 @@ init_comms() {
 	sites=$2
 	
 	remote_cmd $cx spad=0
-	remote_cmd $cs sites=$sites
+	remote_cmd $cx sites=$sites
 }
 
 init_acq2106A() {
