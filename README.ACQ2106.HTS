@@ -31,6 +31,14 @@ With data validation:
 ./scripts/stream-checkramp 1
 SIMULATE=1 ./scripts/hts-test-harness-AI4
 
+Reduced payload - eg with 1 AI
+set.site 1 data32=1
+
+HBFARM=1 ./scripts/stream-checkramp
+HBFARM=1 ./scripts/stream-checkramp 1
+INTCLKDIV=50 SIMULATE=1 ./scripts/hts-test-harness-AI1
+
+=> full rate from one module. 
 
 
 Example Bootlog with 2 x AFHBA in one chassis

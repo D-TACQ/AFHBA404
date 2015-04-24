@@ -19,9 +19,10 @@ CB=12
 # master AI
 AI=1
 
-SITES=1,2,3,4
+SITES=1,2
 CA_SITES=1,2
-CB_SITES=3,4
+CB_SITES=1,2
+
 
 init_comms() {	
 	cx=$1
