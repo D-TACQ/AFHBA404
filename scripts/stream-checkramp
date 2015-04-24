@@ -3,6 +3,9 @@
 DN=${1:-0}
 PATH=$PATH:/usr/local/bin
 
+HBFARM=${HBFARM:-1 2}
+# alt: HBFARM=1 for single source module
+
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
 if [ $? -ne 0 ];then
@@ -15,4 +18,4 @@ export HBFARM_PROCESS=checkramp
 export NAMES_ON_STDIN=1
 
 RTM_DEVNUM=$DN RECYCLE=1 OUTROOT=/mnt/afhba.$DN ./STREAM/rtm-t-stream-disk | \
-	hbfarm425 1 2
+	hbfarm425 $HBFARM
