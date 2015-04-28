@@ -1,4 +1,6 @@
 
+CXXFLAGS=-O2
+
 all: hbfarm425 checkramp
 
 clean:
