@@ -365,6 +365,65 @@ static ssize_t show_fpga_rev(
 static DEVICE_ATTR(fpga_rev, S_IRUGO, show_fpga_rev, 0);
 
 
+static ssize_t store_push_dma_timeouts(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	int clear;
+
+	if (sscanf(buf, "%d", &clear) == 1 && clear == 1){
+		sdev->push_dma_timeouts = 0;
+		return strlen(buf);
+
+	}else{
+		return -1;
+	}
+}
+
+static ssize_t show_push_dma_timeouts(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+
+	sprintf(buf, "%d\n", sdev->push_dma_timeouts);
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(push_dma_timeouts, S_IRUGO|S_IWUGO, show_push_dma_timeouts, store_push_dma_timeouts);
+
+static ssize_t store_pull_dma_timeouts(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	int clear;
+
+	if (sscanf(buf, "%d", &clear) == 1 && clear == 1){
+		sdev->pull_dma_timeouts = 0;
+		return strlen(buf);
+
+	}else{
+		return -1;
+	}
+}
+
+static ssize_t show_pull_dma_timeouts(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+
+	sprintf(buf, "%d\n", sdev->pull_dma_timeouts);
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(pull_dma_timeouts, S_IRUGO|S_IWUGO, show_pull_dma_timeouts, store_pull_dma_timeouts);
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
@@ -383,6 +442,8 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_shot.attr,
 	&dev_attr_latstat.attr,
 	&dev_attr_fpga_rev.attr,
+	&dev_attr_pull_dma_timeouts.attr,
+	&dev_attr_push_dma_timeouts.attr,
 	NULL
 };
 

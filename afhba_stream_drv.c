@@ -1083,6 +1083,7 @@ int push_dma_timeout(struct AFHBA_DEV *adev)
 		dev_err(pdev(adev), "DMA_CTRL_EN NOT SET attempt restart");
 		afs_dma_reset(adev, DMA_PUSH_SEL);
 		afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
+		sdev->push_dma_timeouts++;
 	}
 	return 0;
 }

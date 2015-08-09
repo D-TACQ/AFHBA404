@@ -109,6 +109,8 @@ struct AFHBA_STREAM_DEV {
 		job;
 	spinlock_t job_lock;
 
+	int push_dma_timeouts;
+	int pull_dma_timeouts;
 	unsigned *data_fifo_histo;
       	unsigned *desc_fifo_histo;
 
