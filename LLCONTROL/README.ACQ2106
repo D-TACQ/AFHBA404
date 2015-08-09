@@ -126,3 +126,34 @@ DEV_AI=0 DEV_AO=1 DO32=1 ./LLCONTROL/afhba-llcontrol-two-fiber
 We've tested this to 250kHz, latency ~15 usec.
 
 
+Iterative tests:
+For reliability testing, run LLC in a loop.
+
+./scripts/forxv 1000 ./scripts/llc-runner
+
+To make this work, please review ./scripts/llc-runner to confirm that it 
+is running the scenario you require.
+NB: ./scripts/llc-test-harness-intclk-commsA 
+has been especially refactored to allow it to be called externally
+
+forxv ./scripts/llc-runner iteration 7914
+
+first run LLC ./LLCONTROL/afhba-llcontrol-example 50000
+now run TST ./scripts/llc-test-harness-intclk-commsA
+ready for data
+action init_comms
+[         0]          0 	0 => 0 
+action init_acq2106A
+setting internal clock / 100
+sitelist: 1
+sites: 1
+action start_stream
+
+[     10000]      10353 
+[     20000]      20704 
+[     30000]      31041 
+[     40000]      41374 
+[     50000]      51725 
+finished
+
+
