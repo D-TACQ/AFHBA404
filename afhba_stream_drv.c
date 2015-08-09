@@ -165,7 +165,7 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 		dev_info(pdev(adev), "write_descr(%d) [%d] offset:%04x = %08x",
 				sdev->job.buffers_queued, idesc, offset, descr);
 	}
-	dev_dbg(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
+	DEV_DBG(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
 	writel(descr, adev->mappings[REMOTE_BAR].va+offset);
 }
 
@@ -174,7 +174,7 @@ u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + ZYNQ_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
-	dev_dbg(pdev(adev), "_afs_read_dmareg %04lx = %08x",
+	DEV_DBG(pdev(adev), "_afs_read_dmareg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
@@ -184,7 +184,7 @@ void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
-	dev_info(pdev(adev), "_afs_write_dmareg %04lx = %08x",
+	DEV_DBG(pdev(adev), "_afs_write_dmareg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	writel(value, va);
 }
@@ -194,7 +194,7 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
-	dev_info(pdev(adev), "_afs_read_dmareg %04lx = %08x",
+	DEV_DBG(pdev(adev), "_afs_read_dmareg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
@@ -204,9 +204,9 @@ void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + PCIE_BASE);
 	void* va = &dma_regs[regoff];
-	dev_dbg(pdev(adev), "_afs_write_pcireg %04lx = %08x",
+	DEV_DBG(pdev(adev), "_afs_write_pcireg %04lx = %08x",
 				va-adev->mappings[REMOTE_BAR].va, value);
-	dev_dbg(pdev(adev), "%p = %08x", va, value);
+	DEV_DBG(pdev(adev), "%p = %08x", va, value);
 	writel(value, va);
 }
 
@@ -215,7 +215,7 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + PCIE_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
-	dev_dbg(pdev(adev), "_afs_read_pcireg %04lx = %08x",
+	DEV_DBG(pdev(adev), "_afs_read_pcireg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	return adev->stream_dev->dma_regs[regoff] = value;
 }

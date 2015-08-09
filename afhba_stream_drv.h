@@ -51,6 +51,15 @@
 
 enum { PS_OFF, PS_PLEASE_STOP, PS_STOP_DONE };
 
+/* Linux RT kernel does not have dynamic debug enabled :-(
+ * define PGM_DEBUG_REGS_ACCESS to enable globally
+ */
+#if defined(PGM_DEBUG_REGS_ACCESS)
+#define DEV_DBG		dev_info
+#else
+#define DEV_DBG 	dev_dbg
+#endif
+
 
 
 struct AFHBA_STREAM_DEV {
@@ -184,7 +193,7 @@ static inline void afs_stop_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 
 #define afs_dma_reset(adev, dma_sel) 								\
 {												\
-	dev_info(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__);		\
+	DEV_DBG(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__);		\
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
 	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
@@ -193,14 +202,14 @@ static inline void afs_stop_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 
 #define afs_start_dma(adev, dma_sel)								\
 {												\
-	dev_info(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);		\
+	DEV_DBG(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);		\
 	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
 	if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0) dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");	\
 }
 
 #define afs_stop_dma(adev, dma_sel)								\
 {												\
-	dev_info(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);		\
+	DEV_DBG(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);		\
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
 }
 
