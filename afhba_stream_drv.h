@@ -91,6 +91,11 @@ struct AFHBA_STREAM_DEV {
 
 		unsigned catchup_histo[NBUFFERS];
 		int dma_started;
+
+		struct XLLC_DEF push_llc_def;
+		struct XLLC_DEF pull_llc_def;
+		int (* on_push_dma_timeout)(struct AFHBA_DEV *adev);
+		int (* on_pull_dma_timeout)(struct AFHBA_DEV *adev);
 	}
 		job;
 	spinlock_t job_lock;
@@ -158,6 +163,7 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define DMA_TEST_RD(adev) \
 	_afs_read_reg(adev, DMA_TEST)
 
+/* use #define for better trace
 static inline void afs_dma_reset(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
@@ -174,7 +180,29 @@ static inline void afs_stop_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
 }
+*/
 
+#define afs_dma_reset(adev, dma_sel) 								\
+{												\
+	dev_info(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__);		\
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
+	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
+}
+
+
+#define afs_start_dma(adev, dma_sel)								\
+{												\
+	dev_info(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);		\
+	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
+	if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0) dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");	\
+}
+
+#define afs_stop_dma(adev, dma_sel)								\
+{												\
+	dev_info(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);		\
+	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
+}
 
 #define DMA_DATA_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DATA_FIFSTA)
 #define DMA_DESC_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DESC_FIFSTA)

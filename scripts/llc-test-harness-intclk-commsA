@@ -5,7 +5,8 @@
 [ -d scripts ] && cd scripts
 
 # MUST set remote ip-address
-REMIP=${1:-acq2106_004}
+#REMIP=${1:-acq2106_010}
+REMIP=${REMIP:-acq2106_010}
 INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
 EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
 STREAMPID=0
@@ -28,12 +29,12 @@ init_comms() {
 }
 init_acq2106A() {
 	if [ "$LLC_TRG" = "ext" ]; then
-		remote_cmd $AI trg=1,2,1
+		remote_cmd $AI trg=1,0,1
 	else
 		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd $AI clk=1,2,1
+		remote_cmd $AI clk=1,0,1
 		remote_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
@@ -51,9 +52,11 @@ start_stream() {
 
 
 cleanup() {
+	echo cleanup now
 	remote_cmd $SC streamtonowhered stop
 }
 
+full_house() {
 init_comms
 [ "x$COMMS_ONLY" = "xYES" ] && 	exit 0
 init_acq2106A
@@ -62,4 +65,13 @@ echo CTRL-C to quit
 trap "cleanup" SIGINT SIGTERM
 
 sleep 99999
+}
 
+if [ "x$1" != "x" ]; then
+	for action in $*; do
+		echo action $action
+		$action
+	done
+else
+	full_house
+fi

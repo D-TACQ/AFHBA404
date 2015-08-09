@@ -184,7 +184,7 @@ void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
-	dev_dbg(pdev(adev), "_afs_write_dmareg %04lx = %08x",
+	dev_info(pdev(adev), "_afs_write_dmareg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	writel(value, va);
 }
@@ -194,7 +194,7 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 	u32* dma_regs = (u32*)(adev->mappings[REMOTE_BAR].va + DMA_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
-	dev_dbg(pdev(adev), "_afs_read_dmareg %04lx = %08x",
+	dev_info(pdev(adev), "_afs_read_dmareg %04lx = %08x",
 			va-adev->mappings[REMOTE_BAR].va, value);
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
@@ -890,7 +890,6 @@ static int afs_isr_work(void *arg)
 			}
 		}
 
-
 		if (job->buffers_demand > 0 ){
 			if (queue_full_buffers(adev) > 0){
 				wake_up_interruptible(&sdev->return_waitq);
@@ -898,6 +897,14 @@ static int afs_isr_work(void *arg)
 		}
 
 		spin_lock(&sdev->job_lock);
+
+	        if (sdev->job.on_pull_dma_timeout){
+	        	sdev->job.on_pull_dma_timeout(adev);
+	        }
+	        if (sdev->job.on_push_dma_timeout){
+	        	sdev->job.on_push_dma_timeout(adev);
+	        }
+
 		switch(job->please_stop){
 		case PS_STOP_DONE:
 			break;
@@ -1037,10 +1044,10 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 
 void afs_stop_llc_push(struct AFHBA_DEV *adev)
 {
+	dev_info(pdev(adev), "afs_stop_llc_push()");
 	dev_info(pdev(adev), "afs_dma_set_recycle(0)");
 	msleep(1);
 	afs_dma_set_recycle(adev, DMA_PUSH_SEL, 0);
-	dev_info(pdev(adev), "afs_stop_llc_push()");
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 }
 
@@ -1062,9 +1069,31 @@ void afs_stop_stream_pull(struct AFHBA_DEV *adev)
 	afs_dma_reset(adev, DMA_PULL_SEL);
 }
 
+int push_dma_timeout(struct AFHBA_DEV *adev)
+/* called with job_lock ON */
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	int action = 0;
+
+	action = sdev->job.on_push_dma_timeout != 0 &&
+				(dma_ctrl&DMA_CTRL_EN) == 0;
+	if (action){
+		struct XLLC_DEF* xllc_def = &sdev->job.push_llc_def;
+		dev_err(pdev(adev), "DMA_CTRL_EN NOT SET attempt restart");
+		afs_dma_reset(adev, DMA_PUSH_SEL);
+		afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
+	}
+	return 0;
+}
 long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct JOB* job = &sdev->job;
+
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	spin_unlock(&sdev->job_lock);
 	sdev->onStopPush = afs_stop_llc_push;
 
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
@@ -1072,12 +1101,20 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	}
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	job->on_push_dma_timeout = push_dma_timeout;
+	job->push_llc_def = *xllc_def;
+	spin_unlock(&sdev->job_lock);
 	return 0;
 }
 long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
+	sdev->job.please_stop = PS_OFF;
 	sdev->onStopPull = afs_stop_llc_pull;
+
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
@@ -1151,8 +1188,13 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	mutex_unlock(&sdev->list_mutex);
 
 	dev_dbg(pdev(adev), "90");
+	spin_lock(&sdev->job_lock);
 	sdev->job.please_stop = PS_PLEASE_STOP;
+	sdev->job.on_push_dma_timeout = 0;
+	sdev->job.on_pull_dma_timeout = 0;
 	sdev->job.buffers_demand = 0;
+	spin_unlock(&sdev->job_lock);
+
 
 	if (sdev->onStopPull){
 		sdev->onStopPull(adev);

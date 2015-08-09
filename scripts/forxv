@@ -1,0 +1,38 @@
+#!/bin/bash
+# - forx [count] command ....
+
+
+
+
+echo $0
+if [ "${0##*/}" = "forxv" ]; then
+	let "verbose=1"
+else
+	let "verbose=0"
+fi
+
+case $# in
+0)
+    echo forx [count] command ...
+    exit;;
+*)
+    let "maxcount=$1"
+    shift;;
+esac
+
+let "count=0"
+
+set -e
+
+while [ $count -ne $maxcount ]
+do
+if [ $verbose -ne 0 ]; then
+	echo 
+	echo
+	echo "forxv $* iteration $count"
+	echo
+fi
+eval $*
+let "count=$count+1"
+done
+

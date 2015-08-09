@@ -1,0 +1,19 @@
+#!/bin/bash
+
+NSAM=${1:-50000}
+TST="./scripts/llc-test-harness-intclk-commsA"
+LLC="./LLCONTROL/afhba-llcontrol-example ${NSAM}"
+
+export VERBOSE=1
+echo first run LLC $LLC
+$LLC & LLCPID=$!
+
+echo now run TST $TST
+$TST init_comms init_acq2106A start_stream
+
+wait $LLCPID
+echo LLC $LLCPID done, now kill $TSTPID
+
+$TST cleanup
+
+
