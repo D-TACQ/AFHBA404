@@ -1044,8 +1044,8 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 
 void afs_stop_llc_push(struct AFHBA_DEV *adev)
 {
-	dev_info(pdev(adev), "afs_stop_llc_push()");
-	dev_info(pdev(adev), "afs_dma_set_recycle(0)");
+	DEV_DBG(pdev(adev), "afs_stop_llc_push()");
+	DEV_DBG(pdev(adev), "afs_dma_set_recycle(0)");
 	msleep(1);
 	afs_dma_set_recycle(adev, DMA_PUSH_SEL, 0);
 	afs_dma_reset(adev, DMA_PUSH_SEL);
