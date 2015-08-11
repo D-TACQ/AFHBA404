@@ -28,6 +28,7 @@
 #include "afhba_stream_drv.h"
 
 
+
 static char* getDataFifoStat(u32 stat, char buf[], int maxbuf)
 {
 	int cursor = 0;
@@ -66,7 +67,7 @@ static ssize_t show_data_fifo_stat_##DIR(				\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
 }									\
 									\
-static DEVICE_ATTR(data_fifo_stat_##DIR, S_IRUGO, show_data_fifo_stat_##DIR, 0)
+static DEVICE_ATTR(data_fifo_stat_##DIR, (S_IRUSR|S_IRGRP), show_data_fifo_stat_##DIR, 0)
 
 DATA_FIFO_STAT(pull, DMA_CTRL_PULL_SHL);
 DATA_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
@@ -84,7 +85,7 @@ static ssize_t show_desc_fifo_stat_##DIR(				\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
 }									\
 									\
-static DEVICE_ATTR(desc_fifo_stat_##DIR, S_IRUGO, show_desc_fifo_stat_##DIR, 0)
+static DEVICE_ATTR(desc_fifo_stat_##DIR, (S_IRUSR|S_IRGRP), show_desc_fifo_stat_##DIR, 0)
 
 DESC_FIFO_STAT(pull, DMA_CTRL_PULL_SHL);
 DESC_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
@@ -124,7 +125,7 @@ static ssize_t show_dma_ctrl_##DIR(					\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
 }									\
 									\
-static DEVICE_ATTR(dma_ctrl_##DIR, S_IRUGO, show_dma_ctrl_##DIR, 0)
+static DEVICE_ATTR(dma_ctrl_##DIR, (S_IRUSR|S_IRGRP), show_dma_ctrl_##DIR, 0)
 
 DMA_CTRL(pull, DMA_CTRL_PULL_SHL);
 DMA_CTRL(push, DMA_CTRL_PUSH_SHL);
@@ -157,7 +158,7 @@ static ssize_t show_dma_latest_##DIR(					\
 	return sprintf(buf, "0x%08x %s\n", descr, flags);		\
 }									\
 									\
-static DEVICE_ATTR(dma_latest_##DIR##_desc, S_IRUGO, show_dma_latest_##DIR, 0)
+static DEVICE_ATTR(dma_latest_##DIR##_desc, (S_IRUSR|S_IRGRP), show_dma_latest_##DIR, 0)
 
 DMA_LATEST(pull, DMA_PULL_DESC_STA_RD);
 DMA_LATEST(push, DMA_PUSH_DESC_STA_RD);
@@ -182,7 +183,7 @@ static ssize_t store_reset_buffers(
 	}
 }
 
-static DEVICE_ATTR(reset_buffers, S_IWUGO, 0, store_reset_buffers);
+static DEVICE_ATTR(reset_buffers, (S_IWUSR|S_IWGRP), 0, store_reset_buffers);
 
 
 extern int buffer_len;
@@ -215,7 +216,7 @@ static ssize_t show_buffer_len(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(buffer_len, S_IRUGO|S_IWUGO, show_buffer_len, store_buffer_len);
+static DEVICE_ATTR(buffer_len, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_buffer_len, store_buffer_len);
 
 
 char* getFlags(u32 stat, char buf[], int maxbuf)
@@ -280,7 +281,7 @@ static ssize_t show_aurora##SFPN(					\
 	return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }									\
 									\
-static DEVICE_ATTR(aurora, S_IRUGO|S_IWUGO, show_aurora##SFPN, store_aurora##SFPN);
+static DEVICE_ATTR(aurora, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora##SFPN, store_aurora##SFPN);
 
 AURORA(0);
 
@@ -312,7 +313,7 @@ static ssize_t show_comms_init(
 	return sprintf(buf, "%d\n", sdev->comms_init_done);
 }
 
-static DEVICE_ATTR(comms_init, S_IRUGO|S_IWUGO, show_comms_init, store_comms_init);
+static DEVICE_ATTR(comms_init, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_comms_init, store_comms_init);
 
 
 static ssize_t show_inflight(
@@ -326,7 +327,7 @@ static ssize_t show_inflight(
 	return sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
 }
 
-static DEVICE_ATTR(inflight, S_IRUGO, show_inflight, 0);
+static DEVICE_ATTR(inflight, (S_IRUSR|S_IRGRP), show_inflight, 0);
 
 static ssize_t show_shot(
 		struct device * dev,
@@ -337,7 +338,7 @@ static ssize_t show_shot(
 	return sprintf(buf, "%d\n", sdev->shot);
 }
 
-static DEVICE_ATTR(shot, S_IRUGO, show_shot, 0);
+static DEVICE_ATTR(shot, (S_IRUSR|S_IRGRP), show_shot, 0);
 
 static ssize_t show_latstat(
 		struct device * dev,
@@ -351,7 +352,7 @@ static ssize_t show_latstat(
 			ls1>>16, ls1&0x0ffff, ls2>>16, ls2&0x0ffff);
 }
 
-static DEVICE_ATTR(latstat, S_IRUGO, show_latstat, 0);
+static DEVICE_ATTR(latstat, (S_IRUSR|S_IRGRP), show_latstat, 0);
 
 static ssize_t show_fpga_rev(
 		struct device * dev,
@@ -362,7 +363,7 @@ static ssize_t show_fpga_rev(
 	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, FPGA_REVISION_REG));
 }
 
-static DEVICE_ATTR(fpga_rev, S_IRUGO, show_fpga_rev, 0);
+static DEVICE_ATTR(fpga_rev, (S_IRUSR|S_IRGRP), show_fpga_rev, 0);
 
 
 static ssize_t store_push_dma_timeouts(
@@ -393,7 +394,7 @@ static ssize_t show_push_dma_timeouts(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(push_dma_timeouts, S_IRUGO|S_IWUGO, show_push_dma_timeouts, store_push_dma_timeouts);
+static DEVICE_ATTR(push_dma_timeouts, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_push_dma_timeouts, store_push_dma_timeouts);
 
 static ssize_t store_pull_dma_timeouts(
 	struct device * dev,
@@ -423,7 +424,7 @@ static ssize_t show_pull_dma_timeouts(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(pull_dma_timeouts, S_IRUGO|S_IWUGO, show_pull_dma_timeouts, store_pull_dma_timeouts);
+static DEVICE_ATTR(pull_dma_timeouts, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_pull_dma_timeouts, store_pull_dma_timeouts);
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
@@ -473,7 +474,7 @@ static ssize_t show_dev(
 		return -ENODEV;
 	}
 }
-static DEVICE_ATTR(dev, S_IRUGO, show_dev, 0);
+static DEVICE_ATTR(dev, (S_IRUSR|S_IRGRP), show_dev, 0);
 
 static const struct attribute *class_attrs[] = {
 	&dev_attr_dev.attr,

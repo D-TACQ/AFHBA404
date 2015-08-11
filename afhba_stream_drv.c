@@ -734,7 +734,8 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 
 	dev_dbg(pdev(adev), "%d IRQ %d", __LINE__, dev->irq);
 
-	rc = pci_enable_msi_block(dev, nvec = 4);
+	nvec = 4;
+	rc = pci_enable_msi_range(dev, nvec, nvec);
 	if (rc < 0){
 		dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
 		rc = pci_enable_msi(dev);
