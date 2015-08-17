@@ -37,7 +37,9 @@
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
 
-#define REVID	"1003"
+#include <linux/version.h>
+
+#define REVID	"1004"
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -735,7 +737,11 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "%d IRQ %d", __LINE__, dev->irq);
 
 	nvec = 4;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
+	rc = pci_enable_msi_block(dev, nvec = 4);
+#else
 	rc = pci_enable_msi_range(dev, nvec, nvec);
+#endif
 	if (rc < 0){
 		dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
 		rc = pci_enable_msi(dev);
