@@ -232,7 +232,7 @@ void run(void (*action)(void*))
 
 	if (verbose > 1){
 		int sample;
-		for (sample = 0, lbp = local_buffer; sample < nsamples; sample += 10000, 
+		for (sample = 0, lbp = local_buffer; sample <= nsamples; sample += 10000, 
 			lbp += 10000*VI_LEN/sizeof(short)){
 			printf("[%10u] %10u\n", sample, TLX(lbp));
 		}
