@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ "x$1" == "" ] ; then
+	echo usage analyse-log LOGFILE
+	exit 1
+fi
+
+echo Shot Count  $(grep 100000\] $1 | wc -l)
+grep 100000\] $1 | sort | uniq -c | head
+echo tail
+grep 100000\] $1 | sort | uniq -c | tail
