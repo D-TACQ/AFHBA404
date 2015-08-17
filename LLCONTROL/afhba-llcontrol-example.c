@@ -229,6 +229,15 @@ void run(void (*action)(void*))
 		action(lbp);
 	}
 
+	if (verbose == 1){
+		printf("[%10u] %10u\n", sample-1, tl1);
+	}	
+}
+
+
+void staged_tlatch_report()
+{
+	short* lbp = local_buffer;
 
 	if (verbose > 1){
 		int sample;
@@ -237,9 +246,6 @@ void run(void (*action)(void*))
 			printf("[%10u] %10u\n", sample, TLX(lbp));
 		}
 	}
-	if (verbose == 1){
-		printf("[%10u] %10u\n", sample-1, tl1);
-	}	
 }
 
 void write_log() {
@@ -294,6 +300,7 @@ void check_tlatch_action_post()
 }
 
 close_llc() {
+	staged_tlatch_report();
 	check_tlatch_action_post();
 	write_log();
 	write_pollcats();
@@ -343,7 +350,6 @@ static void* llc(void* unused)
 {
 	run(G_action);
 	printf("posix done\n");
-	close_llc();
 	printf("shot complete\n");
 }
 
@@ -354,10 +360,12 @@ int main(int argc, char* argv[])
 	if (getenv("RTPRIO") != 0){
 		printf("running posix RT\n");
 		goPosixRT(llc);
+		close_llc();
 		return 0;
 	}else{
 		printf("running regular\n");
 		llc(0);
 		printf("finished\n");
+		close_llc();
 	}
 }
