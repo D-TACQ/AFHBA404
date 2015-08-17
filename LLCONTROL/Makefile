@@ -28,7 +28,7 @@ apps: $(APPS)
 
 	
 afhba-llcontrol-example: afhba-llcontrol-example.c
-	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	
+	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	-lpthread
 
 afhba-llcontrol-testharness: afhba-llcontrol-testharness.cpp
 	$(CXX) -o afhba-llcontrol-testharness afhba-llcontrol-testharness.cpp -lpopt	
