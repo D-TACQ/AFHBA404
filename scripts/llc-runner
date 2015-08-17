@@ -1,10 +1,26 @@
 #!/bin/bash
 
-NSAM=${1:-50000}
+NSAM=${1:-100000}
 TST="./scripts/llc-test-harness-intclk-commsA"
 LLC="./LLCONTROL/afhba-llcontrol-example ${NSAM}"
+COMMS=a
+export DEVNUM=${DEVNUM:-0}
+
+comport=$(cat /dev/rtm-t.${DEVNUM}.ctrl/z_ident)
+if [ $(expr match $comport 0x21$COMMS) = 5 ]; then
+	echo $comport GOOD
+else 
+	echo requested COMMS=$COMMS DEVNUM=$DEVNUM but we have $comport
+	exit 1
+fi
+
+
 
 export VERBOSE=1
+export AFFINITY=${AFFINITY:-4}
+export RTPRIO=${RTPRIO:-99}
+export INTCLKDIV=1000
+
 echo first run LLC $LLC
 $LLC & LLCPID=$!
 
