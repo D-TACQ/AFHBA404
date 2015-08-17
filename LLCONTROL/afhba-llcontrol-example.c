@@ -21,10 +21,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /* ------------------------------------------------------------------------- */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <sched.h>
+
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -53,7 +57,8 @@ FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
 
-
+short* local_buffer;
+int *pollcats;
 
 /* ACQ425 */
 
@@ -90,18 +95,10 @@ void get_mapping() {
 	}
 }
 
-void goRealTime(void)
+
+void null_action(void *data)
 {
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
 
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
 }
 
 void write_action(void *data)
@@ -120,6 +117,28 @@ void check_tlatch_action(void *local_buffer)
 	tl0 = tl1;
 }
 
+void setAffinity(unsigned cpu_mask)
+{
+       int cpu = 0;
+        cpu_set_t cpu_set;
+        CPU_ZERO(&cpu_set);
+        for (cpu = 0; cpu < 32; ++cpu){
+                if ((1<<cpu) &cpu_mask){
+                        CPU_SET(cpu, &cpu_set);
+                }
+        }
+        printf("setAffinity: %d,%d,%d,%d\n",
+                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
+                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
+                        );
+
+        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
+        if (rc != 0){
+                perror("sched_set_affinity");
+                exit(1);
+        }
+}
+
 
 void ui(int argc, char* argv[])
 {
@@ -132,6 +151,10 @@ void ui(int argc, char* argv[])
 	if (getenv("DEVNUM")){
 		devnum = atoi(getenv("DEVNUM"));
 	}
+        if (getenv("AFFINITY")){
+                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        }
+
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
 		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
@@ -142,7 +165,7 @@ void ui(int argc, char* argv[])
 	if (argc > 2){
 		samples_buffer = atoi(argv[2]);
 	}
-	G_action = write_action;
+	G_action = null_action;
 	if (getenv("ACTION")){
 		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
 			G_action = check_tlatch_action;
@@ -154,8 +177,9 @@ void setup()
 {
 	char logfile[80];
 	sprintf(logfile, LOG_FILE, devnum);
+	local_buffer = calloc(NSHORTS*nsamples, sizeof(short));
+	pollcats = calloc(nsamples, sizeof(int));
 	get_mapping();
-	goRealTime();
 	fp_log = fopen(logfile, "w");
 	if (fp_log == 0){
 		perror(logfile);
@@ -175,9 +199,12 @@ void setup()
 	}
 }
 
+#define TLX(lbp) (((volatile unsigned*)lbp)[SPIX])        /* actually, sample counter */
+
+
 void run(void (*action)(void*))
 {
-	short* local_buffer = calloc(NSHORTS, sizeof(short));
+	short* lbp = local_buffer;
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned spad1_0 = SPAD1;
 	unsigned spad1_1;
@@ -188,48 +215,149 @@ void run(void (*action)(void*))
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
+	for (sample = 0; sample <= nsamples; 
+			++sample, tl0 = tl1, lbp+=NSHORTS){
 		/** atomic start */
-		while((tl1 = TLATCH) == tl0){   
+		int pollcat;
+
+		for(pollcat = 0; (tl1 = TLATCH) == tl0; ++pollcat){   
 			;
 		}
-		memcpy(local_buffer, host_buffer, VI_LEN);
+		memcpy(lbp, host_buffer, VI_LEN);
+		pollcats[sample] = pollcat;
 		/** atomic end */
-		if (verbose){
-			if (sample%10000 == 0){
-				if (println == 0){
-					printf("[%10u] ", sample);
-					println = 1;
-				}
-				printf("%10u ", tl1);
-			}
-			if (spad1_1 != spad1_0){
-				if (println == 0){
-					printf("[%d] ", sample);
-					println = 1;
-				}
-				printf("\t%u => %u ", sample, spad1_0, spad1_1);
-				spad1_0 = spad1_1;
-			}
-			if (println){
-				printf("\n");
-				println = 0;
-			}
+		action(lbp);
+	}
+
+
+	if (verbose > 1){
+		int sample;
+		for (sample = 0, lbp = local_buffer; sample < nsamples; sample += 10000, 
+			lbp += 10000*VI_LEN/sizeof(short)){
+			printf("[%10u] %10u\n", sample, TLX(lbp));
 		}
-		action(local_buffer);
+	}
+	if (verbose == 1){
+		printf("[%10u] %10u\n", sample-1, tl1);
+	}	
+}
+
+void write_log() {
+	FILE *fp = fopen("llcontrol.log", "w");
+	if (fp == 0){
+		perror("llcontrol.log");
+		return;
+	}
+	fwrite(local_buffer, sizeof(short), NSHORTS*nsamples, fp);
+	fclose(fp);
+}
+
+
+void write_pollcats() {
+	FILE *fp = fopen("pollcat.log", "w");
+	if (fp == 0){
+		perror("pollcat.log");
+		return;
+	}
+	fwrite(pollcats, sizeof(int), nsamples, fp);
+	fclose(fp);
+}
+
+
+
+
+void check_tlatch_action_post()
+{
+	unsigned tl0;
+	unsigned tl1;
+	short *lbp = local_buffer;
+	int sample;
+
+	tl0 = TLX(lbp);
+	lbp += NSHORTS;
+	for (sample = 1; sample < nsamples; ++sample, lbp += NSHORTS, tl0 = tl1){
+		int err = 0;
+		int prt = 0;
+
+		tl1 = TLX(lbp);
+		if (tl1 != tl0 + 1){
+			err = prt = 1;
+		}else if (verbose == 0 && sample%100000 == 0){
+			prt = 1;
+		}
+
+		if (prt){
+			printf("%10d %10d %10d %10d %s %d\n", 
+				sample, tl0, tl1, tl1-tl0, err?"ERR":"GOOD", pollcats[sample]);
+		}
 	}
 }
 
-close() {
+close_llc() {
+	check_tlatch_action_post();
+	write_log();
+	write_pollcats();
 	munmap(host_buffer, HB_LEN);
 	close(fd);
 	fclose(fp_log);
 }
+
+static void* tight_loop(void* unused)
+{
+	unsigned i0;
+	unsigned i1;
+
+	for (i0 = i1 = 0; ++i1 > i0; i0 = i1){
+		;
+	}
+}	
+
+#include <signal.h>
+#include <pthread.h>
+void goPosixRT(void *(*work)(void *)) 
+{
+       	struct sched_param svparam = {.sched_priority = 90 };
+	pthread_t svtid;
+        pthread_attr_t svattr, clattr;
+        sigset_t set;
+        int sig;
+
+        sigemptyset(&set);
+        sigaddset(&set, SIGINT);
+        sigaddset(&set, SIGTERM);
+        sigaddset(&set, SIGHUP);
+        pthread_sigmask(SIG_BLOCK, &set, NULL);
+
+        pthread_attr_init(&svattr);
+        pthread_attr_setdetachstate(&svattr, PTHREAD_CREATE_JOINABLE);
+        pthread_attr_setinheritsched(&svattr, PTHREAD_EXPLICIT_SCHED);
+        pthread_attr_setschedpolicy(&svattr, SCHED_FIFO);
+        pthread_attr_setschedparam(&svattr, &svparam);
+
+        errno = pthread_create(&svtid, &svattr, work, NULL);
+
+	pthread_join(svtid, NULL);
+}
+
+static void* llc(void* unused)
+{
+	run(G_action);
+	printf("posix done\n");
+	close_llc();
+	printf("shot complete\n");
+}
+
 int main(int argc, char* argv[])
 {
 	ui(argc, argv);
 	setup();
-	printf("ready for data\n");
-	run(G_action);
-	printf("finished\n");
+	if (getenv("RTPRIO") != 0){
+		printf("running posix RT\n");
+		goPosixRT(llc);
+		return 0;
+	}else{
+		printf("running regular\n");
+		llc(0);
+		printf("finished\n");
+	}
 }
