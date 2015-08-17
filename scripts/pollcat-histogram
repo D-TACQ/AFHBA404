@@ -1,0 +1,3 @@
+#!/bin/bash
+hexdump -ve '1/4 "%d\n"' pollcat.log | awk '{ print int($1/500)*500 }' | sort -n | uniq -c
+
