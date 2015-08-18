@@ -16,7 +16,7 @@ fi
 
 
 
-export VERBOSE=1
+export VERBOSE=2
 export AFFINITY=${AFFINITY:-4}
 export RTPRIO=${RTPRIO:-99}
 export INTCLKDIV=1000
@@ -25,7 +25,7 @@ echo first run LLC $LLC
 $LLC & LLCPID=$!
 
 echo now run TST $TST
-$TST init_comms init_acq2106A start_stream
+taskset 0x0001 $TST init_comms init_acq2106A start_stream
 
 wait $LLCPID
 echo LLC $LLCPID done, now kill $TSTPID
