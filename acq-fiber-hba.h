@@ -70,8 +70,10 @@ struct AFHBA_DEV;
 
 #define REGS_BAR	0		/* @@todo assumed */
 
-#define MAP_COUNT	2
+#define MAP_COUNT	4
 
+#define MAP_COUNT_4G1	2
+#define MAP_COUNT_4G2	4
 
 extern struct list_head afhba_devices;
 
@@ -108,6 +110,7 @@ struct AFHBA_DEV {
 	int idx;
 	int major;
 	struct list_head list;
+	int map_count;
 
 	struct PciMapping {
 		int bar;
@@ -117,6 +120,8 @@ struct AFHBA_DEV {
 		struct resource *region;
 		char name[32];
 	} mappings[MAP_COUNT];
+
+	void* remote;
 
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
@@ -163,6 +168,8 @@ struct AFHBA_DEV_PATH {
 
 #define REGS_BAR	0
 #define REMOTE_BAR	1
+#define REMOTE_BAR2	2
+#define REMOTE_COM_BAR	3
 #define NO_BAR 		-1
 
 

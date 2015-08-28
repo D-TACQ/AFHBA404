@@ -63,6 +63,9 @@ module_param(ll_mode_only, int, 0444);
 #define PCI_SUBDID_FHBA_2G	0x4100
 #define PCI_SUBDID_FHBA_4G_OLD	0x4101
 #define PCI_SUBDID_FHBA_4G	0x4102
+#define PCI_SUBDID_FHBA_4G2	0x4103
+
+
 
 
 int BUFFER_LEN = 0x100000;
@@ -70,6 +73,8 @@ int BUFFER_LEN = 0x100000;
 static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 {
 	switch(imap){
+	case REMOTE_COM_BAR:
+	case REMOTE_BAR2:
 	case REMOTE_BAR:
 	case REGS_BAR:
 		return imap;
@@ -258,7 +263,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 	int imap;
 	int nmappings = 0;
 
-	for (imap = 0; nmappings < MAP_COUNT; ++imap){
+	for (imap = 0; nmappings < adev->map_count; ++imap){
 		struct PciMapping* mp = adev->mappings+imap;
 		int bar = MAP2BAR(adev, imap);
 
@@ -322,7 +327,27 @@ static void init_buffers(struct AFHBA_DEV* adev)
 			adev->hb1->len, adev->hb1->descr);
 }
 
-int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
+
+struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
+{
+	static int idx;
+	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
+
+	static u64 dma_mask = DMA_BIT_MASK(32);
+
+	adev->pci_dev = dev;
+	adev->idx = idx++;
+	dev->dev.dma_mask = &dma_mask;
+
+	return adev;
+}
+
+void adevDelete(struct AFHBA_DEV* adev)
+{
+	kfree(adev);
+}
+
+int _afhba_probe(struct AFHBA_DEV* adev)
 {
 	static struct file_operations afhba_fops = {
 		.open = afhba_open,
@@ -333,23 +358,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		.mmap = afhba_mmap_hb
 	};
 
-	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
 	int rc;
-	static int idx;
-	static u64 dma_mask = DMA_BIT_MASK(32);
-
-	adev->pci_dev = dev;
-	adev->idx = idx++;
-	dev->dev.dma_mask = &dma_mask;
-
-	dev_info(pdev(adev), "AFHBA: subdevice : %04x\n", ent->subdevice);
-	if (ent->subdevice == PCI_SUBDID_FHBA_2G){
-		dev_err(pdev(adev), "AFHBA 2G FIRMWARE detected %04x", ent->subdevice);
-		return -1;
-	}else if (ent->subdevice == PCI_SUBDID_FHBA_4G_OLD){
-		dev_err(pdev(adev), "AFHBA 4G OBSOLETE FIRMWARE detected %04x", ent->subdevice);
-		return -1;
-	}
 
 	snprintf(adev->name, SZM1(adev->name), "afhba.%d", adev->idx);
 	afhba_devnames[adev->idx] = adev->name;
@@ -370,7 +379,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	afhba_registerDevice(adev);
 	afhba_createDebugfs(adev);
 
-	rc = pci_enable_device(dev);
+	rc = pci_enable_device(adev->pci_dev);
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 	dev_info(pdev(adev), "FPGA revision: %08x",
 			afhba_read_reg(adev, FPGA_REVISION_REG));
@@ -386,6 +395,48 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	afhba_create_sysfs(adev);
 
 	return rc;
+}
+int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
+{
+	struct AFHBA_DEV *adev = adevCreate(dev);
+	int rc;
+
+	dev_info(pdev(adev), "AFHBA: subdevice : %04x\n", ent->subdevice);
+	switch(ent->subdevice){
+	case PCI_SUBDID_FHBA_2G:
+		dev_err(pdev(adev), "AFHBA 2G FIRMWARE detected %04x", ent->subdevice);
+		adevDelete(adev);
+		return -1;
+	case PCI_SUBDID_FHBA_4G_OLD:
+		dev_err(pdev(adev), "AFHBA 4G OBSOLETE FIRMWARE detected %04x", ent->subdevice);
+		adevDelete(adev);
+		return -1;
+	case PCI_SUBDID_FHBA_4G:
+		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
+		adev->map_count = MAP_COUNT_4G1;
+		adev->remote = adev->mappings[REMOTE_BAR].va;
+		return _afhba_probe(adev);
+	case PCI_SUBDID_FHBA_4G2:
+		dev_info(pdev(adev), "AFHBA 4G single port firmware detected");
+		adev->map_count = MAP_COUNT_4G2;
+
+		if ((rc = _afhba_probe(adev)) != 0){
+			dev_err(pdev(adev), "ERROR failed to create first device");
+			return rc;
+		}
+		adev->remote = adev->mappings[REMOTE_BAR].va;
+
+		adev = adevCreate(dev);
+		adev->map_count = MAP_COUNT_4G2;
+		if ((rc = _afhba_probe(adev)) != 0){
+			dev_err(pdev(adev), "ERROR failed to create first device");
+			return rc;
+		}
+		adev->remote = adev->mappings[REMOTE_BAR2].va;
+		return rc;
+	default:
+		return -ENODEV;
+	}
 }
 void afhba_remove (struct pci_dev *dev)
 {
@@ -412,6 +463,8 @@ static struct pci_device_id afhba_pci_tbl[] = {
 		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G_OLD, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
 		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G, 0 },
+	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
+		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G2, 0 },
         { }
 };
 static struct pci_driver afhba_driver = {
