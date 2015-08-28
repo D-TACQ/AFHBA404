@@ -448,9 +448,14 @@ static const struct attribute *dev_attrs[] = {
 	NULL
 };
 
+
 void afhba_create_sysfs(struct AFHBA_DEV *adev)
 {
-	int rc = sysfs_create_files(&adev->pci_dev->dev.kobj, dev_attrs);
+	int rc;
+	const char* rootname = adev->peer == 0? "knobs.0": "knobs.1";
+	adev->knobs_root = kobject_create_and_add(rootname, &adev->pci_dev->dev.kobj);
+
+	rc = sysfs_create_files(adev->knobs_root, dev_attrs);
 	if (rc){
 		dev_err(pdev(adev), "failed to create files");
 		return;
@@ -460,6 +465,7 @@ void afhba_create_sysfs(struct AFHBA_DEV *adev)
 void afhba_remove_sysfs(struct AFHBA_DEV *adev)
 {
 	sysfs_remove_files(&adev->pci_dev->dev.kobj, dev_attrs);
+	kobject_put(adev->knobs_root);
 }
 
 static ssize_t show_dev(

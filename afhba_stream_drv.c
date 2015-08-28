@@ -1597,7 +1597,7 @@ static const struct attribute *dev_attrs[] = {
 
 void afs_create_sysfs(struct AFHBA_DEV *adev)
 {
-	int rc = sysfs_create_files(&adev->pci_dev->dev.kobj, dev_attrs);
+	int rc = sysfs_create_files(adev->knobs_root, dev_attrs);
 	if (rc){
 		dev_err(pdev(adev), "failed to create files");
 		return;

@@ -123,6 +123,7 @@ struct AFHBA_DEV {
 
 	struct AFHBA_DEV* peer;
 	void* remote;
+	struct kobject* knobs_root;
 
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
