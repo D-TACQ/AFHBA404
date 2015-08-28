@@ -267,18 +267,21 @@ void afhba_map(struct AFHBA_DEV *adev)
 		struct PciMapping* mp = adev->mappings+imap;
 		int bar = MAP2BAR(adev, imap);
 
-
 		if (VALID_BAR(bar)){
-			snprintf(mp->name, SZM1(mp->name), "afhba.%d.%d", adev->idx, bar);
+			if (adev->peer != 0 && adev->peer->mappings[imap].va != 0){
+				adev->mappings[imap] = adev->peer->mappings[imap];
+			}else{
+				snprintf(mp->name, SZM1(mp->name), "afhba.%d.%d", adev->idx, bar);
 
-			mp->pa = pci_resource_start(dev,bar)&
+				mp->pa = pci_resource_start(dev,bar)&
 						PCI_BASE_ADDRESS_MEM_MASK;
-			mp->len = pci_resource_len(dev, bar);
-			mp->region = request_mem_region(
+				mp->len = pci_resource_len(dev, bar);
+				mp->region = request_mem_region(
 					mp->pa, mp->len, mp->name);
-			mp->va = ioremap_nocache(mp->pa, mp->len);
+				mp->va = ioremap_nocache(mp->pa, mp->len);
 
-			dev_dbg(pdev(adev), "BAR %d va:%p", bar, mp->va);
+				dev_dbg(pdev(adev), "BAR %d va:%p", bar, mp->va);
+			}
 			++nmappings;
 		}
 	}
@@ -360,8 +363,6 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 
 	int rc;
 
-	adev->remote = adev->mappings[remote_bar].va;
-
 	snprintf(adev->name, SZM1(adev->name), "afhba.%d", adev->idx);
 	afhba_devnames[adev->idx] = adev->name;
 	snprintf(adev->mon_name, SZM1(adev->name), "afhba-mon.%d", adev->idx);
@@ -377,6 +378,7 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 	}
 
 	afhba_map(adev);
+	adev->remote = adev->mappings[remote_bar].va;
 	init_buffers(adev);
 	afhba_registerDevice(adev);
 	afhba_createDebugfs(adev);
@@ -424,17 +426,17 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		if ((rc = _afhba_probe(adev, REMOTE_BAR)) != 0){
 			dev_err(pdev(adev), "ERROR failed to create first device");
 			return rc;
-		}
-		adev->remote = adev->mappings[REMOTE_BAR].va;
+		}else{
+			struct AFHBA_DEV *adev2 = adevCreate(dev);
+			adev2->map_count = MAP_COUNT_4G2;
+			adev2->peer = adev;
 
-		adev = adevCreate(dev);
-		adev->map_count = MAP_COUNT_4G2;
-		if ((rc = _afhba_probe(adev, REMOTE_BAR2)) != 0){
-			dev_err(pdev(adev), "ERROR failed to create first device");
+			if ((rc = _afhba_probe(adev2, REMOTE_BAR2)) != 0){
+				dev_err(pdev(adev2), "ERROR failed to create second device");
+				return rc;
+			}
 			return rc;
 		}
-
-		return rc;
 	default:
 		return -ENODEV;
 	}

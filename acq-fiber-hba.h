@@ -121,6 +121,7 @@ struct AFHBA_DEV {
 		char name[32];
 	} mappings[MAP_COUNT];
 
+	struct AFHBA_DEV* peer;
 	void* remote;
 
 	struct proc_dir_entry *proc_dir_root;
