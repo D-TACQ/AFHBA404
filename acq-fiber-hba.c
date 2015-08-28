@@ -388,7 +388,6 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 	dev_info(pdev(adev), "FPGA revision: %08x",
 			afhba_read_reg(adev, FPGA_REVISION_REG));
 
-	afhba_stream_drv_init(adev);
 	adev->class_dev = device_create(
 			afhba_device_class,			/* cls */
 			NULL,					/* cls_parent */
@@ -397,6 +396,8 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 			adev->name);
 	afhba_create_sysfs_class(adev);
 	afhba_create_sysfs(adev);
+
+	afhba_stream_drv_init(adev);
 
 	return rc;
 }
