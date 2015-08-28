@@ -347,7 +347,7 @@ void adevDelete(struct AFHBA_DEV* adev)
 	kfree(adev);
 }
 
-int _afhba_probe(struct AFHBA_DEV* adev)
+int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 {
 	static struct file_operations afhba_fops = {
 		.open = afhba_open,
@@ -359,6 +359,8 @@ int _afhba_probe(struct AFHBA_DEV* adev)
 	};
 
 	int rc;
+
+	adev->remote = adev->mappings[remote_bar].va;
 
 	snprintf(adev->name, SZM1(adev->name), "afhba.%d", adev->idx);
 	afhba_devnames[adev->idx] = adev->name;
@@ -412,15 +414,14 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		adevDelete(adev);
 		return -1;
 	case PCI_SUBDID_FHBA_4G:
-		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
-		adev->map_count = MAP_COUNT_4G1;
-		adev->remote = adev->mappings[REMOTE_BAR].va;
-		return _afhba_probe(adev);
-	case PCI_SUBDID_FHBA_4G2:
 		dev_info(pdev(adev), "AFHBA 4G single port firmware detected");
+		adev->map_count = MAP_COUNT_4G1;
+		return _afhba_probe(adev, REMOTE_BAR);
+	case PCI_SUBDID_FHBA_4G2:
+		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
 		adev->map_count = MAP_COUNT_4G2;
 
-		if ((rc = _afhba_probe(adev)) != 0){
+		if ((rc = _afhba_probe(adev, REMOTE_BAR)) != 0){
 			dev_err(pdev(adev), "ERROR failed to create first device");
 			return rc;
 		}
@@ -428,11 +429,11 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 
 		adev = adevCreate(dev);
 		adev->map_count = MAP_COUNT_4G2;
-		if ((rc = _afhba_probe(adev)) != 0){
+		if ((rc = _afhba_probe(adev, REMOTE_BAR2)) != 0){
 			dev_err(pdev(adev), "ERROR failed to create first device");
 			return rc;
 		}
-		adev->remote = adev->mappings[REMOTE_BAR2].va;
+
 		return rc;
 	default:
 		return -ENODEV;
