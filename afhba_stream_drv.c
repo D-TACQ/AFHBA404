@@ -726,7 +726,6 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 {
 	struct pci_dev *dev = adev->pci_dev;
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-
 	static const char* irq_names[4] = {
 		"%s-dma", "%s-line", "%s-ppnf", "%s-spare"
 	};
@@ -736,6 +735,10 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 
 	dev_dbg(pdev(adev), "%d IRQ %d", __LINE__, dev->irq);
 
+	if (adev->peer != 0){
+		dev_info(pdev(adev), "hook_interrupts() peer stub");
+		return 0;
+	}
 	nvec = 4;
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
 	rc = pci_enable_msi_block(dev, nvec = 4);
