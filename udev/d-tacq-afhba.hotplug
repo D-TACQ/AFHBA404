@@ -35,7 +35,8 @@ else
     DT100_GRP=root
 fi
 
-ln -s $DEVICE /dev/rtm-t.$DN.ctrl
+#ln -s $DEVICE /dev/rtm-t.$DN.ctrl
+ln -s /sys/class/afhba/afhba.$DN/ /dev/rtm-t.$DN.ctrl
 mkdir -p $DATADIR
 
 ACQTYPE=ACQ196
