@@ -1568,7 +1568,7 @@ static ssize_t show_zmod_id(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_MOD_ID));
 }
 
@@ -1579,7 +1579,7 @@ static ssize_t show_z_ident(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_IDENT));
 }
 
@@ -1597,7 +1597,7 @@ static const struct attribute *dev_attrs[] = {
 
 void afs_create_sysfs(struct AFHBA_DEV *adev)
 {
-	int rc = sysfs_create_files(adev->knobs_root, dev_attrs);
+	int rc = sysfs_create_files(&adev->class_dev->kobj, dev_attrs);
 	if (rc){
 		dev_err(pdev(adev), "failed to create files");
 		return;
