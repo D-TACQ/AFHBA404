@@ -260,7 +260,7 @@ static ssize_t store_aurora##SFPN(					\
 	size_t count)							\
 {									\
 	u32 ctrl = simple_strtoul(buf, 0, 16);				\
-	afhba_write_reg(afhba_lookupDeviceFromClass(dev), AURORA_CONTROL_REG, ctrl);  \
+	afhba_write_reg(afhba_lookupDeviceFromClass(dev), AURORA_CONTROL_REG##SFPN, ctrl);  \
 	return count;							\
 }									\
 									\
@@ -272,18 +272,19 @@ static ssize_t show_aurora##SFPN(					\
 {									\
 	char flags[80];							\
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
-	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG); 		\
+	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG##SFPN); 		\
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){				\
-		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);	\
-		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR); \
-		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl); \
+		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG##SFPN);	\
+		afhba_write_reg(adev, AURORA_CONTROL_REG##SFPN, ctrl|AFHBA_AURORA_CTRL_CLR); \
+		afhba_write_reg(adev, AURORA_CONTROL_REG##SFPN, ctrl); \
 	} \
 	return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }									\
 									\
-static DEVICE_ATTR(aurora, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora##SFPN, store_aurora##SFPN);
+static DEVICE_ATTR(aurora##SFPN, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora##SFPN, store_aurora##SFPN);
 
-AURORA(0);
+AURORA(A);
+AURORA(B);
 
 static ssize_t store_comms_init(
 	struct device * dev,
@@ -366,6 +367,18 @@ static ssize_t show_fpga_rev(
 static DEVICE_ATTR(fpga_rev, (S_IRUSR|S_IRGRP), show_fpga_rev, 0);
 
 
+static ssize_t show_heartbeat(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, HOST_COUNTER_REG));
+}
+
+static DEVICE_ATTR(heartbeat, (S_IRUSR|S_IRGRP), show_heartbeat, 0);
+
+
 static ssize_t store_push_dma_timeouts(
 	struct device * dev,
 	struct device_attribute *attr,
@@ -426,11 +439,41 @@ static ssize_t show_pull_dma_timeouts(
 
 static DEVICE_ATTR(pull_dma_timeouts, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_pull_dma_timeouts, store_pull_dma_timeouts);
 
+static ssize_t store_host_test(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned tv;
+
+	if (sscanf(buf, "%x", &tv) == 1){
+		afhba_write_reg(adev, HOST_TEST_REG, tv);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static ssize_t show_host_test(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+
+	sprintf(buf, "%08x\n", afhba_read_reg(adev, HOST_TEST_REG));
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(host_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_host_test, store_host_test);
+
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
 	&dev_attr_inflight.attr,
 	&dev_attr_reset_buffers.attr,
-	&dev_attr_aurora.attr,
+	&dev_attr_auroraA.attr,
+	&dev_attr_auroraB.attr,
 	&dev_attr_data_fifo_stat_push.attr,
 	&dev_attr_data_fifo_stat_pull.attr,
 	&dev_attr_desc_fifo_stat_push.attr,
@@ -443,6 +486,8 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_shot.attr,
 	&dev_attr_latstat.attr,
 	&dev_attr_fpga_rev.attr,
+	&dev_attr_heartbeat.attr,
+	&dev_attr_host_test.attr,
 	&dev_attr_pull_dma_timeouts.attr,
 	&dev_attr_push_dma_timeouts.attr,
 	NULL

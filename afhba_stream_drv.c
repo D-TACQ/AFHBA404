@@ -297,17 +297,21 @@ static inline int afs_dma_started(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 
 static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 {
-	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+	int srn = adev->sfp == SFP_A? AURORA_STATUS_REGA: AURORA_STATUS_REGB;
+	u32 stat = afhba_read_reg(adev, srn);
 	++aurora_status_read_count;
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
 static int afs_aurora_errors(struct AFHBA_DEV *adev)
 {
-	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+	int srn = adev->sfp == SFP_A? AURORA_STATUS_REGA: AURORA_STATUS_REGB;
+	int crn = adev->sfp == SFP_A? AURORA_CONTROL_REGA: AURORA_CONTROL_REGB;
+	u32 stat = afhba_read_reg(adev, srn);
+
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
-		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);
-		afhba_write_reg(adev, AURORA_CONTROL_REG, ctrl|AFHBA_AURORA_CTRL_CLR);
+		u32 ctrl = afhba_read_reg(adev, crn);
+		afhba_write_reg(adev, crn, ctrl|AFHBA_AURORA_CTRL_CLR);
 		if (++adev->aurora_error_count==1){
 			dev_info(pdev(adev),
 			"aurora initial s:0x%08x m:0x%08x e:0x%08x",
@@ -318,7 +322,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 		}
-		stat = afhba_read_reg(adev, AURORA_STATUS_REG);
+		stat = afhba_read_reg(adev, srn);
 		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 			dev_err(pdev(adev),
 			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
@@ -377,10 +381,11 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+	int crn = adev->sfp == SFP_A? AURORA_CONTROL_REGA: AURORA_CONTROL_REGB;
 	int to = 0;
 
 
-	afhba_write_reg(adev, AURORA_CONTROL_REG, AFHBA_AURORA_CTRL_ENA);
+	afhba_write_reg(adev, crn, AFHBA_AURORA_CTRL_ENA);
 
 	while(!afs_aurora_lane_up(adev)){
 		msleep(to += MSLEEP_TO);

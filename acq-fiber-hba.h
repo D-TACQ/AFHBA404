@@ -123,6 +123,7 @@ struct AFHBA_DEV {
 
 	struct AFHBA_DEV* peer;
 	void* remote;
+	enum SFP { SFP_A, SFP_B } sfp;
 
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
@@ -193,9 +194,16 @@ struct AFHBA_DEV_PATH {
 
 #define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
 #define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
-#define AURORA_CONTROL_REG 		0x0080	/* Aurora Control Register */
-#define AURORA_STATUS_REG 		0x0084	/* Aurora Status Register */
+#define AURORA_CONTROL_REGA 		0x0080	/* Aurora Control Register */
+#define AURORA_CONTROL_REGB 		0x0080	/* Aurora Control Register */
+#define AURORA_STATUS_REGA 		0x0084	/* Aurora Status Register */
+#define AURORA_STATUS_REGB 		0x0088	/* Aurora Status Register */
+
+#ifdef BACKCOMPATIBLE
 #define SFP_I2C_DATA_REG 		0x0088	/* SFP I2C Control and Data Register */
+#else
+#define SFP_I2C_DATA_REG 		0x0090	/* SFP I2C Control and Data Register */
+#endif
 #define HOST_COMMS_FIFO_CONTROL_REG 	0x00C0	/* ACQ400 Receive Communications FIFO Control Register */
 #define HOST_COMMS_FIFO_STATUS_REG 	0x00C4	/* ACQ400 Receive Communications FIFO Status Register */
 #define ACQ400_COMMS_READ 		0x0400	/* ACQ400 Receive Communications FIFO data */

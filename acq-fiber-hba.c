@@ -419,10 +419,12 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	case PCI_SUBDID_FHBA_4G:
 		dev_info(pdev(adev), "AFHBA 4G single port firmware detected");
 		adev->map_count = MAP_COUNT_4G1;
+		adev->sfp = SFP_A;
 		return _afhba_probe(adev, REMOTE_BAR);
 	case PCI_SUBDID_FHBA_4G2:
 		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
 		adev->map_count = MAP_COUNT_4G2;
+		adev->sfp = SFP_A;
 
 		if ((rc = _afhba_probe(adev, REMOTE_BAR)) != 0){
 			dev_err(pdev(adev), "ERROR failed to create first device");
@@ -431,6 +433,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 			struct AFHBA_DEV *adev2 = adevCreate(dev);
 			adev2->map_count = MAP_COUNT_4G2;
 			adev2->peer = adev;
+			adev2->sfp = SFP_B;
 
 			if ((rc = _afhba_probe(adev2, REMOTE_BAR2)) != 0){
 				dev_err(pdev(adev2), "ERROR failed to create second device");
