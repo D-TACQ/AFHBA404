@@ -61,7 +61,7 @@ static ssize_t show_data_fifo_stat_##DIR(				\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 stat = (DMA_DATA_FIFSTA_RD(adev) >> SHL)&0xffff;		\
 	getDataFifoStat(stat, flags, 80);				\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
@@ -79,7 +79,7 @@ static ssize_t show_desc_fifo_stat_##DIR(				\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 stat = (DMA_DESC_FIFSTA_RD(adev) >> SHL)&0xffff;		\
 	getDataFifoStat(stat, flags, 80);				\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
@@ -119,7 +119,7 @@ static ssize_t show_dma_ctrl_##DIR(					\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 stat = (DMA_CTRL_RD(adev) >> SHL)&0xffff;			\
 	getDmaCtrl(stat, flags, 80);					\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
@@ -152,7 +152,7 @@ static ssize_t show_dma_latest_##DIR(					\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 descr = RD(adev);						\
 	getDesc(descr, flags, 80);					\
 	return sprintf(buf, "0x%08x %s\n", descr, flags);		\
@@ -175,7 +175,7 @@ static ssize_t store_reset_buffers(
 
 	if (sscanf(buf, "%u", &mode) > 0){
 		if (mode == 1){
-			afs_reset_buffers(afhba_lookupDev(dev));
+			afs_reset_buffers(afhba_lookupDeviceFromClass(dev));
 		}
 		return count;
 	}else{
@@ -194,7 +194,7 @@ static ssize_t store_buffer_len(
 	const char * buf, size_t count)
 {
 	int ll_length;
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 
 	if (sscanf(buf, "%d", &ll_length) == 1 && ll_length > 0){
 		sdev->buffer_len = min(ll_length, buffer_len);
@@ -210,7 +210,7 @@ static ssize_t show_buffer_len(
 	struct device_attribute *attr,
 	char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 
 	sprintf(buf, "%d\n", sdev->buffer_len);
 	return strlen(buf);
@@ -260,7 +260,7 @@ static ssize_t store_aurora##SFPN(					\
 	size_t count)							\
 {									\
 	u32 ctrl = simple_strtoul(buf, 0, 16);				\
-	afhba_write_reg(afhba_lookupDev(dev), AURORA_CONTROL_REG, ctrl);  \
+	afhba_write_reg(afhba_lookupDeviceFromClass(dev), AURORA_CONTROL_REG, ctrl);  \
 	return count;							\
 }									\
 									\
@@ -271,7 +271,7 @@ static ssize_t show_aurora##SFPN(					\
 	char * buf)							\
 {									\
 	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);			\
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG); 		\
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){				\
 		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG);	\
@@ -291,7 +291,7 @@ static ssize_t store_comms_init(
 	const char * buf, size_t count)
 {
 	int init;
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 
 	if (sscanf(buf, "%d", &init) == 1 && init==1){
@@ -308,7 +308,7 @@ static ssize_t show_comms_init(
 	struct device_attribute *attr,
 	char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 
 	return sprintf(buf, "%d\n", sdev->comms_init_done);
 }
@@ -321,7 +321,7 @@ static ssize_t show_inflight(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 	struct JOB *job = &sdev->job;
 
 	return sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
@@ -334,7 +334,7 @@ static ssize_t show_shot(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 	return sprintf(buf, "%d\n", sdev->shot);
 }
 
@@ -345,7 +345,7 @@ static ssize_t show_latstat(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned ls1 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_1);
 	unsigned ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
 	return sprintf(buf, "%5d %5d %5d %5d\n",
@@ -359,7 +359,7 @@ static ssize_t show_fpga_rev(
 		struct device_attribute *attr,
 		char * buf)
 {
-	struct AFHBA_DEV *adev = afhba_lookupDev(dev);
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, FPGA_REVISION_REG));
 }
 
@@ -371,7 +371,7 @@ static ssize_t store_push_dma_timeouts(
 	struct device_attribute *attr,
 	const char * buf, size_t count)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 	int clear;
 
 	if (sscanf(buf, "%d", &clear) == 1 && clear == 1){
@@ -388,7 +388,7 @@ static ssize_t show_push_dma_timeouts(
 	struct device_attribute *attr,
 	char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 
 	sprintf(buf, "%d\n", sdev->push_dma_timeouts);
 	return strlen(buf);
@@ -401,7 +401,7 @@ static ssize_t store_pull_dma_timeouts(
 	struct device_attribute *attr,
 	const char * buf, size_t count)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 	int clear;
 
 	if (sscanf(buf, "%d", &clear) == 1 && clear == 1){
@@ -418,7 +418,7 @@ static ssize_t show_pull_dma_timeouts(
 	struct device_attribute *attr,
 	char * buf)
 {
-	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDev(dev)->stream_dev;
+	struct AFHBA_STREAM_DEV *sdev = afhba_lookupDeviceFromClass(dev)->stream_dev;
 
 	sprintf(buf, "%d\n", sdev->pull_dma_timeouts);
 	return strlen(buf);
@@ -452,10 +452,7 @@ static const struct attribute *dev_attrs[] = {
 void afhba_create_sysfs(struct AFHBA_DEV *adev)
 {
 	int rc;
-	const char* rootname = adev->peer == 0? "knobs.0": "knobs.1";
-	adev->knobs_root = kobject_create_and_add(rootname, &adev->pci_dev->dev.kobj);
-
-	rc = sysfs_create_files(adev->knobs_root, dev_attrs);
+	rc = sysfs_create_files(&adev->class_dev->kobj, dev_attrs);
 	if (rc){
 		dev_err(pdev(adev), "failed to create files");
 		return;
@@ -464,8 +461,7 @@ void afhba_create_sysfs(struct AFHBA_DEV *adev)
 
 void afhba_remove_sysfs(struct AFHBA_DEV *adev)
 {
-	sysfs_remove_files(&adev->pci_dev->dev.kobj, dev_attrs);
-	kobject_put(adev->knobs_root);
+	sysfs_remove_files(&adev->class_dev->kobj, dev_attrs);
 }
 
 static ssize_t show_dev(
