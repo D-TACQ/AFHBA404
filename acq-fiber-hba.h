@@ -166,7 +166,7 @@ struct AFHBA_DEV_PATH {
 #define pdev(adev) (&(adev)->pci_dev->dev)
 
 #define LOC(adev) ((adev)->mappings[0].va)
-#define REM(adev) ((adev)->mappings[1].va)
+#define REM(adev) ((adev)->remote)
 
 #define REGS_BAR	0
 #define REMOTE_BAR	1
