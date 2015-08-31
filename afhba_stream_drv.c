@@ -323,18 +323,21 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 		afhba_write_reg(adev, crn, ctrl|AFHBA_AURORA_CTRL_CLR);
 		if (++adev->aurora_error_count==1){
 			dev_info(pdev(adev),
-			"aurora initial s:0x%08x m:0x%08x e:0x%08x",
+			"aurora%c initial s:0x%08x m:0x%08x e:0x%08x",
+			adev->sfp == SFP_A? 'A': 'B',
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 		}else{
 			dev_warn(pdev(adev),
-			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x",
+			"aurora%c error: [%d] s:0x%08x m:0x%08x e:0x%08x",
+			adev->sfp == SFP_A? 'A': 'B',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 		}
 		stat = afhba_read_reg(adev, srn);
 		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 			dev_err(pdev(adev),
-			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
+			"aurora%c error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
+			adev->sfp == SFP_A? 'A': 'B',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 			msleep(1000);
@@ -416,7 +419,8 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 
 	if (afs_aurora_lane_up(adev)){
 		if (!adev->link_up){
-			dev_info(pdev(adev), "aurora link up!");
+			dev_info(pdev(adev),
+				"aurora%c link up!", adev->sfp == SFP_A? 'A': 'B');
 			adev->link_up = true;
 		}
 		if (!sdev->comms_init_done){
@@ -426,7 +430,8 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 		return sdev->comms_init_done;
 	}else{
 		if (adev->link_up){
-			dev_info(pdev(adev), "aurora link down!");
+			dev_info(pdev(adev),
+				"aurora%c link down!", adev->sfp == SFP_A? 'A': 'B');
 			adev->link_up = false;
 		}
 		dev_dbg(pdev(adev), "aurora lane down");
