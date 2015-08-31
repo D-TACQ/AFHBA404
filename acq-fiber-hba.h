@@ -344,6 +344,20 @@ static inline u32 dma_pp(enum DMA_SEL dma_sel, u32 bits)
 
 void afhba_write_reg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 afhba_read_reg(struct AFHBA_DEV *adev, int regoff);
+/*
+New "Special"  Host Register area at offset 0xf000
+
+First Register is the Trigger Register - at 0xf000
+
+Set the Trigger by writing a 1 to bit 0 to Set it back to 0 again afterwards similar to the SOFT_TRIGGER Bit on the A9 Side.
+*/
+#define COMMON_BASE			0xf000
+enum COMMON_REGS {
+	COM_SOFT_TRIGGER,
+};
+
+#define COM_SOFT_TRIGGER_EN		0x0001
+
 
 
 #endif /* ACQ_FIBER_HBA_H_ */

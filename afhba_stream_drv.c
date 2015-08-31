@@ -181,6 +181,15 @@ u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
 
+void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)
+{
+	u32* dma_regs = (u32*)(adev->remote + COMMON_BASE);
+	void* va = &dma_regs[regoff];
+	DEV_DBG(pdev(adev), "_afs_write_comreg %04lx = %08x",
+			va-adev->remote, value);
+	writel(value, va);
+}
+
 void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 
 {
@@ -1590,10 +1599,29 @@ static ssize_t show_z_ident(
 
 static DEVICE_ATTR(z_ident, S_IRUGO, show_z_ident, 0);
 
+static ssize_t store_com_trg(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned tv;
 
+	if (sscanf(buf, "%x", &tv) == 1){
+		_afs_write_comreg(adev, COM_SOFT_TRIGGER, COM_SOFT_TRIGGER_EN);
+		_afs_write_comreg(adev, COM_SOFT_TRIGGER, ~COM_SOFT_TRIGGER_EN);
+		afhba_write_reg(adev, HOST_TEST_REG, tv);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static DEVICE_ATTR(com_trg, (S_IWUSR|S_IWGRP), 0, store_com_trg);
 
 
 static const struct attribute *dev_attrs[] = {
+	&dev_attr_com_trg.attr,
 	&dev_attr_z_mod_id.attr,
 	&dev_attr_z_ident.attr,
 	NULL

@@ -174,6 +174,10 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define DMA_TEST_RD(adev) \
 	_afs_read_reg(adev, DMA_TEST)
 
+void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value);
+
+
+
 /* use #define for better trace
 static inline void afs_dma_reset(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
