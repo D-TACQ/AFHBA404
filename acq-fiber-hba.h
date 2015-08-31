@@ -217,10 +217,10 @@ struct AFHBA_DEV_PATH {
 #define SFP_I2C_SDA1_R		1
 #define	SFP_I2C_SCL1_W		8
 #define SFP_I2C_SDA1_W		9
-#define SFP_I2C_SCL2_R		16
-#define SFP_I2C_SDA2_R		17
-#define	SFP_I2C_SCL2_W		24
-#define SFP_I2C_SDA2_W		25
+#define SFP_I2C_SCL2_R		0
+#define SFP_I2C_SDA2_R		1
+#define	SFP_I2C_SCL2_W		8
+#define SFP_I2C_SDA2_W		9
 
 #define AFHBA_SPI_BUSY		(1<<31)
 #define AFHBA_SPI_CTL_START	(1<<7)
