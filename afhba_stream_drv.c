@@ -337,6 +337,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			"aurora error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+			msleep(1000);
 			return -1;
 		}else{
 			return 1;
