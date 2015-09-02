@@ -742,62 +742,63 @@ static irqreturn_t afs_null_isr(int irq, void* data)
 	dev_info(pdev(adev), "afs_null_isr %d", irq);
 	return IRQ_HANDLED;
 }
-static int hook_interrupts(struct AFHBA_DEV* adev)
+
+static int port_request_irq(struct AFHBA_DEV* adev, int port)
 {
-	struct pci_dev *dev = adev->pci_dev;
-	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	static const char* irq_names[4] = {
-		"%s-dma", "%s-line", "%s-ppnf", "%s-spare"
+		"%sA-dma", "%sB-dma", "%s-Aline", "%s-Bline"
 	};
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+	struct pci_dev *dev = adev->pci_dev;
 	int rc;
-	int nvec;
-	int iv;
 
-	dev_dbg(pdev(adev), "%d IRQ %d", __LINE__, dev->irq);
+	snprintf(sdev->irq_names[port+0], 32, irq_names[port+0], adev->name);
 
-	if (adev->peer != 0){
-		dev_info(pdev(adev), "hook_interrupts() peer stub");
-		return 0;
-	}
-	nvec = 4;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
-	rc = pci_enable_msi_block(dev, nvec = 4);
-#else
-	rc = pci_enable_msi_range(dev, nvec, nvec);
-#endif
-	if (rc < 0){
-		dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
-		rc = pci_enable_msi(dev);
-		nvec = 1;
-	}
-
-	if (rc < 0){
-		dev_err(pdev(adev), "pci_enable_msi FAILED");
+	rc = request_irq(dev->irq+port+0, afs_rx_isr,
+		 	IRQF_SHARED, sdev->irq_names[port+0], adev);
+	if (rc){
+		dev_err(pdev(adev), "request_irq %d failed", dev->irq+port+0);
 		return rc;
 	}
 
-	for (iv = 0; iv < nvec; ++iv){
-		snprintf(sdev->irq_names[iv], 32, irq_names[iv], adev->name);
-	}
-
-	rc = request_irq(dev->irq+0, afs_rx_isr,
-			 	IRQF_SHARED, sdev->irq_names[0], adev);
+	snprintf(sdev->irq_names[port+2], 32, irq_names[port+2], adev->name);
+	rc = request_irq(dev->irq+port+2, afs_null_isr, IRQF_SHARED,
+			sdev->irq_names[port+2], adev);
 	if (rc){
-		dev_err(pdev(adev), "request_irq %d failed", dev->irq+0);
+		dev_err(pdev(adev), "request_irq %d failed", dev->irq+port+2);
+	}else{
+		dev_info(pdev(adev), "request_irq %s %d OK",
+				sdev->irq_names[port+2], dev->irq+port+2);
 	}
-
-	for (iv = 1; iv < nvec; ++iv){
-		rc = request_irq(dev->irq+iv, afs_null_isr, IRQF_SHARED,
-				sdev->irq_names[iv], adev);
-		if (rc){
-			dev_err(pdev(adev), "request_irq %d failed", dev->irq+iv);
-		}else{
-			dev_info(pdev(adev), "request_irq %s %d OK",
-					sdev->irq_names[iv], dev->irq+iv);
-		}
-	}
-
 	return rc;
+}
+static int hook_interrupts(struct AFHBA_DEV* adev)
+{
+	/* non peer case must happen first */
+	if (adev->peer == 0){
+		struct pci_dev *dev = adev->pci_dev;
+		int nvec = 4;
+		int rc;
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
+		rc = pci_enable_msi_block(dev, nvec = 4);
+		if (rc < 0){
+			dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
+			rc = pci_enable_msi(dev);
+			nvec = 1;
+		}
+#else
+		rc = pci_enable_msi_range(dev, nvec, nvec);
+#endif
+		if (rc < 0){
+			dev_err(pdev(adev), "pci_enable_msi range FAILED");
+			return rc;
+		}
+
+		return port_request_irq(adev, 0);
+	}else{
+		return port_request_irq(adev, 1);
+	}
 }
 
 
