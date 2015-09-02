@@ -183,7 +183,7 @@ u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
-	u32* dma_regs = (u32*)(adev->remote + COMMON_BASE);
+	u32* dma_regs = (u32*)(adev->mappings[REMOTE_COM_BAR].va + COMMON_BASE);
 	void* va = &dma_regs[regoff];
 	DEV_DBG(pdev(adev), "_afs_write_comreg %04lx = %08x",
 			va-adev->remote, value);
