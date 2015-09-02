@@ -286,6 +286,36 @@ static DEVICE_ATTR(aurora##SFPN, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_auror
 AURORA(A);
 AURORA(B);
 
+static ssize_t store_aurora(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+
+	if (adev->peer){
+		return store_auroraB(dev, attr, buf, count);
+	}else{
+		return store_auroraA(dev, attr, buf, count);
+	}
+}
+
+static ssize_t show_aurora(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+
+	if (adev->peer){
+		return show_auroraB(dev, attr, buf);
+	}else{
+		return show_auroraA(dev, attr, buf);
+	}
+}
+
+static DEVICE_ATTR(aurora, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora, store_aurora);
+
 static ssize_t store_comms_init(
 	struct device * dev,
 	struct device_attribute *attr,
@@ -474,6 +504,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_reset_buffers.attr,
 	&dev_attr_auroraA.attr,
 	&dev_attr_auroraB.attr,
+	&dev_attr_aurora.attr,
 	&dev_attr_data_fifo_stat_push.attr,
 	&dev_attr_data_fifo_stat_pull.attr,
 	&dev_attr_desc_fifo_stat_push.attr,
@@ -492,6 +523,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_push_dma_timeouts.attr,
 	NULL
 };
+
 
 
 void afhba_create_sysfs(struct AFHBA_DEV *adev)
