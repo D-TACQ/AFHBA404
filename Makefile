@@ -5,6 +5,7 @@ obj-m += afhbasfp.o
 SRC := $(shell pwd)
 LDRV:= $(SRC)/linux/drivers
 
+CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
 

@@ -68,6 +68,6 @@ int main(int argc, char* argv[])
 		}
 	}	
 
-	printf("%012llx bytes %d Mbytes %d errors\n",
+	printf("%012llx bytes %llu Mbytes %d errors\n",
 		ii*4, ii*4/0x100000, errors);		
 }

@@ -786,12 +786,16 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 			dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
 			rc = pci_enable_msi(dev);
 			nvec = 1;
+			if (rc < 0){
+				dev_warn(pdev(adev), "pci_enable_msi() failed");
+			}
+			return rc;
 		}
 #else
-		rc = pci_enable_msi_range(dev, nvec, nvec);
+		rc = pci_enable_msi_exact(dev, nvec);
 #endif
 		if (rc < 0){
-			dev_err(pdev(adev), "pci_enable_msi range FAILED");
+			dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", nvec);
 			return rc;
 		}
 
