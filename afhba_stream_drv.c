@@ -1616,6 +1616,7 @@ static ssize_t store_com_trg(
 
 	if (sscanf(buf, "%x", &tv) == 1){
 		_afs_write_comreg(adev, COM_SOFT_TRIGGER, COM_SOFT_TRIGGER_EN);
+		msleep(10);
 		_afs_write_comreg(adev, COM_SOFT_TRIGGER, ~COM_SOFT_TRIGGER_EN);
 		afhba_write_reg(adev, HOST_TEST_REG, tv);
 		return strlen(buf);
