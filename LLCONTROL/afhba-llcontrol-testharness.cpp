@@ -255,7 +255,7 @@ public:
         		fwrite(buffer+ic2, 1, VI_LEN, fp_log);
         	}
         	delete checkAction;
-        	printf("wrote %d bytes\n", ::nsamples*VI_LEN);
+        	printf("wrote %ld bytes\n", ::nsamples*VI_LEN);
         }
 };
 

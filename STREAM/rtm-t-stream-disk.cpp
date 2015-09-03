@@ -313,7 +313,7 @@ static void run_stop_monitor(char *monitor)
 		char arg1[20];
 		sprintf(arg1, "%d", ppid);
 		info("monitor: %s %s\n", monitor, arg1);
-		int rc = execlp(monitor, basename(monitor), arg1);
+		int rc = execlp(monitor, basename(monitor), arg1, (char*)NULL);
 
 		if (rc){
 			perror("execlp failed");

@@ -308,7 +308,7 @@ int main( int argc, const char* argv[] )
 			assert( fp );
 	    
 			while( fgets( aline, sizeof(aline), fp ) != NULL ) {
-				fprintf( stderr, aline );
+				fputs(aline, stderr);
 			}
 			fclose( fp );
 		}
