@@ -1,0 +1,65 @@
+#!/bin/bash
+# high throughput streaming test harness
+#!/bin/bash
+
+[ -d scripts ] && cd scripts
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_009}
+STREAMPID=0
+SIMULATE=${SIMULATE:-0}
+SPAD=${SPAD:-0}
+
+source afhba-common
+# site definitions SC: system controller, CX: commsA, AI: AI
+SC=0
+CA=13
+CB=12
+# master AI
+AI=1
+
+SITES=1,2,3
+CA_SITES=1,2,3
+CB_SITES=1,2,3
+
+init_comms() {	
+	cx=$1
+	sites=$2
+        remote_cmd $cx spad=${SPAD}
+        remote_cmd $cx aggregator sites=$sites
+}
+
+init_acq2106A() {
+	remote_cmd $AI simulate=$SIMULATE
+	remote_cmd $SC spad=0,0,0
+	init_comms $CA $CA_SITES
+	init_comms $CB $CB_SITES
+	remote_cmd $SC run0 $SITES
+	remote_cmd $SC decimate=2
+}
+
+start_stream() {
+	remote_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+	echo cleanup
+	remote_cmd $SC streamtonowhered stop
+}
+
+echo Hello "$0"
+
+if [ "$0" = "./scripts/hts-test-harness-AI3-intecs-commsB-hook" ]; then
+	echo init_comms $CB only
+	init_comms $CB $CB_SITES
+	exit 0
+fi
+
+init_acq2106A
+start_stream
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
