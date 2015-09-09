@@ -138,6 +138,7 @@ struct AFHBA_STREAM_DEV {
 	char irq_names[4][32];
 
 	bool aurora_fail_detected;
+	enum ZI_REPORT { ZI_BAD = -1, ZI_NULL = 0, ZI_GOOD = 1 } zi_report;
 
 	int shot;
 };

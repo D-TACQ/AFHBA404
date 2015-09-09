@@ -374,6 +374,7 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 
 static int _afs_check_read(struct AFHBA_DEV *adev)
 {
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	unsigned z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
 	unsigned z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
 
@@ -383,10 +384,23 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 	}else{
 		char buf[80];
 		int valid_id = is_valid_z_ident(z_ident2, buf, 80);
+#define ZI_FMT	"[%d] Z_IDENT 1:0x%08x 2:0x%08x %s"
 
-		dev_info(pdev(adev), "[%d] Z_IDENT 1:0x%08x 2:0x%08x %s",
-			adev->idx, z_ident1, z_ident2,
-			valid_id? buf: "ID NOT VALID");
+		if (valid_id){
+			if (sdev->zi_report != ZI_GOOD){
+				dev_info(pdev(adev), ZI_FMT,
+						adev->idx, z_ident1, z_ident2,
+						buf);
+				sdev->zi_report = ZI_GOOD;
+			}
+		}else{
+			if (sdev->zi_report != ZI_BAD){
+				dev_info(pdev(adev), ZI_FMT,
+					adev->idx, z_ident1, z_ident2,
+					"ID NOT VALID");
+				sdev->zi_report = ZI_BAD;
+			}
+		}
 		return 0;
 	}
 }
@@ -424,7 +438,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 			adev->link_up = true;
 		}
 		if (!sdev->comms_init_done){
-			_afs_comms_init(adev);
+			sdev->comms_init_done = _afs_comms_init(adev);
 		}
 		afs_aurora_errors(adev);
 		return sdev->comms_init_done;
