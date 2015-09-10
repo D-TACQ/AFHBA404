@@ -1,0 +1,142 @@
+#!/bin/bash
+# high throughput streaming test harness
+#!/bin/bash
+
+[ -d scripts ] && cd scripts
+
+# basic setter/getters
+
+set_sys() {
+	dev=$1; shift
+        knob=$1;shift
+        logger -t set_sys ${dev}/${knob} $*
+        echo $* >${dev}/${knob}
+}
+
+get_sys() {
+	dev=$1;shift
+        knob=$1
+        RB=$(cat ${dev}/${knob})
+        logger -t get_sys ${dev}/${knob} $RB
+        echo $RB
+}
+
+remote_cmd() {
+	remip=$1; shift
+        site=$1;shift
+        let port="4220+$site"
+        logger -t rem_cmd $remip $port $*
+        echo $* | nc $remip $port
+}
+
+# validate system
+
+get_port() {
+	dev=$1
+	knob=/dev/rtm-t.$dev.ctrl/acq_port
+	if [ -e $knob ]; then
+		echo $(cat $knob)
+	else
+		echo 1>&2 "ERROR file $knob not found"
+		exit 1
+	fi
+}
+
+get_ident() {
+	dev=$1
+	knob=/dev/rtm-t.$dev.ctrl/acq_ident
+	if [ -e $knob ]; then
+		echo $(cat $knob)
+	else
+		echo 1>&2 "ERROR file $knob not found"
+		exit 1
+	fi
+}
+
+pingtest() {
+	ping -c 1 $1 >/dev/null
+	if [ $? -ne 0 ]; then
+		echo ERROR: failed to ping $1
+		exit 1
+	else
+		echo PING $1 OK
+	fi
+}
+
+HOST1=$(get_ident 0)
+HOST2=$(get_ident 1)
+PORT1=$(get_port 0)
+PORT2=$(get_port 1)
+
+echo HOST1:$HOST1 HOST2:$HOST2 PORT1:$PORT1 PORT2:$PORT2
+
+if [ "$PORT1" != "$PORT2" ]; then
+	echo "ERROR: connected to different COMM ports at ACQ2106, please swap"
+	exit 1
+else
+	echo "Connected to $PORT1 on both UUT : OK"
+fi
+
+pingtest $HOST1
+pingtest $HOST2
+exit 0
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_009}
+STREAMPID=0
+SIMULATE=${SIMULATE:-0}
+SPAD=${SPAD:-0}
+
+source afhba-common
+# site definitions SC: system controller, CX: commsA, AI: AI
+SC=0
+CA=13
+CB=12
+# master AI
+AI=1
+
+SITES=1,2,3
+CA_SITES=1,2,3
+CB_SITES=1,2,3
+
+init_comms() {	
+	cx=$1
+	sites=$2
+        remote_cmd $cx spad=${SPAD}
+        remote_cmd $cx aggregator sites=$sites
+}
+
+init_acq2106A() {
+	remote_cmd $AI simulate=$SIMULATE
+	remote_cmd $SC spad=0,0,0
+	init_comms $CA $CA_SITES
+	init_comms $CB $CB_SITES
+	remote_cmd $SC run0 $SITES
+	remote_cmd $SC decimate=2
+}
+
+start_stream() {
+	remote_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+	echo cleanup
+	remote_cmd $SC streamtonowhered stop
+}
+
+echo Hello "$0"
+
+if [ "$0" = "./scripts/hts-test-harness-AI3-intecs-commsB-hook" ]; then
+	echo init_comms $CB only
+	init_comms $CB $CB_SITES
+	exit 0
+fi
+
+init_acq2106A
+start_stream
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
