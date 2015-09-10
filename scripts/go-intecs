@@ -74,20 +74,18 @@ if [ "$PORT1" != "$PORT2" ]; then
 	echo "ERROR: connected to different COMM ports at ACQ2106, please swap"
 	exit 1
 else
+	PORT=$PORT1
 	echo "Connected to $PORT1 on both UUT : OK"
 fi
 
 pingtest $HOST1
 pingtest $HOST2
-exit 0
 
-# MUST set remote ip-address
-REMIP=${1:-acq2106_009}
-STREAMPID=0
+SITES=${1:-1,2,3}
+
 SIMULATE=${SIMULATE:-0}
 SPAD=${SPAD:-0}
 
-source afhba-common
 # site definitions SC: system controller, CX: commsA, AI: AI
 SC=0
 CA=13
@@ -95,48 +93,76 @@ CB=12
 # master AI
 AI=1
 
-SITES=1,2,3
-CA_SITES=1,2,3
-CB_SITES=1,2,3
+CA_SITES=${SITES}
+CB_SITES=${SITES}
 
-init_comms() {	
-	cx=$1
-	sites=$2
+init_comms() {
+	ip=$1
+	cx=$2
+	sites=$3
         remote_cmd $cx spad=${SPAD}
         remote_cmd $cx aggregator sites=$sites
 }
 
 init_acq2106A() {
-	remote_cmd $AI simulate=$SIMULATE
-	remote_cmd $SC spad=0,0,0
-	init_comms $CA $CA_SITES
-	init_comms $CB $CB_SITES
-	remote_cmd $SC run0 $SITES
-	remote_cmd $SC decimate=2
+	ip=$1
+	init_comms $ip $CA $CA_SITES
+	init_comms $ip $CB $CB_SITES
+
+	remote_cmd $ip $AI simulate=$SIMULATE
+	remote_cmd $ip $SC spad=0,0,0
+	remote_cmd $ip $SC SIG:SRC:CLK:0=COMM_$PORT
+	remote_cmd $ip $SC SIG:SRC:TRG:1=HOST$PORT
+	remote_cmd $ip $SC run0 $SITES
+	remote_cmd $ip $SC decimate=4
 }
 
 start_stream() {
-	remote_cmd $SC streamtonowhered start
+	ip=$1
+	remote_cmd $ip $SC streamtonowhered start
 }
 
 
 cleanup() {
-	echo cleanup
-	remote_cmd $SC streamtonowhered stop
+	remote_cmd $1 $SC streamtonowhered stop
 }
 
-echo Hello "$0"
+cleanup2() {
+	cleanup $HOST1
+	cleanup $HOST2
+}
 
-if [ "$0" = "./scripts/hts-test-harness-AI3-intecs-commsB-hook" ]; then
-	echo init_comms $CB only
-	init_comms $CB $CB_SITES
+trigger() {
+	echo trigger
+	echo 1 > /dev/rtm-t.0.ctrl/com_trg
+}
+
+# hack: emergency stop
+if [ "$1" = "STOP" ]; then
+	cleanup2
 	exit 0
 fi
 
-init_acq2106A
-start_stream
+
+# regular code runs from here
+
+init_acq2106A $HOST1
+init_acq2106A $HOST2
+
+start_stream $HOST1
+start_stream $HOST2
+
+echo "Enter T to trigger"
+read TRG
+if [ "$TRG" = "T" ] then
+	trigger
+else
+	echo trigger from elsewhere like this:
+	echo "1 > /dev/rtm-t.0.ctrl/com_trg"
+fi
+
 echo CTRL-C to quit
-trap "cleanup" SIGINT SIGTERM
+trap "cleanup2" SIGINT SIGTERM
 
 sleep 99999
 
