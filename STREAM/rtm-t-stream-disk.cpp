@@ -123,6 +123,23 @@ static int write_meta(int fd, int ibuf, int nbuf)
 	write(fd, buf, strlen(buf));
 }
 
+void fail_if_exists(char *buf)
+{
+	struct stat stat_buf;
+	int rc = stat(buf, &stat_buf);
+	DIAG("stat:rc %d errno %d\n", rc, errno);
+	if (rc == 0){
+		err("OVERRUN: NO_OVERWRITE SET and \"%s\" exists", buf);
+		exit(1);
+	}else if (errno != ENOENT){
+		err("OVERRUN: NO_OVERWRITE SET and \"%s\" exists", buf);
+		perror("buf");
+		exit(errno);
+	}else{
+		;	/* ENOENT - that's good! */
+	}
+}
+
 #define O_MODE	(O_WRONLY|O_CREAT|O_TRUNC)
 #define PERM	(S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
@@ -136,30 +153,12 @@ static void process(int ibuf, int nbuf){
 
 	static char data_fname[80];
 	char buf[80];
-
 	
-	sprintf(buf, "%s/%06d/", OUTROOT, CYCLE);
-	mkdir(buf, 0777);
-	sprintf(data_fname, "%s/%06d/%d.%02d", OUTROOT, CYCLE, dev->getDevnum(), ibuf);
-
-	if (NO_OVERWRITE){
-		struct stat stat_buf;
-		int rc = stat(buf, &stat_buf);
-		DIAG("stat:rc %d errno %d\n", rc, errno);
-		if (rc == 0){
-			err("OVERRUN: NO_OVERWRITE SET and \"%s\" exists",
-					buf);
-			exit(1);
-		}else if (errno != ENOENT){
-			err("OVERRUN: NO_OVERWRITE SET and \"%s\" exists",
-					buf);
-			perror("buf");
-			exit(errno);
-		}else{
-			;	/* ENOENT - that's good! */
-		}
-	}
 	if (icat == 0){
+		sprintf(buf, "%s/%06d/", OUTROOT, CYCLE);
+		mkdir(buf, 0777);
+		sprintf(data_fname, "%s/%06d/%d.%02d", OUTROOT, CYCLE, dev->getDevnum(), ibuf);
+
 		outfp = open(data_fname, O_MODE, PERM);
 		if (outfp == -1){
 			perror(buf);
@@ -171,6 +170,10 @@ static void process(int ibuf, int nbuf){
 		write_meta(out_meta, ibuf, nbuf);
 		close(out_meta);
 	}
+	if (NO_OVERWRITE){
+		fail_if_exists(data_fname);
+	}
+
 	write(outfp, dev->getHostBufferMapping(ibuf), maxlen);
 
 	if (++icat > CONCAT){
