@@ -180,6 +180,7 @@ static void process(int ibuf, int nbuf){
 		}else{
 			puts(buf);
 		}
+		icat = 0;
 	}
 
 	if (USLEEP){
