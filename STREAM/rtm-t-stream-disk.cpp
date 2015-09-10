@@ -134,12 +134,13 @@ static void process(int ibuf, int nbuf){
 		fprintf(stderr, "%02d\n", ibuf);
 	}
 
+	static char data_fname[80];
 	char buf[80];
 
 	
 	sprintf(buf, "%s/%06d/", OUTROOT, CYCLE);
 	mkdir(buf, 0777);
-	sprintf(buf, "%s/%06d/%d.%02d", OUTROOT, CYCLE, dev->getDevnum(), ibuf);
+	sprintf(data_fname, "%s/%06d/%d.%02d", OUTROOT, CYCLE, dev->getDevnum(), ibuf);
 
 	if (NO_OVERWRITE){
 		struct stat stat_buf;
@@ -159,11 +160,12 @@ static void process(int ibuf, int nbuf){
 		}
 	}
 	if (icat == 0){
-		outfp = open(buf, O_MODE, PERM);
+		outfp = open(data_fname, O_MODE, PERM);
 		if (outfp == -1){
 			perror(buf);
 			_exit(errno);
 		}
+		strcpy(buf, data_fname);
 		strcat(buf, ".id");
 		int out_meta = open(buf, O_MODE, PERM);
 		write_meta(out_meta, ibuf, nbuf);
@@ -173,15 +175,12 @@ static void process(int ibuf, int nbuf){
 
 	if (++icat > CONCAT){
 		close(outfp);		/* close data last - we monitor this one */
-	}
-
-	if (PUT_DATA){
-		char *cp = strstr(buf, ".id");
-		if (cp){
-			*cp = '\0';
+		if (PUT_DATA){
+			puts(data_fname);
+		}else{
+			puts(buf);
 		}
 	}
-	puts(buf);
 
 	if (USLEEP){
 		usleep(USLEEP);
