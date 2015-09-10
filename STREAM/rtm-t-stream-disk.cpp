@@ -59,6 +59,7 @@ int MAXITER_MASK       = 0x7fffffff;
 int NELEMS = RTM_T_Device::MAXBUF;
 int USLEEP = 0;
 int VERBOSE = 0;
+int CONCAT = 0;
 
 int SSIZE = sizeof(short) * 96;
 
@@ -125,6 +126,9 @@ static int write_meta(int fd, int ibuf, int nbuf)
 #define O_MODE	(O_WRONLY|O_CREAT|O_TRUNC)
 #define PERM	(S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
+int icat;
+int outfp;
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE){
 		fprintf(stderr, "%02d\n", ibuf);
@@ -154,20 +158,22 @@ static void process(int ibuf, int nbuf){
 			;	/* ENOENT - that's good! */
 		}
 	}
-	int outfp = open(buf, O_MODE, PERM);
-
-	if (outfp == -1){
-		perror(buf);
-		_exit(errno);
+	if (icat == 0){
+		outfp = open(buf, O_MODE, PERM);
+		if (outfp == -1){
+			perror(buf);
+			_exit(errno);
+		}
+		strcat(buf, ".id");
+		int out_meta = open(buf, O_MODE, PERM);
+		write_meta(out_meta, ibuf, nbuf);
+		close(out_meta);
 	}
 	write(outfp, dev->getHostBufferMapping(ibuf), maxlen);
 
-	strcat(buf, ".id");
-	int out_meta = open(buf, O_MODE, PERM);
-	write_meta(out_meta, ibuf, nbuf);
-
-	close(out_meta);		
-	close(outfp);		/* close data last - we monitor this one */
+	if (++icat > CONCAT){
+		close(outfp);		/* close data last - we monitor this one */
+	}
 
 	if (PUT_DATA){
 		char *cp = strstr(buf, ".id");
@@ -391,6 +397,9 @@ static void init_defaults(int argc, char* argv[])
 	}
 	if (getenv("NO_OVERWRITE")){
 		NO_OVERWRITE=atol(getenv("NO_OVERWRITE"));
+	}
+	if (getenv("CONCAT")){
+		CONCAT=atoi(getenv("CONCAT"));
 	}
 	setvbuf(stdout, 0, _IOLBF, 0);
 
