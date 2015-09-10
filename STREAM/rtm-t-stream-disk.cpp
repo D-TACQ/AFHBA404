@@ -152,6 +152,7 @@ static void process(int ibuf, int nbuf){
 	}
 
 	static char data_fname[80];
+	static char old_fname[80];
 	char buf[80];
 	
 	if (icat == 0){
@@ -179,7 +180,10 @@ static void process(int ibuf, int nbuf){
 	if (++icat > CONCAT){
 		close(outfp);		/* close data last - we monitor this one */
 		if (PUT_DATA){
-			puts(data_fname);
+			if (strlen(old_fname)){
+				puts(old_fname);
+			}
+			strcpy(old_fname, data_fname);
 		}else{
 			puts(buf);
 		}
