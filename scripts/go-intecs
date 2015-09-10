@@ -75,7 +75,12 @@ if [ "$PORT1" != "$PORT2" ]; then
 	exit 1
 else
 	PORT=$PORT1
-	echo "Connected to $PORT1 on both UUT : OK"
+	if [ "$PORT" = "A" ]; then
+		echo "Connected to $PORT1 on both UUT : OK"
+	else
+		echo "ERROR: Please use PORT A for control"	
+		exit 1
+	fi
 fi
 
 pingtest $HOST1
@@ -100,8 +105,8 @@ init_comms() {
 	ip=$1
 	cx=$2
 	sites=$3
-        remote_cmd $cx spad=${SPAD}
-        remote_cmd $cx aggregator sites=$sites
+        remote_cmd $ip $cx aggregator sites=$sites
+        remote_cmd $ip $cx spad=${SPAD}
 }
 
 init_acq2106A() {
@@ -110,6 +115,7 @@ init_acq2106A() {
 	init_comms $ip $CB $CB_SITES
 
 	remote_cmd $ip $AI simulate=$SIMULATE
+	remote_cmd $ip $AI bitslice_frame=1
 	remote_cmd $ip $SC spad=0,0,0
 	remote_cmd $ip $SC SIG:SRC:CLK:0=COMM_$PORT
 	remote_cmd $ip $SC SIG:SRC:TRG:1=HOST$PORT
@@ -154,7 +160,7 @@ start_stream $HOST2
 
 echo "Enter T to trigger"
 read TRG
-if [ "$TRG" = "T" ] then
+if [ "$TRG" = "T" ]; then
 	trigger
 else
 	echo trigger from elsewhere like this:
