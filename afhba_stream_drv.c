@@ -393,6 +393,7 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 						buf);
 				sdev->zi_report = ZI_GOOD;
 			}
+			return 0;
 		}else{
 			if (sdev->zi_report != ZI_BAD){
 				dev_info(pdev(adev), ZI_FMT,
@@ -400,8 +401,8 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 					"ID NOT VALID");
 				sdev->zi_report = ZI_BAD;
 			}
+			return 1;
 		}
-		return 0;
 	}
 }
 
@@ -1624,6 +1625,46 @@ static ssize_t show_z_ident(
 
 static DEVICE_ATTR(z_ident, S_IRUGO, show_z_ident, 0);
 
+static ssize_t show_acq_model(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned model = _afs_read_zynqreg(adev, Z_IDENT) >> 16;
+	model = model&0x2106;
+	return sprintf(buf, "acq%04x\n", model);
+}
+
+static DEVICE_ATTR(acq_model, S_IRUGO, show_acq_model, 0);
+
+static ssize_t show_acq_port(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned comms = _afs_read_zynqreg(adev, Z_IDENT) >> 20;
+	comms = comms&0xf;
+	return sprintf(buf, "%x\n", comms);
+}
+
+static DEVICE_ATTR(acq_port, S_IRUGO, show_acq_port, 0);
+
+static ssize_t show_acq_ident(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned ident = _afs_read_zynqreg(adev, Z_IDENT)&0x0ffff;
+	unsigned model = _afs_read_zynqreg(adev, Z_IDENT) >> 16;
+	model = model&0x2106;
+	return sprintf(buf, "acq%04x_%03d\n", model, ident);
+}
+
+static DEVICE_ATTR(acq_ident, S_IRUGO, show_acq_ident, 0);
+
 static ssize_t store_com_trg(
 	struct device * dev,
 	struct device_attribute *attr,
@@ -1650,6 +1691,9 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_com_trg.attr,
 	&dev_attr_z_mod_id.attr,
 	&dev_attr_z_ident.attr,
+	&dev_attr_acq_model.attr,
+	&dev_attr_acq_port.attr,
+	&dev_attr_acq_ident.attr,
 	NULL
 };
 
