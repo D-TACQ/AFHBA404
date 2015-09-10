@@ -1646,7 +1646,7 @@ static ssize_t show_acq_port(
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned comms = _afs_read_zynqreg(adev, Z_IDENT) >> 20;
 	comms = comms&0xf;
-	return sprintf(buf, "%x\n", comms);
+	return sprintf(buf, "%X\n", comms);
 }
 
 static DEVICE_ATTR(acq_port, S_IRUGO, show_acq_port, 0);
