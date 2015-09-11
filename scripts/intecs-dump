@@ -1,0 +1,4 @@
+#!/bin/bash
+
+hexdump -e '2/4 "%08x " "\n"' $*
+

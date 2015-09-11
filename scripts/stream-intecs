@@ -1,0 +1,30 @@
+#!/bin/bash
+
+DN=${1} ; shift
+PATH=$PATH:/usr/local/bin
+SITES="${*:-1 2 3}"
+
+IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+
+echo DN $DN SITES $SITES
+
+# alt: HBFARM=1 for single source module
+
+echo checking aurora is up ..
+grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
+if [ $? -ne 0 ];then
+	echo aurora lane NOT up, quit
+	exit 1
+fi
+echo stream to /mnt/afhba.$DN 
+mkdir -p /mnt/afhba.$DN
+# --filenames
+# --mask=
+# --maxsamples=
+# CONCAT=2 combine 1+2 buffers for modulo 96 data
+RTM_DEVNUM=$DN RECYCLE=10 OUTROOT=/mnt/afhba.$DN CONCAT=2 \
+	./STREAM/rtm-t-stream-disk | \
+	acq435_tschan --filenames --maxsamples=100000 \
+	--outfile=/data/$IDENT.dat \
+	1=ABCDl 2=ABCD 3=ABCD
+
