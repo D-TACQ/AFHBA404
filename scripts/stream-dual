@@ -1,9 +1,23 @@
 #!/bin/bash
+# stream-dual DEV1 DEV2  : stream from two devices
 
+
+case $# in
+2)
+	$0 $1 &
+	$0 $2 &
+	wait;wait; exit 0;;
+1)
+	;;
+*)
+	echo usages $0  DEV1 [DEV2]
+esac
+	
 DN=${1} ; shift
 PATH=$PATH:/usr/local/bin
-SITES="${*:-1 2 3}"
+SITES="${SITES:-1 2 3}"
 MASK=${MASK:-1:96}
+MAXSAMPLES=${MAXSAMPLES:-200000000}
 
 IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 
@@ -25,7 +39,7 @@ mkdir -p /mnt/afhba.$DN
 # CONCAT=2 combine 1+2 buffers for modulo 96 data
 RTM_DEVNUM=$DN RECYCLE=10 OUTROOT=/mnt/afhba.$DN CONCAT=2 \
 	./STREAM/rtm-t-stream-disk | \
-	acq435_tschan --filenames --maxsamples=200000000 \
+	acq435_tschan --filenames --maxsamples=$MAXSAMPLES \
 	--mask=$MASK \
 	--outfile=/data/$IDENT.dat \
 	1=ABCDl 2=ABCD 3=ABCD
