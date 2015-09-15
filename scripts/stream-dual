@@ -1,11 +1,17 @@
 #!/bin/bash
 # stream-dual DEV1 DEV2  : stream from two devices
 
+cleanup() {
+	echo cleanup
+	kill -9 -- -$$
+}
 
 case $# in
 2)
+	export DATECODE=$(date +%y%m%d%H%M)
 	$0 $1 &
 	$0 $2 &
+	trap "cleanup" SIGINT SIGTERM
 	wait;wait; exit 0;;
 1)
 	;;
@@ -20,6 +26,9 @@ MASK=${MASK:-1:96}
 MAXSAMPLES=${MAXSAMPLES:-200000000}
 
 IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+if [ "x$DATECODE" != "x" ]; then
+	IDENT=$IDENT-$DATECODE
+fi
 
 echo DN $DN SITES $SITES
 
@@ -31,16 +40,16 @@ if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-echo stream to /mnt/afhba.$DN 
+echo stream raw to /mnt/afhba.$DN cooked to /data/$IDENT.dat
 mkdir -p /mnt/afhba.$DN
 # --filenames
 # --mask=
 # --maxsamples=
 # CONCAT=2 combine 1+2 buffers for modulo 96 data
 RTM_DEVNUM=$DN RECYCLE=10 OUTROOT=/mnt/afhba.$DN CONCAT=2 \
-	./STREAM/rtm-t-stream-disk | \
+	./STREAM/rtm-t-stream-disk 2>afhba.$DN.log | \
 	acq435_tschan --filenames --maxsamples=$MAXSAMPLES \
 	--mask=$MASK \
 	--outfile=/data/$IDENT.dat \
-	1=ABCDl 2=ABCD 3=ABCD
+	1=ABCDl 2=ABCD 3=ABCD 2>&1 >afhba.$DN.log
 
