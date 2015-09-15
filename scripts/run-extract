@@ -1,0 +1,51 @@
+#!/bin/bash
+# extract CH01 from two data sets, store to TWOBOX for KST compare
+# ./run-extract 
+# extract ch01 from acq0, ch01 from acq1
+# equivalent to
+# ./run-extract 0:1 1:1
+# example
+# ./run-extract 0:1 0:9: 0:49 1:1 1:19 1:66
+# extract a random selection
+
+mkdir -p TWOBOX
+cat - >TWOBOX/format <<EOF
+# format for model:acq420fmc nchan:192 word_size:4
+# acq_demux $Revision: 1.52 $ B1025
+# acq_demux --channel_mask=2 -a acq435x3x2.def gash.dat 
+# 
+# DATASOURCE	gash.dat
+# HOSTNAME	tatooine
+# CREATED	Sun Sep 13 17:48:30 2015
+
+START_SAMPLE CONST UINT32 0
+EOF
+
+add_channel() {
+echo "$1	RAW	S	1" >>TWOBOX/format
+}
+
+ID[0]=$(cat /dev/rtm-t.0.ctrl/acq_ident)
+ID[1]=$(cat /dev/rtm-t.1.ctrl/acq_ident)
+
+extract_channel() {
+	acq=${ID[$1]}
+	ch=$2
+	chid=$(printf "%s_%02d" ${acq} $ch)
+	add_channel $chid
+	extract_chan $ch /data/${acq}.dat TWOBOX/$chid &
+}
+
+if [ "x$1" = "x" ]; then
+	echo default extract CH01
+	extract_channel 0 1
+	extract_channel 1 1
+else
+	for arg in $*; do
+		extract_channel ${arg%:*} ${arg##*:} 
+	done
+	for arg in $*; do
+		wait
+	done
+fi
+
