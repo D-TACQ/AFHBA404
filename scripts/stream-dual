@@ -44,8 +44,9 @@ esac
 
 
 IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+IDC=$IDENT
 if [ "x$DATECODE" != "x" ]; then
-	IDENT=$IDENT-$DATECODE
+	IDC=$IDENT-$DATECODE
 fi
 
 echo DN $DN SITES $SITES
@@ -58,6 +59,11 @@ if [ $? -ne 0 ];then
 fi
 echo stream raw to /mnt/afhba.$DN cooked to /data/$IDENT.dat
 mkdir -p /mnt/afhba.$DN
+if [ "$IDC" != "$IDENT" ]; then
+	# softlink needed for ATP data
+	rm -f /data/$IDENT.dat
+	ln -s /data/$IDC.dat /data/$IDENT.dat
+fi
 # --filenames
 # --mask=
 # --maxsamples=
@@ -66,6 +72,6 @@ RTM_DEVNUM=$DN RECYCLE=10 OUTROOT=/mnt/afhba.$DN CONCAT=2 \
 	./STREAM/rtm-t-stream-disk 2>afhba.$DN.log | \
 	acq435_tschan --filenames --maxsamples=$MAXSAMPLES \
 	--mask=$MASK \
-	--outfile=/data/$IDENT.dat \
+	--outfile=/data/$IDC.dat \
 	$SITEDEF 2>&1 >afhba.$DN.log
 
