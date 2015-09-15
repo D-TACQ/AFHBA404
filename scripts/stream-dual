@@ -21,9 +21,27 @@ esac
 	
 DN=${1} ; shift
 PATH=$PATH:/usr/local/bin
-SITES="${SITES:-1 2 3}"
+SITES="${SITES:-1,2,3}"
 MASK=${MASK:-1:96}
 MAXSAMPLES=${MAXSAMPLES:-200000000}
+
+case ${SITES} in
+1,2,3,4,5,6)
+	SITEDEF="1=ABCDl 2=ABCD 3=ABCD 4=ABCD 5=ABCD 6=ABCD";;
+1,2,3,4,5)
+	SITEDEF="1=ABCDl 2=ABCD 3=ABCD 4=ABCD 5=ABCD";;
+1,2,3,4)
+	SITEDEF="1=ABCDl 2=ABCD 3=ABCD 4=ABCD";;
+1,2,3)
+	SITEDEF="1=ABCDl 2=ABCD 3=ABCD";;
+2)
+	SITEDEF="1=ABCDl 2=ABCD";;
+1)
+	SITEDEF="1=ABCDl";;
+*)
+	echo ERROR: BAD SITES $SITES;;
+esac
+
 
 IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 if [ "x$DATECODE" != "x" ]; then
@@ -31,8 +49,6 @@ if [ "x$DATECODE" != "x" ]; then
 fi
 
 echo DN $DN SITES $SITES
-
-# alt: HBFARM=1 for single source module
 
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
@@ -51,5 +67,5 @@ RTM_DEVNUM=$DN RECYCLE=10 OUTROOT=/mnt/afhba.$DN CONCAT=2 \
 	acq435_tschan --filenames --maxsamples=$MAXSAMPLES \
 	--mask=$MASK \
 	--outfile=/data/$IDENT.dat \
-	1=ABCDl 2=ABCD 3=ABCD 2>&1 >afhba.$DN.log
+	$SITEDEF 2>&1 >afhba.$DN.log
 
