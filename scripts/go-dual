@@ -1,6 +1,25 @@
 #!/bin/bash
 # high throughput streaming test harness
-#!/bin/bash
+# autodetects two ACQ2106 UUT's
+# default: wait-trigger wait-ctrlC
+# command line options
+# no-wait : do not wait for completion
+# no-wait-trigger : do not wait for trigger command
+# no-trigger : do not trigger
+# trigger-now : send common trigger only
+# cleanup : stop capture
+#
+# Use Case 1: ./scripts/go-dual (no args)
+#       configure two UUT
+#	prompt user for Trigger
+#       prompt user for completion (CTRL-C)
+# Use Case 2:
+#	./scripts/go-dual no-wait no-wait-trigger
+#       	configure two UUT, trigger and exit
+# Use Case 2.1: 
+#	./scripts/go-dual cleanup
+#		stop capture previously set in 2)
+
 
 [ -d scripts ] && cd scripts
 
@@ -86,7 +105,7 @@ fi
 pingtest $HOST1
 pingtest $HOST2
 
-SITES=${1:-1,2,3}
+SITES=${SITES:-1,2,3}
 
 SIMULATE=${SIMULATE:-0}
 SPAD=${SPAD:-0}
@@ -143,6 +162,14 @@ trigger() {
 	echo 1 > /dev/rtm-t.0.ctrl/com_trg
 }
 
+mantrg() {
+	echo "Enter T to trigger"
+	read TRG
+	if [ "$TRG" = "T" ]; then
+		trigger
+	fi
+}
+
 # hack: emergency stop
 if [ "$1" = "STOP" ]; then
 	cleanup2
@@ -152,23 +179,42 @@ fi
 
 # regular code runs from here
 
+NOWAITTRG=${NOWAITTRG:-0}
+NOWAIT=${NOWAIT:-0}
+CLEANUP=${CLEANUP:-0}
+NOTRIGGER=${NOTRIGGER:-0}
+
+for arg in $*; do
+	case $arg in
+	no-wait)	 NOWAIT=1;;
+	no-wait-trigger) NOWAITTRG=1;;
+	no-trigger)	 NOTRIGGER=1;;
+	trigger-now)	 trigger; exit 0;;
+	cleanup)	 cleanup2; exit 0;;
+	esac
+done
+
+
 init_acq2106A $HOST1
 init_acq2106A $HOST2
 
 start_stream $HOST1
 start_stream $HOST2
+sleep 1
 
-echo "Enter T to trigger"
-read TRG
-if [ "$TRG" = "T" ]; then
-	trigger
-else
-	echo trigger from elsewhere like this:
-	echo "1 > /dev/rtm-t.0.ctrl/com_trg"
+if [ $NOTRIGGER -eq 0 ]; then
+	if [ $NOWAITTRG -ne 0 ]; then
+		trigger
+	else
+		mantrg
+	fi
 fi
 
-echo CTRL-C to quit
-trap "cleanup2" SIGINT SIGTERM
+if [ $NOWAIT -eq 0 ]; then
+	echo CTRL-C to quit
+	trap "cleanup2" SIGINT SIGTERM
 
-sleep 99999
+	sleep 99999
+fi
+
 
