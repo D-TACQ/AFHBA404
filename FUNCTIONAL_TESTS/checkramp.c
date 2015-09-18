@@ -42,7 +42,11 @@ int main(int argc, char* argv[])
 	unsigned errors = 0;
 	unsigned error_report = 0;
 	int verbose = 0;
+	int lwstride = 0;
 
+	if (getenv("LWSTRIDE") != 0){
+		lwstride = atoi(getenv("LWSTRIDE"));
+	}
 	if (argc > 1 && strcmp(argv[1], "-v") == 0){
 		verbose = 1;
 	}
@@ -65,6 +69,9 @@ int main(int argc, char* argv[])
 		if (verbose && ii % 0x40000 == 0){
 			printf("%012llx  %08x %08x  %d errors\n",
 			       ii, xx0, xx, errors);
+		}
+		if (lwstride>1){
+			fseek(stdin, (lwstride-1)*sizeof(xx), SEEK_CUR);
 		}
 	}	
 
