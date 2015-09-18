@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1005"
+#define REVID	"1006"
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -1657,9 +1657,10 @@ static ssize_t show_acq_ident(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	unsigned ident = _afs_read_zynqreg(adev, Z_IDENT)&0x0ffff;
-	unsigned model = _afs_read_zynqreg(adev, Z_IDENT) >> 16;
-	model = model&0x2106;
+	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT);
+	unsigned ident = z_ident&0x0ffff;
+	unsigned model = (z_ident >> 16) & 0x2106;
+
 	return sprintf(buf, "acq%04x_%03d\n", model, ident);
 }
 
