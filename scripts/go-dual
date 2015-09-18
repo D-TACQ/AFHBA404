@@ -200,7 +200,7 @@ init_acq2106A $HOST2
 
 start_stream $HOST1
 start_stream $HOST2
-sleep 1
+sleep 2
 
 if [ $NOTRIGGER -eq 0 ]; then
 	if [ $NOWAITTRG -ne 0 ]; then
