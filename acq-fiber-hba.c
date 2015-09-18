@@ -350,6 +350,24 @@ void adevDelete(struct AFHBA_DEV* adev)
 	kfree(adev);
 }
 
+#include <linux/pci_regs.h>
+
+#define AFHBA_PCI_CMD (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY)
+
+void compensate_for_inadequate_bios(struct AFHBA_DEV* adev)
+{
+	u16 cmd;
+
+	/* Workaround for PCI problem when BIOS sets MMRBC incorrectly. */
+	pci_read_config_word( adev->pci_dev, PCI_COMMAND, &cmd);
+	if ((cmd & AFHBA_PCI_CMD) != AFHBA_PCI_CMD) {
+		u16 new_cmd = cmd | AFHBA_PCI_CMD;
+		pci_write_config_word( adev->pci_dev, PCI_COMMAND, new_cmd);
+		dev_warn(pdev(adev), "hacked PCI_COMMAND from %04x to %04x",
+							cmd, new_cmd);
+	}
+}
+
 int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 {
 	static struct file_operations afhba_fops = {
@@ -384,6 +402,11 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 	afhba_createDebugfs(adev);
 
 	rc = pci_enable_device(adev->pci_dev);
+	if (rc != 0){
+		dev_warn(pdev(adev), "pci_enabled_device returned %d", rc);
+	}
+	compensate_for_inadequate_bios(adev);
+
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 	dev_info(pdev(adev), "FPGA revision: %08x",
 			afhba_read_reg(adev, FPGA_REVISION_REG));
