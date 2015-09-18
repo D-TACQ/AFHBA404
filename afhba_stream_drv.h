@@ -159,14 +159,29 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 #define DMA_CTRL_WR(adev, value) \
 	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) = value)
 
-#define DMA_CTRL_CLR(adev, bits) \
-	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) &= ~(bits))
-
-#define DMA_CTRL_SET(adev, bits) \
-	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) |= (bits))
 
 #define DMA_CTRL_RD(adev) \
 	(MIRROR(adev, DMA_CTRL) = _afs_read_dmareg(adev, DMA_CTRL))
+
+#define DMA_CTRL_CLR(adev, bits) do {					       \
+	u32 ctrl = DMA_CTRL_RD(adev);					       \
+	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) &= ~(bits));  \
+	ctrl = DMA_CTRL_RD(adev);					       \
+	if ((ctrl&bits) != 0){                                                 \
+		dev_err(pdev(adev),                                            \
+		"DMA_CTRL_CLR wanted to clear:%08x but got %08x", bits, ctrl); \
+	}								       \
+} while(0)
+
+#define DMA_CTRL_SET(adev, bits) do {					       \
+	u32 ctrl = DMA_CTRL_RD(adev);					       \
+	_afs_write_dmareg(adev, DMA_CTRL, MIRROR(adev, DMA_CTRL) |= (bits));   \
+	ctrl = DMA_CTRL_RD(adev);					       \
+	if ((ctrl&bits) == 0){                                                 \
+		dev_err(pdev(adev),                                            \
+		"DMA_CTRL_SET wanted to set:%08x but got %08x", bits, ctrl);   \
+	}								       \
+} while(0)
 
 
 #define DMA_TEST_WR(adev, value) \
@@ -179,46 +194,24 @@ void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value);
 
 
 
-/* use #define for better trace
-static inline void afs_dma_reset(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
-{
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
-	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
-}
-
-static inline void afs_start_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
-{
-	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));
-}
-
-static inline void afs_stop_dma(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
-{
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
-}
-*/
-
-#define afs_dma_reset(adev, dma_sel) 								\
-{												\
-	DEV_DBG(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__);		\
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
-	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));					\
-}
+#define afs_dma_reset(adev, dma_sel)  do {				       		\
+       DEV_DBG(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__); 	\
+       DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));                       		\
+       DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));                 		\
+       DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));                 		\
+	} while(0)
 
 
-#define afs_start_dma(adev, dma_sel)								\
-{												\
+#define afs_start_dma(adev, dma_sel) do {							\
 	DEV_DBG(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);		\
 	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
 	if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0) dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");	\
-}
+	} while(0)
 
-#define afs_stop_dma(adev, dma_sel)								\
-{												\
+#define afs_stop_dma(adev, dma_sel) do {							\
 	DEV_DBG(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);		\
 	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
-}
+	} while(0)
 
 #define DMA_DATA_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DATA_FIFSTA)
 #define DMA_DESC_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DESC_FIFSTA)
