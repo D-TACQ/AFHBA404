@@ -1,0 +1,9 @@
+#!/bin/bash
+# - forx [count] command ....
+
+while [ true ]
+do
+eval $*
+sleep 1
+done
+
