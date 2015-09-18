@@ -9,7 +9,7 @@ cleanup() {
 case $# in
 2)
 	export DATECODE=$(date +%y%m%d%H%M)
-	$0 $1 &
+	$0 $1 & 
 	$0 $2 &
 	trap "cleanup" SIGINT SIGTERM
 	wait;wait; exit 0;;
@@ -43,13 +43,23 @@ case ${SITES} in
 esac
 
 
+cat /dev/rtm-t.${DN}.ctrl/z_ident
+IDENT0=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+
+while [ "$IDENT0" != "$IDENT" ]; do
+	echo "ident mismatch 0:$IDENT0 1:$IDENT1"
+	IDENT0=$IDENT
+	IDENT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+done
+echo IDENT $IDENT
+
 IDC=$IDENT
 if [ "x$DATECODE" != "x" ]; then
 	IDC=$IDENT-$DATECODE
 fi
 
-echo DN $DN SITES $SITES
+echo DN $DN SITES $SITES IDENT $IDENT
 
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
@@ -57,7 +67,7 @@ if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-echo stream raw to /mnt/afhba.$DN cooked to /data/$IDENT.dat
+echo stream raw to /mnt/afhba.$DN cooked to /data/$IDC.dat
 mkdir -p /mnt/afhba.$DN
 if [ "$IDC" != "$IDENT" ]; then
 	# softlink needed for ATP data
