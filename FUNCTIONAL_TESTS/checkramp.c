@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	unsigned errors = 0;
 	unsigned error_report = 0;
 	int verbose = 0;
-	int lwstride = 0;
+	int lwstride = 1;
 
 	if (getenv("LWSTRIDE") != 0){
 		lwstride = atoi(getenv("LWSTRIDE"));
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	if (argc > 1 && strcmp(argv[1], "-v") == 0){
 		verbose = 1;
 	}
-	for(ii = 0; fread(&xx, sizeof(xx), 1, stdin); ++ii){
+	for(ii = 0; fread(&xx, sizeof(xx), 1, stdin); ii += lwstride){
 		if (ii == 0){
 			xx0 = xx1 = xx;
 		}else{
