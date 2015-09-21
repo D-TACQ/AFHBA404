@@ -69,6 +69,8 @@ if [ $? -ne 0 ];then
 fi
 echo stream raw to /mnt/afhba.$DN cooked to /data/$IDC.dat
 mkdir -p /mnt/afhba.$DN
+rm -Rf /mnt/afhba.$DN/*
+
 if [ "$IDC" != "$IDENT" ]; then
 	# softlink needed for ATP data
 	rm -f /data/$IDENT.dat

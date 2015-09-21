@@ -1,0 +1,27 @@
+#!/bin/bash
+# count files in elastic store 
+# this is the processing backlog
+
+LEN=3
+ACQ[0]=$(cat /dev/rtm-t.0.ctrl/acq_ident)
+ACQ[1]=$(cat /dev/rtm-t.1.ctrl/acq_ident)
+
+
+backlog() {
+find /mnt/afhba.$1/ -name \*.id -type f | wc -l
+}
+
+len() {
+ls -lLh /data/${ACQ[$1]}.dat | awk '{ print $5 }'
+}
+
+
+while [ 1 ]; do
+	let bl0=$(backlog 0)*$LEN
+	let bl1=$(backlog 1)*$LEN
+	echo "0: ram: $bl0 MB ssd: $(len 0)	1: ram: $bl0 MB ssd: $(len 1)"
+	sleep 1
+done
+
+
+
