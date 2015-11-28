@@ -61,7 +61,7 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 		dev_warn(pdev(adev), "failed create dir %s", "LOC");
 		return;
 	}
-	for (ireg = 0; ireg < 38; ++ireg){
+	for (ireg = 0; ireg < 50; ++ireg){
 		NUM_REG_CREATE(loc, LOC(adev), ireg*sizeof(u32));
 	}
 	NUM_REG_CREATE(loc, LOC(adev), 0x100*sizeof(u32));
