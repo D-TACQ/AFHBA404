@@ -75,6 +75,8 @@ struct AFHBA_DEV;
 #define MAP_COUNT_4G1	2
 #define MAP_COUNT_4G2	4
 
+#define MAP_COUNT_4G4	6
+
 extern struct list_head afhba_devices;
 
 int afhba_registerDevice(struct AFHBA_DEV *tdev);

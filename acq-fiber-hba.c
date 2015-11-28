@@ -54,17 +54,7 @@ int ll_mode_only = 1;
 module_param(ll_mode_only, int, 0444);
 
 
-#define PCI_VENDOR_ID_XILINX      0x10ee
-#define PCI_DEVICE_ID_XILINX_PCIE 0x0007
-// D-TACQ changes the device ID to work around unwanted zomojo lspci listing */
-#define PCI_DEVICE_ID_DTACQ_PCIE  0xadc1
-
-#define PCI_SUBVID_DTACQ	0xd1ac
-#define PCI_SUBDID_FHBA_2G	0x4100
-#define PCI_SUBDID_FHBA_4G_OLD	0x4101
-#define PCI_SUBDID_FHBA_4G	0x4102
-#define PCI_SUBDID_FHBA_4G2	0x4103
-
+#include "d-tacq_pci_id.h"
 
 
 
@@ -368,7 +358,8 @@ void compensate_for_inadequate_bios(struct AFHBA_DEV* adev)
 	}
 }
 
-int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
+int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
+		int (*stream_drv_init)(struct AFHBA_DEV* adev))
 {
 	static struct file_operations afhba_fops = {
 		.open = afhba_open,
@@ -420,10 +411,19 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar)
 	afhba_create_sysfs_class(adev);
 	afhba_create_sysfs(adev);
 
-	afhba_stream_drv_init(adev);
+	stream_drv_init(adev);
 
 	return rc;
 }
+
+int null_stream_drv_init(struct AFHBA_DEV* adev)
+{
+	dev_warn(pdev(adev), "null_stream_drv_init STUB");
+	return 0;
+}
+#define STREAM		afhba_stream_drv_init
+#define NOSTREAM	null_stream_drv_init
+
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	struct AFHBA_DEV *adev = adevCreate(dev);
@@ -443,13 +443,13 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		dev_info(pdev(adev), "AFHBA 4G single port firmware detected");
 		adev->map_count = MAP_COUNT_4G1;
 		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR);
+		return _afhba_probe(adev, REMOTE_BAR, STREAM);
 	case PCI_SUBDID_FHBA_4G2:
 		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
 		adev->map_count = MAP_COUNT_4G2;
 		adev->sfp = SFP_A;
 
-		if ((rc = _afhba_probe(adev, REMOTE_BAR)) != 0){
+		if ((rc = _afhba_probe(adev, REMOTE_BAR, STREAM)) != 0){
 			dev_err(pdev(adev), "ERROR failed to create first device");
 			return rc;
 		}else{
@@ -458,12 +458,27 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 			adev2->peer = adev;
 			adev2->sfp = SFP_B;
 
-			if ((rc = _afhba_probe(adev2, REMOTE_BAR2)) != 0){
+			if ((rc = _afhba_probe(adev2, REMOTE_BAR2, STREAM)) != 0){
 				dev_err(pdev(adev2), "ERROR failed to create second device");
 				return rc;
 			}
 			return rc;
 		}
+	case PCI_SUBDID_FHBA_4G4:
+		dev_info(pdev(adev), "AFHBA404 detected");
+		adev->map_count = MAP_COUNT_4G4;
+		adev->sfp = SFP_A;
+		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
+	case PCI_SUBDID_HBA_KMCU:
+		dev_info(pdev(adev), "KMCU detected");
+		adev->map_count = MAP_COUNT_4G4;
+		adev->sfp = SFP_A;
+		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
+	case PCI_SUBDID_HBA_KMCU2:
+		dev_info(pdev(adev), "KMCU2 detected");
+		adev->map_count = MAP_COUNT_4G4;
+		adev->sfp = SFP_A;
+		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
 	default:
 		return -ENODEV;
 	}
