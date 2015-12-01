@@ -530,10 +530,9 @@ int __init afhba_init_module(void)
 {
 	int rc;
 
-	printk(KERN_INFO "%s %s %s %s\n%s\n",
+	printk(KERN_INFO "%s %s %s\n%s\n",
 	     afhba_driver_name, afhba__driver_string,
 	     afhba__driver_version,
-	     __DATE__,
 	     afhba__copyright);
 
 	afhba_device_class = class_create(THIS_MODULE, "afhba");
