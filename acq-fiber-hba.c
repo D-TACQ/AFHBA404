@@ -481,7 +481,6 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	struct AFHBA_DEV *adev = adevCreate(dev);
-	int rc;
 
 	dev_info(pdev(adev), "AFHBA: subdevice : %04x\n", ent->subdevice);
 	switch(ent->subdevice){
