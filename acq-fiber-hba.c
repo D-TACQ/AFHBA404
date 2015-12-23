@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1102";
+char afhba__driver_version[] = "B1103";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -56,6 +56,11 @@ module_param(ll_mode_only, int, 0444);
 
 #include "d-tacq_pci_id.h"
 
+int afhba4_stream = 0;
+module_param(afhba4_stream, int, 0444);
+
+int afhba4_usebars = 1;
+module_param(afhba4_usebars, int, 0444);
 
 
 int BUFFER_LEN = 0x100000;
@@ -424,6 +429,55 @@ int null_stream_drv_init(struct AFHBA_DEV* adev)
 #define STREAM		afhba_stream_drv_init
 #define NOSTREAM	null_stream_drv_init
 
+int afhba2_probe(struct AFHBA_DEV *adev)
+{
+	int rc;
+	dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
+	adev->map_count = MAP_COUNT_4G2;
+	adev->sfp = SFP_A;
+
+	if ((rc = _afhba_probe(adev, REMOTE_BAR, STREAM)) != 0){
+		dev_err(pdev(adev), "ERROR failed to create first device");
+		return rc;
+	}else{
+		struct AFHBA_DEV *adev2 = adevCreate(adev->pci_dev);
+		adev2->map_count = MAP_COUNT_4G2;
+		adev2->peer = adev;
+		adev2->sfp = SFP_B;
+
+		if ((rc = _afhba_probe(adev2, REMOTE_BAR2, STREAM)) != 0){
+			dev_err(pdev(adev2), "ERROR failed to create second device");
+			return rc;
+		}
+		return rc;
+	}
+}
+int afhba4_probe(struct AFHBA_DEV *adev)
+{
+	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
+	int rc;
+	int ib;
+
+	dev_info(pdev(adev), "AFHBA404 detected");
+	adev->map_count = MAP_COUNT_4G4;
+	adev->sfp = SFP_A;
+	rc = _afhba_probe(adev, REMOTE_BAR, _init);
+	if (rc!=0) return rc;
+
+
+	for (ib = 1; ib < afhba4_usebars; ++ib){
+		struct AFHBA_DEV *adev2 = adevCreate(adev->pci_dev);
+		adev2->map_count = MAP_COUNT_4G2;
+		adev2->peer = adev;
+		adev2->sfp = SFP_A+ib;
+		if ((rc = _afhba_probe(adev2, REMOTE_BAR+ib, _init)) != 0){
+			dev_err(pdev(adev2), "ERROR failed to create device %d", ib);
+				return rc;
+		}
+	}
+	return 0;
+}
+
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	struct AFHBA_DEV *adev = adevCreate(dev);
@@ -445,30 +499,9 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		adev->sfp = SFP_A;
 		return _afhba_probe(adev, REMOTE_BAR, STREAM);
 	case PCI_SUBDID_FHBA_4G2:
-		dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
-		adev->map_count = MAP_COUNT_4G2;
-		adev->sfp = SFP_A;
-
-		if ((rc = _afhba_probe(adev, REMOTE_BAR, STREAM)) != 0){
-			dev_err(pdev(adev), "ERROR failed to create first device");
-			return rc;
-		}else{
-			struct AFHBA_DEV *adev2 = adevCreate(dev);
-			adev2->map_count = MAP_COUNT_4G2;
-			adev2->peer = adev;
-			adev2->sfp = SFP_B;
-
-			if ((rc = _afhba_probe(adev2, REMOTE_BAR2, STREAM)) != 0){
-				dev_err(pdev(adev2), "ERROR failed to create second device");
-				return rc;
-			}
-			return rc;
-		}
+		return afhba2_probe(adev);
 	case PCI_SUBDID_FHBA_4G4:
-		dev_info(pdev(adev), "AFHBA404 detected");
-		adev->map_count = MAP_COUNT_4G4;
-		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
+		return afhba4_probe(adev);
 	case PCI_SUBDID_HBA_KMCU:
 		dev_info(pdev(adev), "KMCU detected");
 		adev->map_count = MAP_COUNT_4G4;

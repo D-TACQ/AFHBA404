@@ -125,7 +125,7 @@ struct AFHBA_DEV {
 
 	struct AFHBA_DEV* peer;
 	void* remote;
-	enum SFP { SFP_A, SFP_B } sfp;
+	enum SFP { SFP_A, SFP_B, SFP_C, SFP_D } sfp;
 
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
