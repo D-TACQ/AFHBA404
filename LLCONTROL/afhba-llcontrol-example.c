@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
 
 #include <sched.h>
 
@@ -299,7 +301,7 @@ void check_tlatch_action_post()
 	}
 }
 
-close_llc() {
+void close_llc() {
 	staged_tlatch_report();
 	check_tlatch_action_post();
 	write_log();

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sched.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -226,7 +227,7 @@ void run(void (*action)(void*))
 	}
 }
 
-close() {
+void closedown() {
 	munmap(host_buffer, HB_LEN);
 	close(fd);
 	fclose(fp_log);
@@ -238,4 +239,5 @@ int main(int argc, char* argv[])
 	printf("ready for data\n");
 	run(G_action);
 	printf("finished\n");
+	closedown();
 }
