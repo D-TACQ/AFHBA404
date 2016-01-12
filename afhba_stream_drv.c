@@ -39,7 +39,9 @@
 
 #include <linux/version.h>
 
-#define REVID	"1006"
+#define REVID	"1007"
+
+#define BUFFER_LEN 0x100000
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);

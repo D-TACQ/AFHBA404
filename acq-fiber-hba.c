@@ -62,8 +62,7 @@ module_param(afhba4_stream, int, 0444);
 int afhba4_usebars = 1;
 module_param(afhba4_usebars, int, 0444);
 
-
-int BUFFER_LEN = 0x100000;
+extern int buffer_len;
 
 static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 {
@@ -227,7 +226,7 @@ int afhba_mmap_hb(struct file* file, struct vm_area_struct* vma)
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct HostBuffer* hb = adev->hb1;
 	unsigned long vsize = vma->vm_end - vma->vm_start;
-	unsigned long psize = BUFFER_LEN;
+	unsigned long psize = buffer_len;
 	unsigned pfn = hb->pa >> PAGE_SHIFT;
 
 	dev_dbg(pdev(adev), "%c vsize %lu psize %lu %s",
@@ -298,7 +297,7 @@ static int getOrder(int len)
 
 static void init_buffers(struct AFHBA_DEV* adev)
 {
-	int order = getOrder(BUFFER_LEN);
+	int order = getOrder(buffer_len);
 	int ii = 0;
 	struct HostBuffer* hb = adev->hb1 = kmalloc(sizeof(struct HostBuffer)*1, GFP_KERNEL);
 	void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
@@ -312,9 +311,9 @@ static void init_buffers(struct AFHBA_DEV* adev)
 
 	hb->ibuf = 0;
 	hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-			BUFFER_LEN, PCI_DMA_FROMDEVICE);
+			buffer_len, PCI_DMA_FROMDEVICE);
 	hb->va = buf;
-	hb->len = BUFFER_LEN;
+	hb->len = buffer_len;
 
 	dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
 
