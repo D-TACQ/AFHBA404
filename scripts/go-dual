@@ -82,28 +82,46 @@ pingtest() {
 	fi
 }
 
+# issue BLANK if no host. That causes all [ $HOSTx ] tests to skip
+
+host_good() {
+	hx=${1#acq2106_*}
+	[ $hx != $1 ] && echo $1
+}
+
 HOST1=$(get_ident 0)
 HOST2=$(get_ident 1)
 PORT1=$(get_port 0)
 PORT2=$(get_port 1)
 
-echo HOST1:$HOST1 HOST2:$HOST2 PORT1:$PORT1 PORT2:$PORT2
+HOST1=$(host_good $HOST1)
+HOST2=$(host_good $HOST2)
 
-if [ "$PORT1" != "$PORT2" ]; then
-	echo "ERROR: connected to different COMM ports at ACQ2106, please swap"
-	exit 1
-else
-	PORT=$PORT1
-	if [ "$PORT" = "A" ]; then
-		echo "Connected to $PORT1 on both UUT : OK"
-	else
-		echo "ERROR: Please use PORT A for control"	
+
+
+if [ $HOST1 ] && [ $HOST2]; then
+	echo HOST1:$HOST1 HOST2:HOST2 PORT1:$PORT1 PORT2:$PORT2 OK1:$OK1
+	if [ "$PORT1" != "$PORT2" ]; then
+		echo "ERROR: connected to different COMM ports at ACQ2106, please swap"
 		exit 1
+	else
+		PORT=$PORT1
+		if [ "$PORT" = "A" ]; then
+			echo "Connected to $PORT1 on both UUT : OK"
+		else
+			echo "ERROR: Please use PORT A for control"	
+			exit 1
+		fi
 	fi
+else
+	echo "using single host.."
 fi
+[ $HOST1 ] && echo using $HOST1
+[ $HOST2 ] && echo using $HOST2
+	
 
-pingtest $HOST1
-pingtest $HOST2
+[ $HOST1 ] && pingtest $HOST1
+[ $HOST2 ] && pingtest $HOST2
 
 SITES=${SITES:-1,2,3}
 
@@ -153,8 +171,8 @@ cleanup() {
 }
 
 cleanup2() {
-	cleanup $HOST1
-	cleanup $HOST2
+	[ $HOST1 ] && cleanup $HOST1
+	[ $HOST2 ] && cleanup $HOST2
 }
 
 trigger() {
@@ -195,11 +213,11 @@ for arg in $*; do
 done
 
 
-init_acq2106A $HOST1
-init_acq2106A $HOST2
+[ $HOST1 ] && init_acq2106A $HOST1
+[ $HOST2 ] && init_acq2106A $HOST2
 
-start_stream $HOST1
-start_stream $HOST2
+[ $HOST1 ] && start_stream $HOST1
+[ $HOST2 ] && start_stream $HOST2
 sleep 2
 
 if [ $NOTRIGGER -eq 0 ]; then
