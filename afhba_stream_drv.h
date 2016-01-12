@@ -105,6 +105,7 @@ struct AFHBA_STREAM_DEV {
 		struct XLLC_DEF pull_llc_def;
 		int (* on_push_dma_timeout)(struct AFHBA_DEV *adev);
 		int (* on_pull_dma_timeout)(struct AFHBA_DEV *adev);
+
 	}
 		job;
 	spinlock_t job_lock;
@@ -132,6 +133,8 @@ struct AFHBA_STREAM_DEV {
 	int req_len;		/* request len .. not part of job ? */
 	void (* onStopPull)(struct AFHBA_DEV *adev);
 	void (* onStopPush)(struct AFHBA_DEV *adev);
+	int push_ram_cursor;
+	int pull_ram_cursor;
 
 	int comms_init_done;
 
