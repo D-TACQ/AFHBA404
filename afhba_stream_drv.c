@@ -41,7 +41,7 @@
 
 #define REVID	"1007"
 
-#define BUFFER_LEN 0x100000
+#define DEF_BUFFER_LEN 0x100000
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -68,11 +68,10 @@ int nbuffers = NBUFFERS;
 module_param(nbuffers, int, 0444);
 MODULE_PARM_DESC(nbuffers, "number of host-side buffers");
 
-int buffer_len = BUFFER_LEN;
+int buffer_len = DEF_BUFFER_LEN;
 module_param(buffer_len, int, 0644);
 MODULE_PARM_DESC(buffer_len, "length of each buffer in bytes");
 
-#undef BUFFER_LEN
 
 int stop_on_skipped_buffer = 0;
 module_param(stop_on_skipped_buffer, int, 0644);
