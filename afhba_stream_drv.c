@@ -72,6 +72,7 @@ int buffer_len = BUFFER_LEN;
 module_param(buffer_len, int, 0644);
 MODULE_PARM_DESC(buffer_len, "length of each buffer in bytes");
 
+#undef BUFFER_LEN
 
 int stop_on_skipped_buffer = 0;
 module_param(stop_on_skipped_buffer, int, 0644);
@@ -714,7 +715,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	struct HostBuffer *hb;
-	int order = getOrder(BUFFER_LEN);
+	int order = getOrder(buffer_len);
 	int ii;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
@@ -728,9 +729,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	mutex_init(&sdev->list_mutex);
 	mutex_lock(&sdev->list_mutex);
 
-	sdev->buffer_len = BUFFER_LEN;
+	sdev->buffer_len = buffer_len;
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
-			nbuffers, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
+			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
 	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
@@ -744,9 +745,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		hb->ibuf = ii;
 		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				BUFFER_LEN, PCI_DMA_FROMDEVICE);
+				buffer_len, PCI_DMA_FROMDEVICE);
 		hb->va = buf;
-		hb->len = BUFFER_LEN;
+		hb->len = buffer_len;
 
 		dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
 
@@ -1248,8 +1249,8 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	sdev->shot++;
 
-	if (sdev->buffer_len == 0) sdev->buffer_len = BUFFER_LEN;
-	sdev->req_len = min(sdev->buffer_len, BUFFER_LEN);
+	if (sdev->buffer_len == 0) sdev->buffer_len = buffer_len;
+	sdev->req_len = min(sdev->buffer_len, buffer_len);
 
 	for (ii = 0; ii != nbuffers; ++ii){
 		sdev->hbx[ii].req_len = sdev->req_len;
