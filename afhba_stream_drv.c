@@ -41,7 +41,7 @@
 
 #define REVID	"1007"
 
-#define BUFFER_LEN 0x100000
+#define DEF_BUFFER_LEN 0x100000
 
 int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
@@ -68,7 +68,7 @@ int nbuffers = NBUFFERS;
 module_param(nbuffers, int, 0444);
 MODULE_PARM_DESC(nbuffers, "number of host-side buffers");
 
-int buffer_len = BUFFER_LEN;
+int buffer_len = DEF_BUFFER_LEN;
 module_param(buffer_len, int, 0644);
 MODULE_PARM_DESC(buffer_len, "length of each buffer in bytes");
 
@@ -95,6 +95,10 @@ MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: inter
 int aurora_status_read_count = 0;
 module_param(aurora_status_read_count, int, 0644);
 MODULE_PARM_DESC(aurora_status_read_count, "number of amon polls");
+
+int dma_descriptor_ram = 0;
+module_param(dma_descriptor_ram, int, 0644);
+MODULE_PARM_DESC(dma_descriptor_ram, "descriptors in RAM not FIFO");
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -148,6 +152,8 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 
 		sdev->hbx[ii].descr = descr;
 	}
+
+	sdev->push_ram_cursor = sdev->pull_ram_cursor = 0;
 }
 
 
@@ -173,6 +179,36 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 	writel(descr, adev->remote+offset);
 }
 
+static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, int *cursor)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 descr = sdev->hbx[idesc].descr;
+
+	if (*cursor < sdev->nbuffers){
+		DEV_DBG(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
+		writel(descr, adev->remote+offset+*cursor*sizeof(unsigned));
+		return *cursor++;
+	}else{
+		return 0;
+	}
+}
+static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	int cursor;
+
+	if (offset == DMA_PUSH_DESC_RAM){
+		cursor = _write_ram_descr(adev, offset, idesc, &sdev->push_ram_cursor);
+		if (cursor){
+			_afs_write_dmareg(adev, DMA_PUSH_DESC_LEN, cursor);
+		}
+	}else{
+		cursor = _write_ram_descr(adev, offset, idesc, &sdev->pull_ram_cursor);
+		if (cursor){
+			_afs_write_dmareg(adev, DMA_PULL_DESC_LEN, cursor);
+		}
+	}
+}
 u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
 {
 	u32* dma_regs = (u32*)(adev->remote + ZYNQ_BASE);
@@ -234,8 +270,13 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
+
+	if (dma_descriptor_ram){
+		write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
+	}else{
 /* change descr status .. */
-	write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
+		write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
+	}
 }
 
 static void afs_init_dma_clr(struct AFHBA_DEV *adev)
@@ -249,6 +290,11 @@ static void afs_configure_streaming_dma(
 {
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
+	if (dma_descriptor_ram){
+		dma_ctrl |= DMA_CTRL_RAM;
+	}else{
+		dma_ctrl &= ~DMA_CTRL_RAM;
+	}
 	DMA_CTRL_WR(adev, dma_ctrl);
 }
 
@@ -668,7 +714,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	struct HostBuffer *hb;
-	int order = getOrder(BUFFER_LEN);
+	int order = getOrder(buffer_len);
 	int ii;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
@@ -682,9 +728,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	mutex_init(&sdev->list_mutex);
 	mutex_lock(&sdev->list_mutex);
 
-	sdev->buffer_len = BUFFER_LEN;
+	sdev->buffer_len = buffer_len;
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
-			nbuffers, BUFFER_LEN, order, *adev->pci_dev->dev.dma_mask);
+			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
 	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
@@ -698,9 +744,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		hb->ibuf = ii;
 		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				BUFFER_LEN, PCI_DMA_FROMDEVICE);
+				buffer_len, PCI_DMA_FROMDEVICE);
 		hb->va = buf;
-		hb->len = BUFFER_LEN;
+		hb->len = buffer_len;
 
 		dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
 
@@ -1086,6 +1132,9 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 	}
 
 	sdev->init_descriptors(sdev);
+
+
+
 	memset(sdev->data_fifo_histo, 0, DATA_FIFO_SZ);
 	memset(sdev->desc_fifo_histo, 0, DESC_FIFO_SZ);
 
@@ -1199,8 +1248,8 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	sdev->shot++;
 
-	if (sdev->buffer_len == 0) sdev->buffer_len = BUFFER_LEN;
-	sdev->req_len = min(sdev->buffer_len, BUFFER_LEN);
+	if (sdev->buffer_len == 0) sdev->buffer_len = buffer_len;
+	sdev->req_len = min(sdev->buffer_len, buffer_len);
 
 	for (ii = 0; ii != nbuffers; ++ii){
 		sdev->hbx[ii].req_len = sdev->req_len;

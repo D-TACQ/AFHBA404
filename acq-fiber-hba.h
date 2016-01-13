@@ -282,6 +282,9 @@ enum DMA_REGS {
 	DMA_DESC_FIFSTA,
 	DMA_PUSH_DESC_STA,
 	DMA_PULL_DESC_STA,
+	DMA_PUSH_DATACOUNT,
+	DMA_PUSH_DESC_LEN,
+	DMA_PULL_DESC_LEN,
 	DMA_REGS_COUNT,
 };
 
@@ -315,7 +318,7 @@ inline static const char*  sDMA_SEL(enum DMA_SEL dma_sel)
 #define DMA_CTRL_FIFO_RST		0x0010
 #define DMA_CTRL_LOW_LAT		0x0020
 #define DMA_CTRL_RECYCLE		0x0040
-
+#define DMA_CTRL_RAM			0x8000
 
 #define DMA_DESCR_ADDR			0xfffffc00
 #define DMA_DESCR_INTEN			0x00000100
@@ -331,6 +334,8 @@ inline static const char*  sDMA_SEL(enum DMA_SEL dma_sel)
 
 #define DMA_DESCR_LEN_BYTES(descr)	((1<<((descr&DMA_DESCR_LEN)>>4))*1024)
 
+#define DMA_PUSH_DESC_RAM		0x6000
+#define DMA_PULL_DESC_RAM		0x7000
 
 static inline u32 dma_pp(enum DMA_SEL dma_sel, u32 bits)
 {
