@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1008"
+#define REVID	"1009"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -185,9 +185,10 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 	u32 descr = sdev->hbx[idesc].descr;
 
 	if (*cursor < sdev->nbuffers){
-		DEV_DBG(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
+		DEV_DBG(pdev(adev), "_write_ram_descr() ibuf %d offset:%04x = %08x cursor:%d",
+					idesc, offset, descr, *cursor);
 		writel(descr, adev->remote+offset+*cursor*sizeof(unsigned));
-		return *cursor++;
+		return *cursor += 1;
 	}else{
 		return 0;
 	}
@@ -310,6 +311,7 @@ static void afs_configure_streaming_dma(
 		struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	u32 check;
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
 	if (dma_descriptor_ram){
 		dma_ctrl |= DMA_CTRL_RAM;
@@ -317,6 +319,11 @@ static void afs_configure_streaming_dma(
 		dma_ctrl &= ~DMA_CTRL_RAM;
 	}
 	DMA_CTRL_WR(adev, dma_ctrl);
+	check = DMA_CTRL_RD(adev);
+	if (check != dma_ctrl){
+		dev_err(pdev(adev), "%s setting DMA_CTRL w:%08x r:%08x",
+				"afs_configure_streaming_dma", dma_ctrl, check);
+	}
 }
 
 static void afs_dma_set_recycle(
