@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1007"
+#define REVID	"1008"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -98,7 +98,7 @@ MODULE_PARM_DESC(aurora_status_read_count, "number of amon polls");
 
 int dma_descriptor_ram = 0;
 module_param(dma_descriptor_ram, int, 0644);
-MODULE_PARM_DESC(dma_descriptor_ram, "descriptors in RAM not FIFO");
+MODULE_PARM_DESC(dma_descriptor_ram, "descriptors in RAM not FIFO >1 :: validate on load");
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -192,6 +192,24 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 		return 0;
 	}
 }
+
+static void validate_dma_descriptor_ram(
+		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 descr;
+	u32 id;
+
+	for (id = 0; id < max_id; ++id){
+		descr = readl(adev->remote+offset+id*sizeof(unsigned));
+		if (descr != sdev->hbx[id].descr){
+			dev_err(pdev(adev), "%s descriptor mismatch at [%d] w:%08x r:%08x",
+					"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+		}
+		dev_dbg(pdev(adev), "%s descriptor at [%d] w:%08x r:%08x",
+				"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+	}
+}
 static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -202,10 +220,13 @@ static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 		if (cursor){
 			_afs_write_dmareg(adev, DMA_PUSH_DESC_LEN, cursor);
 		}
+		if (cursor == sdev->nbuffers && dma_descriptor_ram > 1){
+			validate_dma_descriptor_ram(adev, offset, cursor);
+		}
 	}else{
 		cursor = _write_ram_descr(adev, offset, idesc, &sdev->pull_ram_cursor);
 		if (cursor){
-			_afs_write_dmareg(adev, DMA_PULL_DESC_LEN, cursor);
+			_afs_write_dmareg(adev, offset, cursor);
 		}
 	}
 }
