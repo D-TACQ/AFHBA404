@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1103";
+char afhba__driver_version[] = "B1104";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -61,6 +61,9 @@ module_param(afhba4_stream, int, 0444);
 
 int afhba4_usebars = 1;
 module_param(afhba4_usebars, int, 0444);
+
+int bad_bios_bar_limit = 0;
+module_param(bad_bios_bar_limit, int, 0644);
 
 extern int buffer_len;
 
@@ -459,6 +462,11 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 
 	dev_info(pdev(adev), "AFHBA404 detected");
 	adev->map_count = MAP_COUNT_4G4;
+	if (bad_bios_bar_limit){
+		dev_warn(pdev(adev), "limiting BAR count to bad_bios_bar_limit=%d",
+				bad_bios_bar_limit);
+		adev->map_count = bad_bios_bar_limit;
+	}
 	adev->sfp = SFP_A;
 	rc = _afhba_probe(adev, REMOTE_BAR, _init);
 	if (rc!=0) return rc;
