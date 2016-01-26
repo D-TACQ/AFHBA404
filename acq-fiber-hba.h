@@ -70,7 +70,7 @@ struct AFHBA_DEV;
 
 #define REGS_BAR	0		/* @@todo assumed */
 
-#define MAP_COUNT	4
+#define MAP_COUNT_MAX	6
 
 #define MAP_COUNT_4G1	2
 #define MAP_COUNT_4G2	4
@@ -121,7 +121,7 @@ struct AFHBA_DEV {
 		unsigned len;
 		struct resource *region;
 		char name[32];
-	} mappings[MAP_COUNT];
+	} mappings[MAP_COUNT_MAX];
 
 	struct AFHBA_DEV* peer;
 	void* remote;
