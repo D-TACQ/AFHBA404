@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1009"
+#define REVID	"1010"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -382,38 +382,36 @@ static inline int afs_dma_started(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 
 static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 {
-	int srn = adev->sfp == SFP_A? AURORA_STATUS_REGA: AURORA_STATUS_REGB;
-	u32 stat = afhba_read_reg(adev, srn);
+
+	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
 	++aurora_status_read_count;
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
 static int afs_aurora_errors(struct AFHBA_DEV *adev)
 {
-	int srn = adev->sfp == SFP_A? AURORA_STATUS_REGA: AURORA_STATUS_REGB;
-	int crn = adev->sfp == SFP_A? AURORA_CONTROL_REGA: AURORA_CONTROL_REGB;
-	u32 stat = afhba_read_reg(adev, srn);
+	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
 
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
-		u32 ctrl = afhba_read_reg(adev, crn);
-		afhba_write_reg(adev, crn, ctrl|AFHBA_AURORA_CTRL_CLR);
+		u32 ctrl = afhba_read_reg(adev, adev->ACR);
+		afhba_write_reg(adev, adev->ACR, ctrl|AFHBA_AURORA_CTRL_CLR);
 		if (++adev->aurora_error_count==1){
 			dev_info(pdev(adev),
 			"aurora%c initial s:0x%08x m:0x%08x e:0x%08x",
-			adev->sfp == SFP_A? 'A': 'B',
+			adev->sfp-SFP_A + 'A',
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 		}else{
 			dev_warn(pdev(adev),
 			"aurora%c error: [%d] s:0x%08x m:0x%08x e:0x%08x",
-			adev->sfp == SFP_A? 'A': 'B',
+			adev->sfp-SFP_A + 'A',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 		}
-		stat = afhba_read_reg(adev, srn);
+		stat = afhba_read_reg(adev, ASR(adev->ACR));
 		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 			dev_err(pdev(adev),
 			"aurora%c error: [%d] s:0x%08x m:0x%08x e:0x%08x NOT CLEARED",
-			adev->sfp == SFP_A? 'A': 'B',
+			adev->sfp-SFP_A + 'A',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
 			msleep(1000);
@@ -485,11 +483,9 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	int crn = adev->sfp == SFP_A? AURORA_CONTROL_REGA: AURORA_CONTROL_REGB;
 	int to = 0;
 
-
-	afhba_write_reg(adev, crn, AFHBA_AURORA_CTRL_ENA);
+	afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
 
 	while(!afs_aurora_lane_up(adev)){
 		msleep(to += MSLEEP_TO);
@@ -499,6 +495,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	}
 	/* ... now make _sure_ it's up .. */
 	msleep(MSLEEP_TO);
+	afs_init_dma_clr(adev);
 	_afs_pcie_mirror_init(adev);
 
 	return sdev->comms_init_done = _afs_check_read(adev) == 0;
@@ -1793,7 +1790,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
 	dev_info(pdev(adev), "afhba_stream_drv_init(%s)", REVID);
-	afs_init_dma_clr(adev);
+
 	afs_init_buffers(adev);
 	hook_interrupts(adev);
 	startWork(adev);

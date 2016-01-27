@@ -59,8 +59,8 @@ module_param(ll_mode_only, int, 0444);
 int afhba4_stream = 0;
 module_param(afhba4_stream, int, 0444);
 
-int afhba4_usebars = 1;
-module_param(afhba4_usebars, int, 0444);
+int afhba_nports = 4;
+module_param(afhba_nports, int, 0444);
 
 int bad_bios_bar_limit = 0;
 module_param(bad_bios_bar_limit, int, 0644);
@@ -69,6 +69,7 @@ extern int buffer_len;
 
 static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 {
+/*
 	switch(imap){
 	case REMOTE_COM_BAR:
 	case REMOTE_BAR2:
@@ -78,6 +79,8 @@ static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 	default:
 		return NO_BAR;
 	}
+*/
+	return imap;
 }
 
 static int minor2bar(struct AFHBA_DEV *adev, int iminor)
@@ -264,6 +267,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 		struct PciMapping* mp = adev->mappings+imap;
 		int bar = MAP2BAR(adev, imap);
 
+		dev_dbg(pdev(adev), "afhba_map [%d] ", imap);
 		if (VALID_BAR(bar)){
 			if (adev->peer != 0 && adev->peer->mappings[imap].va != 0){
 				adev->mappings[imap] = adev->peer->mappings[imap];
@@ -282,6 +286,8 @@ void afhba_map(struct AFHBA_DEV *adev)
 			++nmappings;
 		}
 	}
+
+	dev_dbg(pdev(adev), "afhba_map 99 nmappings %d", nmappings);
 }
 
 
@@ -416,10 +422,14 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 			&adev->pci_dev->dev,			/* device */
 			adev->name);
 	afhba_create_sysfs_class(adev);
+
+	dev_dbg(pdev(adev), "_afhba_probe() calling afhba_create_sysfs()");
 	afhba_create_sysfs(adev);
 
+	dev_dbg(pdev(adev), "_afhba_probe() calling stream_drv_init()");
 	stream_drv_init(adev);
 
+	dev_dbg(pdev(adev), "_afhba_probe() 99 rc %d", rc);
 	return rc;
 }
 
@@ -468,15 +478,17 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 		adev->map_count = bad_bios_bar_limit;
 	}
 	adev->sfp = SFP_A;
+	adev->ACR = AURORA_CONTROL_REGA;
 	rc = _afhba_probe(adev, REMOTE_BAR, _init);
 	if (rc!=0) return rc;
 
 
-	for (ib = 1; ib < afhba4_usebars; ++ib){
+	for (ib = 1; ib < afhba_nports; ++ib){
 		struct AFHBA_DEV *adev2 = adevCreate(adev->pci_dev);
 		adev2->map_count = MAP_COUNT_4G2;
 		adev2->peer = adev;
 		adev2->sfp = SFP_A+ib;
+		adev2->ACR = AURORA_CONTROL_REGA + (ib-1)*0x10;
 		if ((rc = _afhba_probe(adev2, REMOTE_BAR+ib, _init)) != 0){
 			dev_err(pdev(adev2), "ERROR failed to create device %d", ib);
 				return rc;
