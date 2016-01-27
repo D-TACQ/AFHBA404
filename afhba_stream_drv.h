@@ -172,7 +172,8 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 	ctrl = DMA_CTRL_RD(adev);					       \
 	if ((ctrl&bits) != 0){                                                 \
 		dev_err(pdev(adev),                                            \
-		"DMA_CTRL_CLR wanted to clear:%08x but got %08x", bits, ctrl); \
+		"DMA_CTRL_CLR sfp:%c wanted to clear:%08x but got %08x",       \
+		adev->sfp+'A', bits, ctrl); 				       \
 	}								       \
 } while(0)
 
@@ -182,7 +183,8 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 	ctrl = DMA_CTRL_RD(adev);					       \
 	if ((ctrl&bits) == 0){                                                 \
 		dev_err(pdev(adev),                                            \
-		"DMA_CTRL_SET wanted to set:%08x but got %08x", bits, ctrl);   \
+		"DMA_CTRL_SET sfp:%c wanted to set:%08x but got %08x", 	       \
+			adev->sfp+'A', bits, ctrl);                            \
 	}								       \
 } while(0)
 
