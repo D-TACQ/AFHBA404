@@ -126,6 +126,7 @@ struct AFHBA_DEV {
 	struct AFHBA_DEV* peer;
 	void* remote;
 	enum SFP { SFP_A, SFP_B, SFP_C, SFP_D } sfp;
+	unsigned ACR;		/* Aurora Control Reg Offset */
 
 	struct proc_dir_entry *proc_dir_root;
 	struct dentry* debug_dir;
@@ -200,6 +201,7 @@ struct AFHBA_DEV_PATH {
 #define AURORA_STATUS_REGA 		0x0084	/* Aurora Status Register */
 
 
+
 #define SFP_I2C_DATA_REG 		0x0088	/* SFP I2C Control and Data Register */
 #define SFP_I2C_DATA_REGA 		0x0088	/* SFP I2C Control and Data Register */
 
@@ -212,7 +214,8 @@ struct AFHBA_DEV_PATH {
 #define ACQ400_COMMS_READ 		0x0400	/* ACQ400 Receive Communications FIFO data */
 
 
-#define RTMT_I2C_W(R)			((R)+8)
+#define ASR(acr)	((acr)+4)
+#define I2C(acr)	((acr)+8)
 
 
 #define SFP_I2C_SCL1_R		0
