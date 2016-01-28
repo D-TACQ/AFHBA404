@@ -380,10 +380,14 @@ static inline int afs_dma_started(struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 }
 
 
+
 static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 {
 
-	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
+	u32 stat;
+
+	stat = afhba_read_reg(adev, ASR(adev->ACR));
+
 	++aurora_status_read_count;
 	++adev->aurora_status_read_count;
 	if (adev->aurora_status_read_count == 1){

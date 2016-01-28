@@ -488,7 +488,7 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 		adev2->map_count = MAP_COUNT_4G2;
 		adev2->peer = adev;
 		adev2->sfp = SFP_A+ib;
-		adev2->ACR = AURORA_CONTROL_REGA + (ib-1)*0x10;
+		adev2->ACR = AURORA_CONTROL_REGA + ib*0x10;
 		if ((rc = _afhba_probe(adev2, REMOTE_BAR+ib, _init)) != 0){
 			dev_err(pdev(adev2), "ERROR failed to create device %d", ib);
 				return rc;
