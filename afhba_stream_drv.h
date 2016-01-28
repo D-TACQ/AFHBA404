@@ -150,6 +150,8 @@ struct AFHBA_STREAM_DEV {
 void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value);
 u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff);
 
+int afs_comms_ready(struct AFHBA_DEV *adev);
+
 #define PCI_REG_WRITE(adev, regoff, value) \
 	_afs_write_pcireg(adev, regoff, value)
 
@@ -197,25 +199,26 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value);
 
+void __afs_dma_reset(struct AFHBA_DEV *adev, u32 dma_sel);
 
 
 #define afs_dma_reset(adev, dma_sel)  do {				       		\
        DEV_DBG(pdev(adev), "afs_dma_reset, called from %s %d", __FILE__, __LINE__); 	\
-       DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));                       		\
-       DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));                 		\
-       DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));                 		\
+       __afs_dma_reset(adev, dma_sel);							\
 	} while(0)
 
+void __afs_start_dma(struct AFHBA_DEV *adev, u32 dma_sel);
 
-#define afs_start_dma(adev, dma_sel) do {							\
-	DEV_DBG(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);		\
-	DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
-	if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0) dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");	\
+#define afs_start_dma(adev, dma_sel) do {						\
+	DEV_DBG(pdev(adev), "afs_start_dma, called from %s %d", __FILE__, __LINE__);	\
+	__afs_start_dma(adev, dma_sel);							\
 	} while(0)
 
-#define afs_stop_dma(adev, dma_sel) do {							\
-	DEV_DBG(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);		\
-	DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));					\
+void __afs_stop_dma(struct AFHBA_DEV *adev, u32 dma_sel);
+
+#define afs_stop_dma(adev, dma_sel) do {						\
+	DEV_DBG(pdev(adev), "afs_stop_dma, called from %s %d", __FILE__, __LINE__);	\
+	__afs_stop_dma(adev, dma_sel);							\
 	} while(0)
 
 #define DMA_DATA_FIFSTA_RD(adev)   _afs_read_dmareg(adev, DMA_DATA_FIFSTA)

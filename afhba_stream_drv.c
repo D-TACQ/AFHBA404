@@ -388,6 +388,32 @@ static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
+/* super-paranoid remote access */
+void __afs_dma_reset(struct AFHBA_DEV *adev, u32 dma_sel)
+{
+	if (afs_comms_ready(adev)){
+		DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+		DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
+		DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_FIFO_RST));
+	}
+}
+void __afs_stop_dma(struct AFHBA_DEV *adev, u32 dma_sel)
+{
+	if (afs_comms_ready(adev)){
+		DMA_CTRL_CLR(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+	}
+}
+
+void __afs_start_dma(struct AFHBA_DEV *adev, u32 dma_sel)
+{
+	if (afs_comms_ready(adev)){
+		DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));
+		if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0){
+			dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");
+		}
+	}
+}
+
 static int afs_aurora_errors(struct AFHBA_DEV *adev)
 {
 	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
@@ -527,7 +553,11 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 	}
 }
 
-
+int afs_comms_ready(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+	return adev->link_up && sdev->comms_init_done;
+}
 
 
 #define RTDMAC_DATA_FIFO_CNT	0x1000
