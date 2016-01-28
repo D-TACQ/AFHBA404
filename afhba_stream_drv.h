@@ -241,4 +241,10 @@ int afs_init_procfs(struct AFHBA_DEV *adev);
 int afs_reset_buffers(struct AFHBA_DEV *adev);
 int afs_comms_init(struct AFHBA_DEV *adev);
 
+
+char aurora_id(struct AFHBA_DEV *adev)
+{
+	return adev->sfp - SFP_A + 'A';
+}
+
 #endif /* AFHBA_STREAM_DRV_H_ */

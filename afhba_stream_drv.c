@@ -385,6 +385,12 @@ static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 
 	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
 	++aurora_status_read_count;
+	++adev->aurora_status_read_count;
+	if (adev->aurora_status_read_count == 1){
+		dev_info(pdev(adev), "afs_aurora_lane_up %c status 0x%08x",
+				aurora_id(adev), stat));
+	}
+
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
 }
 
@@ -533,8 +539,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 
 	if (afs_aurora_lane_up(adev)){
 		if (!adev->link_up){
-			dev_info(pdev(adev),
-				"aurora%c link up!", adev->sfp == SFP_A? 'A': 'B');
+			dev_info(pdev(adev), "aurora%c link up!", aurora_id(adev));
 			adev->link_up = true;
 		}
 		if (!sdev->comms_init_done){
@@ -544,8 +549,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 		return sdev->comms_init_done;
 	}else{
 		if (adev->link_up){
-			dev_info(pdev(adev),
-				"aurora%c link down!", adev->sfp == SFP_A? 'A': 'B');
+			dev_info(pdev(adev), "aurora%c link down!", aurora_id(adev));
 			adev->link_up = false;
 		}
 		dev_dbg(pdev(adev), "aurora lane down");
@@ -892,6 +896,7 @@ static int port_request_irq(struct AFHBA_DEV* adev, int port)
 }
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
+#ifdef INTERRUPTS_WORK_OK
 	/* non peer case must happen first */
 	if (adev->peer == 0){
 		struct pci_dev *dev = adev->pci_dev;
@@ -921,6 +926,7 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 	}else{
 		return port_request_irq(adev, 1);
 	}
+#endif
 }
 
 

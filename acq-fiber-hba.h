@@ -141,6 +141,7 @@ struct AFHBA_DEV {
 
 	int link_up;
 	int aurora_error_count;
+	int aurora_status_read_count;
 };
 
 #define SZM1(field)	(sizeof(field)-1)
