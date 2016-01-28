@@ -388,7 +388,7 @@ static int afs_aurora_lane_up(struct AFHBA_DEV *adev)
 	++adev->aurora_status_read_count;
 	if (adev->aurora_status_read_count == 1){
 		dev_info(pdev(adev), "afs_aurora_lane_up %c status 0x%08x",
-				aurora_id(adev), stat));
+				aurora_id(adev), stat);
 	}
 
 	return (stat & AFHBA_AURORA_STAT_LANE_UP) != 0;
@@ -835,7 +835,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	return 0;
 }
 
-
+#ifdef INTERRUPTS_WORK_OK
 static irqreturn_t afs_rx_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
@@ -864,6 +864,7 @@ static irqreturn_t afs_null_isr(int irq, void* data)
 	dev_info(pdev(adev), "afs_null_isr %d", irq);
 	return IRQ_HANDLED;
 }
+
 
 static int port_request_irq(struct AFHBA_DEV* adev, int port)
 {
@@ -894,6 +895,8 @@ static int port_request_irq(struct AFHBA_DEV* adev, int port)
 	}
 	return rc;
 }
+#endif
+
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
 #ifdef INTERRUPTS_WORK_OK
@@ -926,6 +929,8 @@ static int hook_interrupts(struct AFHBA_DEV* adev)
 	}else{
 		return port_request_irq(adev, 1);
 	}
+#else
+	return 0;
 #endif
 }
 

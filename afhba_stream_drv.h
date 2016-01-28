@@ -242,7 +242,7 @@ int afs_reset_buffers(struct AFHBA_DEV *adev);
 int afs_comms_init(struct AFHBA_DEV *adev);
 
 
-char aurora_id(struct AFHBA_DEV *adev)
+static inline char aurora_id(struct AFHBA_DEV *adev)
 {
 	return adev->sfp - SFP_A + 'A';
 }
