@@ -17,11 +17,13 @@ SC=0
 CA=13
 CB=12
 AI=1
-AO=4
+AO=5
+AO2=6
+AOSITES=5
 
-SITES=1
-CA_SITES=1
-CB_SITES=1
+SITES=1,2,3,4
+CA_SITES=1,2,3,4
+CB_SITES=1,2,3,4
 
 init_comms() {	
 	cx=$1
@@ -47,13 +49,16 @@ init_2106() {
 		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$AO comms=1 on
+	remote_cmd $SC distributor sites=$AOSITES comms=1 on
 	remote_cmd $AO lotide 256
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
+#	remote_cmd $AO2 lotide 256
+#	remote_cmd $AO2 clk=1,2,1
+#	remote_cmd $AO2 clk=1,2,1
 
 	remote_cmd $SC spad=1,16,0	
-	remote_cmd $SC run0 1
+	remote_cmd $SC run0 1,2,3,4
 #	remote_cmd $CB aggregator sites=1 on
 	remote_cmd $CB spad 1
 	
