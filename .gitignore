@@ -11,11 +11,12 @@ modules.order
 *.lo
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
+=======
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
 # Compiled Dynamic libraries
 *.so
 *.dylib
@@ -29,8 +30,20 @@ modules.order
 *.la
 *.a
 *.lib
+=======
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
 
-# Executables
-*.exe
-*.out
-*.app
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+=======
+*.i*86
+*.x86_64
+*.hex
+
