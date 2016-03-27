@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1104";
+char afhba__driver_version[] = "B1105";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -267,7 +267,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 		struct PciMapping* mp = adev->mappings+imap;
 		int bar = MAP2BAR(adev, imap);
 
-		dev_dbg(pdev(adev), "afhba_map [%d] ", imap);
+		dev_dbg(pdev(adev), "[%d] ", imap);
 		if (VALID_BAR(bar)){
 			if (adev->peer != 0 && adev->peer->mappings[imap].va != 0){
 				adev->mappings[imap] = adev->peer->mappings[imap];
@@ -287,7 +287,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 		}
 	}
 
-	dev_dbg(pdev(adev), "afhba_map 99 nmappings %d", nmappings);
+	dev_dbg(pdev(adev), "99 nmappings %d", nmappings);
 }
 
 
@@ -423,13 +423,13 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 			adev->name);
 	afhba_create_sysfs_class(adev);
 
-	dev_dbg(pdev(adev), "_afhba_probe() calling afhba_create_sysfs()");
+	dev_dbg(pdev(adev), "calling afhba_create_sysfs()");
 	afhba_create_sysfs(adev);
 
-	dev_dbg(pdev(adev), "_afhba_probe() calling stream_drv_init()");
+	dev_dbg(pdev(adev), "calling stream_drv_init()");
 	stream_drv_init(adev);
 
-	dev_dbg(pdev(adev), "_afhba_probe() 99 rc %d", rc);
+	dev_dbg(pdev(adev), "99 rc %d", rc);
 	return rc;
 }
 
@@ -485,7 +485,7 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 
 	for (ib = 1; ib < afhba_nports; ++ib){
 		struct AFHBA_DEV *adev2 = adevCreate(adev->pci_dev);
-		adev2->map_count = MAP_COUNT_4G2;
+		adev2->map_count = MAP_COUNT_4G4;
 		adev2->peer = adev;
 		adev2->sfp = SFP_A+ib;
 		adev2->ACR = AURORA_CONTROL_REGA + ib*0x10;
