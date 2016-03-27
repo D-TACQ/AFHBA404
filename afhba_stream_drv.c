@@ -262,12 +262,19 @@ void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)
 
 u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff)
 {
+	DEV_DBG(pdev(adev), "_afs_read_dmareg() remote %p", adev->remote);
+	if (adev->remote == 0){
+		dev_err(pdev(adev), "_afs_read_dmareg() remote not set");
+		return 0;
+	}else
+	{
 	u32* dma_regs = (u32*)(adev->remote + DMA_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
 	DEV_DBG(pdev(adev), "_afs_read_dmareg %04lx = %08x",
 			va-adev->remote, value);
 	return adev->stream_dev->dma_regs[regoff] = value;
+	}
 }
 
 void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value)
