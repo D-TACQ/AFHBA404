@@ -58,13 +58,13 @@ int dummy_first_loop;
 /* potentially good for cache fill, but sets initial value zero */
 
 #define DEF_NCHAN 	16
-int has_do32;
 int nchan = DEF_NCHAN;
 int spadlongs = 16;
 
 #define NSHORTS (nchan+spadlongs*sizeof(unsigned)/sizeof(short))
 
-/* ACQ425 */
+int has_do32;
+
 
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
