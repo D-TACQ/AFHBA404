@@ -57,14 +57,17 @@ int devnum = 0;
 int dummy_first_loop;
 /* potentially good for cache fill, but sets initial value zero */
 
+#define DEF_NCHAN 	16
 int has_do32;
+int nchan = DEF_NCHAN;
+int spadlongs = 16;
+
+#define NSHORTS (nchan+spadlongs*sizeof(unsigned)/sizeof(short))
 
 /* ACQ425 */
 
-#define NCHAN	16
-#define NSHORTS	32
 #define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
+#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
 
 #define CH01 (((volatile short*)host_buffer)[0])
 #define CH02 (((volatile short*)host_buffer)[1])
@@ -75,7 +78,7 @@ int has_do32;
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
-		.len = VI_LEN
+
 };
 
 #define AO_CHAN	32
@@ -148,6 +151,16 @@ void ui(int argc, char* argv[])
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
+	if (getenv("NCHAN")){
+		nchan = atoi(getenv("NCHAN"));
+		fprintf(stderr, "NCHAN set %d\n", nchan);
+	}
+	if (getenv("SPADLONGS")){
+		spadlongs = atoi(getenv("SPADLONGS"));
+		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
+	}
+	xllc_def.len = VI_LEN;
+
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
 	}
