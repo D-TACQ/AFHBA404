@@ -459,7 +459,12 @@ static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 	int ireg;
 
 	for (ireg = PCIE_CNTRL; ireg <= PCIE_BUFFER_CTRL; ++ireg){
-		PCI_REG_WRITE(adev, ireg, afhba_read_reg(adev, ireg*sizeof(u32)));
+		u32 local = afhba_read_reg(adev, ireg*sizeof(u32));
+		switch(ireg){
+		case PCIE_CONF:
+			local |= adev->sfp << PCIE_CONF_AF_PORT_SHL;
+		}
+		PCI_REG_WRITE(adev, ireg, local);
 	}
 }
 

@@ -264,8 +264,10 @@ enum ZYNQ_REGS {
 	Z_AURORA_SR,		/* 0x0010 */
 	Z_IDENT			/* 0x0014 */
 };
-#define PCIE_BASE			0x1000
 
+
+
+#define PCIE_BASE			0x1000
 
 enum PCIE_REGS {
 	PCIE_CNTRL = 1,
@@ -275,8 +277,9 @@ enum PCIE_REGS {
 	PCIE_LINK_CSR,
 	PCIE_CONF,
 	PCIE_BUFFER_CTRL
-
 };
+
+#define PCIE_CONF_AF_PORT_SHL		16
 
 #define DMA_BASE			0x2000
 enum DMA_REGS {
