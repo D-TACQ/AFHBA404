@@ -79,16 +79,15 @@ static int hb_seq_show(struct seq_file *sfile, void *v)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int ib = *(int*)v;
 	struct HostBuffer *hb = sdev->hbx+ib;
-	int len = 0;
 
 	if (ib == 0){
-		len = seq_printf(sfile, "ix va pa len req_len descr state\n");
+		seq_printf(sfile, "ix va pa len req_len descr state\n");
 	}
-	len += seq_printf(sfile,
+	seq_printf(sfile,
 			 "[%02d] %p %08x %06x %06x %08x %s\n",
 			 ib, hb->va, hb->pa, hb->len, hb->req_len,
 			 hb->descr, BSTATE2S(hb->bstate));
-	return len;
+	return 0;
 }
 
 static int hbd_seq_show(struct seq_file *sfile, void *v)
@@ -98,10 +97,9 @@ static int hbd_seq_show(struct seq_file *sfile, void *v)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int ib = *(int*)v;
 	struct HostBuffer *hb = sdev->hbx+ib;
-	int len = 0;
 
-	len += seq_printf(sfile, "%08x\n", hb->descr);
-	return len;
+	seq_printf(sfile, "%08x\n", hb->descr);
+	return 0;
 }
 
 
@@ -115,18 +113,17 @@ static int ab_seq_show(struct seq_file *sfile, void *v)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int ib = *(int*)v;
 	struct HostBuffer *hb = sdev->hbx+ib;
-	int len = 0;
 
 	if (ib == 0){
-		len = seq_printf(sfile, "ix va pa len req_len descr state\n");
+		seq_printf(sfile, "ix va pa len req_len descr state\n");
 	}
 	if (hb->bstate == BS_FULL_APP){
-		len += seq_printf(sfile,
+		seq_printf(sfile,
 				 "[%02d] %p %08x %06x %06x %08x %s\n",
 				 ib, hb->va, hb->pa, hb->len, hb->req_len,
 				 hb->descr, BSTATE2S(hb->bstate));
 	}
-	return len;
+	return 0;
 }
 
 
@@ -254,7 +251,7 @@ static int job_proc_show(struct seq_file *m, void *v)
 		}
 	}
 
-        ii = seq_printf(m,
+        seq_printf(m,
         	"dev=%s idx=%d demand=%d queued=%d "
         	"rx=%d rx_rate=%d int_rate=%d "
         	"MBPS=%d "
