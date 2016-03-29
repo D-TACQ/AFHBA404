@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1106";
+char afhba__driver_version[] = "B1107";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -69,17 +69,6 @@ extern int buffer_len;
 
 static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 {
-/*
-	switch(imap){
-	case REMOTE_COM_BAR:
-	case REMOTE_BAR2:
-	case REMOTE_BAR:
-	case REGS_BAR:
-		return imap;
-	default:
-		return NO_BAR;
-	}
-*/
 	return imap;
 }
 
@@ -344,6 +333,7 @@ struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
 	adev->pci_dev = dev;
 	adev->idx = idx++;
 	dev->dev.dma_mask = &dma_mask;
+	adev->remote_com_bar = NO_BAR;
 
 	return adev;
 }
@@ -446,6 +436,7 @@ int afhba2_probe(struct AFHBA_DEV *adev)
 	int rc;
 	dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
 	adev->map_count = MAP_COUNT_4G2;
+	adev->remote_com_bar = MAP_COUNT_4G2 -1;
 	adev->sfp = SFP_A;
 
 	if ((rc = _afhba_probe(adev, REMOTE_BAR, STREAM)) != 0){
@@ -472,6 +463,7 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 
 	dev_info(pdev(adev), "AFHBA404 detected");
 	adev->map_count = MAP_COUNT_4G4;
+	adev->remote_com_bar = MAP_COUNT_4G4-1;
 	if (bad_bios_bar_limit){
 		dev_warn(pdev(adev), "limiting BAR count to bad_bios_bar_limit=%d",
 				bad_bios_bar_limit);

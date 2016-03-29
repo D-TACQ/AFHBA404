@@ -1,0 +1,26 @@
+#!/bin/bash
+
+RPORT=${RPORT:-A}
+
+if [ "x$*" = "x" ]; then
+	echo "list remote hosts on command line"
+	echo "assume that all posts connected RPORT=$RPORT
+	exit 1
+fi
+
+remote_cmd() {
+	remip=$1; shift
+        site=$1;shift
+        let port="4220+$site"
+        logger -t rem_cmd $remip $port $*
+        echo $* | nc $remip $port
+}
+
+for h in $*
+do
+	remote_cmd $h 0 SIG:SRC:TRG:1=HOST$RPORT
+done
+
+echo 1 > /dev/rtm-t.0.ctrl/com_trg
+
+

@@ -242,7 +242,7 @@ u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
-	u32* dma_regs = (u32*)(adev->mappings[REMOTE_COM_BAR].va + COMMON_BASE);
+	u32* dma_regs = (u32*)(adev->mappings[adev->remote_com_bar].va + COMMON_BASE);
 	void* va = &dma_regs[regoff];
 	DEV_DBG(pdev(adev), "%04lx = %08x", va-adev->remote, value);
 	writel(value, va);
@@ -1809,7 +1809,7 @@ static DEVICE_ATTR(com_trg, (S_IWUSR|S_IWGRP), 0, store_com_trg);
 
 
 static const struct attribute *dev_attrs[] = {
-	&dev_attr_com_trg.attr,
+	&dev_attr_com_trg.attr,		/* must be first */
 	&dev_attr_z_mod_id.attr,
 	&dev_attr_z_ident.attr,
 	&dev_attr_acq_model.attr,
@@ -1821,7 +1821,13 @@ static const struct attribute *dev_attrs[] = {
 
 void afs_create_sysfs(struct AFHBA_DEV *adev)
 {
-	int rc = sysfs_create_files(&adev->class_dev->kobj, dev_attrs);
+	static const struct attribute ** attrs = dev_attrs;
+	int rc;
+
+	if (adev->remote_com_bar == -1 ){
+		++attrs;
+	}
+	rc = sysfs_create_files(&adev->class_dev->kobj, attrs);
 	if (rc){
 		dev_err(pdev(adev), "failed to create files");
 		return;

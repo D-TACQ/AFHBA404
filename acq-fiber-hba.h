@@ -122,6 +122,7 @@ struct AFHBA_DEV {
 		struct resource *region;
 		char name[32];
 	} mappings[MAP_COUNT_MAX];
+	int remote_com_bar;
 
 	struct AFHBA_DEV* peer;
 	void* remote;
@@ -175,7 +176,6 @@ struct AFHBA_DEV_PATH {
 #define REGS_BAR	0
 #define REMOTE_BAR	1
 #define REMOTE_BAR2	2
-#define REMOTE_COM_BAR	3
 #define NO_BAR 		-1
 
 
