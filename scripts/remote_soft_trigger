@@ -4,7 +4,7 @@ RPORT=${RPORT:-A}
 
 if [ "x$*" = "x" ]; then
 	echo "list remote hosts on command line"
-	echo "assume that all posts connected RPORT=$RPORT
+	echo "assume that all posts connected RPORT=$RPORT"
 	exit 1
 fi
 
