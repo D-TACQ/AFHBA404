@@ -8,7 +8,8 @@ echo 9 > /proc/sys/kernel/printk
 
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
-	aurora_monitor=$AMON nbuffers=64 eot_interrupt=0 WORK_TO=1 \
-	dyndbg="\" func afhba_map +pf\""
+	aurora_monitor=$AMON nbuffers=64 eot_interrupt=0 WORK_TO=1 
+	
+#	dyndbg="\" func afhba_map +pf\""
 
 
