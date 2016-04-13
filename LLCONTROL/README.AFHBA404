@@ -1,0 +1,118 @@
+README file for afhba404 LLC
+
+What is it? :
+
+Demonstration of very low latency transfer from ADC to host memory.
+Demonstrations of very low latency transfer from HOST to DAC.
+Provides a test harness suitable for GA-style low latency control.
+
+Hardware:
+ACQ2106+MGT400+		Carrier with fiber-comms
+NxACQ424ELF+		N x 32 channels AI
+AO424ELF		1 x 32 channels AO
+
+AFHBA404		4 port host-side bus adapter.
+
+AFHBA supports 4 ports 6Gbps/ SFP+ transceivers.
+
+Demo below uses one port only.
+
+
+Theory of operation:
+
+ADC => Z7030 -> SFP -> AFHBA404 -> PCI-Express 4x -> HOST
+
+ADC: 32 .. 128 channels, 1MSPS, very low latency output
+Z7030: ZYNQ series FPGA with ARM processor and MGT serial links
+SFP : fiber optic link, running "Aurora" protocol at 5Gbps.
+AFHBA404: D-TACQ host bus adapter, Kintex.
+
+Repetition Rate : 1MSPS
+Latency: 
+
+View on scope.
+
+
+Getting Started:
+
+1. On the HOST linux-rt system:
+NB: we've been using Ubuntu 14.04. Partly from customer request, mainly from 
+provision of a kernel with dynamic debug enabled.
+Linux 3.10.33-rt should still work.
+dt100@jakku:~$ uname -a
+Linux jakku 3.16.0-57-generic #77~14.04.1-Ubuntu SMP
+
+1.1 Plug the AFHBA into your linux-rt system, and check that it still boots.
+
+1.2 Check that the AFHBA has been correctly enumerated:
+dt100@jakku:~$ lspci -v | grep -A 10 Xil
+01:00.0 Memory controller: Xilinx Corporation Device adc1
+	Subsystem: Device d1ac:4104
+
+
+1.3 Build and load host side driver.
+https://github.com/petermilne/AFHBA404
+
+2. Power up the ACQ2106 and check that you can log in to it.
+2.1 Connect ACQ2106 to Ethernet.
+2.2 Connect to the console
+3.3 Power up and log in
+
+This is described in
+http://www.d-tacq.com/resources/d-tacq-4G-acq4xx-UserGuide.pdf
+#5 "Power Up Guide"
+
+3.4 It's _essential_  that ACQ2106 is visible on Ethernet from HOST
+let IP = ACQ2106 IP ADDRESS
+
+3. Connect fiber-optics
+Example connects PORTB on ACQ2106 to PORTD on AFHBA404
+Any combination will do
+
+5. Install HOST SIDE SOFTWARE
+
+git clone from 
+https://github.com/petermilne/AFHBA404.git
+
+or select the "Download Zip" option and unzip
+https://github.com/petermilne/AFHBA404/archive/master.zip
+wget http://www.d-tacq.com/swrel/afhba-1409182241.tar
+
+On the host:
+
+5.1 cd AFHBA404
+5.2 make all
+
+Then, load the driver. Later, you might want to automate this:
+
+5.3 sudo ./loadNIRQ
+
+
+6. Run a shot
+
+6.0 Connect a signal to AI01. Connect a scope to AI01, AO01.
+
+6.1 TERMINAL SESSION 1: "PCS"
+cd LLCONTROL
+DEVNUM=3 NCHAN=128 ./afhba-llcontrol-zcopy
+
+6.2 TERMINAL SESSION 2: "Session Management":
+INTCLKDIV=660 ./scripts/llc-test-harness-intclk-AI1234-AO5 acq2106_021
+
+6.3 TERMINAL SESSION 3: TRIGGER
+Optional COMMS "over the fiber" trigger 
+RPORT=B ./scripts/remote_soft_trigger  acq2106_021
+
+.. the cool think about the COMMS trigger is that it will operate on all 
+connected ports at the same time.
+
+
+
+
+
+
+
+
+
+
+
