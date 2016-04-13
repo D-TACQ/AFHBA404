@@ -5,15 +5,20 @@
 #include <strings.h>
 #include <string.h>
 
+int verbose;
+
+#define MAXSITES	6
+ 
 class HBFarm {
 	const char* process;
 	const char* outroot;
-	FILE *fp_out[5];	/* index from 1 */
+	FILE *fp_out[MAXSITES+1];	/* index from 1 */
 	
 	int ii;
-
+	int sitelw;
+	unsigned *lw;
 	int next(int _ii){
-		if (++_ii > 4) _ii = 1;
+		if (++_ii > MAXSITES) _ii = 1;
 		if (fp_out[_ii] == 0){
 			return next(_ii);/* recursion : woohoo! */
 		}
@@ -22,14 +27,13 @@ class HBFarm {
 public:
 	int operator() (FILE *fin)
 	{
-		unsigned lw[8];
-		while(fread(lw, sizeof(unsigned), 8, fin) == 8){
-			fwrite(lw, sizeof(unsigned), 8, fp_out[ii]);
+		while(fread(lw, sizeof(unsigned), sitelw, fin) == sitelw){
+			fwrite(lw, sizeof(unsigned), sitelw, fp_out[ii]);
 			ii = next(ii);	
 		}
 	}
 	int addSite(int site) {
-		if (site < 1 || site > 4){
+		if (site < 1 || site > MAXSITES){
 			fprintf(stderr, "site %d out of range\n", site);
 			return -1;
 		}else if (fp_out[site]){
@@ -53,11 +57,13 @@ public:
 		}
 		return 0;
 	}
-	HBFarm() {
+	HBFarm(int _sitelw = 8) : sitelw(_sitelw) {
+		lw = new unsigned [_sitelw];
 		ii = next(0);
 		memset(fp_out, 0, sizeof(fp_out));
 		if (getenv("HBFARM_PROCESS")){
-			process = getenv("HBFARM_PROCESS");		
+			process = getenv("HBFARM_PROCESS");
+			if (verbose) fprintf(stderr, "HBFarm process:%s lw:%d\n", process, sitelw);		
 		}else{
 			process = 0;
 		}
@@ -86,7 +92,10 @@ int main(int argc, char* argv[])
 	}	
 
 	int sinks = 0;
-	HBFarm hbfarm;
+	int sitelw = 8;
+	if (getenv("HBFARM_SITELW")) sitelw = atoi(getenv("HBFARM_SITELW"));
+	if (getenv("HBFARM_VERBOSE")) verbose = atoi(getenv("HBFARM_VERBOSE"));
+	HBFarm hbfarm(sitelw);
 
 	for (int ii = 1; ii < argc; ++ii, ++sinks){
 		if (hbfarm.addSite(atoi(argv[ii]))){
@@ -97,11 +106,12 @@ int main(int argc, char* argv[])
 		fprintf(stderr, "must specify 1 or more sinks\n");
 		return 1;
 	}
-
+	if (verbose) fprintf(stderr, "hbfarm %d sinks\n", sinks);
 
 	if (getenv("NAMES_ON_STDIN")){
 		char fname[80];
 		while (fgets(fname, 80, stdin) && chomp(fname)){
+			if (verbose) fprintf(stderr, "hbfarm %s\n", fname);
 			FILE *fp = fopen(fname, "r");
 			if (fp == 0){
 				perror(fname);
