@@ -1,0 +1,98 @@
+# INSTALL instructions
+
+# AFHBA404
+http://www.d-tacq.com/resources/InstallationGuides/AFHBA404-installation-guide.pdf
+
+
+# Do this once:
+make
+sudo ./scripts/install-hotplug
+
+
+# Do this every boot
+
+./scripts/loadNIRQ
+
+# for HTSTREAM
+
+./scripts/mount-ramdisk
+
+
+# Faultfinding checklist
+
+1. Is the device visible on PCI-Express?.
+
+[root@hoth AFHBA404]# lspci | grep Xil
+03:00.0 Memory controller: Xilinx Corporation Device adc1
+
+[root@hoth AFHBA404]# lspci -v | grep -A 20 Xil
+03:00.0 Memory controller: Xilinx Corporation Device adc1
+	Subsystem: Device d1ac:4104
+	Flags: bus master, fast devsel, latency 0, IRQ 11
+	Memory at f7c50000 (32-bit, non-prefetchable) [size=64K]
+	Memory at f7c40000 (32-bit, non-prefetchable) [size=64K]
+	Memory at f7c30000 (32-bit, non-prefetchable) [size=64K]
+	Memory at f7c20000 (32-bit, non-prefetchable) [size=64K]
+	Memory at f7c10000 (32-bit, non-prefetchable) [size=64K]
+	Memory at f7c00000 (32-bit, non-prefetchable) [size=64K]
+	Capabilities: [40] Power Management version 3
+	Capabilities: [48] MSI: Enable- Count=1/16 Maskable- 64bit-
+	Capabilities: [60] Express Endpoint, MSI 00
+	Capabilities: [100] Device Serial Number 45-e1-14-07-52-e0-b8-04
+
+2. Did the device driver load correctly?
+
+afhba D-TACQ ACQ-FIBER-HBA Driver for ACQ400 B1104
+Copyright (c) 2010/2014 D-TACQ Solutions Ltd
+afhba 0000:03:00.0: AFHBA: subdevice : 4104
+afhba 0000:03:00.0: AFHBA404 detected
+afhba 0000:03:00.0: hb1 [0] ffff880037900000 37900000 1048576 00000000
+afhba 0000:03:00.0: FPGA revision: ac010004
+afhba 0000:03:00.0: afhba_stream_drv_init(1009)
+afhba 0000:03:00.0: DMA_CTRL_CLR wanted to clear:00010001 but got deadc0de
+afhba 0000:03:00.0: DMA_CTRL_CLR wanted to clear:00100010 but got deadc0de
+afhba 0000:03:00.0: irq 51 for MSI/MSI-X
+afhba 0000:03:00.0: irq 52 for MSI/MSI-X
+afhba 0000:03:00.0: irq 53 for MSI/MSI-X
+afhba 0000:03:00.0: irq 54 for MSI/MSI-X
+afhba 0000:03:00.0: request_irq afhba.0-Aline 53 OK
+
+
+[root@hoth AFHBA404]# ls /sys/class/afhba/afhba.0/
+acq_ident   data_fifo_stat_pull   dma_latest_push_desc  reset_buffers
+acq_model   data_fifo_stat_push   fpga_rev              shot
+acq_port    desc_fifo_stat_pull   heartbeat             subsystem
+aurora      desc_fifo_stat_push   host_test             uevent
+auroraA     dev                   inflight              z_ident
+auroraB     device                latstat               z_mod_id
+buffer_len  dma_ctrl_pull         power
+comms_init  dma_ctrl_push         pull_dma_timeouts
+com_trg     dma_latest_pull_desc  push_dma_timeouts
+
+
+3. Did the hotplug work?.
+[root@hoth AFHBA404]# ls -l /dev/rtm-t.0* | head -n 20
+crw-rw-r--. 1 dt100 dt100 247, 254 Apr 15 08:40 /dev/rtm-t.0
+crw-rw-r--. 1 dt100 dt100 247, 246 Apr 15 08:40 /dev/rtm-t.0.catchup_histo
+lrwxrwxrwx. 1 dt100 dt100       25 Apr 15 08:40 /dev/rtm-t.0.ctrl -> /sys/class/afhba/afhba.0/
+crw-rw-r--. 1 dt100 dt100 247, 248 Apr 15 08:40 /dev/rtm-t.0.fifo
+crw-rw-r--. 1 dt100 dt100 247, 252 Apr 15 08:40 /dev/rtm-t.0.fifo_histo.data
+crw-rw-r--. 1 dt100 dt100 247, 251 Apr 15 08:40 /dev/rtm-t.0.fifo_histo.desc
+crw-rw-r--. 1 dt100 dt100 247, 253 Apr 15 08:40 /dev/rtm-t.0.regs
+crw-rw-r--. 1 dt100 dt100 247, 250 Apr 15 08:40 /dev/rtm-t.0.uart
+
+/dev/rtm-t.0.data:
+total 0
+crw-rw-r--. 1 dt100 dt100 247,  0 Apr 15 08:40 hb00
+crw-rw-r--. 1 dt100 dt100 247,  1 Apr 15 08:40 hb01
+crw-rw-r--. 1 dt100 dt100 247,  2 Apr 15 08:40 hb02
+crw-rw-r--. 1 dt100 dt100 247,  3 Apr 15 08:40 hb03
+
+
+
+
+# OPERATION
+
+see specific examples in
+README.ACQ2106.HTS
+LLCONTROL.README*
