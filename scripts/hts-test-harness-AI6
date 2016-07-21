@@ -1,0 +1,54 @@
+#!/bin/bash
+# high throughput streaming test harness
+#!/bin/bash
+
+[ -d scripts ] && cd scripts
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_004}
+INTCLKDIV=${INTCLKDIV:-100}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+STREAMPID=0
+SIMULATE=${SIMULATE:-0}
+
+source afhba-common
+# site definitions SC: system controller, CX: commsA, AI: AI
+SC=0
+CA=13
+CB=12
+# master AI
+AI=1
+
+SITES=1,2,3,4,5,6
+CA_SITES=1,2,3,4,5,6
+
+init_comms() {	
+	cx=$1
+	sites=$2
+	
+	remote_cmd $cx spad=0
+	remote_cmd $cx aggregator sites=$sites
+}
+
+init_acq2106A() {
+	init_comms $CA $CA_SITES
+	remote_cmd $SC run0 $SITES
+	#remote_cmd $SC decimate=20
+}
+
+start_stream() {
+	remote_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+	remote_cmd $SC streamtonowhered stop
+}
+
+init_acq2106A
+start_stream
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
