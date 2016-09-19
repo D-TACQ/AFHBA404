@@ -492,7 +492,7 @@ int afhba_mtca_probe(struct AFHBA_DEV *adev)
 {
 	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
 
-	dev_info(pdev(adev), "AFHBA404 detected");
+	dev_info(pdev(adev), "AFHBA404 detected %s", afhba4_stream? "STREAM": "NOSTREAM");
 	adev->map_count = MAP_COUNT_4G1;
 	adev->remote_com_bar = MAP_COUNT_4G1-1;
 	if (bad_bios_bar_limit){
