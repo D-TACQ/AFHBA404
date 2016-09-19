@@ -488,6 +488,24 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 	}
 	return 0;
 }
+int afhba_mtca_probe(struct AFHBA_DEV *adev)
+{
+	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
+	int rc;
+	int ib;
+
+	dev_info(pdev(adev), "AFHBA404 detected");
+	adev->map_count = MAP_COUNT_4G1;
+	adev->remote_com_bar = MAP_COUNT_4G1-1;
+	if (bad_bios_bar_limit){
+		dev_warn(pdev(adev), "limiting BAR count to bad_bios_bar_limit=%d",
+				bad_bios_bar_limit);
+		adev->map_count = bad_bios_bar_limit;
+	}
+	adev->sfp = SFP_A;
+	adev->ACR = AURORA_CONTROL_REGA;
+	return _afhba_probe(adev, REMOTE_BAR, _init);
+}
 
 int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
@@ -514,14 +532,10 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		return afhba4_probe(adev);
 	case PCI_SUBDID_HBA_KMCU:
 		dev_info(pdev(adev), "KMCU detected");
-		adev->map_count = MAP_COUNT_4G4;
-		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR, STREAM);
+		return afhba_mtca_probe(adev);
 	case PCI_SUBDID_HBA_KMCU2:
 		dev_info(pdev(adev), "KMCU2 detected");
-		adev->map_count = MAP_COUNT_4G4;
-		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR, STREAM);
+		return afhba_mtca_probe(adev);
 	default:
 		return -ENODEV;
 	}
