@@ -491,8 +491,6 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 int afhba_mtca_probe(struct AFHBA_DEV *adev)
 {
 	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
-	int rc;
-	int ib;
 
 	dev_info(pdev(adev), "AFHBA404 detected");
 	adev->map_count = MAP_COUNT_4G1;
