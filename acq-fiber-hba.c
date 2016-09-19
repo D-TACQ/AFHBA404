@@ -516,12 +516,12 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		dev_info(pdev(adev), "KMCU detected");
 		adev->map_count = MAP_COUNT_4G4;
 		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
+		return _afhba_probe(adev, REMOTE_BAR, STREAM);
 	case PCI_SUBDID_HBA_KMCU2:
 		dev_info(pdev(adev), "KMCU2 detected");
 		adev->map_count = MAP_COUNT_4G4;
 		adev->sfp = SFP_A;
-		return _afhba_probe(adev, REMOTE_BAR, NOSTREAM);
+		return _afhba_probe(adev, REMOTE_BAR, STREAM);
 	default:
 		return -ENODEV;
 	}
