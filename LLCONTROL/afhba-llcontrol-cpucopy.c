@@ -243,7 +243,7 @@ void control(short *ao, short *ai)
 {
 	int ii;
 	for (ii = 0; ii < AO_CHAN; ii += 2){
-		ao[ii] = ai[0];
+		ao[ii] = -ai[0];
 		ao[ii+1] = -ai[0];
 	}
 	if (has_do32){
