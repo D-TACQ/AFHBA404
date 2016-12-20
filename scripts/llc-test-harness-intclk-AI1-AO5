@@ -34,12 +34,12 @@ init_comms() {
 
 init_2106() {
 	if [ "$LLC_TRG" = "ext" ]; then
-		remote_cmd $AI trg=1,2,1
+		remote_cmd $AI trg=1,0,1
 	else
 		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd $AI clk=1,2,1
+		remote_cmd $AI clk=1,1,1
 		remote_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else

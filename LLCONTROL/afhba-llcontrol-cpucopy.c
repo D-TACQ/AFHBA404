@@ -133,10 +133,15 @@ void write_action(void *data)
 void check_tlatch_action(void *local_buffer)
 {
 	static unsigned tl0;
+	static int errcount;
 
 	unsigned tl1 = *TLATCH;
 	if (tl1 != tl0+1){
-		printf("%d => %d\n", tl0, tl1);
+		if (++errcount < 100){
+			printf("%d => %d\n", tl0, tl1);
+		}else if (errcount == 100){
+			printf("stop reporting at 100 errors ..\n");
+		}
 	}
 	tl0 = tl1;
 }
@@ -251,7 +256,7 @@ void control(short *ao, short *ai)
 	int ii;
 	for (ii = 0; ii < AO_CHAN; ii += 2){
 		ao[ii] = G_POLARITY * ai[0];
-		ao[ii+1] = ((ii&1) != 0? 1: -1) *ai[0];
+		ao[ii+1] = (((ii&1) != 0? ii: -ii)*ai[0])/AO_CHAN;
 	}
 	if (has_do32){
 		copy_tlatch_to_do32(ao, ai);
