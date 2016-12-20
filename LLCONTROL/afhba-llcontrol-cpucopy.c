@@ -55,7 +55,10 @@ FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
 int dummy_first_loop;
-/* potentially good for cache fill, but sets initial value zero */
+/** potentially good for cache fill, but sets initial value zero */
+int G_POLARITY = 1;		
+/** env POLARITY=-1 negates feedback this is usefult to know that the 
+ *  software is in fact doing something 					 */
 
 
 #define DEF_NCHAN 	16
@@ -164,6 +167,10 @@ void ui(int argc, char* argv[])
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
 	}
+	if (getenv("POLARITY")){
+		G_POLARITY = atoi(getenv("POLARITY"));
+		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
+	}
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
@@ -243,8 +250,8 @@ void control(short *ao, short *ai)
 {
 	int ii;
 	for (ii = 0; ii < AO_CHAN; ii += 2){
-		ao[ii] = -ai[0];
-		ao[ii+1] = -ai[0];
+		ao[ii] = G_POLARITY * ai[0];
+		ao[ii+1] = ((ii&1) != 0? 1: -1) *ai[0];
 	}
 	if (has_do32){
 		copy_tlatch_to_do32(ao, ai);
