@@ -57,7 +57,8 @@ init_2106() {
 	fi
 	remote_cmd $SC distributor sites=$DS_SITES comms=1 on
 	remote_cmd $AO lotide 256
-	remote_cmd $AO clk=1,1,1
+# slave AO off site 2 outclock
+	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
 
 	remote_cmd $SC spad=1,$NSPAD,0	
