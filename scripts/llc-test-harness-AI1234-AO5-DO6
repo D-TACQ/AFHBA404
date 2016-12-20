@@ -1,14 +1,15 @@
-#!/bin/bash
-# llc-test-harness-intclk-AI1-AO4-zcopy
+#!/bin/bash 
+# llc-test-harness-intclk-AI1-AO4-zcopy 
 # AI+AO llc with zerocopy on one fiber. Basic LLC test
 
 [ -d scripts ] && cd scripts
 
 # MUST set remote ip-address
 REMIP=${1:-acq2106_003}
-INTCLKDIV=${INTCLKDIV:-1000}		# 100M/100 = 1MHz
-EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+INTCLKDIV=${INTCLKDIV:-100}		# 10M/100 = 100k
+EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100k
 STREAMPID=0
+DO=${DO:-0}
 
 
 source afhba-common
@@ -19,9 +20,18 @@ CB=12
 AI=1
 AO=5
 
-SITES=1
-CA_SITES=1
-CB_SITES=1
+AG_SITES=1
+DS_SITES=$AO
+CA_SITES=$AG_SITES
+CB_SITES=$AG_SITES
+
+if [ $DO -ne 0 ]; then
+	NSPAD=15
+	AG_SITES=$AG_SITES,$DO
+	DS_SITES=$DS_SITES,$DO
+else
+	NSPAD=16
+fi
 
 init_comms() {	
 	cx=$1
@@ -39,22 +49,20 @@ init_2106() {
 		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd $AI clk=1,1,1
-		remote_cmd $AI clkdiv=$EXTCLKDIV
+		remote_cmd $SC acq2106_set_ext_clk=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
-		remote_cmd $AI clk=0,0,0
-		remote_cmd $AI clkdiv=$INTCLKDIV
+		remote_cmd $SC acq2106_set_int_clk=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$AO comms=1 on
+	remote_cmd $SC distributor sites=$DS_SITES comms=1 on
 	remote_cmd $AO lotide 256
-	remote_cmd $AO clk=1,2,1
+	remote_cmd $AO clk=1,1,1
 	remote_cmd $AO clkdiv=1 
 
-	remote_cmd $SC spad=1,16,0	
-	remote_cmd $SC run0 1
-#	remote_cmd $CB aggregator sites=1 on
+	remote_cmd $SC spad=1,$NSPAD,0	
+	
+	remote_cmd $SC run0 $AG_SITES
 	remote_cmd $CB spad 1
 	
 	init_comms $CA $CA_SITES
