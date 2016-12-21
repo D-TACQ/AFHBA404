@@ -22,8 +22,6 @@ AO=5
 
 AG_SITES=${AG_SITES:-1,2,3,4}
 DS_SITES=$AO
-CA_SITES=$AG_SITES
-CB_SITES=$AG_SITES
 
 if [ $DO -ne 0 ]; then
 	NSPAD=15
@@ -32,6 +30,8 @@ if [ $DO -ne 0 ]; then
 else
 	NSPAD=16
 fi
+CA_SITES=$AG_SITES
+CB_SITES=$AG_SITES
 
 init_comms() {	
 	cx=$1
@@ -60,7 +60,11 @@ init_2106() {
 		remote_cmd $SC acq2106_set_int_clk=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$DS_SITES comms=1 on
+	if [ $DO -ne 0 ]; then
+	        remote_cmd $SC distributor sites=$DS_SITES comms=1 pad=15 on
+	else
+	        remote_cmd $SC distributor sites=$DS_SITES comms=1  on
+	fi   
 	remote_cmd $AO lotide 256
 # slave AO off site 2 outclock
 
