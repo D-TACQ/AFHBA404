@@ -226,7 +226,8 @@ void setup()
 	xllc_def.len = VO_LEN;
 
 	if (has_do32){
-		xllc_def.len += 64;
+		int ll = xllc_def.len/64;
+		xllc_def.len = ++ll*64;
 	}
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
