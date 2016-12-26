@@ -61,8 +61,10 @@ init_2106() {
 		echo setting internal clock / $INTCLKDIV
 	fi
 	if [ $DO -ne 0 ]; then
+	        remote_cmd $SC distributor sites=$DS_SITES comms=1 pad=15 off
 	        remote_cmd $SC distributor sites=$DS_SITES comms=1 pad=15 on
 	else
+	        remote_cmd $SC distributor sites=$DS_SITES comms=1  off
 	        remote_cmd $SC distributor sites=$DS_SITES comms=1  on
 	fi   
 	remote_cmd $AO lotide 256
@@ -94,6 +96,7 @@ start_stream() {
 cleanup() {
 #	kill ${STREAMPID}
 	remote_cmd $SC streamtonowhered stop
+	remote_cmd $SC distributor sites=$DS_SITES off
 }
 
 init_2106
