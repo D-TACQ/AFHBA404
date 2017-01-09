@@ -1,0 +1,2 @@
+RTPRIO=99 NCHAN=130 DO32=1 SPADLONGS=15 ACTION=check_tlatch POLARITY=-1 ./LLCONTROL/afhba-llcontrol-cpucopy $*
+

@@ -8,8 +8,9 @@
 REMIP=${1:-acq2106_003}
 INTCLKDIV=${INTCLKDIV:-100}		# 10M/100 = 100k
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100k
+LLC_CLK=${LLC_CLK:-ext}
 STREAMPID=0
-DO=${DO:-0}
+DO=${DO:-6}
 
 
 source afhba-common
