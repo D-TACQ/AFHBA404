@@ -22,6 +22,9 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /* ------------------------------------------------------------------------- */
 
+#define _GNU_SOURCE
+#include <sched.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -111,6 +114,29 @@ void get_mapping() {
 	}
 }
 
+void setAffinity(unsigned cpu_mask)
+{
+       int cpu = 0;
+        cpu_set_t cpu_set;
+        CPU_ZERO(&cpu_set);
+        for (cpu = 0; cpu < 32; ++cpu){
+                if ((1<<cpu) &cpu_mask){
+                        CPU_SET(cpu, &cpu_set);
+                }
+        }
+        printf("setAffinity: %d,%d,%d,%d\n",
+                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
+                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
+                        );
+
+        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
+        if (rc != 0){
+                perror("sched_set_affinity");
+                exit(1);
+        }
+}
+
+
 void goRealTime(void)
 {
 	struct sched_param p = {};
@@ -124,6 +150,7 @@ void goRealTime(void)
 		perror("failed to set RT priority");
 	}
 }
+
 
 void write_action(void *data)
 {
@@ -176,6 +203,10 @@ void ui(int argc, char* argv[])
 		G_POLARITY = atoi(getenv("POLARITY"));
 		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
 	}
+        if (getenv("AFFINITY")){
+                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        }
+
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
