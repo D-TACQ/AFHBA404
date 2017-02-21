@@ -1,5 +1,5 @@
 obj-m += afhba.o
-obj-m += afhbaspi.o
+#obj-m += afhbaspi.o
 obj-m += afhbasfp.o
 
 SRC := $(shell pwd)
