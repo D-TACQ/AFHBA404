@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1010"
+#define REVID	"1011"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -476,6 +476,14 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 		snprintf(buf, maxbuf, "acq2106_%03d.comms%X",
 				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
 		return 1;
+	}else if ((z_ident&0xe4330000) == 0xe4330000){
+        snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
+                        z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
+        return 1;
+	}else if ((z_ident&0x43000000) == 0x43000000){
+        snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
+                        z_ident&0x0ffff, 0);
+        return 1;
 	}else{
 		return 0;
 	}
@@ -581,8 +589,7 @@ static void mark_empty(struct device *dev, struct HostBuffer *hb){
 	pmark[0] = EMPTY1;
 	pmark[1] = EMPTY2;
 
-	/* direction may be wrong - we're trying to flush */
-	dma_sync_single_for_device(dev, hb->pa, hb->req_len, PCI_DMA_TODEVICE);
+	dma_sync_single_for_device(dev, hb->pa, hb->req_len, PCI_DMA_FROMDEVICE);
 }
 
 
