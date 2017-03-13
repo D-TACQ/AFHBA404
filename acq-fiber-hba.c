@@ -347,7 +347,7 @@ void adevDelete(struct AFHBA_DEV* adev)
 
 #define AFHBA_PCI_CMD (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY)
 
-void compensate_for_inadequate_bios(struct AFHBA_DEV* adev)
+void force_busmaster_mode(struct AFHBA_DEV* adev)
 {
 	u16 cmd;
 
@@ -356,7 +356,7 @@ void compensate_for_inadequate_bios(struct AFHBA_DEV* adev)
 	if ((cmd & AFHBA_PCI_CMD) != AFHBA_PCI_CMD) {
 		u16 new_cmd = cmd | AFHBA_PCI_CMD;
 		pci_write_config_word( adev->pci_dev, PCI_COMMAND, new_cmd);
-		dev_warn(pdev(adev), "hacked PCI_COMMAND from %04x to %04x",
+		dev_info(pdev(adev), "ENABLE BUS MASTER transactions %04x to %04x",
 							cmd, new_cmd);
 	}
 }
@@ -399,7 +399,7 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 	if (rc != 0){
 		dev_warn(pdev(adev), "pci_enabled_device returned %d", rc);
 	}
-	compensate_for_inadequate_bios(adev);
+	force_busmaster_mode(adev);
 
 	dev_dbg(pdev(adev), "pci_enable_device returns %d", rc);
 	dev_info(pdev(adev), "FPGA revision: %08x",
