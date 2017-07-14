@@ -12,11 +12,7 @@
 #include <string>
 
 class RTM_T_Device {
-
 	enum { CTRL_ROOT=-1, MINOR_REGREAD=253, MINOR_DMAREAD=254 };
-
-	int devnum;
-	int nbuffers;
 
 	std::map<int, std::string> names;
 	std::map<int, void*> host_buffers;
@@ -42,7 +38,12 @@ class RTM_T_Device {
 	}
 
 public:
-	RTM_T_Device(int _devnum, int _nbuffers = MAXBUF);
+	const unsigned devnum;
+	const unsigned nbuffers;
+ 	const unsigned maxlen;
+	const unsigned transfer_buffers;
+
+	RTM_T_Device(int _devnum);
 	virtual ~RTM_T_Device() {
 		_close();
 	}
@@ -67,9 +68,9 @@ public:
 	}
 
 	enum {
-		MAXBUF = 16,		 // maximum buffers per read
-		MAXLEN = 0x100000 	 // maximum length of buffer
+		MAXBUF = 16		 // maximum buffers per read
 	};
+
 };
 
 #endif /* RTM_T_DEVICE_H_ */

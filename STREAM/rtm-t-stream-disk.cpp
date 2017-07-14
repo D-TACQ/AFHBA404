@@ -65,13 +65,6 @@ int SSIZE = sizeof(short) * 96;
 
 int acq200_debug = 0;
 
-int maxlen = RTM_T_Device::MAXLEN;
-
-#define PARAMETERS		"/sys/module/afhba/parameters/"
-#define BUFFER_LEN 		PARAMETERS "buffer_len"
-#define NBUFFERS		PARAMETERS "nbuffers"
-#define TRANSFER_BUFFERS 	PARAMETERS "transfer_buffers"
-
 const char* OUTROOT = "/mnt";
 
 
@@ -114,7 +107,7 @@ static double htime(void){
 
 static int write_meta(int fd, int ibuf, int nbuf)
 {
-	unsigned long long nsamples = (unsigned long long)nbuf * maxlen / SSIZE;
+	unsigned long long nsamples = (unsigned long long)nbuf * dev->maxlen / SSIZE;
 	
 	char buf[128];
 	snprintf(buf, 128, 
@@ -175,7 +168,7 @@ static void process(int ibuf, int nbuf){
 		fail_if_exists(data_fname);
 	}
 
-	write(outfp, dev->getHostBufferMapping(ibuf), maxlen);
+	write(outfp, dev->getHostBufferMapping(ibuf), dev->maxlen);
 
 	if (++icat > CONCAT){
 		close(outfp);		/* close data last - we monitor this one */
@@ -258,60 +251,6 @@ all_done:
 	return 0;
 }
 
-static int getKnob(const char* knob, unsigned* value)
-{
-	FILE *fp = fopen(knob, "r");
-	int rc = fscanf(fp, "%u", value);
-	fclose(fp);
-	return rc;
-}
-
-
-static void calc_maxlen(int devnum)
-{
-	char knob[80];
-	FILE *fp;
-/*
-	snprintf(knob, 80, "/dev/rtm-t.%d.ctrl/lowlat", devnum);
-	FILE *fp = fopen(knob, "r");
-	if (fp){
-		int ll_maxlen;
-		int nc = fscanf(fp, "%d", &ll_maxlen);
-		fclose(fp);
-
-		if (nc == 1 && ll_maxlen > 0){
-			maxlen = ll_maxlen;
-			info("maxlen set LL %d\n", maxlen);
-			return;
-		}
-	}
-	fclose(fp);
-*/
-	snprintf(knob, 80, "/dev/rtm-t.%d.ctrl/buffer_len", devnum);
-	fp = fopen(knob, "r");
-	if (fp){
-		int nc = fscanf(fp, "%d", &maxlen);
-		fclose(fp);
-
-		if (nc == 1 && maxlen > 0){
-			info("maxlen set LL %d\n", maxlen);
-			return;
-		}
-	}
-	fclose(fp);
-
-	fp = fopen(BUFFER_LEN, "r");
-	if (!fp){
-		perror(BUFFER_LEN);
-		exit(errno);
-	}
-	if (fscanf(fp, "%d", &maxlen) == 1){
-		info("maxlen set %d", maxlen);
-	}else{
-		err("maxlen not set");
-	}
-	fclose(fp);
-}
 
 static void run_stop_monitor(char *monitor)
 {
@@ -352,15 +291,10 @@ static void init_defaults(int argc, char* argv[])
 {
 	int devnum = 0;
 
-	unsigned nbuffers = RTM_T_Device::MAXBUF;
-
-	getKnob(NBUFFERS, &nbuffers);
-	info("using %d buffers\n", nbuffers);
-	
 	if (getenv("RTM_DEVNUM")){
 		devnum = atol(getenv("RTM_DEVNUM"));
 	}
-	dev = new RTM_T_Device(devnum, nbuffers);
+	dev = new RTM_T_Device(devnum);
 	
 	if (getenv("RTM_MAXITER")){
 		MAXITER = atol(getenv("RTM_MAXITER"));
@@ -410,15 +344,12 @@ static void init_defaults(int argc, char* argv[])
 	}
 	setvbuf(stdout, 0, _IOLBF, 0);
 
-	calc_maxlen(devnum);
-
-
 	char* monitor;
 	if ((monitor = getenv("KILL_ON_STOP")) != 0){
 		run_stop_monitor(monitor);
 	}
 
-	getKnob(TRANSFER_BUFFERS, &transfer_buffers);
+	transfer_buffers = dev->transfer_buffers;
 	if (argc > 1){
 		unsigned tb = strtoul(argv[1], 0, 0);
 		if (tb > 0){
