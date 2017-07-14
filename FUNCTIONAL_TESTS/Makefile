@@ -1,5 +1,5 @@
 
-CXXFLAGS=-O2
+CXXFLAGS=-O2 -std=c++11
 
 all: hbfarm425 checkramp checkramp480 multisitecheckramp
 
