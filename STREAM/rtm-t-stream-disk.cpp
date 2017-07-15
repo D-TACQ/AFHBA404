@@ -76,6 +76,7 @@ int NO_OVERWRITE = 0;		/* refuse to allow buffer overwrite */
 int MAXINT = 999999;
 int PUT_DATA = 1;		/* output name of data buffer, not id */
 int NBUFS = 0;			/* !=) ? stop after this many buffers */
+int PUT4KPERFILE = 0;		/* fake 4MB output for pv to measure at /1000 */
 
 
 /* number of buffers to transfer - set on command line or use module knob. */
@@ -145,6 +146,8 @@ int outfp;
 
 const char* outfmt;
 
+char buf4k[4096];
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE){
 		fprintf(stderr, "%02d\n", ibuf);
@@ -186,7 +189,14 @@ static void process(int ibuf, int nbuf){
 		close(outfp);		/* close data last - we monitor this one */
 		if (PUT_DATA){
 			if (strlen(old_fname)){
-				puts(old_fname);
+				if (PUT4KPERFILE){
+					strcpy(buf4k, old_fname);
+					strcat(buf4k, "\n");
+					fwrite(buf4k, 1, 4096, stdout);
+					fflush(stdout);
+				}else{
+					puts(old_fname);
+				}
 			}
 			strcpy(old_fname, data_fname);
 		}else{
@@ -356,6 +366,9 @@ static void init_defaults(int argc, char* argv[])
 	}
 	if (getenv("CONCAT")){
 		CONCAT=atoi(getenv("CONCAT"));
+	}
+	if (getenv("PUT4KPERFILE")){
+		PUT4KPERFILE = 1;
 	}
 	setvbuf(stdout, 0, _IOLBF, 0);
 
