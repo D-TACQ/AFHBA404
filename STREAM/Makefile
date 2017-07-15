@@ -1,7 +1,7 @@
 
 
 
-CXXFLAGS += -I ..
+CXXFLAGS += -I .. -O2
 
 APPS = rtm-t-stream-disk
  

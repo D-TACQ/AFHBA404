@@ -148,6 +148,12 @@ const char* outfmt;
 
 char buf4k[4096];
 
+
+int succ(int ib) {
+	++ib;
+	return ib >= dev->nbuffers? 0: ib;
+}
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE){
 		fprintf(stderr, "%02d\n", ibuf);
@@ -156,7 +162,16 @@ static void process(int ibuf, int nbuf){
 	static char data_fname[80];
 	static char old_fname[80];
 	char buf[80];
+	static int _ibuf = -1;
 	
+	if (_ibuf != -1){
+		if (succ(_ibuf) != ibuf){
+			fprintf(stderr, "ERROR: buffer skip %d -> %d\n",
+					_ibuf, ibuf);
+		}		
+	}
+	_ibuf = ibuf;
+
 	if (icat == 0){
 		sprintf(buf, OUTROOTFMT, OUTROOT, CYCLE);
 		mkdir(buf, 0777);
@@ -214,7 +229,7 @@ static void process(int ibuf, int nbuf){
 static int stream()
 {
 	unsigned iter = 0;
-	int id_buf[16];
+	int id_buf[NELEMS];
 	int fp = dev->getDeviceHandle();
 	int ifirst = MAXINT;
 	int nbuf = 0;
@@ -233,7 +248,11 @@ static int stream()
 		DIAG("	read returned %d\n", nread);
 
 		if (nread > 0){
-			for (ibuf = 0; ibuf < nread/sizeof(int); ++ibuf){
+			int nb = nread/sizeof(int);
+			if (nb > 1){
+				fprintf(stderr, "buffer_backlog:%d\n", nb);
+			}
+			for (ibuf = 0; ibuf < nb; ++ibuf){
 				int nwrite =  sizeof(int)*1;
 
 				if (id_buf[ibuf] <= ifirst ){
