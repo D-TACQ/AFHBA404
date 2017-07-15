@@ -139,6 +139,12 @@ void fail_if_exists(char *buf)
 int icat;
 int outfp;
 
+#define OUTROOTFMT	"%s/%06d/"
+#define OUTFMT2		"%s/%06d/%d.%02d"
+#define OUTFMT3		"%s/%06d/%d.%03d"
+
+const char* outfmt;
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE){
 		fprintf(stderr, "%02d\n", ibuf);
@@ -149,9 +155,11 @@ static void process(int ibuf, int nbuf){
 	char buf[80];
 	
 	if (icat == 0){
-		sprintf(buf, "%s/%06d/", OUTROOT, CYCLE);
+		sprintf(buf, OUTROOTFMT, OUTROOT, CYCLE);
 		mkdir(buf, 0777);
-		sprintf(data_fname, "%s/%06d/%d.%02d", OUTROOT, CYCLE, dev->getDevnum(), ibuf);
+		
+		sprintf(data_fname, outfmt, OUTROOT, CYCLE, 
+				dev->getDevnum(), ibuf);
 
 		outfp = open(data_fname, O_MODE, PERM);
 		if (outfp == -1){
@@ -299,6 +307,9 @@ static void init_defaults(int argc, char* argv[])
 		devnum = atol(getenv("RTM_DEVNUM"));
 	}
 	dev = new RTM_T_Device(devnum);
+	
+	outfmt = dev->nbuffers > 99? OUTFMT3: OUTFMT2;
+
 	
 	if (getenv("RTM_MAXITER")){
 		MAXITER = atol(getenv("RTM_MAXITER"));
