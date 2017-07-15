@@ -45,6 +45,9 @@ namespace AcqData {
 	unsigned ramp_start[7];		// index from 1 */
 };
 
+int fail_stop = 0;
+int accept_first_ramp_value;
+
 #define NGRP	3
 
 int check_ramp_site(unsigned *b0, unsigned offset, int nrows, unsigned& start)
@@ -64,14 +67,18 @@ int check_ramp_site(unsigned *b0, unsigned offset, int nrows, unsigned& start)
 #endif
 	for (int row = 0; row < nrows; ++row, br += stride){
 		unsigned *bs = br + offset;		// slice ptr
-		for (int col = 0; col < AcqData::cps; ++col, ++start){
+		for (int col = 0; col < AcqData::cps; ++col){
 			if (bs[col] != start+1){
 				printf("ramp fail [%d][%d] %x %x\n",
 					row, col, bs[col], start+1);
 				fail += 1;
 				start = bs[col];
+				if (fail_stop != 0 && fail > fail_stop){
+					printf("quitting on fail_stop\n");
+					exit(1);
+				}
 			}else{
-				;
+				++start;;
 				/* printf("ramp pass [%d][%d] %x %x\n",
 					row, col, bs[col], start+1); */
 			}
@@ -137,7 +144,9 @@ void process_files()
 
 void ui(int argc, char* argv[])
 {
-
+	if (getenv("FAIL_STOP")){
+		fail_stop = atoi(getenv("FAIL_STOP"));
+	}
 }
 
 int main(int argc, char* argv[])
