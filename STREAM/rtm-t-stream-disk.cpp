@@ -168,7 +168,11 @@ static void process(int ibuf, int nbuf){
 		fail_if_exists(data_fname);
 	}
 
-	write(outfp, dev->getHostBufferMapping(ibuf), dev->maxlen);
+	int rc = write(outfp, dev->getHostBufferMapping(ibuf), dev->maxlen);
+	if (rc != dev->maxlen){
+		perror("write fail");
+		exit(1);
+	}
 
 	if (++icat > CONCAT){
 		close(outfp);		/* close data last - we monitor this one */
