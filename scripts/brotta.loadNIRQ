@@ -1,0 +1,15 @@
+#!/bin/bash
+
+AMON=${AMON:-1}
+
+DDB=/sys/kernel/debug/dynamic_debug
+[ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
+echo 9 > /proc/sys/kernel/printk
+
+/sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
+	afhba4_stream=1 \
+	aurora_monitor=$AMON buffer_len=4194304 nbuffers=99 eot_interrupt=0 WORK_TO=1 
+	
+#	dyndbg="\" func afhba_map +pf\""
+
+
