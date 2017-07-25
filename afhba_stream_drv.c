@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1011"
+#define REVID	"1012"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -589,7 +589,7 @@ static void mark_empty(struct device *dev, struct HostBuffer *hb){
 	pmark[0] = EMPTY1;
 	pmark[1] = EMPTY2;
 
-	dma_sync_single_for_device(dev, hb->pa, hb->req_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_device(dev, hb->pa+offset, hb->req_len, PCI_DMA_FROMDEVICE);
 }
 
 
@@ -599,7 +599,7 @@ static int is_marked_empty(struct device *dev, struct HostBuffer *hb){
 	u32 *pmark = (u32*)(hb->va + offset);
 	int is_empty;
 
-	dma_sync_single_for_cpu(dev, hb->pa, hb->req_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_cpu(dev, hb->pa+offset, hb->req_len, PCI_DMA_FROMDEVICE);
 
 	is_empty = pmark[0] == EMPTY1 && pmark[1] == EMPTY2;
 
@@ -680,7 +680,7 @@ static void report_inflight(
 			inflight? inflight->ibuf: -1,
 			DMA_DESC_FIFSTA_RD(adev));
 	}else{
-		dev_dbg(pdev(adev),
+		dev_warn(pdev(adev),
 			"%30s: buffer %02d last descr:%08x [%02d] fifo:%08x",
 			msg,
 			ibuf,
@@ -701,6 +701,21 @@ static void return_empty(struct AFHBA_DEV *adev, struct HostBuffer *hb)
 	dev_dbg(pdev(adev), "ibuf %d", hb->ibuf);
 	hb->bstate = BS_EMPTY;
 	list_move_tail(&hb->list, &sdev->bp_empties.list);
+}
+
+static int _queue_full_buffer(struct AFHBA_DEV *adev, struct HostBuffer* hb, int nrx)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct JOB *job = &sdev->job;
+
+	if (buffer_debug){
+		report_inflight(adev, hb->ibuf, 0, "->FULL");
+	}
+
+	hb->bstate = BS_FULL;
+	list_move_tail(&hb->list, &sdev->bp_full.list);
+	job->buffers_received++;
+	return nrx + 1;
 }
 static int queue_full_buffers(struct AFHBA_DEV *adev)
 {
@@ -728,23 +743,21 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			}
 		}else{
 			if (ifilling > 1 && first && hb != first){
-				job->buffers_discarded++;
-				report_stuck_buffer(adev, first->ibuf);
-				return_empty(adev, first);
-				first = 0;
-				if (stop_on_skipped_buffer){
-					dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
-					job->please_stop = PS_PLEASE_STOP;
+				if (is_marked_empty(&adev->pci_dev->dev, first)){
+					report_stuck_buffer(adev, first->ibuf);
+					return_empty(adev, first);
+					first = 0;
+					if (stop_on_skipped_buffer){
+						dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
+						job->please_stop = PS_PLEASE_STOP;
+					}
+				}else{
+					dev_info(pdev(adev), "jackpot: marker found on retry");
+					nrx = _queue_full_buffer(adev, first, nrx);
 				}
 			}
-			if (buffer_debug){
-				report_inflight(adev, hb->ibuf, 0, "->FULL");
-			}
 
-			hb->bstate = BS_FULL;
-			list_move_tail(&hb->list, &sdev->bp_full.list);
-			job->buffers_received++;
-			++nrx;
+			nrx = _queue_full_buffer(adev, hb, nrx);
 		}
 	}
 
