@@ -78,6 +78,11 @@ int PUT_DATA = 1;		/* output name of data buffer, not id */
 int NBUFS = 0;			/* !=) ? stop after this many buffers */
 int PUT4KPERFILE = 0;		/* fake 4MB output for pv to measure at /1000 */
 
+struct SEQ {
+	unsigned long errors;
+	unsigned long buffers;
+}
+	SEQ;
 
 /* number of buffers to transfer - set on command line or use module knob. */
 unsigned transfer_buffers;
@@ -109,7 +114,7 @@ static double htime(void){
 static int write_meta(int fd, int ibuf, int nbuf)
 {
 	unsigned long long nsamples = (unsigned long long)nbuf * dev->maxlen / SSIZE;
-	
+
 	char buf[128];
 	snprintf(buf, 128, 
 		"IBUF=%d\n" "NBUF=%d\n" "NSAMPLES=%llu\n" "HTIME=%.3f\n",
@@ -155,7 +160,18 @@ int succ(int ib) {
 }
 
 static void process(int ibuf, int nbuf){
-	if (VERBOSE){
+	if (VERBOSE == 1){
+		if (ibuf%10 == 0){
+			fprintf(stderr, "%c", ibuf==0? '\r': '.');
+			fflush(stderr);
+		}
+	}else if (VERBOSE == 2){
+		static int cycle;
+		if (ibuf == 0){
+			fprintf(stderr, "\r%06d", cycle++);
+			fflush(stderr);
+		}
+	}else if (VERBOSE > 2){
 		fprintf(stderr, "%02d\n", ibuf);
 	}
 
@@ -165,9 +181,11 @@ static void process(int ibuf, int nbuf){
 	static int _ibuf = -1;
 	
 	if (_ibuf != -1){
+		SEQ.buffers++;
 		if (succ(_ibuf) != ibuf){
-			fprintf(stderr, "ERROR: buffer skip %d -> %d\n",
-					_ibuf, ibuf);
+			SEQ.errors++;
+			fprintf(stderr, "ERROR: buffer %u/%u skip %d -> %d\n",
+					SEQ.errors, SEQ.buffers, _ibuf, ibuf);
 		}		
 	}
 	_ibuf = ibuf;
@@ -282,12 +300,16 @@ static int stream()
 			}
 		}else{
 			perror("read error");
-			return nread;
+			goto on_error;
 		}
 
 		iter = ++iter&MAXITER_MASK;
 	}
+on_error:
 all_done:
+	if (VERBOSE){
+		fprintf(stderr, "rtm-t-stream-disk finish %u seq errors in %u buffers\n", SEQ.errors, SEQ.buffers);
+	}	
 	DIAG("all done\n");
 	return 0;
 }

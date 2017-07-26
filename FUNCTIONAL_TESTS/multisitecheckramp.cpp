@@ -39,7 +39,7 @@ using namespace std;
 namespace AcqData {
 	vector<string> fn;	/* file name (triplet) */
 	vector<int> sites = { 1, 2, 3, 4, 5, 6 };
-	vector<int> rsites = { 3, 4, 5 , 6 };
+	vector<int> rsites = { 1, 2, 3, 4, 5 , 6 };
 	int cps = 16;
 	int bl = 0x400000;
 	unsigned ramp_start[7];		// index from 1 */
