@@ -41,13 +41,15 @@
 #include <sstream>
 #include <iterator>
 
+#include <popt.h>
+
 using namespace std;
 
 namespace AcqData {
 	vector<string> fn;	/* file name (triplet) */
 	vector<int> sites = { 1, 2, 3, 4, 5, 6 };
 	vector<int> rsites = { 1, 2, 3, 4, 5 , 6 };
-	int cps = 16;
+	int cps = 16;							/* columns per site */
 	int bl = 0x400000;
 	unsigned ramp_start[7];		// index from 1 */
 };
@@ -149,32 +151,51 @@ void process_files()
 	}
 }
 
-void ui(int argc, char* argv[])
+const char* sim_str;
+
+struct poptOption opt_table[] = {
+	{ "sim", 's', POPT_ARG_STRING, &::sim_str, 's', "csv list of sites with simulation ramp" },
+	{ "cps", 'c', POPT_ARG_INT, &AcqData::cps, 0, "columns (of u32) per site" },
+       POPT_AUTOHELP
+       POPT_TABLEEND
+};
+void ui(int argc, const char* argv[])
 {
+	
 	if (getenv("FAIL_STOP")){
 		fail_stop = atoi(getenv("FAIL_STOP"));
 	}
-	if (argc > 1 && strstr(argv[1], "sim=")){
-// next line nfg. wchars?.
-//		std::string str = (argv[1]+strlen("sim="));
-		std::string str = index(argv[1], '=') + 1;
-		std::replace( str.begin(), str.end(), ',', ' ');
-		std::istringstream buf(str);
-		std::istream_iterator<std::string> beg(buf), end;
 
-		std::vector<std::string> tokens(beg, end);
-		AcqData::rsites.clear();
-		for (auto& s: tokens)
-			AcqData::rsites.push_back(std::stoi(s));
+	poptContext opt_context =
+                        poptGetContext(argv[0], argc, argv, opt_table, 0);
 
-		std::cerr << "ramp sites set:\"";
-		for (int& s: AcqData::rsites)
-			std::cerr << s;
-		std::cerr << "\"\n";				
-	}
+	int rc;
+
+        while ( (rc = poptGetNextOpt( opt_context )) >= 0 ){
+                switch(rc){
+			case 's': {
+	                std::string str = sim_str;
+        	        std::replace( str.begin(), str.end(), ',', ' ');
+                	std::istringstream buf(str);
+	                std::istream_iterator<std::string> beg(buf), end;
+
+        	        std::vector<std::string> tokens(beg, end);
+                	AcqData::rsites.clear();
+	                for (auto& s: tokens)
+        	                AcqData::rsites.push_back(std::stoi(s));
+
+	                std::cerr << "ramp sites set:\"";
+        	        for (int& s: AcqData::rsites)
+                	        std::cerr << s;
+	                std::cerr << "\"\n";
+	
+                        } break;
+                }
+        }
+
 }
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
 	ui(argc, argv);
 	process_files();
