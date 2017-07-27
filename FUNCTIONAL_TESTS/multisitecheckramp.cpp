@@ -34,6 +34,13 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <sstream>
+#include <iterator>
+
 using namespace std;
 
 namespace AcqData {
@@ -146,6 +153,24 @@ void ui(int argc, char* argv[])
 {
 	if (getenv("FAIL_STOP")){
 		fail_stop = atoi(getenv("FAIL_STOP"));
+	}
+	if (argc > 1 && strstr(argv[1], "sim=")){
+// next line nfg. wchars?.
+//		std::string str = (argv[1]+strlen("sim="));
+		std::string str = index(argv[1], '=') + 1;
+		std::replace( str.begin(), str.end(), ',', ' ');
+		std::istringstream buf(str);
+		std::istream_iterator<std::string> beg(buf), end;
+
+		std::vector<std::string> tokens(beg, end);
+		AcqData::rsites.clear();
+		for (auto& s: tokens)
+			AcqData::rsites.push_back(std::stoi(s));
+
+		std::cerr << "ramp sites set:\"";
+		for (int& s: AcqData::rsites)
+			std::cerr << s;
+		std::cerr << "\"\n";				
 	}
 }
 
