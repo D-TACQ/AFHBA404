@@ -181,12 +181,19 @@ static void process(int ibuf, int nbuf){
 	static int _ibuf = -1;
 	
 	if (_ibuf != -1){
-		SEQ.buffers++;
 		if (succ(_ibuf) != ibuf){
 			SEQ.errors++;
-			fprintf(stderr, "ERROR: buffer %u/%u skip %d -> %d\n",
-					SEQ.errors, SEQ.buffers, _ibuf, ibuf);
-		}		
+			if (SEQ.errors < 10){
+				if (succ(succ(_ibuf)) == ibuf || succ(ibuf) == _ibuf){
+					fprintf(stderr, "WARNING potential buffer cycle detected %u/%u skip %d -> %d\n",
+						SEQ.errors, SEQ.buffers, _ibuf, ibuf);
+				}else{
+					fprintf(stderr, "ERROR: buffer %u/%u skip %d -> %d\n",
+									SEQ.errors, SEQ.buffers, _ibuf, ibuf);
+				}
+			}
+		}
+		SEQ.buffers++;
 	}
 	_ibuf = ibuf;
 
