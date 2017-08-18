@@ -15,14 +15,14 @@ ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x21
 }
 trap "fan_lo" SIGINT SIGTERM
 
-mkdir -p /mnt/afhba.$DN
+
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
 if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-export ACQ2106_UUT=$(cat /dev/rtm-t.0.ctrl/acq_ident)
+export ACQ2106_UUT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 if [ "${ACQ2106_UUT#acq2106_}" = "${ACQ2106}" ]; then
 	echo "ERROR: UUT SFP link NOT connected"
 	exit 1
