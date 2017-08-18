@@ -26,6 +26,8 @@ export ACQ2106_UUT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 if [ "${ACQ2106_UUT#acq2106_}" = "${ACQ2106}" ]; then
 	echo "ERROR: UUT SFP link NOT connected"
 	exit 1
+else
+echo streaming from UUT $ACQ2106_UUT
 fi
 export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/data/ACQ400DATA/${ACQ2106_UUT}
 mkdir -p ${OUTROOT}
