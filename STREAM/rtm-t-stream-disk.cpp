@@ -314,9 +314,7 @@ static int stream()
 	}
 on_error:
 all_done:
-	if (VERBOSE){
-		fprintf(stderr, "rtm-t-stream-disk finish %u seq errors in %u buffers\n", SEQ.errors, SEQ.buffers);
-	}	
+	fprintf(stderr, "rtm-t-stream-disk finish %u seq errors in %u buffers\n", SEQ.errors, SEQ.buffers);
 	DIAG("all done\n");
 	return 0;
 }
