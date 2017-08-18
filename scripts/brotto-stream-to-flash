@@ -22,9 +22,13 @@ if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-echo stream to /mnt/afhba.$DN 
-#export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN 
-export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/data/ACQ400DATA
+export ACQ2106_UUT=$(cat /dev/rtm-t.0.ctrl/acq_ident)
+if [ "${ACQ2106_UUT#acq2106_}" = "${ACQ2106}" ]; then
+	echo "ERROR: UUT SFP link NOT connected"
+	exit 1
+fi
+export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/data/ACQ400DATA/${ACQ2106_UUT}
+mkdir -p ${OUTROOT}
 export PUT4KPERFILE=1
 fan_hi
 ./STREAM/rtm-t-stream-disk | pv > /dev/null
