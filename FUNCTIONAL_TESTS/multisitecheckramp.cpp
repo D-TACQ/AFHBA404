@@ -96,10 +96,28 @@ int check_ramp_site(unsigned *b0, unsigned offset, int nrows, unsigned& start)
 	}
 	return fail;
 }
+int fail_count[MAXSITES+1] = {};
+
+int show_fail_summary()
+{
+	bool ok = true;
+        for (int site = 1; site <= MAXSITES; ++site){
+                if (fail_count[site]){
+                        printf("%d:%d ", site, fail_count[site]);
+                        ok = 0;
+                }
+        }
+        if (!ok){
+                printf(" FAIL\n");
+        }else{
+                printf(" PASS\n");
+        }
+	return ok;
+}
+
 void process_mapped_data(unsigned * ba, int len)
 {
 	int nrows = len/AcqData::sites.size()/AcqData::cps/sizeof(unsigned);
-	int fail_count[MAXSITES+1] = {};
 #pragma omp parallel for
 //	for (int site : AcqData::rsites){
 	for (int ii = 0; ii < AcqData::rsites.size(); ++ii){
@@ -107,18 +125,7 @@ void process_mapped_data(unsigned * ba, int len)
 		fail_count[site] += check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
 	}
 
-	bool ok = 1;
-	for (int site = 1; site <= MAXSITES; ++site){
-		if (fail_count[site]){
-			printf("%d:%d ", site, fail_count[site]);
-			ok = 0;
-		}
-	}
-	if (!ok){
-		printf(" FAIL\n");
-	}else{
-		printf(" PASS\n");
-	}
+	show_fail_summary();
 }
 void process_group()
 {
@@ -152,7 +159,7 @@ void process_group()
 		fclose(fp[ii]);
 	}
 }
-void process_files()
+int process_files()
 {
 	char buf[80];
 
@@ -164,6 +171,8 @@ void process_files()
 			AcqData::fn.clear();
 		}
 	}
+
+	return !show_fail_summary();	// 0 is success for progs
 }
 
 const char* sim_str;
@@ -213,7 +222,7 @@ void ui(int argc, const char* argv[])
 int main(int argc, const char* argv[])
 {
 	ui(argc, argv);
-	process_files();
+	return process_files();
 }
 
 
