@@ -118,6 +118,7 @@ int show_fail_summary()
 void process_mapped_data(unsigned * ba, int len)
 {
 	int nrows = len/AcqData::sites.size()/AcqData::cps/sizeof(unsigned);
+	bool ok = true;
 #pragma omp parallel for
 //	for (int site : AcqData::rsites){
 	for (int ii = 0; ii < AcqData::rsites.size(); ++ii){
@@ -125,7 +126,11 @@ void process_mapped_data(unsigned * ba, int len)
 		fail_count[site] += check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
 	}
 
-	show_fail_summary();
+	if (!ok){
+		show_fail_summary();
+	}else{
+		printf(" PASS\n");
+	}
 }
 void process_group()
 {
@@ -172,6 +177,7 @@ int process_files()
 		}
 	}
 
+	printf("checkramp run complete: ");
 	return !show_fail_summary();	// 0 is success for progs
 }
 
