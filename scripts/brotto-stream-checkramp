@@ -1,0 +1,54 @@
+#!/bin/bash
+
+DN=${1:-0}
+
+~dt100/bin/run-shot-logger &
+LOGPID=$!
+
+fan_hi() {
+# peripheral fan HI 90%
+ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x60
+}
+fan_lo() {
+# peripheral fan LO 33%
+ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x21
+}
+trap "fan_lo" SIGINT SIGTERM
+
+
+echo checking ramdisk
+mount -t ramfs dram /mnt
+
+grep dram /proc/mounts 
+if [ $? -ne 0 ]; then
+	mount -t ramfs dram /mnt
+	grep dram /proc/mounts
+	if [ $? -ne 0 ]; then
+		ERROR: unable to mount ramdisk
+		exit 1
+	fi
+fi
+
+mkdir -p /mnt/afhba.$DN
+
+
+echo checking aurora is up ..
+grep +LANE_UP /dev/rtm-t.$DN.ctrl/aurora
+if [ $? -ne 0 ];then
+	echo aurora lane NOT up, quit
+	exit 1
+fi
+export ACQ2106_UUT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+if [ "${ACQ2106_UUT#acq2106_}" = "${ACQ2106}" ]; then
+	echo "ERROR: UUT SFP link NOT connected"
+	exit 1
+else
+echo streaming from UUT $ACQ2106_UUT live checkramp store:/mnt/afhba.$DN
+fi
+export NAMES_ON_STDIN=1
+export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN
+fan_hi
+./STREAM/rtm-t-stream-disk | /home/dt100/bin/multisitecheckramp-6x425
+fan_lo
+
+kill -9 $LOGPID
