@@ -43,6 +43,7 @@
 
 #include <popt.h>
 
+#define MAXSITES	6
 using namespace std;
 
 namespace AcqData {
@@ -98,11 +99,25 @@ int check_ramp_site(unsigned *b0, unsigned offset, int nrows, unsigned& start)
 void process_mapped_data(unsigned * ba, int len)
 {
 	int nrows = len/AcqData::sites.size()/AcqData::cps/sizeof(unsigned);
+	int fail_count[MAXSITES+1] = {};
 #pragma omp parallel for
 //	for (int site : AcqData::rsites){
 	for (int ii = 0; ii < AcqData::rsites.size(); ++ii){
 		int site = AcqData::rsites[ii];
-		check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
+		fail_count[site] += check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
+	}
+
+	bool ok = 1;
+	for (int site = 1; site <= MAXSITES; ++site){
+		if (fail_count[site]){
+			printf("%d:%d ", site, fail_count[site]);
+			ok = 0;
+		}
+	}
+	if (!ok){
+		printf(" FAIL\n");
+	}else{
+		printf(" PASS\n");
 	}
 }
 void process_group()
