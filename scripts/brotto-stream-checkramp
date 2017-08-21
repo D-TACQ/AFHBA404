@@ -17,7 +17,6 @@ trap "fan_lo" SIGINT SIGTERM
 
 
 echo checking ramdisk
-mount -t ramfs dram /mnt
 
 grep dram /proc/mounts 
 if [ $? -ne 0 ]; then
