@@ -47,7 +47,7 @@ echo streaming from UUT $ACQ2106_UUT live checkramp store:/mnt/afhba.$DN
 fi
 export NAMES_ON_STDIN=1
 export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN
-fan_hi
+#fan_hi
 ./STREAM/rtm-t-stream-disk | /home/dt100/bin/multisitecheckramp-6x425
 fan_lo
 
