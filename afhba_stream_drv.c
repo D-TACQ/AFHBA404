@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1014"
+#define REVID	"1015"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -288,7 +288,7 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram){
+	if (dma_descriptor_ram && !adev->stream_dev->job.dma_started){
 		write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
 	}else{
 /* change descr status .. */
@@ -1036,12 +1036,10 @@ void load_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
-	if (dma_descriptor_ram){
-		if (sdev->job.dma_started){
-			queue_free_buffers(adev);
-			validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
+	queue_free_buffers(adev);
+	if (dma_descriptor_ram && !sdev->job.dma_started){
+		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
 							sdev->push_ram_cursor);
-		}
      	}else{
        		queue_free_buffers(adev);
        	}
