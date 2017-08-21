@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1013"
+#define REVID	"1014"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -225,9 +225,6 @@ static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 		if (addr != -1){
 			_afs_write_dmareg(adev, DMA_PUSH_DESC_LEN, addr);
 		}
-		if (sdev->push_ram_cursor == sdev->nbuffers){
-			validate_dma_descriptor_ram(adev, offset, sdev->nbuffers);
-		}
 	}else{
 		dev_warn(pdev(adev), "write_ram_descr  valid PUSH only");
 		addr = _write_ram_descr(adev, offset, idesc, &sdev->pull_ram_cursor);
@@ -291,7 +288,6 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-
 	if (dma_descriptor_ram){
 		write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
 	}else{
@@ -1034,6 +1030,23 @@ int job_is_go(struct JOB* job)
 {
 	return !job->please_stop && job->buffers_queued < job->buffers_demand;
 }
+
+
+void load_buffers(struct AFHBA_DEV* adev)
+{
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
+
+	if (dma_descriptor_ram){
+		if (sdev->job.dma_started){
+			queue_free_buffers(adev);
+			validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
+							sdev->push_ram_cursor);
+		}
+     	}else{
+       		queue_free_buffers(adev);
+       	}
+}
+
 static int afs_isr_work(void *arg)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)arg;
@@ -1071,7 +1084,8 @@ static int afs_isr_work(void *arg)
 		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
-	        	queue_free_buffers(adev);
+	        	load_buffers(adev);
+
 	        	if (!job->dma_started){
 				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
 				afs_start_dma(adev, DMA_PUSH_SEL);
@@ -1119,6 +1133,10 @@ static int afs_isr_work(void *arg)
 	}
 
 	afs_stop_dma(adev, DMA_PUSH_SEL);
+	if (dma_descriptor_ram){
+		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
+						sdev->push_ram_cursor);
+	}
 	return 0;
 }
 
