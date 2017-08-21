@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1015"
+#define REVID	"1016"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1037,7 +1037,7 @@ void load_buffers(struct AFHBA_DEV* adev)
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
 	queue_free_buffers(adev);
-	if (dma_descriptor_ram && !sdev->job.dma_started){
+	if (dma_descriptor_ram > 1 && !sdev->job.dma_started){
 		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
 							sdev->push_ram_cursor);
      	}else{
@@ -1131,7 +1131,8 @@ static int afs_isr_work(void *arg)
 	}
 
 	afs_stop_dma(adev, DMA_PUSH_SEL);
-	if (dma_descriptor_ram){
+
+	if (dma_descriptor_ram > 1){
 		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
 						sdev->push_ram_cursor);
 	}
