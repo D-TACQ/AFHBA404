@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1012"
+#define REVID	"1013"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -180,17 +180,21 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 }
 
 static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, int *cursor)
+/* returns "address" of entry or ERR */
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 descr = sdev->hbx[idesc].descr;
 
+
 	if (*cursor < sdev->nbuffers){
+		int addr = *cursor;
 		DEV_DBG(pdev(adev), "_write_ram_descr() ibuf %d offset:%04x = %08x cursor:%d",
 					idesc, offset, descr, *cursor);
 		writel(descr, adev->remote+offset+*cursor*sizeof(unsigned));
-		return *cursor += 1;
+		*cursor += 1;
+		return addr;
 	}else{
-		return 0;
+		return -1;
 	}
 }
 
@@ -214,20 +218,21 @@ static void validate_dma_descriptor_ram(
 static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	int cursor;
+	int addr;
 
 	if (offset == DMA_PUSH_DESC_RAM){
-		cursor = _write_ram_descr(adev, offset, idesc, &sdev->push_ram_cursor);
-		if (cursor){
-			_afs_write_dmareg(adev, DMA_PUSH_DESC_LEN, cursor);
+		addr = _write_ram_descr(adev, offset, idesc, &sdev->push_ram_cursor);
+		if (addr != -1){
+			_afs_write_dmareg(adev, DMA_PUSH_DESC_LEN, addr);
 		}
-		if (cursor == sdev->nbuffers && dma_descriptor_ram > 1){
-			validate_dma_descriptor_ram(adev, offset, cursor);
+		if (sdev->push_ram_cursor == sdev->nbuffers){
+			validate_dma_descriptor_ram(adev, offset, sdev->nbuffers);
 		}
 	}else{
-		cursor = _write_ram_descr(adev, offset, idesc, &sdev->pull_ram_cursor);
-		if (cursor){
-			_afs_write_dmareg(adev, offset, cursor);
+		dev_warn(pdev(adev), "write_ram_descr  valid PUSH only");
+		addr = _write_ram_descr(adev, offset, idesc, &sdev->pull_ram_cursor);
+		if (addr != -1){
+			_afs_write_dmareg(adev, DMA_PULL_DESC_LEN, addr);
 		}
 	}
 }
