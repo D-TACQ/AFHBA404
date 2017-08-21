@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+get_dlna() {
+	lspci -vv | grep Xilinx -A 40 | \
+		egrep d1ac\|Serial | \
+		sed -e 's/Capabilities: \[100 v1\]//' | \
+		sed -r 's/Subsystem://'
+
+}
+echo $(hostname) $(get_dlna)
+
