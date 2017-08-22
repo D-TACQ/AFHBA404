@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1018"
+#define REVID	"R1020"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -204,15 +204,24 @@ static void validate_dma_descriptor_ram(
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 descr;
 	u32 id;
+	int errors = 0;
 
 	for (id = 0; id < max_id; ++id){
 		descr = readl(adev->remote+offset+id*sizeof(unsigned));
 		if (descr != sdev->hbx[id].descr){
 			dev_err(pdev(adev), "%s descriptor mismatch at [%d] w:%08x r:%08x",
 					"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+			errors += 1;
 		}
 		dev_dbg(pdev(adev), "%s descriptor at [%d] w:%08x r:%08x",
 				"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+	}
+	if (errors){
+		dev_err(pdev(adev), "%s descriptor errors %d out of %d",
+				"validate_dma_descriptor_ram", errors, id);
+	}else{
+		dev_info(pdev(adev), "%s %d descriptors PASS",
+				"validate_dma_descriptor_ram", id);
 	}
 }
 static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
@@ -288,10 +297,12 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram && !adev->stream_dev->job.dma_started){
-		write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
+	if (dma_descriptor_ram){
+		if  (!adev->stream_dev->job.dma_started){
+			write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
+		}
+		/* else .. NO ACTION, descriptor already loaded in RAM */
 	}else{
-/* change descr status .. */
 		write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
 	}
 }
@@ -1082,16 +1093,12 @@ static int afs_isr_work(void *arg)
 		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
-	        	if (!dma_descriptor_ram){
+	        	if (job->dma_started){
 	        		queue_free_buffers(adev);
-	        	}
-
-	        	if (!job->dma_started){
+	        	}else{
 	        		afs_stop_dma(adev, DMA_PUSH_SEL);	/* belt+braces */
 				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
-				if (dma_descriptor_ram){
-					load_buffers(adev);
-				}
+				load_buffers(adev);
 				afs_start_dma(adev, DMA_PUSH_SEL);
 
 				spin_lock(&sdev->job_lock);
