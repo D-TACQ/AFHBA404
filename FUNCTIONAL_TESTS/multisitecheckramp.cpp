@@ -96,6 +96,7 @@ int check_ramp_site(unsigned *b0, unsigned offset, int nrows, unsigned& start)
 	}
 	return fail;
 }
+int pass_count;
 int fail_count[MAXSITES+1] = {};
 
 int show_fail_summary()
@@ -108,6 +109,7 @@ int show_fail_summary()
                         ok = 0;
                 }
         }
+        printf(" OK:%d", pass_count);
         if (!ok){
                 printf(" FAIL\n");
         }else{
@@ -134,6 +136,7 @@ void process_mapped_data(unsigned * ba, int len)
 	if (!ok){
 		show_fail_summary();
 	}else{
+		++pass_count;
 		printf(" PASS\n");
 	}
 }
