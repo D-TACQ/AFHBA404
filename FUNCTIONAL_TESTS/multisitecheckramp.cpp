@@ -101,6 +101,7 @@ int fail_count[MAXSITES+1] = {};
 int show_fail_summary()
 {
 	bool ok = true;
+	printf("CUMULATIVE ");
         for (int site = 1; site <= MAXSITES; ++site){
                 if (fail_count[site]){
                         printf("%d:%d ", site, fail_count[site]);
@@ -124,6 +125,7 @@ void process_mapped_data(unsigned * ba, int len)
 	for (int ii = 0; ii < AcqData::rsites.size(); ++ii){
 		int site = AcqData::rsites[ii];
 		fail_count[site] += check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
+		ok = false;
 	}
 
 	if (!ok){
