@@ -124,8 +124,11 @@ void process_mapped_data(unsigned * ba, int len)
 //	for (int site : AcqData::rsites){
 	for (int ii = 0; ii < AcqData::rsites.size(); ++ii){
 		int site = AcqData::rsites[ii];
-		fail_count[site] += check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
-		ok = false;
+		int fc = check_ramp_site(ba, (site-1)*AcqData::cps, nrows, AcqData::ramp_start[site]);
+		if (fc){
+			fail_count[site] += fc;
+			ok = false;
+		}
 	}
 
 	if (!ok){
