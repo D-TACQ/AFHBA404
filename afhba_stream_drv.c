@@ -1056,6 +1056,18 @@ void load_buffers(struct AFHBA_DEV* adev)
        	}
 }
 
+void start_job(struct AFHBA_DEV* adev)
+{
+	afs_stop_dma(adev, DMA_PUSH_SEL);	/* belt+braces */
+	afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
+	load_buffers(adev);
+	afs_start_dma(adev, DMA_PUSH_SEL);
+
+	spin_lock(&adev->stream_dev->job_lock);
+	adev->stream_dev->job.dma_started = 1;
+	spin_unlock(&adev->stream_dev->job_lock);
+}
+
 static int afs_isr_work(void *arg)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)arg;
@@ -1093,17 +1105,10 @@ static int afs_isr_work(void *arg)
 		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
-	        	if (job->dma_started){
-	        		queue_free_buffers(adev);
+	        	if (!job->dma_started){
+	        		start_job(adev);
 	        	}else{
-	        		afs_stop_dma(adev, DMA_PUSH_SEL);	/* belt+braces */
-				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
-				load_buffers(adev);
-				afs_start_dma(adev, DMA_PUSH_SEL);
-
-				spin_lock(&sdev->job_lock);
-				job->dma_started = 1;
-				spin_unlock(&sdev->job_lock);
+	        		queue_free_buffers(adev);
 			}
 		}
 
