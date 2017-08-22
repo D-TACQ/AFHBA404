@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"1016"
+#define REVID	"R1017"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1082,10 +1082,16 @@ static int afs_isr_work(void *arg)
 		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
-	        	load_buffers(adev);
+	        	if (!dma_descriptor_ram){
+	        		queue_free_buffers(adev);
+	        	}
 
 	        	if (!job->dma_started){
+	        		afs_stop_dma(adev, DMA_PUSH_SEL);	/* belt+braces */
 				afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
+				if (dma_descriptor_ram){
+					load_buffers(adev);
+				}
 				afs_start_dma(adev, DMA_PUSH_SEL);
 
 				spin_lock(&sdev->job_lock);
@@ -1881,7 +1887,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init(%s)", REVID);
+	dev_info(pdev(adev), "afhba_stream_drv_init %s", REVID);
 
 	afs_init_buffers(adev);
 	hook_interrupts(adev);
