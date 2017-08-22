@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1017"
+#define REVID	"R1018"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1121,6 +1121,11 @@ static int afs_isr_work(void *arg)
 		case PS_PLEASE_STOP:
 			afs_stop_dma(adev, DMA_PUSH_SEL);
 			job->please_stop = PS_STOP_DONE;
+			job->dma_started = 0;
+			if (dma_descriptor_ram > 1){
+				validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
+									sdev->push_ram_cursor);
+			}
 			break;
 /*
   		default:
@@ -1136,12 +1141,6 @@ static int afs_isr_work(void *arg)
 		}
 	}
 
-	afs_stop_dma(adev, DMA_PUSH_SEL);
-
-	if (dma_descriptor_ram > 1){
-		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
-						sdev->push_ram_cursor);
-	}
 	return 0;
 }
 
