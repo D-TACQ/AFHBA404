@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1020"
+#define REVID	"R1021"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -677,7 +677,8 @@ static void report_inflight(
 	struct AFHBA_DEV *adev, int ibuf, int is_error, char *msg)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	u32 inflight_descr = DMA_PUSH_DESC_STA_RD(adev);
+	u32 inflight_descr = dma_descriptor_ram? 0: DMA_PUSH_DESC_STA_RD(adev);
+	u32 fifsta = dma_descriptor_ram? 0: DMA_DESC_FIFSTA_RD(adev);
 	struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
 
 	if (sdev->job.buffers_demand == 0){
@@ -690,7 +691,7 @@ static void report_inflight(
 			ibuf,
 			inflight_descr,
 			inflight? inflight->ibuf: -1,
-			DMA_DESC_FIFSTA_RD(adev));
+			fifsta);
 	}else{
 		dev_warn(pdev(adev),
 			"%30s: buffer %02d last descr:%08x [%02d] fifo:%08x",
@@ -698,7 +699,7 @@ static void report_inflight(
 			ibuf,
 			inflight_descr,
 			inflight? inflight->ibuf: -1,
-			DMA_DESC_FIFSTA_RD(adev));
+			fifsta);
 	}
 }
 static void report_stuck_buffer(struct AFHBA_DEV *adev, int ibuf)
