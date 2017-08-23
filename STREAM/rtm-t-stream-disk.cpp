@@ -73,6 +73,8 @@ static RTM_T_Device *dev;
 int CYCLE;
 int RECYCLE = 0;		/* accumulate by default */
 int NO_OVERWRITE = 0;		/* refuse to allow buffer overwrite */
+#define WRITE_LEN_ALL -1
+int WRITE_LEN = WRITE_LEN_ALL;		/* don't write data at all .. */
 int MAXINT = 999999;
 int PUT_DATA = 1;		/* output name of data buffer, not id */
 int NBUFS = 0;			/* !=) ? stop after this many buffers */
@@ -219,10 +221,13 @@ static void process(int ibuf, int nbuf){
 		fail_if_exists(data_fname);
 	}
 
-	int rc = write(outfp, dev->getHostBufferMapping(ibuf), dev->maxlen);
-	if (rc != dev->maxlen){
-		perror("write fail");
-		exit(1);
+	if (WRITE_LEN != 0){
+		int len = WRITE_LEN == WRITE_LEN_ALL? dev->maxlen: WRITE_LEN;
+		int rc = write(outfp, dev->getHostBufferMapping(ibuf), len);
+		if (rc != len){
+			perror("write fail");
+			exit(1);
+		}
 	}
 
 	if (++icat > CONCAT){
@@ -406,6 +411,9 @@ static void init_defaults(int argc, char* argv[])
 	}
 	if (getenv("RECYCLE")){
 		RECYCLE=atol(getenv("RECYCLE"));
+	}
+	if (getenv("WRITE_LEN")){
+		WRITE_LEN = atol(getenv("WRITE_LEN"));
 	}
 	if (getenv("NO_OVERWRITE")){
 		NO_OVERWRITE=atol(getenv("NO_OVERWRITE"));
