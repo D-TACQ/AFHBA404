@@ -161,6 +161,14 @@ int succ(int ib) {
 	return ib >= dev->nbuffers? 0: ib;
 }
 
+#define MAXHN 1024
+const char* hostname()
+{
+	static char hn[MAXHN];
+	gethostname(hn, MAXHN-1);
+	return hn;
+}
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE == 1){
 		if (ibuf%10 == 0){
@@ -319,7 +327,7 @@ static int stream()
 	}
 on_error:
 all_done:
-	fprintf(stderr, "rtm-t-stream-disk finish %u seq errors in %u buffers\n", SEQ.errors, SEQ.buffers);
+	fprintf(stderr, "%s rtm-t-stream-disk finish %u seq errors in %u buffers\n", hostname(), SEQ.errors, SEQ.buffers);
 	DIAG("all done\n");
 	return 0;
 }
