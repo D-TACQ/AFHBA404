@@ -173,7 +173,7 @@ class Histo {
 	unsigned *hg;
 	const int maxbins;
 public:
-	Histo(int _maxbins = 12) :
+	Histo(int _maxbins = NELEMS) :
 		hg(new unsigned[_maxbins]),
 		maxbins(_maxbins)
 	{

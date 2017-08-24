@@ -68,7 +68,7 @@ public:
 	}
 
 	enum {
-		MAXBUF = 16		 // maximum buffers per read
+		MAXBUF = 32		 // maximum buffers per read
 	};
 
 };
