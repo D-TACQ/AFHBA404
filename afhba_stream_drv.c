@@ -680,32 +680,20 @@ static void report_inflight(
 		return;
 	}
 	if (dma_descriptor_ram){
-		if (is_error){
-			dev_err(pdev(adev), "%30s: buffer %02d", msg, ibuf);
-		}else{
-			dev_warn(pdev(adev), "%30s: buffer %02d", msg, ibuf);
-		}
+		(is_error? dev_err: dev_warn)(pdev(adev),
+				"%30s: buffer %02d", msg, ibuf);
 	}else{
 		u32 inflight_descr = DMA_PUSH_DESC_STA_RD(adev);
 		struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
 		u32 fifsta = DMA_DESC_FIFSTA_RD(adev);
-		if (is_error){
-			dev_err(pdev(adev),
+
+		(is_error? dev_err: dev_warn)(pdev(adev),
 				"%30s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
 				msg,
 				ibuf,
 				inflight_descr,
 				inflight? inflight->ibuf: -1,
 				fifsta);
-		}else{
-			dev_warn(pdev(adev),
-				"%30s: buffer %02d last descr:%08x [%02d] fifo:%08x",
-				msg,
-				ibuf,
-				inflight_descr,
-				inflight? inflight->ibuf: -1,
-				fifsta);
-		}
 	}
 
 }
