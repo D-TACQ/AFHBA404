@@ -169,6 +169,31 @@ const char* hostname()
 	return hn;
 }
 
+class Histo {
+	unsigned *hg;
+	const int maxbins;
+public:
+	Histo(int _maxbins = 16) :
+		hg(new unsigned[_maxbins]),
+		maxbins(_maxbins)
+	{
+		for (int ii = 0; ii < maxbins; ++ii){
+			hg[ii] = 0;
+		}
+	}
+	void print(){
+		for (int ii = 0; ii < maxbins; ++ii){
+			printf("%5d%c", hg[ii], ii+1 >= maxbins? '\n': ':');
+		}
+	}
+	unsigned operator() (unsigned bin){
+		if (bin >= maxbins){
+			bin = maxbins - 1;
+		}
+		return hg[bin] ++;
+	}
+};
+
 static void process(int ibuf, int nbuf){
 	if (VERBOSE == 1){
 		if (ibuf%10 == 0){
@@ -271,6 +296,7 @@ static int stream()
 	int fp = dev->getDeviceHandle();
 	int ifirst = MAXINT;
 	int nbuf = 0;
+	Histo backlog(16);
 
 	int rc = ioctl(fp, RTM_T_START_STREAM_MAX, &transfer_buffers);
 	if (rc != 0){
@@ -287,9 +313,7 @@ static int stream()
 
 		if (nread > 0){
 			int nb = nread/sizeof(int);
-			if (nb > 1){
-				fprintf(stderr, "buffer_backlog:%d\n", nb);
-			}
+			backlog(nb);
 			for (ibuf = 0; ibuf < nb; ++ibuf){
 				int nwrite =  sizeof(int)*1;
 
@@ -328,6 +352,7 @@ static int stream()
 on_error:
 all_done:
 	fprintf(stderr, "%s rtm-t-stream-disk finish %u seq errors in %u buffers\n", hostname(), SEQ.errors, SEQ.buffers);
+	backlog.print();
 	DIAG("all done\n");
 	return 0;
 }
