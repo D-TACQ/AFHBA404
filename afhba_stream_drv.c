@@ -100,6 +100,11 @@ int dma_descriptor_ram = 0;
 module_param(dma_descriptor_ram, int, 0644);
 MODULE_PARM_DESC(dma_descriptor_ram, "descriptors in RAM not FIFO >1 :: validate on load");
 
+int assume_stuck_buffers_are_ok = 0;
+module_param(assume_stuck_buffers_are_ok, int, 0644);
+MODULE_PARM_DESC(assume_stuck_buffers_are_ok, "assume that stuck buffers are ok to release into the wild");
+
+
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
 
@@ -753,12 +758,16 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			if (ifilling > 1 && first && hb != first){
 				if (is_marked_empty(&adev->pci_dev->dev, first)){
 					report_stuck_buffer(adev, first->ibuf);
-					return_empty(adev, first);
-					first = 0;
-					if (stop_on_skipped_buffer){
-						dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
-						job->please_stop = PS_PLEASE_STOP;
+					if (dma_descriptor_ram && assume_stuck_buffers_are_ok){
+						nrx = _queue_full_buffer(adev, first, nrx);
+					}else{
+						return_empty(adev, first);
+						if (stop_on_skipped_buffer){
+							dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
+							job->please_stop = PS_PLEASE_STOP;
+						}
 					}
+					first = 0;
 				}else{
 					dev_info(pdev(adev), "jackpot: marker found on retry");
 					nrx = _queue_full_buffer(adev, first, nrx);
@@ -774,7 +783,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			dev_warn(pdev(adev), "ifilling > NBUFFERS?");
 			ifilling = 0;
 		}
-		job->catchup_histo[ifilling]++;
+		job->catchup_histo[nrx]++;
 	}
 
 	mutex_unlock(&sdev->list_mutex);
