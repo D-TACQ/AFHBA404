@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1021"
+#define REVID	"R1022"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -47,10 +47,14 @@ int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
 MODULE_PARM_DESC(RX_TO, "RX timeout (jiffies) [0.1Hz]");
 
-int WORK_TO = HZ/10;
+int WORK_TO = HZ/50;
 module_param(WORK_TO, int, 0644);
 MODULE_PARM_DESC(WORK_TO,
-	"WORK timeout (jiffies) [10Hz] - decrease for hi fifo stat poll rate");
+	"WORK timeout (jiffies) [50Hz] - decrease for hi fifo stat poll rate");
+
+int amon_jiffies = HZ/3;
+module_param(amon_jiffies, int, 0644);
+MODULE_PARM_DESC(amon_jiffies, "aurora monitor poll rate");
 
 int SMOO = 7;
 module_param(SMOO, int, 0644);
@@ -1084,15 +1088,16 @@ static int afs_isr_work(void *arg)
 	struct sched_param param = { .sched_priority = 10 };
 	int please_check_fifo = 0;
 	int job_is_go_but_aurora_is_down = 0;
+	unsigned loop_jiffies = 0;
+	unsigned last_amon_jiffies = 0;
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
 	afs_comms_init(adev);
 
-	for ( ; 1; ++loop_count){
+	for ( ; !kthread_should_stop(); ++loop_count, loop_jiffies += WORK_TO){
 		int timeout = wait_event_interruptible_timeout(
 			sdev->work.w_waitq,
-			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do) ||
-			kthread_should_stop(),
+			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do),
 			WORK_TO) == 0;
 
 		if (!timeout || loop_count%10 == 0){
@@ -1100,14 +1105,16 @@ static int afs_isr_work(void *arg)
 			    timeout, job_is_go(job)  );
 		}
 
-		if (aurora_monitor && !afs_comms_init(adev)){
-			if (job_is_go(job) && !job_is_go_but_aurora_is_down){
+		if (loop_jiffies - last_amon_jiffies > amon_jiffies){
+			if (aurora_monitor && !afs_comms_init(adev) &&
+			    job_is_go(job) && !job_is_go_but_aurora_is_down){
 				dev_warn(pdev(adev), "job is go but aurora is down");
 				job_is_go_but_aurora_is_down = 1;
+			}else{
+				job_is_go_but_aurora_is_down = 0;
 			}
-			continue;
+			last_amon_jiffies = loop_jiffies;
 		}
-		job_is_go_but_aurora_is_down = 0;
 
 	        if (job_is_go(job)){
 	        	if (!job->dma_started){
@@ -1117,10 +1124,8 @@ static int afs_isr_work(void *arg)
 			}
 		}
 
-		if (job->buffers_demand > 0 ){
-			if (queue_full_buffers(adev) > 0){
-				wake_up_interruptible(&sdev->return_waitq);
-			}
+		if (job->buffers_demand > 0 && queue_full_buffers(adev) > 0){
+			wake_up_interruptible(&sdev->return_waitq);
 		}
 
 		spin_lock(&sdev->job_lock);
@@ -1140,8 +1145,8 @@ static int afs_isr_work(void *arg)
 			job->please_stop = PS_STOP_DONE;
 			job->dma_started = 0;
 			if (dma_descriptor_ram > 1){
-				validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
-									sdev->push_ram_cursor);
+				validate_dma_descriptor_ram(
+					adev, DMA_PUSH_DESC_RAM, sdev->push_ram_cursor);
 			}
 			break;
 /*
