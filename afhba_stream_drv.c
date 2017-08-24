@@ -676,31 +676,38 @@ struct HostBuffer* hb_from_descr(struct AFHBA_DEV *adev, u32 inflight_descr)
 static void report_inflight(
 	struct AFHBA_DEV *adev, int ibuf, int is_error, char *msg)
 {
-	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	u32 inflight_descr = dma_descriptor_ram? 0: DMA_PUSH_DESC_STA_RD(adev);
-	u32 fifsta = dma_descriptor_ram? 0: DMA_DESC_FIFSTA_RD(adev);
-	struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
-
-	if (sdev->job.buffers_demand == 0){
+	if (adev->stream_dev->job.buffers_demand == 0){
 		return;
 	}
-	if (is_error){
-		dev_err(pdev(adev),
-			"%30s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
-			msg,
-			ibuf,
-			inflight_descr,
-			inflight? inflight->ibuf: -1,
-			fifsta);
+	if (dma_descriptor_ram){
+		if (is_error){
+			dev_err(pdev(adev), "%30s: buffer %02d", msg, ibuf);
+		}else{
+			dev_warn(pdev(adev), "%30s: buffer %02d", msg, ibuf);
+		}
 	}else{
-		dev_warn(pdev(adev),
-			"%30s: buffer %02d last descr:%08x [%02d] fifo:%08x",
-			msg,
-			ibuf,
-			inflight_descr,
-			inflight? inflight->ibuf: -1,
-			fifsta);
+		u32 inflight_descr = DMA_PUSH_DESC_STA_RD(adev);
+		struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
+		u32 fifsta = DMA_DESC_FIFSTA_RD(adev);
+		if (is_error){
+			dev_err(pdev(adev),
+				"%30s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
+				msg,
+				ibuf,
+				inflight_descr,
+				inflight? inflight->ibuf: -1,
+				fifsta);
+		}else{
+			dev_warn(pdev(adev),
+				"%30s: buffer %02d last descr:%08x [%02d] fifo:%08x",
+				msg,
+				ibuf,
+				inflight_descr,
+				inflight? inflight->ibuf: -1,
+				fifsta);
+		}
 	}
+
 }
 static void report_stuck_buffer(struct AFHBA_DEV *adev, int ibuf)
 {
