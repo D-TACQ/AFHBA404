@@ -189,14 +189,35 @@ int process_files()
 	return !show_fail_summary();	// 0 is success for progs
 }
 
+void vector_replace(vector<int>& v, string str, string id)
+{
+	replace( str.begin(), str.end(), ',', ' ');
+	istringstream buf(str);
+	istream_iterator<std::string> beg(buf), end;
+
+	vector<std::string> tokens(beg, end);
+	v.clear();
+	for (auto& s: tokens){
+	     v.push_back(std::stoi(s));
+	}
+	cerr << id << " sites set:\"";
+	for (int& s: v){
+	       cerr << s;
+	}
+	cerr << "\" size:" << v.size() << "\n";
+}
 const char* sim_str;
+const char* sites_str;
 
 struct poptOption opt_table[] = {
+	{ "sites", 'S', POPT_ARG_STRING, &::sites_str, 'S', "csv list of sites" },
 	{ "sim", 's', POPT_ARG_STRING, &::sim_str, 's', "csv list of sites with simulation ramp" },
 	{ "cps", 'c', POPT_ARG_INT, &AcqData::cps, 0, "columns (of u32) per site" },
        POPT_AUTOHELP
        POPT_TABLEEND
 };
+
+
 void ui(int argc, const char* argv[])
 {
 	
@@ -211,26 +232,21 @@ void ui(int argc, const char* argv[])
 
         while ( (rc = poptGetNextOpt( opt_context )) >= 0 ){
                 switch(rc){
-			case 's': {
-	                std::string str = sim_str;
-        	        std::replace( str.begin(), str.end(), ',', ' ');
-                	std::istringstream buf(str);
-	                std::istream_iterator<std::string> beg(buf), end;
-
-        	        std::vector<std::string> tokens(beg, end);
-                	AcqData::rsites.clear();
-	                for (auto& s: tokens)
-        	                AcqData::rsites.push_back(std::stoi(s));
-
-	                std::cerr << "ramp sites set:\"";
-        	        for (int& s: AcqData::rsites)
-                	        std::cerr << s;
-	                std::cerr << "\"\n";
-	
-                        } break;
+		case 's':
+			vector_replace(AcqData::rsites, sim_str, "rsites");
+			break;
+		case 'S':
+			vector_replace(AcqData::sites, sites_str, "sites");
+			break;
                 }
         }
-
+        for (int&s: AcqData::rsites){
+        	vector<int>& sl = AcqData::sites;
+        	if (find(sl.begin(), sl.end(), s) == sl.end()){
+        		cerr << "ERROR: ramp site" << s << "not in sites\n";
+        		exit(1);
+        	}
+        }
 }
 
 int main(int argc, const char* argv[])
