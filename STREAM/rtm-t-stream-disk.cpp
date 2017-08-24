@@ -183,7 +183,7 @@ public:
 	}
 	void print(){
 		for (int ii = 0; ii < maxbins; ++ii){
-			printf("%5d%c", hg[ii], ii+1 >= maxbins? '\n': ':');
+			fprintf(stderr, "%5d%c", hg[ii], ii+1 >= maxbins? '\n': ':');
 		}
 	}
 	unsigned operator() (unsigned bin){
