@@ -173,7 +173,7 @@ class Histo {
 	unsigned *hg;
 	const int maxbins;
 public:
-	Histo(int _maxbins = 16) :
+	Histo(int _maxbins = 12) :
 		hg(new unsigned[_maxbins]),
 		maxbins(_maxbins)
 	{
@@ -190,7 +190,7 @@ public:
 		if (bin >= maxbins){
 			bin = maxbins - 1;
 		}
-		return hg[bin] ++;
+		return hg[bin]++;
 	}
 };
 
