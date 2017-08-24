@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1022"
+#define REVID	"R1023"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -47,7 +47,7 @@ int RX_TO = 1*HZ;
 module_param(RX_TO, int, 0644);
 MODULE_PARM_DESC(RX_TO, "RX timeout (jiffies) [0.1Hz]");
 
-int WORK_TO = HZ/50;
+int WORK_TO = HZ/100;
 module_param(WORK_TO, int, 0644);
 MODULE_PARM_DESC(WORK_TO,
 	"WORK timeout (jiffies) [50Hz] - decrease for hi fifo stat poll rate");
@@ -690,14 +690,14 @@ static void report_inflight(
 	}
 	if (dma_descriptor_ram){
 		(is_error? dev_err: dev_warn)(pdev(adev),
-				"%30s: buffer %02d", msg, ibuf);
+				"%s: buffer %02d", msg, ibuf);
 	}else{
 		u32 inflight_descr = DMA_PUSH_DESC_STA_RD(adev);
 		struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
 		u32 fifsta = DMA_DESC_FIFSTA_RD(adev);
 
 		(is_error? dev_err: dev_warn)(pdev(adev),
-				"%30s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
+				"%s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
 				msg,
 				ibuf,
 				inflight_descr,
@@ -761,10 +761,12 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 		}else{
 			if (ifilling > 1 && first && hb != first){
 				if (is_marked_empty(&adev->pci_dev->dev, first)){
-					report_stuck_buffer(adev, first->ibuf);
+
 					if (dma_descriptor_ram && assume_stuck_buffers_are_ok){
+						report_inflight(adev, first->ibuf, 0, "queuing dirty");
 						nrx = _queue_full_buffer(adev, first, nrx);
 					}else{
+						report_stuck_buffer(adev, first->ibuf);
 						return_empty(adev, first);
 						if (stop_on_skipped_buffer){
 							dev_warn(pdev(adev), "stop_on_skipped_buffer triggered");
@@ -773,7 +775,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 					}
 					first = 0;
 				}else{
-					dev_info(pdev(adev), "jackpot: marker found on retry");
+					report_inflight(adev, first->ibuf, 0, "jackpot");
 					nrx = _queue_full_buffer(adev, first, nrx);
 				}
 			}
