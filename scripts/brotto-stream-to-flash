@@ -7,11 +7,11 @@ LOGPID=$!
 
 fan_hi() {
 # peripheral fan HI 90%
-ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x60
+	ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x60
 }
 fan_lo() {
 # peripheral fan LO 33%
-ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x21
+	ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x21
 }
 trap "fan_lo" SIGINT SIGTERM
 
@@ -23,13 +23,15 @@ if [ $? -ne 0 ];then
 	exit 1
 fi
 export ACQ2106_UUT=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+
 if [ "${ACQ2106_UUT#acq2106_}" = "${ACQ2106}" ]; then
 	echo "ERROR: UUT SFP link NOT connected"
 	exit 1
 else
-echo streaming from UUT $ACQ2106_UUT
+	echo streaming from UUT $ACQ2106_UUT
 fi
-export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/data/ACQ400DATA/${ACQ2106_UUT}
+
+export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/data/ACQ400DATA/$DN/${ACQ2106_UUT}
 mkdir -p ${OUTROOT}
 export PUT4KPERFILE=1
 fan_hi
