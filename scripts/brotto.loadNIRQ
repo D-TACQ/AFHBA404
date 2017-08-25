@@ -3,6 +3,7 @@
 
 AMON=${AMON:-1}
 NBUFFERS=${1:-99}
+NPORTS=${NPORTS:-1}
 
 DDB=/sys/kernel/debug/dynamic_debug
 [ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
@@ -11,7 +12,7 @@ echo 9 > /proc/sys/kernel/printk
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
 	aurora_monitor=$AMON \
-	afhba_nports=1 buffer_len=4194304 nbuffers=$NBUFFERS \
+	afhba_nports=${NPORTS} buffer_len=4194304 nbuffers=$NBUFFERS \
 	eot_interrupt=0 dma_descriptor_ram=2
 	
 #	dyndbg="\" func afhba_map +pf\""
