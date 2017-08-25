@@ -1,8 +1,13 @@
 #!/bin/bash
 # afhba_nports=1 : only one link used, so save the 3xmemory buffers (1.5GB)
 
+while [ "x$1" != "x" ]; do
+	[[ $1 == *=* ]] && export $1
+	shift
+done
+
 AMON=${AMON:-1}
-NBUFFERS=${1:-99}
+NBUFFERS=${NBUFFERS:-99}
 NPORTS=${NPORTS:-1}
 
 DDB=/sys/kernel/debug/dynamic_debug
