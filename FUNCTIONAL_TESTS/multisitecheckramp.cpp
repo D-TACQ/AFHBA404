@@ -166,7 +166,7 @@ void process_group()
 		ii += 1;
 	}
 	process_mapped_data(ba, NGRP*AcqData::bl);
-	cout << "\n";
+
 	for (ii = 0; ii < NGRP; ++ii){
 		munmap(pdata[ii], AcqData::bl);
 		fclose(fp[ii]);
