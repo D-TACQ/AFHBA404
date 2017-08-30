@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1023"
+#define REVID	"R1024"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -186,6 +186,8 @@ static void write_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 	}
 	DEV_DBG(pdev(adev), "ibuf %d offset:%04x = %08x", idesc, offset, descr);
 	writel(descr, adev->remote+offset);
+	/* force write posting through to avoid message backup */
+	DMA_DESC_FIFSTA_RD(adev);
 }
 
 static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, int *cursor)
@@ -193,14 +195,22 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 descr = sdev->hbx[idesc].descr;
+	u32 descrr;
+	int cr = *cursor;
 
+	if (cr < sdev->nbuffers){
+		int addr = cr;
+		unsigned va = adev->remote + offset + cr*sizeof(unsigned);
 
-	if (*cursor < sdev->nbuffers){
-		int addr = *cursor;
 		DEV_DBG(pdev(adev), "_write_ram_descr() ibuf %d offset:%04x = %08x cursor:%d",
-					idesc, offset, descr, *cursor);
-		writel(descr, adev->remote+offset+*cursor*sizeof(unsigned));
-		*cursor += 1;
+					idesc, offset, descr, cr);
+		writel(descr, va);
+		descrr = readl(va);
+		if (descr != descrr){
+			dev_err(pdev(adev), "descriptor [%4d] wrote 0x%08x read 0x%08x",
+					cr, descr, descrr);
+		}
+		*cursor = cr + 1;
 		return addr;
 	}else{
 		return -1;
