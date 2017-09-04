@@ -198,9 +198,11 @@ struct AFHBA_DEV_PATH {
 
 #define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
 #define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
+
+#define AURORA_STEP			0x0010  /* Duplicate blocks every STEP */
 #define AURORA_CONTROL_REGA 		0x0080	/* Aurora Control Register */
 #define AURORA_STATUS_REGA 		0x0084	/* Aurora Status Register */
-
+#define AURORA_STATUS2_REGA		0x008C
 
 
 #define SFP_I2C_DATA_REG 		0x0088	/* SFP I2C Control and Data Register */

@@ -314,7 +314,21 @@ static ssize_t show_aurora(
 	}
 }
 
+
 static DEVICE_ATTR(aurora, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora, store_aurora);
+
+static ssize_t show_aurora_ext(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned asr2 = AURORA_STATUS2_REGA + adev->sfp*AURORA_STEP;
+	u32 stat = afhba_read_reg(adev, asr2);
+
+	return sprintf(buf, "0x%08x\n", stat);
+}
+static DEVICE_ATTR(aurora_ext, (S_IRUSR|S_IRGRP), show_aurora_ext, 0);
 
 static ssize_t store_comms_init(
 	struct device * dev,
@@ -505,6 +519,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_auroraA.attr,
 	&dev_attr_auroraB.attr,
 	&dev_attr_aurora.attr,
+	&dev_attr_aurora_ext.attr,
 	&dev_attr_data_fifo_stat_push.attr,
 	&dev_attr_data_fifo_stat_pull.attr,
 	&dev_attr_desc_fifo_stat_push.attr,
