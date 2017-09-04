@@ -200,7 +200,7 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 
 	if (cr < sdev->nbuffers){
 		int addr = cr;
-		unsigned va = adev->remote + offset + cr*sizeof(unsigned);
+		void* va = adev->remote + offset + cr*sizeof(unsigned);
 
 		DEV_DBG(pdev(adev), "_write_ram_descr() ibuf %d offset:%04x = %08x cursor:%d",
 					idesc, offset, descr, cr);
