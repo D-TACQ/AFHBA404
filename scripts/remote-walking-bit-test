@@ -1,0 +1,34 @@
+#!/bin/expect
+# walking bits test on dma_test reg
+
+proc poke {value} {
+	set fp [open /dev/rtm-t.0.ctrl/dma_test w]
+	puts $fp $value
+	close $fp
+}
+
+proc peek {} {
+	set fp [open /dev/rtm-t.0.ctrl/dma_test r]
+	gets $fp value
+	close $fp
+	return $value
+}
+
+poke 0x1234000
+puts [peek]
+poke 0x00001234
+puts [peek]
+
+while {1} {
+	for {set ii 0} {$ii < 32}  {incr ii} {
+		set tv [format 0x%08x [expr 1 << $ii]]
+		poke $tv
+		set rx [peek]
+		if {$tv == $rx} {
+			set status PASS
+		} else {
+			set status FAIL
+		}		
+		puts "$tv $rx $status"
+	}
+}
