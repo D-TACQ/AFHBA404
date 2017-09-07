@@ -411,6 +411,36 @@ static ssize_t show_fpga_rev(
 static DEVICE_ATTR(fpga_rev, (S_IRUSR|S_IRGRP), show_fpga_rev, 0);
 
 
+static ssize_t store_dma_test(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	unsigned test;
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+
+	if (sscanf(buf, "0x%x", &test) == 1 || sscanf(buf, "%d", &test) == 1){
+		DMA_TEST_WR(adev, test);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static ssize_t show_dma_test(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+
+	sprintf(buf, "0x%08x\n", DMA_TEST_RD(adev));
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(dma_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_dma_test, store_dma_test);
+
+
 static ssize_t show_heartbeat(
 		struct device * dev,
 		struct device_attribute *attr,
@@ -514,6 +544,7 @@ static DEVICE_ATTR(host_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_host_tes
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
+	&dev_attr_dma_test.attr,
 	&dev_attr_inflight.attr,
 	&dev_attr_reset_buffers.attr,
 	&dev_attr_auroraA.attr,

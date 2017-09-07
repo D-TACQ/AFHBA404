@@ -192,10 +192,10 @@ u32 _afs_read_dmareg(struct AFHBA_DEV *adev, int regoff);
 
 
 #define DMA_TEST_WR(adev, value) \
-	_afs_write_dmareg(adev, DMA_TEST, MIRROR(adev, DMA_CTRL)), value)
+	_afs_write_dmareg(adev, DMA_TEST, MIRROR(adev, DMA_TEST) = (value))
 
 #define DMA_TEST_RD(adev) \
-	_afs_read_reg(adev, DMA_TEST)
+	(MIRROR(adev, DMA_TEST) = _afs_read_dmareg(adev, DMA_TEST))
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value);
 
