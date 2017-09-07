@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1025"
+#define REVID	"R1028"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -108,6 +108,9 @@ int assume_stuck_buffers_are_ok = 0;
 module_param(assume_stuck_buffers_are_ok, int, 0644);
 MODULE_PARM_DESC(assume_stuck_buffers_are_ok, "assume that stuck buffers are ok to release into the wild");
 
+int max_dma_load_retry = 2;
+module_param(max_dma_load_retry, int, 0644);
+MODULE_PARM_DESC(max_dma_load_retry, "number of times to retry loading descriptors. HACK: once should be enough");
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
@@ -217,7 +220,7 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 	}
 }
 
-static void validate_dma_descriptor_ram(
+static int validate_dma_descriptor_ram(
 		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id, int phase)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -238,9 +241,11 @@ static void validate_dma_descriptor_ram(
 	if (errors){
 		dev_err(pdev(adev), "%s descriptor errors %d out of %d",
 				"validate_dma_descriptor_ram", errors, id);
+		return errors;
 	}else{
 		dev_info(pdev(adev), "%s %d descriptors PASS",
 				"validate_dma_descriptor_ram", id);
+		return 0;
 	}
 }
 static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
@@ -1064,29 +1069,46 @@ int job_is_go(struct JOB* job)
 }
 
 
-void load_buffers(struct AFHBA_DEV* adev)
+int load_buffers(struct AFHBA_DEV* adev)
+/* return 0 on success */
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
 	queue_free_buffers(adev);
 	if (dma_descriptor_ram > 1 && !sdev->job.dma_started){
-		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
+		return validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
 							sdev->push_ram_cursor, 1);
      	}else{
        		queue_free_buffers(adev);
+       		return 0;
        	}
 }
 
-void start_job(struct AFHBA_DEV* adev)
+int start_job(struct AFHBA_DEV* adev)
+/* returns 0 on success */
 {
+	int retry = 0;
+	int load_ok = 0;
+
 	afs_stop_dma(adev, DMA_PUSH_SEL);	/* belt+braces */
 	afs_configure_streaming_dma(adev, DMA_PUSH_SEL);
-	load_buffers(adev);
+
+	while(retry++ < max_dma_load_retry){
+		if (load_buffers(adev) == 0){
+			load_ok = 1;
+			break;
+		}
+	}
+	if (!load_ok){
+		dev_err(pdev(adev), "ERROR dma load retry count exceeded");
+		return 1;
+	}
 	afs_start_dma(adev, DMA_PUSH_SEL);
 
 	spin_lock(&adev->stream_dev->job_lock);
 	adev->stream_dev->job.dma_started = 1;
 	spin_unlock(&adev->stream_dev->job_lock);
+	return 0;
 }
 
 static int afs_isr_work(void *arg)
@@ -1130,7 +1152,9 @@ static int afs_isr_work(void *arg)
 
 	        if (job_is_go(job)){
 	        	if (!job->dma_started){
-	        		start_job(adev);
+	        		if (start_job(adev) != 0){
+	        			job->please_stop = PS_PLEASE_STOP;
+	        		}
 	        	}else{
 	        		queue_free_buffers(adev);
 			}
