@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1024"
+#define REVID	"R1025"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -218,7 +218,7 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 }
 
 static void validate_dma_descriptor_ram(
-		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id)
+		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id, int phase)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 descr;
@@ -228,12 +228,12 @@ static void validate_dma_descriptor_ram(
 	for (id = 0; id < max_id; ++id){
 		descr = readl(adev->remote+offset+id*sizeof(unsigned));
 		if (descr != sdev->hbx[id].descr){
-			dev_err(pdev(adev), "%s descriptor mismatch at [%d] w:%08x r:%08x",
-					"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+			dev_err(pdev(adev), "%s phase:%d descriptor mismatch at [%d] w:%08x r:%08x",
+					"validate_dma_descriptor_ram", phase, id, sdev->hbx[id].descr, descr);
 			errors += 1;
 		}
-		dev_dbg(pdev(adev), "%s descriptor at [%d] w:%08x r:%08x",
-				"validate_dma_descriptor_ram", id, sdev->hbx[id].descr, descr);
+		dev_dbg(pdev(adev), "%s phase:%d descriptor at [%d] w:%08x r:%08x",
+				"validate_dma_descriptor_ram", phase, id, sdev->hbx[id].descr, descr);
 	}
 	if (errors){
 		dev_err(pdev(adev), "%s descriptor errors %d out of %d",
@@ -1071,7 +1071,7 @@ void load_buffers(struct AFHBA_DEV* adev)
 	queue_free_buffers(adev);
 	if (dma_descriptor_ram > 1 && !sdev->job.dma_started){
 		validate_dma_descriptor_ram(adev, DMA_PUSH_DESC_RAM,
-							sdev->push_ram_cursor);
+							sdev->push_ram_cursor, 1);
      	}else{
        		queue_free_buffers(adev);
        	}
@@ -1158,7 +1158,7 @@ static int afs_isr_work(void *arg)
 			job->dma_started = 0;
 			if (dma_descriptor_ram > 1){
 				validate_dma_descriptor_ram(
-					adev, DMA_PUSH_DESC_RAM, sdev->push_ram_cursor);
+					adev, DMA_PUSH_DESC_RAM, sdev->push_ram_cursor, 99);
 			}
 			break;
 /*
