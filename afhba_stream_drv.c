@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1029"
+#define REVID	"R1030"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -625,7 +625,7 @@ static void mark_empty(struct device *dev, struct HostBuffer *hb){
 	pmark[0] = EMPTY1;
 	pmark[1] = EMPTY2;
 
-	dma_sync_single_for_device(dev, hb->pa+offset, hb->req_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_device(dev, hb->pa+offset, mark_len, PCI_DMA_FROMDEVICE);
 }
 
 
@@ -635,7 +635,7 @@ static int is_marked_empty(struct device *dev, struct HostBuffer *hb){
 	u32 *pmark = (u32*)(hb->va + offset);
 	int is_empty;
 
-	dma_sync_single_for_cpu(dev, hb->pa+offset, hb->req_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_cpu(dev, hb->pa+offset, mark_len, PCI_DMA_FROMDEVICE);
 
 	is_empty = pmark[0] == EMPTY1 && pmark[1] == EMPTY2;
 
