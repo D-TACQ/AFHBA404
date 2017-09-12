@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1030"
+#define REVID	"R1031"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -114,6 +114,10 @@ MODULE_PARM_DESC(max_dma_load_retry, "number of times to retry loading descripto
 
 static struct file_operations afs_fops_dma;
 static struct file_operations afs_fops_dma_poll;
+
+int max_empty_backlog_check = 2;
+module_param(max_empty_backlog_check, int , 0644);
+MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of deck, set to two to check skips");
 
 static int getOrder(int len)
 {
@@ -768,7 +772,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 			first = hb;
 		}
 		if (is_marked_empty(&adev->pci_dev->dev, hb)){
-			if (ifilling > 1){
+			if (ifilling >= max_empty_backlog_check){
 				break; 	/* top 2 buffers empty: no action */
 			}else{
 				continue;  /* check skipped data. */
