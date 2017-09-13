@@ -1543,6 +1543,7 @@ ssize_t afs_dma_read(
 				break;
 			}
 
+			dma_sync_single_for_cpu(dev, hb->pa, hb->req_len, PCI_DMA_FROMDEVICE);
 			if (copy_to_user(buf+nbytes, &hb->ibuf, sizeof(int))){
 				rc = -EFAULT;
 				goto read99;
