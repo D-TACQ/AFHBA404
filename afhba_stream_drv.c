@@ -796,6 +796,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 				}else{
 					report_inflight(adev, first->ibuf, 0, "jackpot");
 					nrx = _queue_full_buffer(adev, first, nrx);
+					first = 0;
 				}
 			}
 
