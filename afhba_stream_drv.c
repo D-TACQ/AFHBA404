@@ -1538,7 +1538,8 @@ ssize_t afs_dma_read(
 		struct HostBuffer *hb;
 		struct HostBuffer *tmp;
 		int nbytes = 0;
-		int backlog = 0
+		int backlog = 0;
+		struct StreamBufferDef sbd;
 
 		list_for_each_entry_safe(hb, tmp, &sdev->bp_full.list, list){
 			if (nbytes+SBDSZ > count){
@@ -1546,7 +1547,7 @@ ssize_t afs_dma_read(
 				    nbytes, (long)count);
 				break;
 			}
-			struct StreamBufferDef sbd;
+
 			sbd.ibuf = IBUF_MAGIC|(backlog<<IBUF_IDX_SHL)|hb->ibuf;
 			sbd.esta = hb->esta;
 
