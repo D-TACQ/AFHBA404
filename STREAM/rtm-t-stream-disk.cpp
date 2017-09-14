@@ -211,15 +211,13 @@ static void writeSBD(struct StreamBufferDef* sbd, const char* data_fname)
 		old = *sbd;
 	}
 
-	fprintf(fp, "%08x,%08x,%d,%d,%d,%s,%s\n",
+	fprintf(fp, "%s,%08x,%08x,%d,%d,%d,%s\n",
+			data_fname,
 			sbd->ibuf, sbd->esta,
 			sbd->ibuf&IBUF_IBUF,
 			(sbd->ibuf&IBUF_IDX)>>IBUF_IDX_SHL,
 			sbd->esta&IBUF_IBUF,
-			data_fname,
 			(sbd->esta&ESTA_CRC)-(old.esta&ESTA_CRC)<2? "OK": "ERR");
-
-
 
 	old = *sbd;
 }
