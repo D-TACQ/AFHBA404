@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1040"
+#define REVID	"R1050"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1538,15 +1538,19 @@ ssize_t afs_dma_read(
 		struct HostBuffer *hb;
 		struct HostBuffer *tmp;
 		int nbytes = 0;
+		int backlog = 0
 
 		list_for_each_entry_safe(hb, tmp, &sdev->bp_full.list, list){
-			if (nbytes+sizeof(int) > count){
+			if (nbytes+SBDSZ > count){
 				dev_dbg(pdev(adev), "quit nbytes %d count %lu",
 				    nbytes, (long)count);
 				break;
 			}
+			struct StreamBufferDef sbd;
+			sbd.ibuf = IBUF_MAGIC|(backlog<<IBUF_IDX_SHL)|hb->ibuf;
+			sbd.esta = hb->esta;
 
-			if (copy_to_user(buf+nbytes, &hb->ibuf, sizeof(int))){
+			if (copy_to_user(buf+nbytes, &sbd, SBDSZ)){
 				rc = -EFAULT;
 				goto read99;
 			}
@@ -1554,7 +1558,8 @@ ssize_t afs_dma_read(
 
 			list_move_tail(&hb->list, &PD(file)->my_buffers);
 			hb->bstate = BS_FULL_APP;
-			nbytes += sizeof(int);
+			nbytes += SBDSZ;
+			backlog++;
 		}
 
 		if (rc == 0 && nbytes == 0){

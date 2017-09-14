@@ -79,6 +79,7 @@ int MAXINT = 999999;
 int PUT_DATA = 1;		/* output name of data buffer, not id */
 int NBUFS = 0;			/* !=) ? stop after this many buffers */
 int PUT4KPERFILE = 0;		/* fake 4MB output for pv to measure at /1000 */
+int OUTPUT_META = 0;
 
 struct SEQ {
 	unsigned long errors;
@@ -194,7 +195,36 @@ public:
 	}
 };
 
-static void process(int ibuf, int nbuf){
+static void writeSBD(struct StreamBufferDef* sbd, const char* data_fname)
+{
+	static FILE *fp;
+	static struct StreamBufferDef old;
+
+	if (fp == 0){
+		char buf[128];
+		sprintf(buf, "%s/err.log", OUTROOT);
+		fp = fopen(buf, "w");
+		if (fp == 0){
+			fprintf(stderr, "ERROR failed to open file \"%s\"\n", buf);
+			exit(1);
+		}
+		old = *sbd;
+	}
+
+	fprintf(fp, "%08x,%08x,%d,%d,%d,%s,%s\n",
+			sbd->ibuf, sbd->esta,
+			sbd->ibuf&IBUF_IBUF,
+			(sbd->ibuf&IBUF_IDX)>>IBUF_IDX_SHL,
+			sbd->esta&IBUF_IBUF,
+			data_fname,
+			(sbd->esta&ESTA_CRC)-(old.esta&ESTA_CRC)<2? "OK": "ERR");
+
+
+
+	old = *sbd;
+}
+
+static void process(int ibuf, int nbuf, struct StreamBufferDef *sbd){
 	if (VERBOSE == 1){
 		if (ibuf%10 == 0){
 			fprintf(stderr, "%c", ibuf==0? '\r': '.');
@@ -244,11 +274,15 @@ static void process(int ibuf, int nbuf){
 			perror(buf);
 			_exit(errno);
 		}
-		strcpy(buf, data_fname);
-		strcat(buf, ".id");
-		int out_meta = open(buf, O_MODE, PERM);
-		write_meta(out_meta, ibuf, nbuf);
-		close(out_meta);
+		writeSBD(sbd, data_fname);
+
+		if (OUTPUT_META){
+			strcpy(buf, data_fname);
+			strcat(buf, ".id");
+			int out_meta = open(buf, O_MODE, PERM);
+			write_meta(out_meta, ibuf, nbuf);
+			close(out_meta);
+		}
 	}
 	if (NO_OVERWRITE){
 		fail_if_exists(data_fname);
@@ -288,11 +322,20 @@ static void process(int ibuf, int nbuf){
 	}
 }
 
+int getBufNo(StreamBufferDef* sbd)
+{
+	if ((sbd->ibuf&IBUF_MAGIC_MASK) != IBUF_MAGIC){
+		fprintf(stderr, "ERROR NOT IBUF_MAGIC %08x %08x\n",
+				sbd->ibuf, sbd->esta);
+		exit(1);
+	}
+	return sbd->ibuf&IBUF_IBUF;
+}
 
 static int stream()
 {
 	unsigned iter = 0;
-	int id_buf[NELEMS];
+	struct StreamBufferDef sbd[NELEMS];
 	int fp = dev->getDeviceHandle();
 	int ifirst = MAXINT;
 	int nbuf = 0;
@@ -306,19 +349,20 @@ static int stream()
 
 	while (iter < MAXITER){
 		DIAG("CALLING read\n");
-		int nread = read(fp, id_buf, NELEMS*sizeof(int));
+		int nread = read(fp, sbd, NELEMS*SBDSZ);
 		int ibuf;
 
 		DIAG("	read returned %d\n", nread);
 
 		if (nread > 0){
-			int nb = nread/sizeof(int);
+			int nb = nread/SBDSZ;
 			backlog(nb);
 			for (ibuf = 0; ibuf < nb; ++ibuf){
-				int nwrite =  sizeof(int)*1;
+				int nwrite = sizeof(int);
+				int bufno = getBufNo(sbd+ibuf);
 
-				if (id_buf[ibuf] <= ifirst ){
-					ifirst = id_buf[ibuf];
+				if (bufno <= ifirst ){
+					ifirst = bufno;
 					if (RECYCLE == 0){
 						++CYCLE;
 					}else{
@@ -328,12 +372,12 @@ static int stream()
 					}
 				}
 				DIAG("CALLING process\n");
-				process(id_buf[ibuf], ++nbuf);
+				process(bufno, ++nbuf, sbd+ibuf);
 			
-				dbg(2, "write [%d] %d\n", ibuf, id_buf[ibuf]);
+				dbg(2, "write [%d] %d\n", ibuf, bufno);
 
 				DIAG("CALLING write\n");
-				if (write(fp, id_buf+ibuf, nwrite) != nwrite ){
+				if (write(fp, &bufno, nwrite) != nwrite ){
 					perror("write failed");
 					return -1;
 				}
@@ -456,6 +500,9 @@ static void init_defaults(int argc, char* argv[])
 	}
 	if (getenv("PUT4KPERFILE")){
 		PUT4KPERFILE = 1;
+	}
+	if (getenv("OUTPUT_META")){
+		OUTPUT_META = atoi(getenv("OUTPUT_META"));
 	}
 	setvbuf(stdout, 0, _IOLBF, 0);
 

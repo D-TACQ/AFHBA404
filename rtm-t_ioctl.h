@@ -76,8 +76,11 @@ struct StreamBufferDef {
 	u32 esta;
 };
 #define IBUF_MAGIC	0xb1f00000
+#define IBUF_MAGIC_MASK	0xfff00000
 #define IBUF_IDX	0x000f0000
 #define IBUF_IDX_SHL	16
-#define ESTA_ERRCOUNT	0x0000ffff
+#define IBUF_IBUF	0x0000ffff
+#define ESTA_CRC	0x0000ffff
+#define SBDSZ		sizeof(struct StreamBufferDef)
 
 #endif /* __RTM_T_IOCTL_H__ */
