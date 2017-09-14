@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1031"
+#define REVID	"R1040"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -744,6 +744,7 @@ static int _queue_full_buffer(struct AFHBA_DEV *adev, struct HostBuffer* hb, int
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB *job = &sdev->job;
 
+	hb->esta = read_astatus2(adev);
 	if (buffer_debug){
 		report_inflight(adev, hb->ibuf, 0, "->FULL");
 	}
@@ -1489,6 +1490,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	return afhba_release(inode, file);
 }
 
+
 ssize_t afs_dma_read(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 /* returns when buffer[s] available
@@ -1544,7 +1546,6 @@ ssize_t afs_dma_read(
 				break;
 			}
 
-			dma_sync_single_for_cpu(dev, hb->pa, hb->req_len, PCI_DMA_FROMDEVICE);
 			if (copy_to_user(buf+nbytes, &hb->ibuf, sizeof(int))){
 				rc = -EFAULT;
 				goto read99;

@@ -98,6 +98,7 @@ struct HostBuffer {
 	enum BSTATE {
 		BS_EMPTY, BS_FILLING, BS_FULL, BS_FULL_APP }
 	bstate;
+	u32 esta;		/* error status */
 	u32 timestamp;
 };
 
@@ -376,6 +377,10 @@ enum COMMON_REGS {
 
 #define COM_SOFT_TRIGGER_EN		0x0001
 
-
+static inline u32 read_astatus2(struct AFHBA_DEV *adev)
+{
+	unsigned asr2 = AURORA_STATUS2_REGA + adev->sfp*AURORA_STEP;
+	return afhba_read_reg(adev, asr2);
+}
 
 #endif /* ACQ_FIBER_HBA_H_ */

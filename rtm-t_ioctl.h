@@ -71,4 +71,13 @@ struct XLLC_DEF {
 #define AFHBA_START_AO_LLC	_IOWR(DMAGIC,   6, struct XLLC_DEF)
 /**< ioctl ACQ2106 Start Low Latency Control Outbound */
 
+struct StreamBufferDef {
+	u32 ibuf;
+	u32 esta;
+};
+#define IBUF_MAGIC	0xb1f00000
+#define IBUF_IDX	0x000f0000
+#define IBUF_IDX_SHL	16
+#define ESTA_ERRCOUNT	0x0000ffff
+
 #endif /* __RTM_T_IOCTL_H__ */

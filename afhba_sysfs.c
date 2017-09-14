@@ -323,10 +323,8 @@ static ssize_t show_aurora_ext(
 	char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	unsigned asr2 = AURORA_STATUS2_REGA + adev->sfp*AURORA_STEP;
-	u32 stat = afhba_read_reg(adev, asr2);
 
-	return sprintf(buf, "0x%08x\n", stat);
+	return sprintf(buf, "0x%08x\n", read_astatus2(adev));
 }
 static DEVICE_ATTR(aurora_ext, (S_IRUSR|S_IRGRP), show_aurora_ext, 0);
 
