@@ -18,9 +18,15 @@ remote_cmd() {
 
 for h in $*
 do
-	remote_cmd $h 0 SIG:SRC:TRG:1=HOST$RPORT
+	if [ "$RPORT" = "A" ]; then
+		BIT=1
+	else
+		BIT=0
+	fi
+	remote_cmd $h 0 SIG:SRC:TRG:$BIT=HOST$RPORT
 done
 
-echo 1 > /dev/rtm-t.0.ctrl/com_trg
+echo 1 > /sys/class/afhba/afhba.0/com_trg
+
 
 
