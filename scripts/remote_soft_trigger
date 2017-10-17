@@ -18,12 +18,17 @@ remote_cmd() {
 
 for h in $*
 do
-	if [ "$RPORT" = "A" ]; then
-		BIT=1
-	else
-		BIT=0
-	fi
-	remote_cmd $h 0 SIG:SRC:TRG:$BIT=HOST$RPORT
+	remote_cmd $h 0 SIG:SRC:TRG:0=EXT
+	remote_cmd $h 0 SIG:SRC:TRG:1=STRIG
+
+	case $RPORT in
+	A)
+		remote_cmd $h 0 SIG:SRC:TRG:1=HOSTA;;
+	B)
+		remote_cmd $h 0 SIG:SRC:TRG:0=HOSTB;;
+	*)
+		;;
+	esac
 done
 
 echo 1 > /sys/class/afhba/afhba.0/com_trg
