@@ -19,6 +19,8 @@
 #define PCI_SUBDID_FHBA_4G	0x4102
 #define PCI_SUBDID_FHBA_4G2	0x4103
 #define PCI_SUBDID_FHBA_4G4	0x4104	/* AFHBA404 */
+#define PCI_SUBDID_FHBA_4G4_3R	0x4204  /* AFHBA404, 3Gbps, Retry */
+#define PCI_SUBDID_FHBA_4G4_6R  0x4304  /* AFHBA404, 6Gbps, Retry */
 #define PCI_SUBDID_HBA_KMCU	0x4105	/* KMCU #1 Z7035 using one lane of 4 */
 #define PCI_SUBDID_HBA_KMCU2	0x4106	/* KMCU #2 Z7030 single lane */
 

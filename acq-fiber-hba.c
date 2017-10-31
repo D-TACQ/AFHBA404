@@ -455,13 +455,13 @@ int afhba2_probe(struct AFHBA_DEV *adev)
 		return rc;
 	}
 }
-int afhba4_probe(struct AFHBA_DEV *adev)
+int afhba4_probe(struct AFHBA_DEV *adev, const char* flavour)
 {
 	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
 	int rc;
 	int ib;
 
-	dev_info(pdev(adev), "AFHBA404 detected");
+	dev_info(pdev(adev), "AFHBA404 detected %s", flavour);
 	adev->map_count = MAP_COUNT_4G4;
 	adev->remote_com_bar = MAP_COUNT_4G4-1;
 	if (bad_bios_bar_limit){
@@ -527,7 +527,11 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	case PCI_SUBDID_FHBA_4G2:
 		return afhba2_probe(adev);
 	case PCI_SUBDID_FHBA_4G4:
-		return afhba4_probe(adev);
+		return afhba4_probe(adev, "AFHBA404 6Gbps");
+	case PCI_SUBDID_FHBA_4G4_3R:
+		return afhba4_probe(adev, "AFHBA404 3Gbps Retry");
+	case PCI_SUBDID_FHBA_4G4_6R:
+		return afhba4_probe(adev, "AFHBA404 6Gbps Retry");
 	case PCI_SUBDID_HBA_KMCU:
 		dev_info(pdev(adev), "KMCU detected");
 		return afhba_mtca_probe(adev);
@@ -567,6 +571,10 @@ static struct pci_device_id afhba_pci_tbl[] = {
 		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G2, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
 		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G4, 0 },
+	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
+		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G4_3R, 0 },
+	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
+		PCI_SUBVID_DTACQ, PCI_SUBDID_FHBA_4G4_6R, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
 		PCI_SUBVID_DTACQ, PCI_SUBDID_HBA_KMCU, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
