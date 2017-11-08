@@ -172,12 +172,45 @@ void process_group()
 		fclose(fp[ii]);
 	}
 }
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int _flen(const char* fname)
+{
+	struct stat buf;
+	int rc = stat(fname, &buf);
+	if (rc != 0){
+		perror(fname);
+		exit(1);
+	}
+	return buf.st_size;
+}
+int check_length(const char* fname)
+{
+	static bool first_time_done;
+	int flen = _flen(fname);
+
+	if (!first_time_done){
+		AcqData::bl = flen;
+		fprintf(stderr, "File length recorded as %d\n", flen);
+		first_time_done = true;
+	}else{
+		if (flen != AcqData::bl){
+			fprintf(stderr, "ERROR: length mismatch %s %d != %d\n",
+				fname, flen, AcqData::bl);
+		}
+	}
+}
+
 int process_files()
 {
 	char buf[80];
 
 	while(fgets(buf, 80, stdin)){
 		chomp(buf);
+		check_length(buf);
 		AcqData::fn.push_back(buf);
 		if (AcqData::fn.size() == NGRP){
 			process_group();
