@@ -151,6 +151,7 @@ void process_group()
 	for (string& s : AcqData::fn){
 		if (ii ==0) cout << s << " ";
 		fp[ii] = fopen(s.c_str(), "r");
+//		printf("fopen %s\n", s.c_str());
 		if (fp[ii] == 0){
 			perror("failed to open file");
 			exit(1);
@@ -162,12 +163,14 @@ void process_group()
 			perror("mmap() failed to get the hint");
 			exit(1);
 		}
+//		printf("mmap:%x\n", bax);
 		bax += AcqData::bl;
 		ii += 1;
 	}
-	process_mapped_data(ba, NGRP*AcqData::bl);
+	int ngrp = ii;
+	process_mapped_data(ba, ngrp*AcqData::bl);
 
-	for (ii = 0; ii < NGRP; ++ii){
+	for (ii = 0; ii < ngrp; ++ii){
 		munmap(pdata[ii], AcqData::bl);
 		fclose(fp[ii]);
 	}
@@ -204,15 +207,29 @@ int check_length(const char* fname)
 	}
 }
 
+int calc_NGRP() {
+	int nsites = AcqData::rsites.size();
+	int ngrp = 1;
+	switch(nsites){
+	case 3:
+	case 6:
+		ngrp = 3;
+	}
+
+	printf("calc_NGRP() return ngrp=%d\n", ngrp);
+	return ngrp;	
+}
+
 int process_files()
 {
 	char buf[80];
+	int ngrp = calc_NGRP();
 
 	while(fgets(buf, 80, stdin)){
 		chomp(buf);
 		check_length(buf);
 		AcqData::fn.push_back(buf);
-		if (AcqData::fn.size() == NGRP){
+		if (AcqData::fn.size() == ngrp){
 			process_group();
 			AcqData::fn.clear();
 		}
