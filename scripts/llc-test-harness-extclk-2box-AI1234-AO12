@@ -1,0 +1,83 @@
+#!/bin/bash
+# llc-test-harness-extclk-AI1234-AO12
+# AI+AO llc on two fibers AI and AO in separate boxes AI on Comms A and AO on Comms B. Basic LLC test
+
+[ -d scripts ] && cd scripts
+
+# MUST set remote ip-address
+REMIP_AI=${1:-acq2106_076}
+REMIP_AO=${1:-acq2106_079}
+INTCLKDIV=${INTCLKDIV:-1000}		# 100M/100 = 1MHz
+EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+STREAMPID=0
+
+
+source afhba-common
+# site definitions SC: system controller, CB: commsB, AI: AI, AO : AO
+SC=0
+CA=13
+CB=12
+AI=1
+AO=1
+
+AISITES=1,2,3,4
+AOSITES=1,2
+
+CA_SITES=1,2,3,4
+CB_SITES=1,2
+
+init_comms() {	
+	cx=$1
+	sites=$2
+	
+#	remote_cmd $cx spad=0
+	remote_AI_cmd $cx aggregator sites=$sites
+}
+
+in_cmd() {
+        REMIP=$INBOX remote_cmd $*
+}
+
+out_cmd() {
+        REMIP=$OUTBOX remote_cmd $*
+}
+
+
+init_2106() {
+	echo CLK TRG basics have been preset, but
+	echo settting clkdiv=$EXTCLKDIV
+	in_cmd $AI clkdiv=$EXTCLKDIV
+	out_cmd $AO clkdiv=$EXTCLKDIV
+
+	out_cmd $AO lotide 256
+
+
+	in_cmd $SC spad=1,16,0	
+	in_cmd $SC run0 1,2,3,4
+	out_cmd $CB spad 1
+	
+	in_cmd $CA $CA_SITES
+	in_cmd $CA aggregator sites=$AISITES
+	out_cmd $CB $CB_SITES		# should not be needed
+	out_cmd $SC distributor sites=$AOSITES comms=2 on
+	
+}
+
+start_stream() {
+	remote_cmd $SC streamtonowhered start
+}
+
+
+cleanup() {
+#	kill ${STREAMPID}
+	remote_cmd $SC streamtonowhered stop
+}
+
+init_2106
+start_stream
+echo now view data perhaps using ./mapsample
+echo CTRL-C to quit
+trap "cleanup" SIGINT SIGTERM
+
+sleep 99999
+
