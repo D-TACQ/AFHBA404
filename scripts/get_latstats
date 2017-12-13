@@ -1,0 +1,25 @@
+#!/usr/bin/python
+
+import sys
+
+# TICK in usec
+TICK=4e-3	
+#TICK = 4
+#
+
+fp = open("/dev/rtm-t.0.ctrl/latstat", "r")
+line = fp.readline()
+
+args = line.split()
+
+names = ("Avg", "Runs", "Max", "Min" )
+
+
+for ii in range(0, len(args)):
+	count = int(args[ii])
+	if count == 65535:
+		sys.stdout.write("%5s:ERR," % (names[ii]))
+	else:
+		sys.stdout.write("%5s:%.2f," % (names[ii], count*TICK))
+
+sys.stdout.write("\n")
