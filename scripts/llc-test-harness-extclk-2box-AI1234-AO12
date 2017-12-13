@@ -5,10 +5,9 @@
 [ -d scripts ] && cd scripts
 
 # MUST set remote ip-address
-REMIP_AI=${1:-acq2106_076}
-REMIP_AO=${1:-acq2106_079}
-INTCLKDIV=${INTCLKDIV:-1000}		# 100M/100 = 1MHz
-EXTCLKDIV=${EXTCLKDIV:-1}		# 1M/1 = 1MHz
+INBOX=${1:-acq2106_076}
+OUTBOX=${1:-acq2106_079}
+EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
 STREAMPID=0
 
 
@@ -20,19 +19,9 @@ CB=12
 AI=1
 AO=1
 
-AISITES=1,2,3,4
+AISITES=1,2,3,4,5,6
 AOSITES=1,2
 
-CA_SITES=1,2,3,4
-CB_SITES=1,2
-
-init_comms() {	
-	cx=$1
-	sites=$2
-	
-#	remote_cmd $cx spad=0
-	remote_AI_cmd $cx aggregator sites=$sites
-}
 
 in_cmd() {
         REMIP=$INBOX remote_cmd $*
@@ -48,29 +37,25 @@ init_2106() {
 	echo settting clkdiv=$EXTCLKDIV
 	in_cmd $AI clkdiv=$EXTCLKDIV
 	out_cmd $AO clkdiv=$EXTCLKDIV
-
 	out_cmd $AO lotide 256
 
 
 	in_cmd $SC spad=1,16,0	
-	in_cmd $SC run0 1,2,3,4
-	out_cmd $CB spad 1
-	
-	in_cmd $CA $CA_SITES
+	in_cmd $CA spad 1
 	in_cmd $CA aggregator sites=$AISITES
-	out_cmd $CB $CB_SITES		# should not be needed
-	out_cmd $SC distributor sites=$AOSITES comms=2 on
+
+	out_cmd $SC distributor sites=$AOSITES comms=2 pad=0 on
 	
 }
 
 start_stream() {
-	remote_cmd $SC streamtonowhered start
+	in_cmd $SC streamtonowhered start
 }
 
 
 cleanup() {
 #	kill ${STREAMPID}
-	remote_cmd $SC streamtonowhered stop
+	in_cmd $SC streamtonowhered stop
 }
 
 init_2106
