@@ -61,8 +61,8 @@ int has_do32;
 
 /* ACQ425 */
 
-#define NCHAN	16
-#define NSHORTS	32
+#define NCHAN	(6*32)
+#define NSHORTS	(7*32)
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
 
@@ -78,8 +78,10 @@ struct XLLC_DEF ai_def = {
 		.len = VI_LEN
 };
 
-#define AO_CHAN	32
-#define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
+#define AO_CHAN	64
+//#define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
+#define VO_LEN	(AO_CHAN*sizeof(short))
+
 
 #define DO_IX	(16)		/* longwords */
 
@@ -150,12 +152,16 @@ void check_tlatch_action(void *local_buffer)
 	tl0 = tl1;
 }
 
+int ZCOPY;
 
 void ui(int argc, char* argv[])
 {
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
+	if (getenv("ZCOPY")){
+		ZCOPY = atoi(getenv("ZCOPY"));
+	}
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
@@ -223,13 +229,17 @@ void setup()
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
 	}
-	printf("AI buf pa: 0x%08x\n", ai_def.pa);
+	printf("AI buf %p pa: 0x%08x %d\n", dev_ai.mapping, ai_def.pa, ai_def.len);
 
+	if (ZCOPY){
+		ai_def.len = ao_def.len;
+		ao_def = ai_def;
+	}
 	if (ioctl(dev_ao.fd, AFHBA_START_AO_LLC, &ao_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x\n", ao_def.pa);
+	printf("AO buf %p pa: 0x%08x %d\n", dev_ao.mapping, ao_def.pa, ao_def.len);
 }
 
 void print_sample(unsigned sample, unsigned tl)
@@ -248,14 +258,25 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 }
 void control(short *ao, short *ai)
 {
-	int ii;
-	for (ii = 0; ii < AO_CHAN; ii += 2){
-		ao[ii] = ai[0];
-		ao[ii+1] = ai[1];
+	static int rr;
+#if 1
+	int ii, jj;
+	for (ii = 0; ii < AO_CHAN; ii += 4){
+		for (jj = 0; jj < 4; ++jj){
+			ao[ii+jj] = ai[jj];
+		}
 	}
+	++rr;
 	if (has_do32){
 		copy_tlatch_to_do32(ao, ai);
 	}
+#else
+	int ii;
+	for (ii = 0; ii < AO_CHAN; ii += 1){
+		ao[ii] = ai[ii] + (rr += 10);
+	}
+#endif
+
 }
 
 void run(void (*action)(void*))
