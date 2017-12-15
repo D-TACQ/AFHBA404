@@ -85,6 +85,8 @@ struct XLLC_DEF ai_def = {
 
 #define DO_IX	(16)		/* longwords */
 
+int MAXCOPY = AO_CHAN;
+
 struct XLLC_DEF ao_def = {
 		.pa = RTM_T_USE_HOSTBUF,
 		.len = VO_LEN
@@ -161,6 +163,9 @@ void ui(int argc, char* argv[])
         }
 	if (getenv("ZCOPY")){
 		ZCOPY = atoi(getenv("ZCOPY"));
+	}
+	if (getenv("MAXCOPY")){
+		MAXCOPY = atoi(getenv("MAXCOPY"));
 	}
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
@@ -261,7 +266,7 @@ void control(short *ao, short *ai)
 	static int rr;
 #if 1
 	int ii, jj;
-	for (ii = 0; ii < AO_CHAN; ii += 4){
+	for (ii = 0; ii < MAXCOPY; ii += 4){
 		for (jj = 0; jj < 4; ++jj){
 			ao[ii+jj] = ai[jj];
 		}
