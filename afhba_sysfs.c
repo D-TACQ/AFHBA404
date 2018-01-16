@@ -391,6 +391,9 @@ static ssize_t show_latstat(
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned ls1 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_1);
 	unsigned ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
+	if ((ls2>>16) == 0x0ffff || (ls2&0x0ffff) == 0x0ffff){
+		ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
+	}
 	return sprintf(buf, "%5d %5d %5d %5d\n",
 			ls1>>16, ls1&0x0ffff, ls2>>16, ls2&0x0ffff);
 }
