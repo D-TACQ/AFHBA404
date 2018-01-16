@@ -17,9 +17,11 @@ names = ("Avg", "Runs", "Max", "Min" )
 
 for ii in range(0, len(args)):
 	count = int(args[ii])
+	if ii != 0:
+		sys.stdout.write(",")
 	if count == 65535:
-		sys.stdout.write("%5s:ERR," % (names[ii]))
+		sys.stdout.write("%5s:%6s" % (names[ii], "ERR"))
 	else:
-		sys.stdout.write("%5s:%.2f," % (names[ii], count*TICK))
+		sys.stdout.write("%5s:%6.2f" % (names[ii], count*TICK))
 
 sys.stdout.write("\n")
