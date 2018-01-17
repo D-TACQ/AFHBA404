@@ -22,6 +22,23 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /* ------------------------------------------------------------------------- */
 
+/** Description of Program
+ *
+
+ getMapping() from device driver : this is where the data appears
+ goRealTime() isolate the process for best RT performance
+ ioctl(fd, AFHBA_START_AI_LLC) : device driver starts the acquisition
+
+ Then the control loop in run() is as follows:
+
+ for (sample = 0; sample <= nsamples; ++sample..){
+     poll for new data
+     run the control algorithm on the new AI, store new AO
+ }
+
+*/
+
+
 #define _GNU_SOURCE
 #include <sched.h>
 
