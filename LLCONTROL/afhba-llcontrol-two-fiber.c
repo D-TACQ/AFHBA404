@@ -153,8 +153,12 @@ void check_tlatch_action(void *local_buffer)
 	}
 	tl0 = tl1;
 }
+void control1(short *ao, short *ai);
+void control_dup1(short *ao, short *ai);
 
+void (*control)(short *ao, short *ai) = control1;
 int ZCOPY;
+int DUP1;
 
 void ui(int argc, char* argv[])
 {
@@ -175,6 +179,10 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("DEV_AO")){
 		dev_ao.devnum = atoi(getenv("DEV_AO"));
+	}
+	if (getenv("DUP1")){
+		DUP1 = atoi(getenv("DUP1"));
+		control = control_dup1;		
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_AI_BUF")){
@@ -261,11 +269,28 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 	dox[DO_IX] = tlx[SPIX];
 }
-void control(short *ao, short *ai)
+
+void control_dup1(short *ao, short *ai)
+{
+        static int rr;
+        int ii, jj;
+
+        for (ii = 0; ii < MAXCOPY; ii ++){
+		ao[ii] = ai[DUP1];
+        }
+        ++rr;
+        if (has_do32){
+                copy_tlatch_to_do32(ao, ai);
+        }
+
+}
+
+void control1(short *ao, short *ai)
 {
 	static int rr;
 #if 1
 	int ii, jj;
+
 	for (ii = 0; ii < MAXCOPY; ii += 4){
 		for (jj = 0; jj < 4; ++jj){
 			ao[ii+jj] = ai[jj];
