@@ -39,7 +39,7 @@ init_2106() {
 	out_cmd $AO clkdiv=$EXTCLKDIV
 	out_cmd $AO lotide 256
 
-
+	in_cmd 5 simulate=1
 	in_cmd $SC spad=1,16,0	
 	in_cmd $CA spad 1
 	in_cmd $CA aggregator sites=$AISITES
@@ -49,7 +49,23 @@ init_2106() {
 }
 
 start_stream() {
-	in_cmd $SC streamtonowhered start
+        if [ "x$TRANSIENT" != "x" ]; then
+		if [ $TRANSIENT -gt 1000 ]; then
+                        POST=$TRANSIENT
+                else
+                        POST=100000
+                fi
+                in_cmd $SC transient POST=$POST SOFT_TRIGGER=1
+                in_cmd $SC set_arm
+        else
+		in_cmd $SC streamtonowhered start
+		echo now view data perhaps using ./mapsample
+		echo CTRL-C to quit
+		trap "cleanup" SIGINT SIGTERM
+
+		sleep 99999
+        fi
+
 }
 
 
@@ -60,9 +76,4 @@ cleanup() {
 
 init_2106
 start_stream
-echo now view data perhaps using ./mapsample
-echo CTRL-C to quit
-trap "cleanup" SIGINT SIGTERM
-
-sleep 99999
 
