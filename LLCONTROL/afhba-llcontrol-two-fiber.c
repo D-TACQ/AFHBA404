@@ -138,7 +138,8 @@ void goRealTime(void)
 	}
 }
 
-int FIRST_WRITE = 0
+int FIRST_WRITE = 0;
+
 void write_action(void *data)
 {
 	short *shorts = (short*)data;
