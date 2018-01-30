@@ -59,7 +59,7 @@ int dummy_first_loop;
 short* ao_buffer;
 int has_do32;
 
-/* ACQ425 */
+/* ACQ424 */
 
 #define NCHAN	(6*32)
 #define NSHORTS	(7*32)
@@ -138,9 +138,11 @@ void goRealTime(void)
 	}
 }
 
+int FIRST_WRITE = 0
 void write_action(void *data)
 {
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
+	short *shorts = (short*)data;
+	fwrite(shorts+FIRST_WRITE, sizeof(short), NSHORTS-FIRST_WRITE, fp_log);
 }
 
 void check_tlatch_action(void *local_buffer)
@@ -170,6 +172,9 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("MAXCOPY")){
 		MAXCOPY = atoi(getenv("MAXCOPY"));
+	}
+	if (getenv("FIRST_WRITE")){
+		FIRST_WRITE = atoi(getenv("FIRST_WRITE"));
 	}
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
