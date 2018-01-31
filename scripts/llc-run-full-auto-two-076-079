@@ -10,6 +10,7 @@ UUT2=acq2106_079
 # INBOX: acq2106_076, 6 x AI424
 # OUTBOX: acq2106_079, 2 x AO424
 
+echo llc-run-full-auto-two-076-079 UUT1=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
 export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
 
@@ -56,7 +57,9 @@ control_script() {
         echo CONTROL SCRIPT 99
         )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
-        STATUSMONITOR_TRACE=1 ./acq400_capture.py $UUT1
+        STATUSMONITOR_TRACE=1 ./acq400_capture.py \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
+		$UUT1
 	)
 }
 
