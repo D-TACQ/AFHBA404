@@ -3,7 +3,10 @@
 import sys
 
 # TICK in usec
-TICK=4e-3	
+# AFHBA400
+#TICK=0.016	
+# AFHBA404
+TICK=0.004
 #TICK = 4
 #
 
@@ -12,16 +15,19 @@ line = fp.readline()
 
 args = line.split()
 
-names = ("Avg", "Runs", "Max", "Min" )
+names = ("Avg", "N_Over5", "Max", "Min" )
+ktick = (TICK, 1, TICK, TICK)
+fmts = ("%9s:%6.2f", "%9s:%6.0f", "%9s:%6.2f", "%9s:%6.2f")
 
+sys.stdout.write(line.rstrip())
 
 for ii in range(0, len(args)):
 	count = int(args[ii])
 	if ii != 0:
 		sys.stdout.write(",")
 	if count == 65535:
-		sys.stdout.write("%5s:%6s" % (names[ii], "ERR"))
+		sys.stdout.write("%9s:%6s" % (names[ii], "ERR"))
 	else:
-		sys.stdout.write("%5s:%6.2f" % (names[ii], count*TICK))
+		sys.stdout.write(fmts[ii] % (names[ii], count*ktick[ii]))
 
 sys.stdout.write("\n")

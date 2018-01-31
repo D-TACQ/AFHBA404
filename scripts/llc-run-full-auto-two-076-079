@@ -1,0 +1,84 @@
+#!/bin/sh
+# file PROJECTS/AFHBA404/scripts/llc-run-full-auto-two-076-079
+# POST is number of samples in LLC control loop
+# TLEN is the transient capture, overrun to make sure LLC terminates
+POST=${POST:-100000}
+let TLEN="$POST*120/100"
+
+UUT1=acq2106_076
+UUT2=acq2106_079
+# INBOX: acq2106_076, 6 x AI424
+# OUTBOX: acq2106_079, 2 x AO424
+
+echo llc-run-full-auto-two-076-079 UUT1=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
+export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
+export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
+
+set_clocks() {
+	(cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests
+	./acq2106_set_sync_role.py --test 1 --trace 1 \
+	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=10 \
+	$UUT1 $UUT2
+	)
+}
+control_program() {
+	cd PROJECTS/AFHBA404/LLCONTROL
+	#echo CONTROL PROGRAM 01
+#	export ZCOPY=1 
+# DUP1: index from zero, 1 is CH02
+	export DUP1=1
+# skip this many shorts ie 192AI
+	export FIRST_WRITE=192
+# store this many longs (TLATCH+3 for interest)
+	export STORE_COLS="0,1,2,3"
+# total SPAD 16 longs
+	export NCOLS=16
+# previously, we stored everything. This may have loaded the RT loop
+#	export STORE_COLS="96,97,98,99"
+#	export NCOLS=112
+	export RTPRIO=40
+# run on core 3 (isolated)
+#taskset 8	./afhba-llcontrol-two-fiber $POST &
+	./afhba-llcontrol-two-fiber $POST &
+	echo wait for llcontrol, PID $CTRLPID
+	wait
+	echo CONTROL PROGRAM 99
+	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
+		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
+		$UUT1 afhba.0.log
+}
+
+control_script() {
+       (cd PROJECTS/AFHBA404;
+        echo CONTROL SCRIPT 01
+        TRANSIENT=$TLEN EXTCLKDIV=${EXTCLKDIV:-10} \
+	./scripts/llc-test-harness-extclk-2box-AI123456-AO12 \
+	$UUT1 $UUT2
+        echo CONTROL SCRIPT 99
+        )
+       (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
+        STATUSMONITOR_TRACE=1 ./acq400_capture.py \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
+		$UUT1
+	)
+}
+
+
+
+case "x$1" in
+xset_clocks)
+	set_clocks;;
+xcontrol_program)
+	control_program;;
+xcontrol_script)
+	control_script;;
+*)
+	new_shot --verbose 1 $UUT1
+	sudo $0 control_program &
+
+	control_script
+	wait 
+	echo wait complete
+	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats)
+	;;
+esac

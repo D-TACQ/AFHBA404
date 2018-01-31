@@ -6,7 +6,7 @@
 
 # MUST set remote ip-address
 INBOX=${1:-acq2106_076}
-OUTBOX=${1:-acq2106_079}
+OUTBOX=${2:-acq2106_079}
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
 STREAMPID=0
 
@@ -19,7 +19,7 @@ CB=12
 AI=1
 AO=1
 
-AISITES=1,2,3,4
+AISITES=1,2,3,4,5,6
 AOSITES=1,2
 
 
@@ -34,7 +34,7 @@ out_cmd() {
 
 init_2106() {
 	echo CLK TRG basics have been preset, but
-	echo settting clkdiv=$EXTCLKDIV
+	echo setting clkdiv=$EXTCLKDIV
 	in_cmd $AI clkdiv=$EXTCLKDIV
 	out_cmd $AO clkdiv=$EXTCLKDIV
 	out_cmd $AO lotide 256
@@ -75,5 +75,6 @@ cleanup() {
 }
 
 init_2106
-start_stream
+echo start_stream stubbed
+#start_stream
 

@@ -59,19 +59,19 @@ int dummy_first_loop;
 short* ao_buffer;
 int has_do32;
 
-/* ACQ425 */
+/* ACQ424 */
 
 #define NCHAN	(6*32)
 #define NSHORTS	(7*32)
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
 
-#define CH01 (((volatile short*)host_buffer)[0])
-#define CH02 (((volatile short*)host_buffer)[1])
-#define CH03 (((volatile short*)host_buffer)[2])
-#define CH04 (((volatile short*)host_buffer)[3])
-#define TLATCH (&((volatile unsigned*)host_buffer)[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)host_buffer)[SPIX+1])   /* user signal from ACQ */
+#define CH01 (((volatile short*)ai_buffer)[0])
+#define CH02 (((volatile short*)ai_buffer)[1])
+#define CH03 (((volatile short*)ai_buffer)[2])
+#define CH04 (((volatile short*)ai_buffer)[3])
+#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF ai_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -138,9 +138,12 @@ void goRealTime(void)
 	}
 }
 
+int FIRST_WRITE = 0;
+
 void write_action(void *data)
 {
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
+	short *shorts = (short*)data;
+	fwrite(shorts+FIRST_WRITE, sizeof(short), NSHORTS-FIRST_WRITE, fp_log);
 }
 
 void check_tlatch_action(void *local_buffer)
@@ -153,8 +156,12 @@ void check_tlatch_action(void *local_buffer)
 	}
 	tl0 = tl1;
 }
+void control1(short *ao, short *ai);
+void control_dup1(short *ao, short *ai);
 
+void (*control)(short *ao, short *ai) = control1;
 int ZCOPY;
+int DUP1;
 
 void ui(int argc, char* argv[])
 {
@@ -167,6 +174,9 @@ void ui(int argc, char* argv[])
 	if (getenv("MAXCOPY")){
 		MAXCOPY = atoi(getenv("MAXCOPY"));
 	}
+	if (getenv("FIRST_WRITE")){
+		FIRST_WRITE = atoi(getenv("FIRST_WRITE"));
+	}
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
@@ -175,6 +185,10 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("DEV_AO")){
 		dev_ao.devnum = atoi(getenv("DEV_AO"));
+	}
+	if (getenv("DUP1")){
+		DUP1 = atoi(getenv("DUP1"));
+		control = control_dup1;		
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_AI_BUF")){
@@ -261,11 +275,28 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 	dox[DO_IX] = tlx[SPIX];
 }
-void control(short *ao, short *ai)
+
+void control_dup1(short *ao, short *ai)
+{
+        static int rr;
+        int ii, jj;
+
+        for (ii = 0; ii < MAXCOPY; ii ++){
+		ao[ii] = ai[DUP1];
+        }
+        ++rr;
+        if (has_do32){
+                copy_tlatch_to_do32(ao, ai);
+        }
+
+}
+
+void control1(short *ao, short *ai)
 {
 	static int rr;
 #if 1
 	int ii, jj;
+
 	for (ii = 0; ii < MAXCOPY; ii += 4){
 		for (jj = 0; jj < 4; ++jj){
 			ao[ii+jj] = ai[jj];
