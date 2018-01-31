@@ -6,7 +6,7 @@
 
 # MUST set remote ip-address
 INBOX=${1:-acq2106_076}
-OUTBOX=${1:-acq2106_079}
+OUTBOX=${2:-acq2106_079}
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
 STREAMPID=0
 
