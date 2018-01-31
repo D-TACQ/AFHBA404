@@ -66,12 +66,12 @@ int has_do32;
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
 
-#define CH01 (((volatile short*)host_buffer)[0])
-#define CH02 (((volatile short*)host_buffer)[1])
-#define CH03 (((volatile short*)host_buffer)[2])
-#define CH04 (((volatile short*)host_buffer)[3])
-#define TLATCH (&((volatile unsigned*)host_buffer)[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)host_buffer)[SPIX+1])   /* user signal from ACQ */
+#define CH01 (((volatile short*)ai_buffer)[0])
+#define CH02 (((volatile short*)ai_buffer)[1])
+#define CH03 (((volatile short*)ai_buffer)[2])
+#define CH04 (((volatile short*)ai_buffer)[3])
+#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF ai_def = {
 		.pa = RTM_T_USE_HOSTBUF,
