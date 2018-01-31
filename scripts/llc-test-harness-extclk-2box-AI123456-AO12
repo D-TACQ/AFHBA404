@@ -75,5 +75,6 @@ cleanup() {
 }
 
 init_2106
-start_stream
+echo start_stream stubbed
+#start_stream
 
