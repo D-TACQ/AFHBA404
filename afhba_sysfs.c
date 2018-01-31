@@ -383,6 +383,9 @@ static ssize_t show_shot(
 
 static DEVICE_ATTR(shot, (S_IRUSR|S_IRGRP), show_shot, 0);
 
+#define _ERRLAT(yymask) 	((yymask) == 0x0ffff || (yymask) == 0)
+#define ERRLAT(yy) 		(_ERRLAT((yy)&0x0ffff))
+
 static ssize_t show_latstat(
 		struct device * dev,
 		struct device_attribute *attr,
@@ -391,8 +394,16 @@ static ssize_t show_latstat(
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned ls1 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_1);
 	unsigned ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
-	if ((ls2>>16) == 0x0ffff || (ls2&0x0ffff) == 0x0ffff){
+	int maxtry = 1;
+
+	unsigned over5 = ls1 & 0x0ffff;
+	while (over5 && (ERRLAT(ls2>>16) || ERRLAT(ls2))){
+		yield();
 		ls2 = afhba_read_reg(adev, HOST_PCIE_LATSTATS_2);
+		if (++maxtry > 100){
+			dev_warn(dev, "show_latstat maxtry exceeded");
+			break;
+		}
 	}
 	return sprintf(buf, "%5d %5d %5d %5d\n",
 			ls1>>16, ls1&0x0ffff, ls2>>16, ls2&0x0ffff);
