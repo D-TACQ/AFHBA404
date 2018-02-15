@@ -41,8 +41,12 @@
 #include <linux/moduleparam.h>
 #include <linux/mutex.h>
 
-#include <asm/uaccess.h>  /* VERIFY_READ|WRITE */
+#include <linux/uaccess.h>  /* VERIFY_READ|WRITE */
+#include <linux/version.h>
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
+#include <uapi/linux/sched/types.h>
+#endif
 
 #ifdef CONFIG_KERNEL_ASSERTS
 /* kgdb stuff */
