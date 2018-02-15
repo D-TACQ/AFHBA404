@@ -122,7 +122,7 @@ static int write_meta(int fd, int ibuf, int nbuf)
 	snprintf(buf, 128, 
 		"IBUF=%d\n" "NBUF=%d\n" "NSAMPLES=%llu\n" "HTIME=%.3f\n",
 		 ibuf, nbuf, nsamples, htime());
-	write(fd, buf, strlen(buf));
+	int nw = write(fd, buf, strlen(buf));
 }
 
 void fail_if_exists(char *buf)
@@ -248,10 +248,10 @@ static void process(int ibuf, int nbuf, struct StreamBufferDef *sbd){
 			SEQ.errors++;
 			if (SEQ.errors < 10){
 				if (succ(succ(_ibuf)) == ibuf || succ(ibuf) == _ibuf){
-					fprintf(stderr, "WARNING potential buffer cycle detected %u/%u skip %d -> %d\n",
+					fprintf(stderr, "WARNING potential buffer cycle detected %lu/%lu skip %d > %d\n",
 						SEQ.errors, SEQ.buffers, _ibuf, ibuf);
 				}else{
-					fprintf(stderr, "ERROR: buffer %u/%u skip %d -> %d\n",
+					fprintf(stderr, "ERROR: buffer %lu/%lu skip %d -> %d\n",
 									SEQ.errors, SEQ.buffers, _ibuf, ibuf);
 				}
 			}
@@ -393,7 +393,7 @@ static int stream()
 	}
 on_error:
 all_done:
-	fprintf(stderr, "%s rtm-t-stream-disk finish %u seq errors in %u buffers\n", hostname(), SEQ.errors, SEQ.buffers);
+	fprintf(stderr, "%s rtm-t-stream-disk finish %lu seq errors in %lu buffers\n", hostname(), SEQ.errors, SEQ.buffers);
 	backlog.print();
 	DIAG("all done\n");
 	return 0;
