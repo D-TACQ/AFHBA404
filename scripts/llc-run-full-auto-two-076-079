@@ -14,10 +14,13 @@ echo llc-run-full-auto-two-076-079 UUT1=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
 export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
 
+export EXTCLKDIV=${EXTCLKDIV:-10}
+
 set_clocks() {
 	(cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests
-	./acq2106_set_sync_role.py --test 1 --trace 1 \
-	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=10 \
+#	 SITECLIENT_TRACE=1
+	./acq2106_set_sync_role.py \
+	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=$EXTCLKDIV \
 	$UUT1 $UUT2
 	)
 }
@@ -37,6 +40,7 @@ control_program() {
 #	export STORE_COLS="96,97,98,99"
 #	export NCOLS=112
 	export RTPRIO=40
+	export AO_IDENT=1
 # run on core 3 (isolated)
 #taskset 8	./afhba-llcontrol-two-fiber $POST &
 	./afhba-llcontrol-two-fiber $POST &
@@ -49,18 +53,17 @@ control_program() {
 }
 
 control_script() {
-       (cd PROJECTS/AFHBA404;
+       (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
-        TRANSIENT=$TLEN EXTCLKDIV=${EXTCLKDIV:-10} \
-	./scripts/llc-test-harness-extclk-2box-AI123456-AO12 \
-	$UUT1 $UUT2
+#        SITECLIENT_TRACE=1 
+	./llc-test-harness-twobox.py $UUT1 $UUT2
         echo CONTROL SCRIPT 99
-        )
+       )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
-        STATUSMONITOR_TRACE=1 ./acq400_capture.py \
+        STATUSMONITOR_TRACE=0 ./acq400_capture.py \
 		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
 		$UUT1
-	)
+       )
 }
 
 
