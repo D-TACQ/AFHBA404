@@ -28,6 +28,7 @@ def clear_counters(uuts):
             hit_resets(uut.svc[cx])
             
 def init_common(uut):
+    uut.s1.CLKDIV = EXTCLKDIV
     uut.s1.clkdiv = EXTCLKDIV
     
 def init_ai(uut):
@@ -40,7 +41,8 @@ def init_ai(uut):
     uut.cA.aggregator = 'sites={}'.format(AISITES)
 
 def init_ao(uut):
-    init_common(uut)
+    uut.s1.CLKDIV = 1
+    uut.s1.clkdiv = 1
     uut.s1.lotide = 256
     uut.s0.distributor = "sites={} comms=2 pad=0 on".format(AOSITES)
     
