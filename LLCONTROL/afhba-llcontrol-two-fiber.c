@@ -103,6 +103,7 @@ struct Device dev_ai = { .devnum = 0 };
 struct Device dev_ao = { .devnum = 1 };
 short* ao_buffer;
 short *ai_buffer;
+short *AO_IDENT;
 
 /* SPLIT single HB into 2
  * [0] : AI
@@ -163,6 +164,20 @@ void (*control)(short *ao, short *ai) = control1;
 int ZCOPY;
 int DUP1;
 
+#define MV100	(32768/100)
+
+short* make_ao_ident(int ao_ident)
+{
+	short* ids = calloc(MAXCOPY, sizeof(short));
+	if (ao_ident){
+		int ic;
+		
+		for (ic = 0; ic < MAXCOPY; ++ic){
+			ids[ic] = ic*MV100*ao_ident;
+		}
+	}
+	return ids;
+}
 void ui(int argc, char* argv[])
 {
         if (getenv("RTPRIO")){
@@ -203,6 +218,14 @@ void ui(int argc, char* argv[])
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
+        {
+                int ao_ident = 0;
+                if (getenv("AO_IDENT")){
+                        ao_ident = atoi(getenv("AO_IDENT"));
+                }
+                AO_IDENT = make_ao_ident(ao_ident);
+        }
+
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
 	}
@@ -222,6 +245,8 @@ void setup()
 	char logfile[80];
 	sprintf(logfile, LOG_FILE, dev_ai.devnum);
 
+	printf("%s setup for %d samples at priority %d\n",
+			__FILE__, nsamples, sched_fifo_priority);
 	goRealTime();
 	fp_log = fopen(logfile, "w");
 	if (fp_log == 0){
@@ -282,7 +307,7 @@ void control_dup1(short *ao, short *ai)
         int ii, jj;
 
         for (ii = 0; ii < MAXCOPY; ii ++){
-		ao[ii] = ai[DUP1];
+		ao[ii] = AO_IDENT[ii] + ai[DUP1];
         }
         ++rr;
         if (has_do32){
