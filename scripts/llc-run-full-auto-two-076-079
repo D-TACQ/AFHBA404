@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # file PROJECTS/AFHBA404/scripts/llc-run-full-auto-two-076-079
 # POST is number of samples in LLC control loop
 # TLEN is the transient capture, overrun to make sure LLC terminates
@@ -73,6 +73,7 @@ xcontrol_program)
 xcontrol_script)
 	control_script;;
 *)
+	set_clocks
 	new_shot --verbose 1 $UUT1
 	sudo $0 control_program &
 
