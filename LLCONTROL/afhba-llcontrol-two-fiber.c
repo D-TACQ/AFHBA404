@@ -33,6 +33,8 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
+#define REVID	"R101"
+
 /* Kludge alert */
 typedef unsigned       u32;
 typedef unsigned short u16;
@@ -62,7 +64,8 @@ int has_do32;
 /* ACQ424 */
 
 #define NCHAN	(6*32)
-#define NSHORTS	(7*32)
+#define NSTATL	16		/* status, longwords */
+#define NSHORTS	(NCHAN+(NSTATL*2))
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NCHAN*sizeof(short)/sizeof(unsigned))
 
@@ -71,7 +74,8 @@ int has_do32;
 #define CH03 (((volatile short*)ai_buffer)[2])
 #define CH04 (((volatile short*)ai_buffer)[3])
 #define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
+#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])    /* user signal from ACQ */
+#define PC	(((volatile unsigned*)ai_buffer)[SPIX+15])   /* store POLLCOUNT here for logging */
 
 struct XLLC_DEF ai_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -245,8 +249,8 @@ void setup()
 	char logfile[80];
 	sprintf(logfile, LOG_FILE, dev_ai.devnum);
 
-	printf("%s setup for %d samples at priority %d\n",
-			__FILE__, nsamples, sched_fifo_priority);
+	printf("%s %s setup for %d samples at priority %d\n",
+			__FILE__, REVID, nsamples, sched_fifo_priority);
 	goRealTime();
 	fp_log = fopen(logfile, "w");
 	if (fp_log == 0){
@@ -347,6 +351,7 @@ void run(void (*action)(void*))
 	unsigned tl1;
 	unsigned sample;
 	int println = 0;
+	int pollcat = 0;		/* number of TLATCH polls, measure of how much time we have.. */
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
@@ -354,12 +359,13 @@ void run(void (*action)(void*))
 		*TLATCH = tl0;
 	}
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
+	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
 		while((tl1 = *TLATCH) == tl0){
-			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
+			++pollcat;
 		}
+		PC = sample != 0 ? pollcat: 0;			/* store for possible logging, ingnore time to trigger */
 		control(ao_buffer, ai_buffer);
 		action(ai_buffer);
 

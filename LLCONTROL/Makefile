@@ -11,6 +11,7 @@ else
 SPI_SUPPORT=
 endif
 
+CFLAGS += -O2
 
 # default build is the local kernel.
 # build other kernels like this example:
