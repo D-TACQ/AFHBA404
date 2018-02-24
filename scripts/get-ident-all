@@ -4,8 +4,11 @@ DN=${1:-0}
 for DN in 0 1 2 3
 do
 	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident ]; then
-		echo "$(hostname) $DN $(cat /dev/rtm-t.$DN.ctrl/acq_ident ) \
-$(cat /dev/rtm-t.$DN.ctrl/acq_port)"
+		ID=$(cat /dev/rtm-t.$DN.ctrl/acq_ident)
+		if [ "x$ID" != "xacq2106_65535" ]; then
+			PORT=$(cat /dev/rtm-t.$DN.ctrl/acq_port)
+			echo "$(hostname) $DN $ID $PORT"
+		fi
 	fi
 done
 
