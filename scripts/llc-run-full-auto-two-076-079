@@ -32,8 +32,8 @@ control_program() {
 	export DUP1=1
 # skip this many shorts ie 192AI
 	export FIRST_WRITE=192
-# store this many longs (TLATCH+3 for interest)
-	export STORE_COLS="0,1,2,3"
+# store this many longs (all of SPAD)
+	export STORE_COLS="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
 # total SPAD 16 longs
 	export NCOLS=16
 # previously, we stored everything. This may have loaded the RT loop
@@ -41,9 +41,11 @@ control_program() {
 #	export NCOLS=112
 	export RTPRIO=40
 	export AO_IDENT=1
-# run on core 3 (isolated)
-#taskset 8	./afhba-llcontrol-two-fiber $POST &
-	./afhba-llcontrol-two-fiber $POST &
+# isolcpus=4,5,6,7,8...
+# taskset 0x10 means "run on processor 4"
+	export TASKSET="taskset 0x10"
+	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+	$TASKSET ./afhba-llcontrol-two-fiber $POST &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
 	echo CONTROL PROGRAM 99
