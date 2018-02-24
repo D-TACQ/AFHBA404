@@ -1,0 +1,12 @@
+#!/bin/bash
+DN=${1:-0}
+
+for DN in 0 1 2 3
+do
+	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident ]; then
+		echo "$(hostname) $DN $(cat /dev/rtm-t.$DN.ctrl/acq_ident ) \
+$(cat /dev/rtm-t.$DN.ctrl/acq_port)"
+	fi
+done
+
+
