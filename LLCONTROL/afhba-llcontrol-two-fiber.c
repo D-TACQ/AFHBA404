@@ -361,7 +361,7 @@ void run(void (*action)(void*))
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
 		}
-		PC = sample != 0 ? pollcat: 0;		/* store for possible logging, ignore time to trigger */
+		PC = sample > 1 ? pollcat: 0;			/* store for possible logging, ingnore time to trigger */
 		control(ao_buffer, ai_buffer);
 		action(ai_buffer);
 
