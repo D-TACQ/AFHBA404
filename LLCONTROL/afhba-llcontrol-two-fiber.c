@@ -307,17 +307,14 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 void control_dup1(short *ao, short *ai)
 {
-        static int rr;
         int ii, jj;
 
         for (ii = 0; ii < MAXCOPY; ii ++){
 		ao[ii] = AO_IDENT[ii] + ai[DUP1];
         }
-        ++rr;
         if (has_do32){
                 copy_tlatch_to_do32(ao, ai);
         }
-
 }
 
 void control1(short *ao, short *ai)
@@ -350,8 +347,7 @@ void run(void (*action)(void*))
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned tl1;
 	unsigned sample;
-	int println = 0;
-	int pollcat = 0;		/* number of TLATCH polls, measure of how much time we have.. */
+	int pollcat = 0;	/* number of TLATCH polls, measure of how much time we have.. */
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
@@ -365,7 +361,7 @@ void run(void (*action)(void*))
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
 		}
-		PC = sample != 0 ? pollcat: 0;			/* store for possible logging, ingnore time to trigger */
+		PC = sample != 0 ? pollcat: 0;		/* store for possible logging, ignore time to trigger */
 		control(ao_buffer, ai_buffer);
 		action(ai_buffer);
 
