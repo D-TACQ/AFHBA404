@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 import sys
 
 # TICK in usec
@@ -10,18 +11,20 @@ TICK=0.004
 #TICK = 4
 #
 
-fp = open("/dev/rtm-t.0.ctrl/latstat", "r")
-line = fp.readline()
+def show_stats(devnum):
+    print("latency stats for device {}".format(devnum))
+    fp = open("/dev/rtm-t.{}.ctrl/latstat".format(devnum), "r")
+    line = fp.readline()
 
-args = line.split()
+    args = line.split()
 
-names = ("Avg", "N_Over5", "Max", "Min" )
-ktick = (TICK, 1, TICK, TICK)
-fmts = ("%9s:%6.2f", "%9s:%6.0f", "%9s:%6.2f", "%9s:%6.2f")
+    names = ("Avg", "N_Over5", "Max", "Min" )
+    ktick = (TICK, 1, TICK, TICK)
+    fmts = ("%9s:%6.2f", "%9s:%6.0f", "%9s:%6.2f", "%9s:%6.2f")
 
-sys.stdout.write(line.rstrip())
+    sys.stdout.write(line.rstrip())
 
-for ii in range(0, len(args)):
+    for ii in range(0, len(args)):
 	count = int(args[ii])
 	if ii != 0:
 		sys.stdout.write(",")
@@ -30,4 +33,17 @@ for ii in range(0, len(args)):
 	else:
 		sys.stdout.write(fmts[ii] % (names[ii], count*ktick[ii]))
 
-sys.stdout.write("\n")
+    sys.stdout.write("\n")
+
+
+def run_main():
+    parser = argparse.ArgumentParser(description='get_lat_stats')
+    parser.add_argument("devn", default=0, nargs='?', help="device number 0..")
+    args = parser.parse_args()
+    show_stats(args.devn)
+        
+    
+
+if __name__ == '__main__':
+    run_main()
+
