@@ -13,7 +13,7 @@ import os
 
 
 EXTCLKDIV = int(os.getenv("EXTCLKDIV", "10"))
-SIMULATE = os.getenv("SIMULATE", "5")
+SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 AOSITES = os.getenv("AOSITES", "1,2")
 
