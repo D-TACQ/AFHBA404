@@ -5,14 +5,17 @@
 POST=${POST:-100000}
 let TLEN="$POST*120/100"
 
-UUT1=acq2106_076
-UUT2=acq2106_079
-# INBOX: acq2106_076, 6 x AI424
-# OUTBOX: acq2106_079, 2 x AO424
+UUT1=acq2106_088
+# site1=ACQ424, site5=AO424
 
-echo llc-run-full-auto-two-076-079 UUT1=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
+echo llc-run-full-auto-088 UUT1=$UUT1 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
-export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
+export acq2106_088_path=andros::/home/dt100/TREES/acq2106_088
+
+# We tested with ACQ2106_088 plugged into AFHBA404 PORT B
+# for PORT A set DEVNUM=0
+echo "setting DEVNUM=1"
+export DEVNUM=1
 
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
@@ -21,7 +24,7 @@ set_clocks() {
 #	 SITECLIENT_TRACE=1
 	./acq2106_set_sync_role.py \
 	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=$EXTCLKDIV \
-	$UUT1 $UUT2
+	$UUT1
 	)
 }
 control_program() {
@@ -30,36 +33,34 @@ control_program() {
 #	export ZCOPY=1 
 # DUP1: index from zero, 1 is CH02
 	export DUP1=1
-# skip this many shorts ie 192AI
-	export FIRST_WRITE=192
-# store this many longs (all of SPAD)
-	export STORE_COLS="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
-#	export STORE_COLS=:
-# total SPAD 16 longs
-	export NCOLS=16
-# previously, we stored everything. This may have loaded the RT loop
-#	export STORE_COLS="96,97,98,99"
-#	export NCOLS=112
+# total SPAD 16 longs, + 16 AI longs
+	export NCOLS=32
+	export NCHAN=32
 	export RTPRIO=40
 	export AO_IDENT=1
 # isolcpus=4,5,6,7,8...
 # taskset 0x10 means "run on processor 4"
-	export TASKSET="taskset 0x10"
+#	export TASKSET="taskset 0x10"
 	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
-	$TASKSET ./afhba-llcontrol-two-fiber $POST &
+	$TASKSET ./afhba-llcontrol-cpucopy $POST &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
 	echo CONTROL PROGRAM 99
+	echo $UUT1 $acq2106_088_path
+	export STORE_COLS=16,17
+	ls -l afhba.$DEVNUM.log
 	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
 		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
-		$UUT1 afhba.0.log
+		$UUT1 afhba.$DEVNUM.log
 }
 
 control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
-#        SITECLIENT_TRACE=1 
-	./llc-test-harness-twobox.py $UUT1 $UUT2
+        export SITECLIENT_TRACE=1 
+	export AISITES=1
+        export AOSITES=5
+	./llc-test-harness-twobox.py $UUT1
         echo CONTROL SCRIPT 99
        )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
@@ -79,13 +80,13 @@ xcontrol_program)
 xcontrol_script)
 	control_script;;
 *)
-	set_clocks
+#	set_clocks
 	new_shot --verbose 1 $UUT1
 	sudo $0 control_program &
 
 	control_script
 	wait 
 	echo wait complete
-	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats)
+	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats $DEVNUM)
 	;;
 esac

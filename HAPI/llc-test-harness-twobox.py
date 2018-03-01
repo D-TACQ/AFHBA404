@@ -39,26 +39,37 @@ def init_ai(uut):
     uut.s0.spad = '1,16,0'
     uut.cA.spad = '1'
     uut.cA.aggregator = 'sites={}'.format(AISITES)
+    uut.cB.spad = '1'
+    uut.cB.aggregator = 'sites={}'.format(AISITES)
 
-def init_ao(uut):
-    uut.s1.CLKDIV = 1
-    uut.s1.clkdiv = 1
-    uut.s1.lotide = 256
+def init_ao(uut, slave=False):
+    aom = "s{}".format(AOSITES.split(',')[0])
+    if slave:
+	uut.svc[aom].clk = '1,2,1'
+    uut.svc[aom].trg = '1,1,1'
+#    uut.svc[aom].CLKDIV = 1
+    uut.svc[aom].clkdiv = 1
+    uut.svc[aom].lotide = 256
     uut.s0.distributor = "sites={} comms=2 pad=0 on".format(AOSITES)
+    print("init_ao() done {} {}".format(uut.uut, aom))
     
         
 def run_main(args):
     uuts = [ acq400_hapi.Acq2106(addr) for addr in args.uuts ]
-    uut1 = uuts[0]
-    uut2 = uuts[1]
-    
+   
+    print("initialise {} uuts {}".format(len(uuts), args.uuts)) 
     clear_counters(uuts)    
-    init_ai(uut1)
-    init_ao(uut2)
+    init_ai(uuts[0])
+    # if two boxes ASSUME second box AO
+    if len(uuts) > 1:
+        init_ao(uuts[1])
+    else:
+	print("init_ao {}".format(uuts[0].uut))
+        init_ao(uuts[0], slave=True)
     
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="aq2106_llc-run-full-auto-two.py")
-    parser.add_argument("uuts", nargs=2, help="name the uuts")
+    parser.add_argument("uuts", nargs='+', help="name the uuts")
     run_main(parser.parse_args())
 
