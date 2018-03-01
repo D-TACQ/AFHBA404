@@ -12,6 +12,7 @@ SPI_SUPPORT=
 endif
 
 CFLAGS += -O2
+LDLIBS += -lm
 
 # default build is the local kernel.
 # build other kernels like this example:

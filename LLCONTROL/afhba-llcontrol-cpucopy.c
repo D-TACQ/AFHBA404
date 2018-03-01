@@ -88,6 +88,8 @@ int spadlongs = 16;
 short* ao_buffer;
 int has_do32;
 
+int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
+short *AO_IDENT;
 
 #define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
 #define VI_LEN 	(NSHORTS*sizeof(short))
@@ -191,6 +193,26 @@ void check_tlatch_action(void *local_buffer)
 	tl0 = tl1;
 }
 
+void control_dup1(short *ao, short *ai);
+void (*G_control)(short *ao, short *ai) = control_dup1;
+
+#define MV100   (32768/100)
+
+short* make_ao_ident(int ao_ident)
+{
+        short* ids = calloc(AO_CHAN, sizeof(short));
+        if (ao_ident){
+                int ic;
+
+                for (ic = 0; ic < AO_CHAN; ++ic){
+                        ids[ic] = ic*MV100*ao_ident;
+                }
+        }
+        return ids;
+}
+
+int FFNLUT;
+void control_feedforward(short *ao, short *ai);
 
 void ui(int argc, char* argv[])
 {
@@ -223,6 +245,25 @@ void ui(int argc, char* argv[])
 	}
         if (getenv("AFFINITY")){
                 setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        }
+        if (getenv("DUP1")){
+                DUP1 = atoi(getenv("DUP1"));
+                G_control = control_dup1;
+        }
+	if (getenv("FEED_FORWARD")){
+		int ff = atoi(getenv("FEED_FORWARD"));
+		if (ff){
+			G_control = control_feedforward;
+			FFNLUT = ff;
+		}
+	}
+
+        {
+                int ao_ident = 0;
+                if (getenv("AO_IDENT")){
+                        ao_ident = atoi(getenv("AO_IDENT"));
+                }
+                AO_IDENT = make_ao_ident(ao_ident);
         }
 
 	if (getenv("SPADLONGS")){
@@ -301,7 +342,54 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 	dox[DO_IX] = tlx[SPIX];
 }
-void control(short *ao, short *ai)
+
+void control_dup1(short *ao, short *ai)
+{
+        int ii;
+
+        for (ii = 0; ii < AO_CHAN; ii++){
+                ao[ii] = AO_IDENT[ii] + ai[DUP1];
+        }
+
+        if (has_do32){
+                copy_tlatch_to_do32(ao, ai);
+        }
+}
+
+#include <math.h>
+
+
+
+short ff(int ii)
+{
+	static short* lut;
+	if (lut == 0){
+		int ii;
+		lut = calloc(FFNLUT, sizeof(short));
+		for (ii = 0; ii < FFNLUT; ++ii){
+			lut[ii] = MV100 * sin((double)ii * 2*M_PI/FFNLUT);
+		}
+	}
+	return lut[ii%FFNLUT];
+}
+void control_feedforward(short *ao, short *ai)
+{
+        int ii;
+	static int cursor;
+
+	short xx = ff(cursor++);
+
+        for (ii = 0; ii < AO_CHAN; ii++){
+                ao[ii] = AO_IDENT[ii] + xx;
+        }
+
+        if (has_do32){
+                copy_tlatch_to_do32(ao, ai);
+        }
+}
+
+
+void control_example2(short *ao, short *ai)
 {
 	int ii;
 	for (ii = 0; ii < AO_CHAN; ii += 2){
@@ -313,7 +401,8 @@ void control(short *ao, short *ai)
 	}
 }
 
-void run(void (*action)(void*))
+
+void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
@@ -352,7 +441,7 @@ int main(int argc, char* argv[])
 	ui(argc, argv);
 	setup();
 	printf("ready for data\n");
-	run(G_action);
+	run(G_control, G_action);
 	printf("finished\n");
 	closedown();
 }

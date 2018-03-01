@@ -32,15 +32,17 @@ control_program() {
 	#echo CONTROL PROGRAM 01
 #	export ZCOPY=1 
 # DUP1: index from zero, 1 is CH02
-	export DUP1=1
+	export DUP1=0
 # total SPAD 16 longs, + 16 AI longs
 	export NCOLS=32
 	export NCHAN=32
 	export RTPRIO=40
 	export AO_IDENT=1
+#	for 1:1 loopback cable, set SIMULATE=0, set FEEDFORWARD, get 32 waveforms.
+#	export FEED_FORWARD=2000
 # isolcpus=4,5,6,7,8...
 # taskset 0x10 means "run on processor 4"
-#	export TASKSET="taskset 0x10"
+	export TASKSET="taskset 0x10"
 	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 	$TASKSET ./afhba-llcontrol-cpucopy $POST &
 	echo wait for llcontrol, PID $CTRLPID
@@ -57,8 +59,11 @@ control_program() {
 control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
-        export SITECLIENT_TRACE=1 
+#        export SITECLIENT_TRACE=1 
 	export AISITES=1
+# enable SIMULATE=1 to get some dummay AI data. DO NO use with 1:1 loopback!
+#	export SIMULATE=1
+	export FEEDFORWARD=1000
         export AOSITES=5
 	./llc-test-harness-twobox.py $UUT1
         echo CONTROL SCRIPT 99
