@@ -211,6 +211,9 @@ short* make_ao_ident(int ao_ident)
         return ids;
 }
 
+int FFNLUT;
+void control_feedforward(short *ao, short *ai);
+
 void ui(int argc, char* argv[])
 {
         if (getenv("RTPRIO")){
@@ -247,6 +250,13 @@ void ui(int argc, char* argv[])
                 DUP1 = atoi(getenv("DUP1"));
                 G_control = control_dup1;
         }
+	if (getenv("FEED_FORWARD")){
+		int ff = atoi(getenv("FEED_FORWARD"));
+		if (ff){
+			G_control = control_feedforward;
+			FFNLUT = ff;
+		}
+	}
 
         {
                 int ao_ident = 0;
@@ -345,6 +355,39 @@ void control_dup1(short *ao, short *ai)
                 copy_tlatch_to_do32(ao, ai);
         }
 }
+
+#include <math.h>
+
+
+
+short ff(int ii)
+{
+	static short* lut;
+	if (lut == 0){
+		int ii;
+		lut = calloc(FFNLUT, sizeof(short));
+		for (ii = 0; ii < FFNLUT; ++ii){
+			lut[ii] = MV100 * sin((double)ii * 2*M_PI/FFNLUT);
+		}
+	}
+	return lut[ii%FFNLUT];
+}
+void control_feedforward(short *ao, short *ai)
+{
+        int ii;
+	static int cursor;
+
+	short xx = ff(cursor++);
+
+        for (ii = 0; ii < AO_CHAN; ii++){
+                ao[ii] = AO_IDENT[ii] + xx;
+        }
+
+        if (has_do32){
+                copy_tlatch_to_do32(ao, ai);
+        }
+}
+
 
 void control_example2(short *ao, short *ai)
 {
