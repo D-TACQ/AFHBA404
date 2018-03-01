@@ -59,7 +59,7 @@ control_program() {
 control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
-        export SITECLIENT_TRACE=1 
+#        export SITECLIENT_TRACE=1 
 	export AISITES=1
 # enable SIMULATE=1 to get some dummay AI data. DO NO use with 1:1 loopback!
 #	export SIMULATE=1
