@@ -1756,6 +1756,9 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 	}
 	if (ab->buffers[1].pa == RTM_T_USE_HOSTBUF){
 		ab->buffers[1].pa = sdev->hbx[1].pa;
+	}else if (ab->buffers[1].pa < ab->buffers[1].len){
+		/* pa is an offset in buffer 0 */
+		ab->buffers[1].pa += ab->buffers[0].pa;
 	}
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, ab->buffers, 2);
