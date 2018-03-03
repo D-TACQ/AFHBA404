@@ -63,7 +63,8 @@ typedef unsigned char  u8;
 
 #include "../rtm-t_ioctl.h"
 #define HB_FILE "/dev/rtm-t.%d"
-#define HB_LEN	0x1000
+#define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
+#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define LOG_FILE	"afhba.%d.log"
 
@@ -124,7 +125,7 @@ void get_mapping() {
 		exit(errno);
 	}
 
-	host_buffer = mmap(0, HB_LEN*2, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 	if (host_buffer == (caddr_t)-1 ){
 		perror( "mmap" );
 	        exit(errno);
@@ -279,7 +280,7 @@ void setup()
 
 
 
-	xllc_def.pa += HB_LEN;
+	xllc_def.pa += XO_OFF;
 	xllc_def.len = VO_LEN;
 
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
@@ -288,7 +289,7 @@ void setup()
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
-	xo_buffer = (short*)((void*)host_buffer+HB_LEN);
+	xo_buffer = (short*)((void*)host_buffer+XO_OFF);
 }
 
 void print_sample(unsigned sample, unsigned tl)
