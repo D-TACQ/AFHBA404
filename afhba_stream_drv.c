@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1051"
+#define REVID	"R1052"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1805,6 +1805,7 @@ long afs_dma_ioctl(struct file *file,
 		COPY_FROM_USER(&ab, varg, sizeof(struct AB));
 		rc = afs_start_AI_AB(adev, &ab);
 		COPY_TO_USER(varg, &ab, sizeof(struct AB));
+		return rc;
 	}
 	default:
 		return -ENOTTY;
