@@ -63,7 +63,6 @@ control_script() {
 	export AISITES=1
 # enable SIMULATE=1 to get some dummay AI data. DO NO use with 1:1 loopback!
 #	export SIMULATE=1
-	export FEEDFORWARD=1000
         export AOSITES=5
 	./llc-test-harness-twobox.py $UUT1
         echo CONTROL SCRIPT 99
