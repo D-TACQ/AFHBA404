@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1052"
+#define REVID	"R1053"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -423,7 +423,8 @@ static void afs_load_dram_descriptors(
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-
+	_afs_write_dmareg(adev, dma_sel==DMA_PUSH_SEL?
+			DMA_PUSH_DESC_LEN: DMA_PULL_DESC_LEN, nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
 }
@@ -1756,7 +1757,7 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 	}
 	if (ab->buffers[1].pa == RTM_T_USE_HOSTBUF){
 		ab->buffers[1].pa = sdev->hbx[1].pa;
-	}else if (ab->buffers[1].pa < ab->buffers[1].len){
+	}else if (ab->buffers[1].pa < buffer_len){
 		/* pa is an offset in buffer 0 */
 		ab->buffers[1].pa += ab->buffers[0].pa;
 	}
