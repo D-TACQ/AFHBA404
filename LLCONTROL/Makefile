@@ -25,6 +25,7 @@ all: apps
 APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
 	afhba-llcontrol-testharness check-tlatch afhba-llcontrol-cpucopy \
 	afhba-llcontrol-do32-threshold \
+	afhba-bufferAB-do32-threshold \
 	afhba-llcontrol-two-fiber
 	
 apps: $(APPS)
