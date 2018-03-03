@@ -48,6 +48,10 @@ struct XLLC_DEF {
 	 	 	   *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
 };
 
+struct AB {
+	struct XLLC_DEF buffers[2];
+};
+
 #define RTM_T_USE_HOSTBUF	0
 
 #define DMAGIC 0xDB
@@ -70,6 +74,11 @@ struct XLLC_DEF {
 
 #define AFHBA_START_AO_LLC	_IOWR(DMAGIC,   6, struct XLLC_DEF)
 /**< ioctl ACQ2106 Start Low Latency Control Outbound */
+
+#define AFHBA_START_AI_AB	_IOWR(DMAGIC,   7, struct AB)
+/**< ioctl ACQ2106 Start AI, Buffer A/B struct XLLC_DEF [2]. 
+ * streaming rules: 4K boundary, 1K size modulus
+ */
 
 struct StreamBufferDef {
 	u32 ibuf;

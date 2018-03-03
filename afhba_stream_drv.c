@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1050"
+#define REVID	"R1051"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -400,6 +400,33 @@ static void afs_load_llc_single_dma(
 	afs_start_dma(adev, dma_sel);
 }
 
+static void afs_load_dram_descriptors(
+	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel,
+	struct XLLC_DEF* buffers,
+	int nbufs
+)
+/**< load nbufs buffers to DRAM in regular mode */
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	u32 offset = dma_sel==DMA_PUSH_SEL?
+			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	int idesc;
+
+	for (idesc = 0; idesc < nbufs; ++idesc, offset += 4){
+		struct XLLC_DEF* bd = &buffers[idesc];
+		u32 dma_desc = bd->pa
+		    | getAFDMAC_Order(sdev->buffer_len)<< AFDMAC_DESC_LEN_SHL
+		    | idesc;
+		writel(dma_desc, adev->remote+offset);
+	}
+
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+
+	DMA_CTRL_WR(adev, dma_ctrl);
+	afs_start_dma(adev, dma_sel);
+}
 static int _afs_dma_started(struct AFHBA_DEV *adev, int shl)
 {
 	u32 ctrl = DMA_CTRL_RD(adev);
@@ -1714,6 +1741,30 @@ write99:
 	return rc;
 }
 
+long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct JOB* job = &sdev->job;
+
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	spin_unlock(&sdev->job_lock);
+	sdev->onStopPush = afs_stop_llc_push;
+
+	if (ab->buffers[0].pa == RTM_T_USE_HOSTBUF){
+		ab->buffers[0].pa = sdev->hbx[0].pa;
+	}
+	if (ab->buffers[1].pa == RTM_T_USE_HOSTBUF){
+		ab->buffers[1].pa = sdev->hbx[1].pa;
+	}
+	afs_dma_reset(adev, DMA_PUSH_SEL);
+	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, ab->buffers, 2);
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	job->on_push_dma_timeout = 0;
+	spin_unlock(&sdev->job_lock);
+	return 0;
+}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
@@ -1744,6 +1795,13 @@ long afs_dma_ioctl(struct file *file,
 		rc = afs_start_ao_llc(adev, &xllc_def);
 		COPY_TO_USER(varg, &xllc_def, sizeof(struct XLLC_DEF));
 		return rc;
+	}
+	case AFHBA_START_AI_AB: {
+		struct AB ab;
+		long rc;
+		COPY_FROM_USER(&ab, varg, sizeof(struct AB));
+		rc = afs_start_AI_AB(adev, &ab);
+		COPY_TO_USER(varg, &ab, sizeof(struct AB));
 	}
 	default:
 		return -ENOTTY;
