@@ -287,10 +287,7 @@ void setup()
 	printf("AI buf pa: %c 0x%08x len %d\n", 'B',
 			ab_def.buffers[1].pa, ab_def.buffers[1].len);
 
-
-
-
-	xllc_def.pa += XO_OFF;
+	xllc_def.pa = ab_def.buffers[0].pa + XO_OFF;
 	xllc_def.len = VO_LEN;
 
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
