@@ -87,11 +87,9 @@ int G_POLARITY = 1;
 int nchan = DEF_NCHAN;
 int spadlongs = 16;
 
-short* ao_buffer;
+short* xo_buffer;
 int has_do32;
 
-int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
-short *AO_IDENT;
 
 #define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
 #define VI_LEN 	(NSHORTS*sizeof(short))
@@ -109,11 +107,9 @@ struct XLLC_DEF xllc_def = {
 
 };
 
-#define AO_CHAN	32
-#define VO_LEN  (AO_CHAN*sizeof(short) + (has_do32?sizeof(unsigned):0))
+#define VO_LEN  64
 
-//#define DO_IX	(16)		/* longwords */
-#define DO_IX   (0)
+#define DO_IX   0
 
 /* SPLIT single HB into 2
  * [0] : AI
@@ -195,27 +191,12 @@ void check_tlatch_action(void *local_buffer)
 	tl0 = tl1;
 }
 
-void control_dup1(short *ao, short *ai);
+void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);
-void (*G_control)(short *ao, short *ai) = control_dup1;
+void (*G_control)(short *ao, short *ai) = control_none;
 
 #define MV100   (32768/100)
 
-short* make_ao_ident(int ao_ident)
-{
-        short* ids = calloc(AO_CHAN, sizeof(short));
-        if (ao_ident){
-                int ic;
-
-                for (ic = 0; ic < AO_CHAN; ++ic){
-                        ids[ic] = ic*MV100*ao_ident;
-                }
-        }
-        return ids;
-}
-
-int FFNLUT;
-void control_feedforward(short *ao, short *ai);
 
 void ui(int argc, char* argv[])
 {
@@ -252,26 +233,6 @@ void ui(int argc, char* argv[])
         if (getenv("DO_THRESHOLDS")){
 		G_control = control_thresholds;
 	}
-        if (getenv("DUP1")){
-                DUP1 = atoi(getenv("DUP1"));
-                G_control = control_dup1;
-        }
-	if (getenv("FEED_FORWARD")){
-		int ff = atoi(getenv("FEED_FORWARD"));
-		if (ff){
-			G_control = control_feedforward;
-			FFNLUT = ff;
-		}
-	}
-
-        {
-                int ao_ident = 0;
-                if (getenv("AO_IDENT")){
-                        ao_ident = atoi(getenv("AO_IDENT"));
-                }
-                AO_IDENT = make_ao_ident(ao_ident);
-        }
-
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
@@ -321,17 +282,13 @@ void setup()
 	xllc_def.pa += HB_LEN;
 	xllc_def.len = VO_LEN;
 
-	if (has_do32){
-		int ll = xllc_def.len/64;
-		xllc_def.len = ++ll*64;
-	}
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
-	ao_buffer = (short*)((void*)host_buffer+HB_LEN);
+	xo_buffer = (short*)((void*)host_buffer+HB_LEN);
 }
 
 void print_sample(unsigned sample, unsigned tl)
@@ -341,10 +298,10 @@ void print_sample(unsigned sample, unsigned tl)
 	}
 }
 
-void control_thresholds(short *ao, short *ai)
+void control_thresholds(short *xo, short *ai)
 /* set DO bit for corresponding AI > 0 */
 {
-	unsigned *do32 = (unsigned*)ao;
+	unsigned *do32 = (unsigned*)xo;
 	int ii;
 	static unsigned yy = 0;
 	
@@ -358,71 +315,14 @@ void control_thresholds(short *ao, short *ai)
 
 	do32[DO_IX] = yy;
 }
-void copy_tlatch_to_do32(void *ao, void *ai)
+void control_none(short *xo, short *ai)
 {
-	unsigned* dox = (unsigned *)ao;
+	unsigned* dox = (unsigned *)xo;
 	unsigned* tlx = (unsigned *)ai;
 
 	dox[DO_IX] = tlx[SPIX];
 }
 
-void control_dup1(short *ao, short *ai)
-{
-        int ii;
-
-        for (ii = 0; ii < AO_CHAN; ii++){
-                ao[ii] = AO_IDENT[ii] + ai[DUP1];
-        }
-
-        if (has_do32){
-                copy_tlatch_to_do32(ao, ai);
-        }
-}
-
-#include <math.h>
-
-
-
-short ff(int ii)
-{
-	static short* lut;
-	if (lut == 0){
-		int ii;
-		lut = calloc(FFNLUT, sizeof(short));
-		for (ii = 0; ii < FFNLUT; ++ii){
-			lut[ii] = MV100 * sin((double)ii * 2*M_PI/FFNLUT);
-		}
-	}
-	return lut[ii%FFNLUT];
-}
-void control_feedforward(short *ao, short *ai)
-{
-        int ii;
-	static int cursor;
-
-	short xx = ff(cursor++);
-
-        for (ii = 0; ii < AO_CHAN; ii++){
-                ao[ii] = AO_IDENT[ii] + xx;
-        }
-
-        if (has_do32){
-                copy_tlatch_to_do32(ao, ai);
-        }
-}
-
-
-void control_example2(short *ao, short *ai)
-{
-	int ii;
-	for (ii = 0; ii < AO_CHAN; ii += 2){
-		ao[ii] = G_POLARITY * ai[0];
-		ao[ii+1] = (((ii&1) != 0? ii: -ii)*ai[0])/AO_CHAN;
-	}
-	if (has_do32){
-		copy_tlatch_to_do32(ao, ai);
-	}
-}
 
 
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
@@ -445,7 +345,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 		}
-		control(ao_buffer, ai_buffer);
+		control(xo_buffer, ai_buffer);
 		action(ai_buffer);
 
 		if (verbose){
