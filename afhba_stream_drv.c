@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1061"
+#define REVID	"R1062"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -119,11 +119,9 @@ int max_empty_backlog_check = 2;
 module_param(max_empty_backlog_check, int , 0644);
 MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of deck, set to two to check skips");
 
-int recycle_good = 1;
-module_param(recycle_good, int, 0644);
-MODULE_PARM_DESC(recycle_good, "set 0 to run RAM DESCRIPTORS without recycle");
 
-int use_llc_multi = 1;
+
+int use_llc_multi = 0;
 module_param(use_llc_multi, int, 0644);
 MODULE_PARM_DESC(use_llc_multi, "use LLC for multi descriptor transfer");
 
@@ -429,13 +427,8 @@ static void afs_load_dram_descriptors(
 		writel(dma_desc, adev->remote+offset);
 	}
 
-	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT);
-	if (recycle_good){
-		dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	}else{
-		dev_warn(pdev(adev), "afs_load_dram_descriptors() recycle_good==0");
-		dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	}
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RAM);
 	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
@@ -470,13 +463,8 @@ static void afs_load_dram_descriptors_ll(
 		}
 	}
 
-	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT);
-	if (recycle_good){
-		dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	}else{
-		dev_warn(pdev(adev), "afs_load_dram_descriptors() recycle_good==0");
-		dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	}
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RAM);
 	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), cursor-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
