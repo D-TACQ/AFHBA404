@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1057"
+#define REVID	"R1058"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -375,8 +375,7 @@ static void afs_load_llc_single_dma(
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	u32 len64 = ((len/64-1) + (len%64!=0));
-	u32 offset = dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	u32 offset = DMA_DIR_DESC_FIFO(dma_sel);
 	u32 dma_desc;
 
 	dev_dbg(pdev(adev), "afs_load_llc_single_dma %s 0x%08x %d",
@@ -395,8 +394,7 @@ static void afs_load_llc_single_dma(
 		"afs_load_llc_single_dma len64:%08x dma_desc:%08x dma_ctrl:%08x",
 		len64, dma_desc, dma_ctrl);
 
-	afs_write_dmareg(adev, dma_sel==DMA_PUSH_SEL?
-				DMA_PUSH_DESC_LEN: DMA_PULL_DESC_LEN, 0);
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), 0);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	writel(dma_desc, adev->remote+offset);
 	afs_start_dma(adev, dma_sel);
@@ -410,8 +408,7 @@ static void afs_load_dram_descriptors(
 /**< load nbufs buffers to DRAM in regular mode */
 {
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
-	u32 offset = dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	u32 offset = DMA_DIR_DESC_FIFO(dma_sel);
 	int idesc;
 
 	for (idesc = 0; idesc < nbufs; ++idesc, offset += 4){
@@ -426,8 +423,7 @@ static void afs_load_dram_descriptors(
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	_afs_write_dmareg(adev, dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_LEN: DMA_PULL_DESC_LEN, nbufs-1);
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
 }
