@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1058"
+#define REVID	"R1059"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -421,7 +421,7 @@ static void afs_load_dram_descriptors(
 		writel(dma_desc, adev->remote+offset);
 	}
 
-	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
