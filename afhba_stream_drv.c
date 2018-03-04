@@ -423,7 +423,7 @@ static void afs_load_dram_descriptors(
 		    | getAFDMAC_Order(bd->len)<< AFDMAC_DESC_LEN_SHL
 		    | idesc;
 		dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
-				"afs_load_dram_descriptors()", idesc, dma_desc);
+				"afs_load_dram_descriptors", idesc, dma_desc);
 		writel(dma_desc, adev->remote+offset);
 	}
 
@@ -458,7 +458,7 @@ static void afs_load_dram_descriptors_ll(
 					| LL_NB(LL_MAX_CNT)<< AFDMAC_DESC_LEN_SHL
 					| (idb&0x0f);
 			dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
-				"afs_load_dram_descriptors()", idb, dma_desc);
+				"afs_load_dram_descriptors_ll", idb, dma_desc);
 			writel(dma_desc, adev->remote+DMA_DIR_DESC_FIFO(dma_sel) + cursor*4);
 		}
 	}
