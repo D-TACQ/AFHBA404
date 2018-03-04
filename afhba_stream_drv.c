@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1059"
+#define REVID	"R1060"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -118,6 +118,10 @@ static struct file_operations afs_fops_dma_poll;
 int max_empty_backlog_check = 2;
 module_param(max_empty_backlog_check, int , 0644);
 MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of deck, set to two to check skips");
+
+int recycle_good = 1;
+module_param(recycle_good, int, 0644);
+MODULE_PARM_DESC(recycle_good, "set 0 to run RAM DESCRIPTORS without recycle");
 
 static int getOrder(int len)
 {
@@ -422,7 +426,12 @@ static void afs_load_dram_descriptors(
 	}
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT);
-	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	if (recycle_good){
+		dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	}else{
+		dev_warn(pdev(adev), "afs_load_dram_descriptors() recycle_good==0");
+		dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	}
 	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
