@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1063"
+#define REVID	"R1064"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -414,7 +414,7 @@ static void afs_load_dram_descriptors(
 /**< load nbufs buffers to DRAM in regular mode */
 {
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
-	u32 offset = DMA_DIR_DESC_FIFO(dma_sel);
+	u32 offset = DMA_DIR_DESC_RAM(dma_sel);
 	int idesc;
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_EN|DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
@@ -462,7 +462,7 @@ static void afs_load_dram_descriptors_ll(
 					| (idb&0x0f);
 			dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
 				"afs_load_dram_descriptors_ll", idb, dma_desc);
-			writel(dma_desc, adev->remote+DMA_DIR_DESC_FIFO(dma_sel) + cursor*4);
+			writel(dma_desc, adev->remote+DMA_DIR_DESC_RAM(dma_sel) + cursor*4);
 		}
 	}
 
