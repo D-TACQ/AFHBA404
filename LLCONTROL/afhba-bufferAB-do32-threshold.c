@@ -104,7 +104,7 @@ int has_do32;
 #define CH02 (((volatile short*)ai_buffer)[1])
 #define CH03 (((volatile short*)ai_buffer)[2])
 #define CH04 (((volatile short*)ai_buffer)[3])
-#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
+#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX*samples_buffer])      /* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
