@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1060"
+#define REVID	"R1061"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -122,6 +122,10 @@ MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of dec
 int recycle_good = 1;
 module_param(recycle_good, int, 0644);
 MODULE_PARM_DESC(recycle_good, "set 0 to run RAM DESCRIPTORS without recycle");
+
+int use_llc_multi = 1;
+module_param(use_llc_multi, int, 0644);
+MODULE_PARM_DESC(use_llc_multi, "use LLC for multi descriptor transfer");
 
 static int getOrder(int len)
 {
@@ -436,6 +440,48 @@ static void afs_load_dram_descriptors(
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
 }
+
+
+#define LL_MAX_CNT	16
+#define LL_NB(cnt)	((cnt)-1)
+#define LL_MAX_LEN	(LL_MAX_CNT*64)
+
+static void afs_load_dram_descriptors_ll(
+	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel,
+	struct XLLC_DEF* buffers,
+	int nbufs
+)
+/**< load nbufs buffers to DRAM in regular mode */
+{
+	u32 dma_ctrl = DMA_CTRL_RD(adev);
+	int cursor = 0;
+	int ib = 0;
+
+	for ( ; ib < nbufs; ++ib){
+		struct XLLC_DEF* bd = &buffers[ib];
+		int idb = 0;
+		for ( ; idb*LL_MAX_LEN < bd->len; ++idb, ++cursor){
+			u32 dma_desc = (bd->pa + idb*LL_MAX_LEN)
+					| LL_NB(LL_MAX_CNT)<< AFDMAC_DESC_LEN_SHL
+					| (idb&0x0f);
+			dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
+				"afs_load_dram_descriptors()", idb, dma_desc);
+			writel(dma_desc, adev->remote+DMA_DIR_DESC_FIFO(dma_sel) + cursor*4);
+		}
+	}
+
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT);
+	if (recycle_good){
+		dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	}else{
+		dev_warn(pdev(adev), "afs_load_dram_descriptors() recycle_good==0");
+		dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
+	}
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), cursor-1);
+	DMA_CTRL_WR(adev, dma_ctrl);
+	afs_start_dma(adev, dma_sel);
+}
+
 static int _afs_dma_started(struct AFHBA_DEV *adev, int shl)
 {
 	u32 ctrl = DMA_CTRL_RD(adev);
@@ -1799,8 +1845,12 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 		ab->buffers[1].pa += ab->buffers[0].pa;
 	}
 	afs_dma_reset(adev, DMA_PUSH_SEL);
-	nb = fix_dma_buff_size(ab, xdef);
-	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, xdef, nb);
+	if (use_llc_multi){
+		afs_load_dram_descriptors_ll(adev, DMA_PUSH_SEL, ab->buffers, 2);
+	}else{
+		nb = fix_dma_buff_size(ab, xdef);
+		afs_load_dram_descriptors(adev, DMA_PUSH_SEL, xdef, nb);
+	}
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
 	job->on_push_dma_timeout = 0;
