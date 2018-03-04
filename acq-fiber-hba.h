@@ -352,6 +352,13 @@ inline static const char*  sDMA_SEL(enum DMA_SEL dma_sel)
 #define DMA_PUSH_DESC_RAM		0x6000
 #define DMA_PULL_DESC_RAM		0x7000
 
+
+#define DMA_DIR_DESC_FIFO(dma_sel) \
+	((dma_sel)==DMA_PUSH_SEL? DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO)
+
+#define DMA_DIR_DESC_LEN(dma_sel) \
+	((dma_sel)==DMA_PUSH_SEL? DMA_PUSH_DESC_LEN: DMA_PULL_DESC_LEN)
+
 static inline u32 dma_pp(enum DMA_SEL dma_sel, u32 bits)
 {
 	u32 xx = 0;

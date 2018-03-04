@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1053"
+#define REVID	"R1058"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -375,8 +375,7 @@ static void afs_load_llc_single_dma(
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	u32 len64 = ((len/64-1) + (len%64!=0));
-	u32 offset = dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	u32 offset = DMA_DIR_DESC_FIFO(dma_sel);
 	u32 dma_desc;
 
 	dev_dbg(pdev(adev), "afs_load_llc_single_dma %s 0x%08x %d",
@@ -395,6 +394,7 @@ static void afs_load_llc_single_dma(
 		"afs_load_llc_single_dma len64:%08x dma_desc:%08x dma_ctrl:%08x",
 		len64, dma_desc, dma_ctrl);
 
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), 0);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	writel(dma_desc, adev->remote+offset);
 	afs_start_dma(adev, dma_sel);
@@ -407,24 +407,23 @@ static void afs_load_dram_descriptors(
 )
 /**< load nbufs buffers to DRAM in regular mode */
 {
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
-	u32 offset = dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_FIFO: DMA_PULL_DESC_FIFO;
+	u32 offset = DMA_DIR_DESC_FIFO(dma_sel);
 	int idesc;
 
 	for (idesc = 0; idesc < nbufs; ++idesc, offset += 4){
 		struct XLLC_DEF* bd = &buffers[idesc];
 		u32 dma_desc = bd->pa
-		    | getAFDMAC_Order(sdev->buffer_len)<< AFDMAC_DESC_LEN_SHL
+		    | getAFDMAC_Order(bd->len)<< AFDMAC_DESC_LEN_SHL
 		    | idesc;
+		dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
+				"afs_load_dram_descriptors()", idesc, dma_desc);
 		writel(dma_desc, adev->remote+offset);
 	}
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_RECYCLE);
-	_afs_write_dmareg(adev, dma_sel==DMA_PUSH_SEL?
-			DMA_PUSH_DESC_LEN: DMA_PULL_DESC_LEN, nbufs-1);
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), nbufs-1);
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
 }
@@ -1742,10 +1741,39 @@ write99:
 	return rc;
 }
 
+
+int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
+/* descriptors are power of 2 * 1K .. attempt to fit in 2 descs.. */
+{
+	int nblocks = ab->buffers[0].len/1024;
+	int ii;
+	for (ii = 0; ii < 16; ++ii){
+		if (1<<ii > nblocks){
+			int len1 = (1<<(ii-1))*1024;
+			xdef[0] 	= ab->buffers[0];
+			xdef[1].pa 	= xdef[0].pa + len1;
+			xdef[1].len 	= xdef[0].len - len1;
+			xdef[0].len 	= len1;
+			xdef[2] 	= ab->buffers[1];
+			xdef[3].pa 	= xdef[2].pa + len1;
+			xdef[3].len 	= xdef[2].len - len1;
+			xdef[2].len 	= len1;
+			return 4;
+		}else if (1<<ii == nblocks){
+			xdef[0] = ab->buffers[0];
+			xdef[1] = ab->buffers[1];
+			return 2;
+		}
+	}
+	printk("ERROR: fix_dma_descriptors BUFFER TOO LONG");
+	return 0;
+}
 long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
+	struct XLLC_DEF xdef[4];
+	int nb;
 
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
@@ -1762,7 +1790,8 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 		ab->buffers[1].pa += ab->buffers[0].pa;
 	}
 	afs_dma_reset(adev, DMA_PUSH_SEL);
-	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, ab->buffers, 2);
+	nb = fix_dma_buff_size(ab, xdef);
+	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, xdef, nb);
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
 	job->on_push_dma_timeout = 0;
