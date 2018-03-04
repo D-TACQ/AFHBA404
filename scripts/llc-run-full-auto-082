@@ -10,7 +10,8 @@ UUT1=acq2106_082
 
 echo llc-run-full-auto-082 UUT1=$UUT1 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
-export acq2106_082_path=andros::/home/dt100/TREES/acq2106_082
+#export acq2106_082_path=andros::/home/dt100/TREES/acq2106_082
+export acq2106_082_path=/home/dt100/TREES/acq2106_082
 
 # We tested with ACQ2106_082 plugged into AFHBA404 PORT A
 # for PORT A set DEVNUM=0

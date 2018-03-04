@@ -3,19 +3,21 @@
 # POST is number of samples in LLC control loop
 # TLEN is the transient capture, overrun to make sure LLC terminates
 POST=${POST:-100000}
+NSB=${1:-32}			# Number Samples Buffer
 let TLEN="$POST*120/100"
 
-UUT1=acq2106_088
-# site1=ACQ424, site5=AO424
+UUT1=acq2106_082
+# site1,2,3,4=ACQ424, site6=DIO432
 
-echo llc-run-full-auto-088 UUT1=$UUT1 POST=$POST TLEN=$TLEN
+echo llc-run-full-auto-082 UUT1=$UUT1 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
-export acq2106_088_path=andros::/home/dt100/TREES/acq2106_088
+#export acq2106_082_path=andros::/home/dt100/TREES/acq2106_082
+export acq2106_082_path=/home/dt100/TREES/acq2106_082
 
-# We tested with ACQ2106_088 plugged into AFHBA404 PORT B
+# We tested with ACQ2106_082 plugged into AFHBA404 PORT A
 # for PORT A set DEVNUM=0
-echo "setting DEVNUM=1"
-export DEVNUM=1
+echo "setting DEVNUM=0"
+export DEVNUM=0
 
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
@@ -31,25 +33,22 @@ control_program() {
 	cd PROJECTS/AFHBA404/LLCONTROL
 	#echo CONTROL PROGRAM 01
 #	export ZCOPY=1 
-# DUP1: index from zero, 1 is CH02
-	export DUP1=0
+	export DO_THRESHOLDS=1
 # total SPAD 16 longs, + 16 AI longs
-	export NCOLS=32
-	export NCHAN=32
+	export NCHAN=128
 	export RTPRIO=40
-	export AO_IDENT=1
-#	for 1:1 loopback cable, set SIMULATE=0, set FEEDFORWARD, get 32 waveforms.
-#	export FEED_FORWARD=2000
+	export DO32=1
 # isolcpus=4,5,6,7,8...
 # taskset 0x10 means "run on processor 4"
 	export TASKSET="taskset 0x10"
 	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
-	$TASKSET ./afhba-llcontrol-cpucopy $POST &
+	$TASKSET ./afhba-bufferAB-do32-threshold $POST $NSB &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
 	echo CONTROL PROGRAM 99
 	echo $UUT1 $acq2106_088_path
-	export STORE_COLS=16,17
+	export NCOLS=80
+	export STORE_COLS=64,65
 	ls -l afhba.$DEVNUM.log
 	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
 		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
@@ -60,16 +59,18 @@ control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
 #        export SITECLIENT_TRACE=1 
-	export AISITES=1
-# enable SIMULATE=1 to get some dummay AI data. DO NO use with 1:1 loopback!
+	export AISITES=1,2,3,4
+# enable SIMULATE=1 to get some dummy AI data. DO NO use with 1:1 loopback!
 #	export SIMULATE=1
-        export AOSITES=5
-	./llc-test-harness-twobox.py $UUT1
+	export FEEDFORWARD=1000
+        export AOSITES=6
+	./llc-test-harness-ai4-dio32.py $UUT1
         echo CONTROL SCRIPT 99
        )
+       export AUTO_SOFT_TRIGGER=0
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
-        STATUSMONITOR_TRACE=0 ./acq400_capture.py \
-		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
+        STATUSMONITOR_TRACE=1 ./acq400_capture.py \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=$AUTO_SOFT_TRIGGER" \
 		$UUT1
        )
 }
