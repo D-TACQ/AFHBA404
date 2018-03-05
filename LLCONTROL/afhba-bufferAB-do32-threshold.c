@@ -354,8 +354,8 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		TLATCH(bufferAB[ab])[0] = MARKER;
 		control(xo_buffer, ai_buffer);
-		TLATCH(bufferAB[ab])[1] = ib != 0? pollcat: 0;
-		TLATCH(bufferAB[ab])[2] = ib != 0? difftime_us(): 0;
+		TLATCH(ai_buffer)[1] = ib != 0? pollcat: 0;
+		TLATCH(ai_buffer)[2] = ib != 0? difftime_us(): 0;
 		action(ai_buffer);
 
 		if (verbose){
