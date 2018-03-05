@@ -77,8 +77,8 @@ int spadlongs = 16;
 short* xo_buffer;
 int has_do32;
 
-
-#define NSHORTS	((nchan+spadlongs*sizeof(unsigned)/sizeof(short))*samples_buffer)
+#define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
 #define SPIX	(NSHORTS/2-spadlongs)
 
@@ -331,9 +331,9 @@ void control_threshold_history(short *xo, short *ai)
 	static unsigned yy = 0;
 
 	for (ii = 0; ii < 32; ++ii){
-		if (ai[ii*NSHORTS + mon_chan] > 100){
+		if (ai[ii*NSHORTS1 + mon_chan] > 100){
 			yy |= 1<<ii;
-		}else if (ai[ii*NSHORTS + mon_chan] < -100){
+		}else if (ai[ii*NSHORTS1 + mon_chan] < -100){
 			yy &= ~(1<<ii);
 		}
 	}
