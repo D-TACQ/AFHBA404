@@ -46,7 +46,8 @@
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 #define XO_OFF  0x080000		/* XO buffer at this offset */
 
-#define LOG_FILE	"afhba.%d.log"
+#define _LOG_FILE	"afhba.%d.log"
+const char* log_file = _LOG_FILE;
 
 void* host_buffer;
 int fd;
@@ -181,6 +182,9 @@ void (*G_control)(short *ao, short *ai) = control_none;
 
 void ui(int argc, char* argv[])
 {
+	if (getenv("LOG_FILE")){
+		log_file = getenv("LOG_FILE");
+	}
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
@@ -237,7 +241,7 @@ void ui(int argc, char* argv[])
 void setup()
 {
 	char logfile[80];
-	sprintf(logfile, LOG_FILE, devnum);
+	sprintf(logfile, log_file, devnum);
 	get_mapping();
 	goRealTime();
 	fp_log = fopen(logfile, "w");
