@@ -41,32 +41,12 @@
 */
 
 
-#define _GNU_SOURCE
-#include <sched.h>
+#include "afhba-llcontrol-common.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sched.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
-
-
-#include "../rtm-t_ioctl.h"
-#define HB_FILE "/dev/rtm-t.%d"
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
-#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define BUFFER_AB_OFFSET 0x040000	/* BUFFERB starts here */
+#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define LOG_FILE	"afhba.%d.log"
 
@@ -342,15 +322,17 @@ void control_none(short *xo, short *ai)
 
 #define MARKER 0xdeadc0d1
 
+
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl1;
-	unsigned sample;
+	unsigned ib;
 	int println = 0;
 	int nbuffers = nsamples/samples_buffer;
 	int ab = 0;
 	int rtfails = 0;
+	int pollcat = 0;
 
 	mlockall(MCL_CURRENT);
 	memset(bufferAB[0], 0, VI_LEN);
@@ -358,7 +340,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	*TLATCH(bufferAB[0]) = MARKER;
 	*TLATCH(bufferAB[1]) = MARKER;
 
-	for (sample = 0; sample <= nbuffers; ++sample, tl1, ab = !ab){
+	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (*TLATCH(bufferAB[ab]) != MARKER){
 			*TLATCH(bufferAB[ab]) = MARKER;
@@ -367,14 +349,17 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 
 		while((tl1 = *TLATCH(bufferAB[ab])) == MARKER){
 			sched_yield();
+			++pollcat;
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		*TLATCH(bufferAB[ab]) = MARKER;
 		control(xo_buffer, ai_buffer);
+		TLATCH(ai_buffer)[1] = pollcat;
+		TLATCH(ai_buffer)[2] = difftime_us();
 		action(ai_buffer);
 
 		if (verbose){
-			print_sample(sample, tl1);
+			print_sample(ib, tl1);
 		}
 	}
 	if (rtfails){

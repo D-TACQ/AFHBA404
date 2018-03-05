@@ -39,31 +39,14 @@
 */
 
 
-#define _GNU_SOURCE
-#include <sched.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sched.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
 
 
-#include "../rtm-t_ioctl.h"
-#define HB_FILE "/dev/rtm-t.%d"
+#include "afhba-llcontrol-common.h"
+
+
 #define HB_LEN	0x1000
 
-#define LOG_FILE	"afhba.%d.log"
+
 
 void* host_buffer;
 int fd;
@@ -409,6 +392,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	unsigned tl1;
 	unsigned sample;
 	int println = 0;
+	int pollcat = 0;
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
@@ -416,13 +400,16 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		*TLATCH = tl0;
 	}
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
+	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
 		while((tl1 = *TLATCH) == tl0){
 			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
+			++pollcat;
 		}
 		control(ao_buffer, ai_buffer);
+		TLATCH[1] = pollcat;
+		TLATCH[2] = difftime_us();
 		action(ai_buffer);
 
 		if (verbose){
