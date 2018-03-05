@@ -185,10 +185,14 @@ void check_tlatch_action(void *local_buffer)
 
 void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);
+void control_threshold_history(short* ao, short *ai);
+
 void (*G_control)(short *ao, short *ai) = control_none;
 
 #define MV100   (32768/100)
 
+
+int mon_chan = 0;
 
 void ui(int argc, char* argv[])
 {
@@ -228,6 +232,12 @@ void ui(int argc, char* argv[])
         if (getenv("DO_THRESHOLDS")){
 		G_control = control_thresholds;
 	}
+        if (getenv("CONTROL_THRESHOLD_HISTORY")){
+        	mon_chan = atoi(getenv("CONTROL_THRESHOLD_HISTORY"));
+        	G_control = control_threshold_history;
+        	fprintf(stderr, "control set %s mon_chan %d\n",
+        			"control_threshold_history", mon_chan);
+        }
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
@@ -242,7 +252,8 @@ void ui(int argc, char* argv[])
 	}
 	G_action = write_action;
 	if (getenv("ACTION")){
-		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
+		const char* acts = getenv("ACTION");
+		if (strcmp(acts, "check_tlatch") == 0){
 			G_action = check_tlatch_action;
 		}
 	}
@@ -305,6 +316,24 @@ void control_thresholds(short *xo, short *ai)
 		if (ai[ii] > 100){
 			yy |= 1<<ii;
 		}else if (ai[ii] < -100){
+			yy &= ~(1<<ii);
+		}
+	}
+
+	do32[DO_IX] = yy;
+}
+
+void control_threshold_history(short *xo, short *ai)
+/* set DO bit for corresponding AI[mon_chan][t] > 0 t=0:31 */
+{
+	unsigned *do32 = (unsigned*)xo;
+	int ii;
+	static unsigned yy = 0;
+
+	for (ii = 0; ii < 32; ++ii){
+		if (ai[ii*NSHORTS + mon_chan] > 100){
+			yy |= 1<<ii;
+		}else if (ai[ii*NSHORTS + mon_chan] < -100){
 			yy &= ~(1<<ii);
 		}
 	}
