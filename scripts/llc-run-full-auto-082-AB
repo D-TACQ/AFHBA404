@@ -52,11 +52,12 @@ control_program() {
 	echo CONTROL PROGRAM 99
 	echo $UUT1 $acq2106_088_path
 	export NCOLS=80
-	export STORE_COLS=64,65
-	ls -l afhba.$DEVNUM.log
-	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
+	export STORE_COLS=64,65,66,67
+	logfile=$(printf $LOG_FILE $DEVNUM)
+	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 \
+		--store_cols $STORE_COLS \
 		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
-		$UUT1 afhba.$DEVNUM.log
+		$UUT1 $logfile
 }
 
 control_script() {
