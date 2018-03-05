@@ -318,12 +318,12 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
 	if (!dummy_first_loop){
-		*TLATCH = tl0;
+		TLATCH[0] = tl0;
 	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = *TLATCH) == tl0){
+		while((tl1 = TLATCH[0]) == tl0){
 			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;

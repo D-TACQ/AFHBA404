@@ -337,22 +337,22 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	mlockall(MCL_CURRENT);
 	memset(bufferAB[0], 0, VI_LEN);
 	memset(bufferAB[1], 0, VI_LEN);
-	*TLATCH(bufferAB[0]) = MARKER;
-	*TLATCH(bufferAB[1]) = MARKER;
+	TLATCH(bufferAB[0])[0] = MARKER;
+	TLATCH(bufferAB[1])[0] = MARKER;
 
 	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
-		if (*TLATCH(bufferAB[ab]) != MARKER){
-			*TLATCH(bufferAB[ab]) = MARKER;
+		if (TLATCH(bufferAB[ab])[0] != MARKER){
+			TLATCH(bufferAB[ab])[0] = MARKER;
 			++rtfails;
 		}
 
-		while((tl1 = *TLATCH(bufferAB[ab])) == MARKER){
+		while((tl1 = TLATCH(bufferAB[ab])[0]) == MARKER){
 			sched_yield();
 			++pollcat;
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
-		*TLATCH(bufferAB[ab]) = MARKER;
+		TLATCH(bufferAB[ab])[0] = MARKER;
 		control(xo_buffer, ai_buffer);
 		TLATCH(ai_buffer)[1] = pollcat;
 		TLATCH(ai_buffer)[2] = difftime_us();
