@@ -328,13 +328,13 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
 		while((tl1 = TLATCH[0]) == tl0){
-			sched_yield();
+//			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
 		}
 		control(xo_buffer, ai_buffer);
-		TLATCH[1] = sample != 0? pollcat: 0;
-		TLATCH[2] = sample != 0? difftime_us(): 0;
+		TLATCH[1] = sample <= 1 ? pollcat: 0;
+		TLATCH[2] = sample <= 1 ? difftime_us(): 0;
 		action(ai_buffer);
 
 		if (verbose){
