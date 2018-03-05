@@ -3,7 +3,7 @@
 # POST is number of samples in LLC control loop
 # TLEN is the transient capture, overrun to make sure LLC terminates
 POST=${POST:-100000}
-NSB=${1:-32}			# Number Samples Buffer
+NSB=${NSB:-32}			# Number Samples Buffer
 let TLEN="$POST*120/100"
 
 UUT1=acq2106_082
@@ -38,10 +38,14 @@ control_program() {
 	export NCHAN=128
 	export RTPRIO=40
 	export DO32=1
+	export LOG_FILE="/ramdisk/afhba.%d.log"
+#	export ACTION=check_tlatch
+#	export VERBOSE=1
 # isolcpus=4,5,6,7,8...
 # taskset 0x10 means "run on processor 4"
 	export TASKSET="taskset 0x10"
 	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+	echo "$TASKSET ./afhba-bufferAB-do32-threshold $POST $NSB"
 	$TASKSET ./afhba-bufferAB-do32-threshold $POST $NSB &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
