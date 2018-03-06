@@ -1,0 +1,6 @@
+mkdir -p ~/bin
+for file in llc-run-full*
+do
+	ln -s $PWD/$file ~/bin
+done
+
