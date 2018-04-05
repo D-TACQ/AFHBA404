@@ -41,34 +41,16 @@
 */
 
 
-#define _GNU_SOURCE
-#include <sched.h>
+#include "afhba-llcontrol-common.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sched.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
-
-
-#include "../rtm-t_ioctl.h"
-#define HB_FILE "/dev/rtm-t.%d"
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
-#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define BUFFER_AB_OFFSET 0x040000	/* BUFFERB starts here */
+#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define LOG_FILE	"afhba.%d.log"
+
+const char* log_file = LOG_FILE;
 
 void* host_buffer;
 
@@ -95,16 +77,12 @@ int spadlongs = 16;
 short* xo_buffer;
 int has_do32;
 
-
-#define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
+#define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
-/* ai_buffer is a local copy of host buffer */
-#define CH01 (((volatile short*)ai_buffer)[0])
-#define CH02 (((volatile short*)ai_buffer)[1])
-#define CH03 (((volatile short*)ai_buffer)[2])
-#define CH04 (((volatile short*)ai_buffer)[3])
-#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX*samples_buffer])      /* actually, sample counter */
+#define SPIX	(NSHORTS/2-spadlongs)
+
+#define TLATCH(buf) (&((volatile unsigned*)(buf))[SPIX])      /* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
@@ -185,28 +163,42 @@ void check_tlatch_action(void *local_buffer)
 {
 	static unsigned tl0;
 	static int errcount;
+	static int call_count;
 	short *ai_buffer = local_buffer;
 
-	unsigned tl1 = *TLATCH;
-	if (tl1 != tl0+1){
-		if (++errcount < 100){
-			printf("%d => %d\n", tl0, tl1);
-		}else if (errcount == 100){
-			printf("stop reporting at 100 errors ..\n");
+	++call_count;
+
+	if (tl0 == 0){
+		tl0 = *TLATCH(ai_buffer);
+	}else{
+		unsigned tl1 = *TLATCH(ai_buffer);
+		if (tl1 != tl0+samples_buffer){
+			if (++errcount < 100){
+				printf("ERROR:%5d %08x => %08x\n", call_count, tl0, tl1);
+			}else if (errcount == 100){
+				printf("stop reporting at 100 errors ..\n");
+			}
 		}
+		tl0 = tl1;
 	}
-	tl0 = tl1;
 }
 
 void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);
+void control_threshold_history(short* ao, short *ai);
+
 void (*G_control)(short *ao, short *ai) = control_none;
 
 #define MV100   (32768/100)
 
 
+int mon_chan = 0;
+
 void ui(int argc, char* argv[])
 {
+	if (getenv("LOG_FILE")){
+		log_file = getenv("LOG_FILE");
+	}
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
@@ -240,6 +232,12 @@ void ui(int argc, char* argv[])
         if (getenv("DO_THRESHOLDS")){
 		G_control = control_thresholds;
 	}
+        if (getenv("CONTROL_THRESHOLD_HISTORY")){
+        	mon_chan = atoi(getenv("CONTROL_THRESHOLD_HISTORY"));
+        	G_control = control_threshold_history;
+        	fprintf(stderr, "control set %s mon_chan %d\n",
+        			"control_threshold_history", mon_chan);
+        }
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
@@ -254,7 +252,8 @@ void ui(int argc, char* argv[])
 	}
 	G_action = write_action;
 	if (getenv("ACTION")){
-		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
+		const char* acts = getenv("ACTION");
+		if (strcmp(acts, "check_tlatch") == 0){
 			G_action = check_tlatch_action;
 		}
 	}
@@ -263,7 +262,7 @@ void ui(int argc, char* argv[])
 void setup()
 {
 	char logfile[80];
-	sprintf(logfile, LOG_FILE, devnum);
+	sprintf(logfile, log_file, devnum);
 	get_mapping();
 	goRealTime();
 	struct AB ab_def;
@@ -276,7 +275,7 @@ void setup()
 	ab_def.buffers[0].pa = xllc_def.pa;
 	ab_def.buffers[1].pa = BUFFER_AB_OFFSET;
 	ab_def.buffers[0].len =
-	ab_def.buffers[1].len = samples_buffer*VI_LEN;
+	ab_def.buffers[1].len = VI_LEN;
 
 	if (ioctl(fd, AFHBA_START_AI_AB, &ab_def)){
 		perror("ioctl AFHBA_START_AI_AB");
@@ -294,7 +293,7 @@ void setup()
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
+	printf("AO buf pa:   0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
 	xo_buffer = (short*)((void*)host_buffer+XO_OFF);
 }
@@ -323,6 +322,24 @@ void control_thresholds(short *xo, short *ai)
 
 	do32[DO_IX] = yy;
 }
+
+void control_threshold_history(short *xo, short *ai)
+/* set DO bit for corresponding AI[mon_chan][t] > 0 t=0:31 */
+{
+	unsigned *do32 = (unsigned*)xo;
+	int ii;
+	static unsigned yy = 0;
+
+	for (ii = 0; ii < 32; ++ii){
+		if (ai[ii*NSHORTS1 + mon_chan] > 100){
+			yy |= 1<<ii;
+		}else if (ai[ii*NSHORTS1 + mon_chan] < -100){
+			yy &= ~(1<<ii);
+		}
+	}
+
+	do32[DO_IX] = yy;
+}
 void control_none(short *xo, short *ai)
 {
 	unsigned* dox = (unsigned *)xo;
@@ -332,33 +349,50 @@ void control_none(short *xo, short *ai)
 }
 
 
+#define MARKER 0xdeadc0d1
+
 
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
-	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned tl1;
-	unsigned sample;
+	unsigned ib;
 	int println = 0;
+	int nbuffers = nsamples/samples_buffer;
+	int ab = 0;
+	int rtfails = 0;
+	int pollcat = 0;
 
 	mlockall(MCL_CURRENT);
-	memset(host_buffer, 0, VI_LEN);
-	if (!dummy_first_loop){
-		*TLATCH = tl0;
-	}
+	memset(bufferAB[0], 0, VI_LEN);
+	memset(bufferAB[1], 0, VI_LEN);
+	TLATCH(bufferAB[0])[0] = MARKER;
+	TLATCH(bufferAB[1])[0] = MARKER;
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
-		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = *TLATCH) == tl0){
-			sched_yield();
-			memcpy(ai_buffer, host_buffer, VI_LEN);
+	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
+		/* WARNING: RT: software MUST get there first, or we lose data */
+		if (TLATCH(bufferAB[ab])[0] != MARKER){
+			TLATCH(bufferAB[ab])[0] = MARKER;
+			++rtfails;
 		}
+
+		while((tl1 = TLATCH(bufferAB[ab])[0]) == MARKER){
+			sched_yield();
+			++pollcat;
+		}
+		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
+		TLATCH(bufferAB[ab])[0] = MARKER;
 		control(xo_buffer, ai_buffer);
+		TLATCH(ai_buffer)[1] = ib != 0? pollcat: 0;
+		TLATCH(ai_buffer)[2] = ib != 0? difftime_us(): 0;
 		action(ai_buffer);
 
 		if (verbose){
-			print_sample(sample, tl1);
+			print_sample(ib, tl1);
 		}
+	}
+	if (rtfails){
+		fprintf(stderr, "ERROR: rtfails:%d\n", rtfails);
 	}
 }
 

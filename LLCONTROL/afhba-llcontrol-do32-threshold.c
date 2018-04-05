@@ -41,32 +41,13 @@
 */
 
 
-#define _GNU_SOURCE
-#include <sched.h>
+#include "afhba-llcontrol-common.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sched.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
-
-
-#include "../rtm-t_ioctl.h"
-#define HB_FILE "/dev/rtm-t.%d"
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 #define XO_OFF  0x080000		/* XO buffer at this offset */
 
-#define LOG_FILE	"afhba.%d.log"
+#define _LOG_FILE	"afhba.%d.log"
+const char* log_file = _LOG_FILE;
 
 void* host_buffer;
 int fd;
@@ -201,6 +182,9 @@ void (*G_control)(short *ao, short *ai) = control_none;
 
 void ui(int argc, char* argv[])
 {
+	if (getenv("LOG_FILE")){
+		log_file = getenv("LOG_FILE");
+	}
         if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
         }
@@ -257,7 +241,7 @@ void ui(int argc, char* argv[])
 void setup()
 {
 	char logfile[80];
-	sprintf(logfile, LOG_FILE, devnum);
+	sprintf(logfile, log_file, devnum);
 	get_mapping();
 	goRealTime();
 	fp_log = fopen(logfile, "w");
@@ -333,20 +317,24 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	unsigned tl1;
 	unsigned sample;
 	int println = 0;
+	int pollcat = 0;
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
 	if (!dummy_first_loop){
-		*TLATCH = tl0;
+		TLATCH[0] = tl0;
 	}
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1){
+	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = *TLATCH) == tl0){
-			sched_yield();
+		while((tl1 = TLATCH[0]) == tl0){
+//			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
+			++pollcat;
 		}
 		control(xo_buffer, ai_buffer);
+		TLATCH[1] = sample > 1 ? pollcat: 0;
+		TLATCH[2] = sample > 1 ? difftime_us(): 0;
 		action(ai_buffer);
 
 		if (verbose){

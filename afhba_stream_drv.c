@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1064"
+#define REVID	"R1065"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -394,6 +394,7 @@ static void afs_load_llc_single_dma(
 	dma_desc |= len64;
 	dma_desc |= sdev->shot&AFDMAC_DESC_ID_MASK;
 
+	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RAM);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
 
 	dev_dbg(pdev(adev),
