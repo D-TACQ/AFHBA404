@@ -16,6 +16,10 @@ echo stream to /mnt/afhba.$DN
 mkdir -p /mnt/afhba.$DN
 export HBFARM_PROCESS=checkramp
 export NAMES_ON_STDIN=1
+# ACQ425, packed? : 8LW
+export HBFARM_SITELW=${HBFARM_SITELW:-8}
+# ACQ424 : 16LW
+
 
 RTM_DEVNUM=$DN RECYCLE=1 OUTROOT=/mnt/afhba.$DN ./STREAM/rtm-t-stream-disk | \
 	hbfarm425 $HBFARM
