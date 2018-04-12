@@ -1,0 +1,13 @@
+#!/bin/bash
+
+for file in /proc/irq/*/smp_affinity; do 
+	(echo 1 > $file) 2>/dev/null
+done
+for file in /proc/irq/*/smp_affinity; do 
+	AFFINITY=$(cat $file)
+	if [ "x$AFFINITY" != "x1" ]; then 
+		echo $file $(cat $file)
+	fi
+done
+
+
