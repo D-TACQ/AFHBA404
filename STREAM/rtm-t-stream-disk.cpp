@@ -302,7 +302,7 @@ static void process(int ibuf, int nbuf, struct StreamBufferDef *sbd){
 				if (PUT4KPERFILE){
 					strcpy(buf4k, old_fname);
 					strcat(buf4k, "\n");
-					fwrite(buf4k, 1, 4096, stdout);
+					fwrite(buf4k, 1, PUT4KPERFILE, stdout);
 					fflush(stdout);
 				}else{
 					puts(old_fname);
@@ -497,7 +497,7 @@ static void init_defaults(int argc, char* argv[])
 		CONCAT=atoi(getenv("CONCAT"));
 	}
 	if (getenv("PUT4KPERFILE")){
-		PUT4KPERFILE = 1;
+		PUT4KPERFILE = dev->maxlen/1024;
 	}
 	if (getenv("OUTPUT_META")){
 		OUTPUT_META = atoi(getenv("OUTPUT_META"));
