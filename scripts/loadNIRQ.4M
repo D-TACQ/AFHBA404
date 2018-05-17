@@ -9,7 +9,7 @@ echo 9 > /proc/sys/kernel/printk
 
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
-	aurora_monitor=$AMON nbuffers=64 buffer_len=0x400000 \
+	aurora_monitor=$AMON nbuffers=66 buffer_len=0x400000 \
 	eot_interrupt=0 WORK_TO=1
 
 #echo file afhba_stream_drv.c +p >$DDB/control

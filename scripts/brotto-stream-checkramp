@@ -47,7 +47,8 @@ fi
 export NAMES_ON_STDIN=1
 export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN
 #fan_hi
-./STREAM/rtm-t-stream-disk | /home/dt100/bin/multisitecheckramp-3x425
+#./STREAM/rtm-t-stream-disk | /home/dt100/bin/multisitecheckramp-3x425
+./STREAM/rtm-t-stream-disk | /home/dt100/bin/multisitecheckramp-6x482
 fan_lo
 
 kill -9 $LOGPID
