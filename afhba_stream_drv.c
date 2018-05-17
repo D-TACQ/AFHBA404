@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1065"
+#define REVID	"R1066"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -153,9 +153,11 @@ void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 
 	for (ii = 0; ii < sdev->nbuffers; ++ii){
 		u32 descr = sdev->hbx[ii].descr;
+		int len = sdev->hbx[ii].req_len;
 
+		if (len == 0) len = sdev->buffer_len;
 		descr &= ~AFDMAC_DESC_LEN_MASK;
-		descr |= getAFDMAC_Order(sdev->buffer_len)<< AFDMAC_DESC_LEN_SHL;
+		descr |= getAFDMAC_Order(len)<< AFDMAC_DESC_LEN_SHL;
 		switch(eot_interrupt){
 		case 0:
 			descr &= ~AFDMAC_DESC_EOT;
@@ -1488,9 +1490,6 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	dev_dbg(pdev(adev), "45: DMA open");
 
-	if (afs_reset_buffers(adev)){
-		return -ERESTARTSYS;
-	}
 	/** @@todo protect with lock ? */
 	if (sdev->pid == 0){
 		sdev->pid = current->pid;
@@ -1507,6 +1506,9 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	for (ii = 0; ii != nbuffers; ++ii){
 		sdev->hbx[ii].req_len = sdev->req_len;
+	}
+	if (afs_reset_buffers(adev)){
+		return -ERESTARTSYS;
 	}
 
 	if ((file->f_flags & O_NONBLOCK) != 0){
