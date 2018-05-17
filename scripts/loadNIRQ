@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BL=${1:-0x100000}
+BN=${2:-66}
+
 AMON=${AMON:-1}
 
 DDB=/sys/kernel/debug/dynamic_debug
@@ -8,8 +11,8 @@ echo 9 > /proc/sys/kernel/printk
 
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
-	aurora_monitor=$AMON nbuffers=66 eot_interrupt=0 WORK_TO=1 
-	
+	aurora_monitor=$AMON nbuffers=$BN eot_interrupt=0 WORK_TO=1  \
+	buffer_len=$BL
 #	dyndbg="\" func afhba_map +pf\""
 
 
