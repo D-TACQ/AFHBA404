@@ -45,7 +45,9 @@ else
 echo streaming from UUT $ACQ2106_UUT live checkramp store:/mnt/afhba.$DN
 fi
 export NAMES_ON_STDIN=1
-export RECYCLE=1 RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN
+export RECYCLE=${RECYCLE:-1}
+echo RECYCLE $RECYCLE
+export RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN
 export PUT4KPERFILE=1
 #fan_hi
 ./STREAM/rtm-t-stream-disk | pv >/dev/null
