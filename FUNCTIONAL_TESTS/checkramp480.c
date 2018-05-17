@@ -36,11 +36,12 @@
 
 int main(int argc, char* argv[])
 {
-	unsigned short* xx;
+	unsigned* xx;
 	unsigned xx0;
 	unsigned xx1;
 	unsigned long long ii = 0;
 	unsigned long long ii1 = 0;
+	unsigned long long bytes = 0;
 	unsigned errors = 0;
 	unsigned error_report = 0;
 	int verbose = 0;
@@ -63,11 +64,11 @@ int main(int argc, char* argv[])
 		if (ii == 0){
 			xx0 = xx1 = xx[ichan];
 		}else{
-			if (xx[ichan] != xx1 + 4){
+			if (xx[ichan] != xx1 + 1){
 				if (ii1 && ii - ii1 != wrapcount){
 					if (++error_report < 10 || verbose > 1){
-						printf("%012llx +[%d] 0x%08x 0x%08x ** ERROR **\n",
-						       ii, ii-ii1, xx1, xx[ichan]);
+	printf("%012llx [%d] +[%d] 0x%08x 0x%08x ** ERROR **\n",
+		bytes, ii, ii-ii1, xx1, xx[ichan]);
 					}
 					++errors;
 				}
@@ -82,10 +83,12 @@ int main(int argc, char* argv[])
 			printf("%012llx  %08x %08x  %d errors\n",
 			       ii, xx0, xx, errors);
 		}
+		bytes += nchan*sizeof(short);
 	}	
 
 	printf("%012llx bytes %llu Mbytes %d errors\n",
 		ii*sizeof(short)*nchan, ii*sizeof(short)*nchan/0x100000, errors);		
+	return errors;
 }
 
 
