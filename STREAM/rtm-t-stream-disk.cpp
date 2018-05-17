@@ -498,6 +498,7 @@ static void init_defaults(int argc, char* argv[])
 	}
 	if (getenv("PUT4KPERFILE")){
 		PUT4KPERFILE = dev->maxlen/1024;
+		info("PUT4KPERFILE maxlen %x", dev->maxlen);
 	}
 	if (getenv("OUTPUT_META")){
 		OUTPUT_META = atoi(getenv("OUTPUT_META"));
