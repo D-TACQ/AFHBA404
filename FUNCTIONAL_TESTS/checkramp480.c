@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
 			xx0 = xx1 = xx[ichan];
 		}else{
 			if (xx[ichan] != xx1 + 1){
-				if (ii1 && ii - ii1 != wrapcount){
+				if (errors == 0 || ii1 && ii - ii1 != wrapcount){
 					if (++error_report < 10 || verbose > 1){
 	printf("%012llx [%d] +[%d] 0x%08x 0x%08x ** ERROR **\n",
-		bytes, ii, ii-ii1, xx1, xx[ichan]);
+		bytes, ii, ii1? ii-ii1: 0, xx1, xx[ichan]);
 					}
 					++errors;
 				}
