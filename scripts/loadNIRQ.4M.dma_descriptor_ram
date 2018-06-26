@@ -1,6 +1,7 @@
 #!/bin/bash
 
 AMON=${AMON:-1}
+NPORTS=${NPORTS:-2}
 
 DDB=/sys/kernel/debug/dynamic_debug
 [ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
@@ -9,6 +10,7 @@ echo 9 > /proc/sys/kernel/printk
 
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
+	afhba_nports=${NPORTS} \
 	aurora_monitor=$AMON nbuffers=99 buffer_len=0x400000 \
 	eot_interrupt=0 WORK_TO=1 \
         dma_descriptor_ram=1 assume_stuck_buffers_are_ok=1

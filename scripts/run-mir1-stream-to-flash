@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DN=${1:-0}
+# runs mir1-stream-to-flash in a window
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+
+cd /home/ecei/PROJECTS/AFHBA404
+mate-terminal --title="mir-stream-to-flash $DN" \
+    -e "./scripts/mir1-stream-to-flash $DN" &
