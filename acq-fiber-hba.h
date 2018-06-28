@@ -203,6 +203,7 @@ struct AFHBA_DEV_PATH {
 
 #define HOST_SPI_FLASH_CONTROL_REG 	0x0040	/* SPI FLASH Control Register */
 #define HOST_SPI_FLASH_DATA_REG 	0x0044	/* SPI FLASH Data Register */
+#define HOST_MON_REG			0x0048  /* Temperature Monitor/Volts Alarms */
 
 #define AURORA_STEP			0x0010  /* Duplicate blocks every STEP */
 #define AURORA_CONTROL_REGA 		0x0080	/* Aurora Control Register */
@@ -259,6 +260,12 @@ struct AFHBA_DEV_PATH {
 	(AFHBA_AURORA_STAT_SFP_LOS|AFHBA_AURORA_STAT_SFP_TX_FAULT|\
 	AFHBA_AURORA_STAT_HARD_ERR|AFHBA_AURORA_STAT_SOFT_ERR|\
 	AFHBA_AURORA_STAT_FRAME_ERR)
+
+
+#define HOST_MON_TEMP_SHL	20
+#define HOST_MON_USR_TEMP	(1<<5)
+#define HOST_MON_OVER_TEMP	(1<<4)
+#define HOST_MON_VOLT_ALARM	0x7
 
 /* BAR1 register definitions: enums are long-word offsets */
 #define ZYNQ_BASE			0x0000

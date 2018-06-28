@@ -554,6 +554,25 @@ static ssize_t show_host_test(
 
 static DEVICE_ATTR(host_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_host_test, store_host_test);
 
+static ssize_t show_host_temp(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+        unsigned reg = afhba_read_reg(adev, HOST_MON_REG);
+        int TC100 = (reg>>HOST_MON_TEMP_SHL)*50398/4096 - 27315;
+
+	sprintf(buf, "%08x T:%d.%02d C %s %s %s\n",
+			reg, TC100/100, TC100%100,
+			(reg&HOST_MON_USR_TEMP)? "USR_TEMP ALARM":"",
+			(reg&HOST_MON_OVER_TEMP)? "OVER TEMP ALARM": "",
+			(reg&HOST_MON_VOLT_ALARM)? "VOLTAGE ALARM": "");
+	return strlen(buf);
+}
+
+static DEVICE_ATTR(host_temp, (S_IRUSR|S_IRGRP), show_host_temp, 0);
+
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
 	&dev_attr_dma_test.attr,
@@ -577,6 +596,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_fpga_rev.attr,
 	&dev_attr_heartbeat.attr,
 	&dev_attr_host_test.attr,
+	&dev_attr_host_temp.attr,
 	&dev_attr_pull_dma_timeouts.attr,
 	&dev_attr_push_dma_timeouts.attr,
 	NULL
