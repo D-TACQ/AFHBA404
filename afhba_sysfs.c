@@ -571,6 +571,20 @@ static ssize_t show_host_temp(
 	return strlen(buf);
 }
 
+static ssize_t show_streamer_pid(
+        struct device * dev,
+        struct device_attribute *attr,
+        char * buf)
+{
+	struct AFHBA_STREAM_DEV *sdev = 
+		afhba_lookupDeviceFromClass(dev)->stream_dev;
+
+        sprintf(buf, "%d\n", sdev->pid);
+        return strlen(buf);
+}
+
+static DEVICE_ATTR(streamer_pid, (S_IRUSR|S_IRGRP), show_streamer_pid, 0 );
+
 static DEVICE_ATTR(host_temp, (S_IRUSR|S_IRGRP), show_host_temp, 0);
 
 static const struct attribute *dev_attrs[] = {
@@ -597,6 +611,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_heartbeat.attr,
 	&dev_attr_host_test.attr,
 	&dev_attr_host_temp.attr,
+        &dev_attr_streamer_pid.attr,
 	&dev_attr_pull_dma_timeouts.attr,
 	&dev_attr_push_dma_timeouts.attr,
 	NULL
