@@ -100,11 +100,11 @@ int aurora_status_read_count = 0;
 module_param(aurora_status_read_count, int, 0644);
 MODULE_PARM_DESC(aurora_status_read_count, "number of amon polls");
 
-int dma_descriptor_ram = 0;
+int dma_descriptor_ram = 1;
 module_param(dma_descriptor_ram, int, 0644);
 MODULE_PARM_DESC(dma_descriptor_ram, "descriptors in RAM not FIFO >1 :: validate on load");
 
-int assume_stuck_buffers_are_ok = 0;
+int assume_stuck_buffers_are_ok = 1;
 module_param(assume_stuck_buffers_are_ok, int, 0644);
 MODULE_PARM_DESC(assume_stuck_buffers_are_ok, "assume that stuck buffers are ok to release into the wild");
 
