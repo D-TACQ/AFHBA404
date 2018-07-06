@@ -315,7 +315,7 @@ static ssize_t show_aurora(
 }
 
 
-static DEVICE_ATTR(aurora, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora, store_aurora);
+static DEVICE_ATTR(aurora, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_aurora, store_aurora);
 
 static ssize_t show_aurora_ext(
 	struct device * dev,
@@ -326,7 +326,7 @@ static ssize_t show_aurora_ext(
 
 	return sprintf(buf, "0x%08x\n", read_astatus2(adev));
 }
-static DEVICE_ATTR(aurora_ext, (S_IRUSR|S_IRGRP), show_aurora_ext, 0);
+static DEVICE_ATTR(aurora_ext, (S_IRUGO), show_aurora_ext, 0);
 
 static ssize_t store_comms_init(
 	struct device * dev,
@@ -356,7 +356,7 @@ static ssize_t show_comms_init(
 	return sprintf(buf, "%d\n", sdev->comms_init_done);
 }
 
-static DEVICE_ATTR(comms_init, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_comms_init, store_comms_init);
+static DEVICE_ATTR(comms_init, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_comms_init, store_comms_init);
 
 
 static ssize_t show_inflight(
@@ -370,7 +370,7 @@ static ssize_t show_inflight(
 	return sprintf(buf, "%d\n", job->buffers_queued-job->buffers_received);
 }
 
-static DEVICE_ATTR(inflight, (S_IRUSR|S_IRGRP), show_inflight, 0);
+static DEVICE_ATTR(inflight, (S_IRUGO), show_inflight, 0);
 
 static ssize_t show_shot(
 		struct device * dev,
@@ -381,7 +381,7 @@ static ssize_t show_shot(
 	return sprintf(buf, "%d\n", sdev->shot);
 }
 
-static DEVICE_ATTR(shot, (S_IRUSR|S_IRGRP), show_shot, 0);
+static DEVICE_ATTR(shot, (S_IRUGO), show_shot, 0);
 
 #define _ERRLAT(yymask) 	((yymask) == 0x0ffff || (yymask) == 0)
 #define ERRLAT(yy) 		(_ERRLAT((yy)&0x0ffff))
@@ -420,7 +420,7 @@ static ssize_t show_fpga_rev(
 	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, FPGA_REVISION_REG));
 }
 
-static DEVICE_ATTR(fpga_rev, (S_IRUSR|S_IRGRP), show_fpga_rev, 0);
+static DEVICE_ATTR(fpga_rev, (S_IRUGO), show_fpga_rev, 0);
 
 
 static ssize_t store_dma_test(
@@ -450,7 +450,7 @@ static ssize_t show_dma_test(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(dma_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_dma_test, store_dma_test);
+static DEVICE_ATTR(dma_test, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_dma_test, store_dma_test);
 
 
 static ssize_t show_heartbeat(
@@ -462,7 +462,7 @@ static ssize_t show_heartbeat(
 	return sprintf(buf, "0x%08x\n", afhba_read_reg(adev, HOST_COUNTER_REG));
 }
 
-static DEVICE_ATTR(heartbeat, (S_IRUSR|S_IRGRP), show_heartbeat, 0);
+static DEVICE_ATTR(heartbeat, (S_IRUGO), show_heartbeat, 0);
 
 
 static ssize_t store_push_dma_timeouts(
@@ -493,7 +493,7 @@ static ssize_t show_push_dma_timeouts(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(push_dma_timeouts, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_push_dma_timeouts, store_push_dma_timeouts);
+static DEVICE_ATTR(push_dma_timeouts, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_push_dma_timeouts, store_push_dma_timeouts);
 
 static ssize_t store_pull_dma_timeouts(
 	struct device * dev,
@@ -523,7 +523,7 @@ static ssize_t show_pull_dma_timeouts(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(pull_dma_timeouts, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_pull_dma_timeouts, store_pull_dma_timeouts);
+static DEVICE_ATTR(pull_dma_timeouts, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_pull_dma_timeouts, store_pull_dma_timeouts);
 
 static ssize_t store_host_test(
 	struct device * dev,
@@ -552,7 +552,7 @@ static ssize_t show_host_test(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(host_test, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_host_test, store_host_test);
+static DEVICE_ATTR(host_test, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_host_test, store_host_test);
 
 static ssize_t show_host_temp(
 	struct device * dev,
@@ -570,6 +570,7 @@ static ssize_t show_host_temp(
 			(reg&HOST_MON_VOLT_ALARM)? "VOLTAGE ALARM": "");
 	return strlen(buf);
 }
+static DEVICE_ATTR(host_temp, (S_IRUGO), show_host_temp, 0);
 
 static ssize_t show_streamer_pid(
         struct device * dev,
@@ -582,10 +583,8 @@ static ssize_t show_streamer_pid(
         sprintf(buf, "%d\n", sdev->pid);
         return strlen(buf);
 }
+static DEVICE_ATTR(streamer_pid, (S_IRUGO), show_streamer_pid, 0 );
 
-static DEVICE_ATTR(streamer_pid, (S_IRUSR|S_IRGRP), show_streamer_pid, 0 );
-
-static DEVICE_ATTR(host_temp, (S_IRUSR|S_IRGRP), show_host_temp, 0);
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_buffer_len.attr,
