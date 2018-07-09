@@ -1,0 +1,13 @@
+#!/bin/bash
+DN=${1:-0}
+if [ -e /dev/rtm-t.$DN.ctrl/acq_ident ]; then
+	ID=$(cat /dev/rtm-t.$DN.ctrl/acq_ident)
+	if [ "x$ID" != "x" ] &&
+	   [ "$ID" != "acq2106_65535" ] && 
+	   [ "$ID" != "${ID#acq2106_*}" ]; then
+		PORT=$(cat /dev/rtm-t.$DN.ctrl/acq_port)
+		echo "$(hostname) $DN $ID $PORT"
+		exit 0
+	fi
+fi
+exit 1
