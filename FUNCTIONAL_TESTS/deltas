@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+# print delta between lines. drop first and last. present as histogram
+# Work on $1 by default
+awk -F, -v i=${1:-1}  '
+    NR == 1{old = $i; next}     
+    {print $i - old; old = $i} 
+' | sed '1d; $d' |
+  sort -n | uniq -c

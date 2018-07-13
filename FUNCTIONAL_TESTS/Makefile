@@ -1,7 +1,7 @@
 
 CXXFLAGS=-O2 -std=c++11 -fopenmp 
 
-all: hbfarm425 checkramp checkramp480 multisitecheckramp
+all: hbfarm425 checkramp checkramp480 multisitecheckramp checkES
 
 clean:
 	rm -f hbfarm425 checkramp
