@@ -33,6 +33,16 @@
 #include <fcntl.h>
 
 
+#include <signal.h>
+#include <unistd.h>
+
+int sigterm_rx;
+
+void sig_handler(int signo)
+{
+    if (signo == SIGINT) sigterm_rx = 1;
+}
+
 int main(int argc, char* argv[])
 {
 	unsigned xx;
@@ -44,13 +54,18 @@ int main(int argc, char* argv[])
 	int verbose = 0;
 	int lwstride = 1;
 
+	if (signal(SIGTERM, sig_handler) == SIG_ERR){
+		perror("failed to trap signal");
+	}
+
 	if (getenv("LWSTRIDE") != 0){
 		lwstride = atoi(getenv("LWSTRIDE"));
 	}
 	if (argc > 1 && strcmp(argv[1], "-v") == 0){
 		verbose = 1;
 	}
-	for(ii = 0; fread(&xx, sizeof(xx), 1, stdin); ii += lwstride){
+	for(ii = 0; fread(&xx, sizeof(xx), 1, stdin) > 0 && sigterm_rx == 0; 
+		ii += lwstride){
 		if (ii == 0){
 			xx0 = xx1 = xx;
 		}else{
@@ -66,7 +81,7 @@ int main(int argc, char* argv[])
 			xx1 = xx;
 		}
 
-		if (verbose && ii % 0x40000 == 0){
+		if (verbose && ii % 0x400000 == 0){
 			printf("%012llx  %08x %08x  %d errors\n",
 			       ii, xx0, xx, errors);
 		}
