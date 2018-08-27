@@ -1,6 +1,12 @@
 #!/bin/bash
 # llc-test-harness-intclk-AI1-AO4-zcopy
 # AI+AO llc with zerocopy on one fiber. Basic LLC test
+# CONTROLS
+# LLC_TRG=ext
+# LLC_CLK=ext
+# AISITES=1,2,3
+# AOSITES=5,6
+# XOCOMMS=A
 
 [ -d scripts ] && cd scripts
 
@@ -15,21 +21,29 @@ source afhba-common
 SC=0
 CA=13
 CB=12
-# MASTER AI site
-AI=1
-# MASTER AO site
-AO=5
+
+AISITES=${AISITES:-1,2,3}
+# pick off the first AI site as M
+AI=${AISITES%,*}
+
 
 AOSITES=${AOSITES:-5,6}
-AISITES=${AISITES:-1,2,3}
+# pick off the first AO site as M.
+AO=${AOSITES%,*}
 
 CA_SITES=${AISITES}
 CB_SITES=${AISITES}
 
-# DC : Distributor from Comms = 2 : pull from comms A
-DC=2
-# TODO, this is better:
-# DC=A
+XOCOMMS=${XOCOMMS:-B}
+
+case $XOCOMMS in
+2|A)
+	DC=2;;
+*)
+	DC=1;;
+esac
+
+
 
 init_comms() {	
 	cx=$1
@@ -42,12 +56,18 @@ init_comms() {
 
 init_2106() {
 	if [ "$LLC_TRG" = "ext" ]; then
-		remote_cmd $AI trg=1,2,1
+		remote_cmd $AI trg=1,0,1
 	else
 		remote_cmd $AI trg=1,1,1
 	fi
 	if [ "$LLC_CLK" = "ext" ]; then
-		remote_cmd $AI clk=1,2,1
+		# route he clock from FP to CLK.d0
+		remote_cmd $SC SYS:CLK:FPMUX=FPCLK
+		remote_cmd $SC SYS:CLK:BYPASS=1
+		remote_cmd $SC SYS:CLK:OE_CLK1_ZYNQ=1
+		remote_cmd $SC SIG:SRC:CLK:1=MCLK
+		# select CLK.d0
+		remote_cmd $AI clk=1,1,1
 		remote_cmd $AI clkdiv=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
@@ -57,9 +77,11 @@ init_2106() {
 	fi
 	remote_cmd $SC distributor sites=$AOSITES comms=$DC on
 	remote_cmd $AO lotide 256
+	# slave AO on AI site 1 master clock
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
 
+	# 16 word scratchpad, include TLATCH at 0.
 	remote_cmd $SC spad=1,16,0	
 	remote_cmd $SC run0 $AISITES
 	
