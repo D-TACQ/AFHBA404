@@ -1,6 +1,6 @@
 #!/bin/bash
-# llc-test-harness-intclk-AI1-AO4-zcopy
-# AI+AO llc with zerocopy on one fiber. Basic LLC test
+# llc-test-harness-AI123-AO56
+# AI+AO llc 
 # CONTROLS
 # LLC_TRG=ext
 # LLC_CLK=ext
