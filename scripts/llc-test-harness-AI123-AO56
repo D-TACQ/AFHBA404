@@ -10,17 +10,27 @@
 
 [ -d scripts ] && cd scripts
 
-# MUST set remote ip-address
-REMIP=${1:-acq2106_003}
-INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
-EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
-
-
 source afhba-common
 # site definitions SC: system controller, CB: commsB, AI: AI, AO : AO
 SC=0
 CA=13
 CB=12
+
+
+# MUST set remote ip-address
+REMIP=${1:-acq2106_003}
+INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
+EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
+
+LLC_CLK=${LLC_CLK:-ext}
+# default auto SOFT_TRIGGER=0, in transient mode, script will terminate...
+# next run the CONTROL PROGRAM
+# THEN trigger (eg ext trigger, or run soft_trigger command on box
+SOFT_TRIGGER=${SOFT_TRIGGER:-0}
+
+# default transient mode, set # samples.  "no": run continuous mode
+TRANSIENT=${TRANSIENT:-100000}
+
 
 AISITES=${AISITES:-1,2,3}
 # pick off the first AI site as M
@@ -31,17 +41,11 @@ AOSITES=${AOSITES:-5,6}
 # pick off the first AO site as M.
 AO=${AOSITES%,*}
 
+# route AI data to both CA and CB
 CA_SITES=${AISITES}
 CB_SITES=${AISITES}
 
-XOCOMMS=${XOCOMMS:-B}
-
-case $XOCOMMS in
-2|A)
-	DC=2;;
-*)
-	DC=1;;
-esac
+XO_COMMS=${XO_COMMS:-A}
 
 
 
@@ -75,7 +79,7 @@ init_2106() {
 		remote_cmd $AI clkdiv=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$AOSITES comms=$DC on
+	remote_cmd $SC distributor sites=$AOSITES comms=$XO_COMMS on
 	remote_cmd $AO lotide 256
 	# slave AO on AI site 1 master clock
 	remote_cmd $AO clk=1,2,1
@@ -90,9 +94,24 @@ init_2106() {
 }
 
 start_stream() {
-	remote_cmd $SC streamtonowhered start
-}
+        if [ "x$TRANSIENT" = "xno" ]; then
+                remote_cmd $SC streamtonowhered start
+                echo now view data perhaps using ./mapsample
+                echo CTRL-C to quit
+                trap "cleanup" SIGINT SIGTERM
 
+                sleep 99999
+	else
+                if [ $TRANSIENT -gt 1000 ]; then
+                        POST=$TRANSIENT
+                else
+                        POST=100000
+                fi
+                remote_cmd $SC transient POST=$POST SOFT_TRIGGER=$SOFT_TRIGGER
+                remote_cmd $SC set_arm
+        fi
+
+}
 
 cleanup() {
 	remote_cmd $SC streamtonowhered stop
@@ -100,9 +119,4 @@ cleanup() {
 
 init_2106
 start_stream
-echo now view data perhaps using ./mapsample
-echo CTRL-C to quit
-trap "cleanup" SIGINT SIGTERM
-
-sleep 99999
 
