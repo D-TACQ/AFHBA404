@@ -223,6 +223,10 @@ void ui(int argc, char* argv[])
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
 	}
+	if (getenv("AICHAN")){
+		nchan = atoi(getenv("AICHAN"));
+		fprintf(stderr, "AICHAN (nchan) set %d\n", nchan);
+	}
 	if (getenv("AOCHAN")){
 		aochan = atoi(getenv("AOCHAN"));
 		fprintf(stderr, "AOCHAN set %d\n", aochan);
