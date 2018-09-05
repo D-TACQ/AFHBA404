@@ -52,7 +52,8 @@ XO_COMMS=${XO_COMMS:-A}
 init_comms() {	
 	cx=$1
 	sites=$2
-	
+
+	remote_cmd $cx RESET_CTR=1	
 	remote_cmd $cx spad=1
 	remote_cmd $cx aggregator sites=$sites
 }
