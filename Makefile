@@ -40,7 +40,7 @@ modules:
 
 
 APPS := mmap xiloader
-apps: $(APPS) stream functional_tests
+apps: $(APPS) stream functional_tests llc_support
 
 
 flasherase:
