@@ -43,6 +43,11 @@ def init_ai(uut):
     uut.cB.aggregator = 'sites={}'.format(AISITES)
 
 def init_ao(uut, slave=False):
+    if len(AOSITES) == 0:
+        print("AOSITES NOT INITIALIZED")
+        return
+    aosites_list = AOSITES.split(',')
+    if len(aosites_list) == 0
     aom = "s{}".format(AOSITES.split(',')[0])
     if slave:
 	uut.svc[aom].clk = '1,2,1'
