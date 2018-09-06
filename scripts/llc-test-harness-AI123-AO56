@@ -73,11 +73,11 @@ init_2106() {
 		remote_cmd $SC SIG:SRC:CLK:1=MCLK
 		# select CLK.d0
 		remote_cmd $AI clk=1,1,1
-		remote_cmd $AI clkdiv=$EXTCLKDIV
+		remote_cmd $AI CLKDIV=$EXTCLKDIV
 		echo setting external clock / $EXTCLKDIV
 	else
 		remote_cmd $AI clk=0,0,0
-		remote_cmd $AI clkdiv=$INTCLKDIV
+		remote_cmd $AI CLKDIV=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
 	remote_cmd $SC distributor sites=$AOSITES comms=$XO_COMMS on
