@@ -306,12 +306,18 @@ static ssize_t show_aurora(
 	char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	int status_reg = AURORA_STATUS_REGA + 0x10*adev->sfp;
+	int control_reg = AURORA_CONTROL_REGA + 0x10*adev->sfp;
+	char flags[80];
 
-	if (adev->peer){
-		return show_auroraB(dev, attr, buf);
-	}else{
-		return show_auroraA(dev, attr, buf);
-	}
+	u32 stat = afhba_read_reg(adev, status_reg);
+
+       if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
+                u32 ctrl = afhba_read_reg(adev, control_reg);
+                afhba_write_reg(adev, control_reg, ctrl|AFHBA_AURORA_CTRL_CLR);
+                afhba_write_reg(adev, control_reg, ctrl);
+        }
+        return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }
 
 
