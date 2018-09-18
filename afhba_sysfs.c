@@ -252,52 +252,17 @@ char* getFlags(u32 stat, char buf[], int maxbuf)
 	return buf;
 }
 
-#define AURORA(SFPN) \
-static ssize_t store_aurora##SFPN(					\
-	struct device * dev,						\
-	struct device_attribute *attr,					\
-	const char * buf,						\
-	size_t count)							\
-{									\
-	u32 ctrl = simple_strtoul(buf, 0, 16);				\
-	afhba_write_reg(afhba_lookupDeviceFromClass(dev), AURORA_CONTROL_REG##SFPN, ctrl);  \
-	return count;							\
-}									\
-									\
-									\
-static ssize_t show_aurora##SFPN(					\
-	struct device * dev,						\
-	struct device_attribute *attr,					\
-	char * buf)							\
-{									\
-	char flags[80];							\
-	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
-	u32 stat = afhba_read_reg(adev, AURORA_STATUS_REG##SFPN); 		\
-	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){				\
-		u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG##SFPN);	\
-		afhba_write_reg(adev, AURORA_CONTROL_REG##SFPN, ctrl|AFHBA_AURORA_CTRL_CLR); \
-		afhba_write_reg(adev, AURORA_CONTROL_REG##SFPN, ctrl); \
-	} \
-	return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
-}									\
-									\
-static DEVICE_ATTR(aurora##SFPN, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_aurora##SFPN, store_aurora##SFPN);
-
-AURORA(A);
-AURORA(B);
-
 static ssize_t store_aurora(
 	struct device * dev,
 	struct device_attribute *attr,
 	const char * buf, size_t count)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	int control_reg = AURORA_CONTROL_REGA + 0x10*adev->sfp;
+	u32 ctrl = simple_strtoul(buf, 0, 16);
 
-	if (adev->peer){
-		return store_auroraB(dev, attr, buf, count);
-	}else{
-		return store_auroraA(dev, attr, buf, count);
-	}
+	afhba_write_reg(adev, control_reg, ctrl);
+	return count;
 }
 
 static ssize_t show_aurora(
@@ -306,12 +271,18 @@ static ssize_t show_aurora(
 	char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	int status_reg = AURORA_STATUS_REGA + 0x10*adev->sfp;
+	int control_reg = AURORA_CONTROL_REGA + 0x10*adev->sfp;
+	char flags[80];
 
-	if (adev->peer){
-		return show_auroraB(dev, attr, buf);
-	}else{
-		return show_auroraA(dev, attr, buf);
-	}
+	u32 stat = afhba_read_reg(adev, status_reg);
+
+       if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
+                u32 ctrl = afhba_read_reg(adev, control_reg);
+                afhba_write_reg(adev, control_reg, ctrl|AFHBA_AURORA_CTRL_CLR);
+                afhba_write_reg(adev, control_reg, ctrl);
+        }
+        return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }
 
 
@@ -591,8 +562,6 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_dma_test.attr,
 	&dev_attr_inflight.attr,
 	&dev_attr_reset_buffers.attr,
-	&dev_attr_auroraA.attr,
-	&dev_attr_auroraB.attr,
 	&dev_attr_aurora.attr,
 	&dev_attr_aurora_ext.attr,
 	&dev_attr_data_fifo_stat_push.attr,
