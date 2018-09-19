@@ -208,15 +208,13 @@ struct AFHBA_DEV_PATH {
 #define AURORA_STEP			0x0010  /* Duplicate blocks every STEP */
 #define AURORA_CONTROL_REGA 		0x0080	/* Aurora Control Register */
 #define AURORA_STATUS_REGA 		0x0084	/* Aurora Status Register */
+#define SFP_I2C_DATA_REGA 		0x0088	/* SFP I2C Control and Data Register */
 #define AURORA_STATUS2_REGA		0x008C
 
-
-#define SFP_I2C_DATA_REG 		0x0088	/* SFP I2C Control and Data Register */
-#define SFP_I2C_DATA_REGA 		0x0088	/* SFP I2C Control and Data Register */
-
-#define AURORA_CONTROL_REGB 		0x0090	/* Aurora Control Register */
-#define AURORA_STATUS_REGB 		0x0094	/* Aurora Status Register */
-#define SFP_I2C_DATA_REGB		0x0098	/* SFP I2C Control and Data Register */
+#define AURORA_CONTROL_REG(sfp)		(AURORA_CONTROL_REGA + AURORA_STEP*(sfp))
+#define AURORA_STATUS_REG(sfp)		(AURORA_STATUS_REGA  + AURORA_STEP*(sfp))
+#define AURORA_STATUS2_REG(sfp)		(AURORA_STATUS2_REGA + AURORA_STEP*(sfp))
+#define SFP_I2C_DATA_REG(sfp)		(SFP_I2C_DATA_REGA   + AURORA_STEP*(sfp))
 
 #define HOST_COMMS_FIFO_CONTROL_REG 	0x00C0	/* ACQ400 Receive Communications FIFO Control Register */
 #define HOST_COMMS_FIFO_STATUS_REG 	0x00C4	/* ACQ400 Receive Communications FIFO Status Register */
@@ -400,8 +398,7 @@ enum COMMON_REGS {
 
 static inline u32 read_astatus2(struct AFHBA_DEV *adev)
 {
-	unsigned asr2 = AURORA_STATUS2_REGA + adev->sfp*AURORA_STEP;
-	return afhba_read_reg(adev, asr2);
+	return afhba_read_reg(adev, AURORA_STATUS2_REG(adev->sfp));
 }
 
 #endif /* ACQ_FIBER_HBA_H_ */

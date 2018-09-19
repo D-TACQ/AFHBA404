@@ -258,10 +258,10 @@ static ssize_t store_aurora(
 	const char * buf, size_t count)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	int control_reg = AURORA_CONTROL_REGA + 0x10*adev->sfp;
+	int cr_off = AURORA_CONTROL_REG(adev->sfp);
 	u32 ctrl = simple_strtoul(buf, 0, 16);
 
-	afhba_write_reg(adev, control_reg, ctrl);
+	afhba_write_reg(adev, cr_off, ctrl);
 	return count;
 }
 
@@ -271,16 +271,16 @@ static ssize_t show_aurora(
 	char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	int status_reg = AURORA_STATUS_REGA + 0x10*adev->sfp;
-	int control_reg = AURORA_CONTROL_REGA + 0x10*adev->sfp;
+	int sr_off = AURORA_STATUS_REG(adev->sfp);
+	int cr_off = AURORA_CONTROL_REG(adev->sfp);
 	char flags[80];
 
-	u32 stat = afhba_read_reg(adev, status_reg);
+	u32 stat = afhba_read_reg(adev, sr_off);
 
        if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
-                u32 ctrl = afhba_read_reg(adev, control_reg);
-                afhba_write_reg(adev, control_reg, ctrl|AFHBA_AURORA_CTRL_CLR);
-                afhba_write_reg(adev, control_reg, ctrl);
+                u32 ctrl = afhba_read_reg(adev, cr_off);
+                afhba_write_reg(adev, cr_off, ctrl|AFHBA_AURORA_CTRL_CLR);
+                afhba_write_reg(adev, cr_off, ctrl);
         }
         return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
 }
