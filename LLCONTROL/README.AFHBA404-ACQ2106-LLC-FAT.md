@@ -18,7 +18,7 @@ brotto Device d1ac:4104 Device Serial Number af-ba-40-40-11-00-41-0b
 brotto 0 acq2106_110 A
 brotto 1 acq2106_110 B
 ```
-## In this case, our UUT is acq2106_110, and, for demonstration purposes we connected TWO fiber optic links:
+In this case, our UUT is acq2106_110, and, for demonstration purposes we connected TWO fiber optic links:
 ```
 DEVNUM=0, LPORT=A, UUT=ACQ2106_110, RPORT=A
 DEVNUM=1, LPORT=B, UUT=ACQ2106_111, RPORT=B
@@ -30,5 +30,41 @@ We demonstrate operation on either link. The scripting we demonstrate has been t
 ALL of LPORT A,B,C,D and RPORT A,B
 ```
 
-# 
+# 8 Running LLC
+
+## Control Script Window
+```
+cd PROJECTS/AFHBA404
+SOFT_TRIGGER=1 AISITES=1,2,3,4 AOSITES=5,6 XO_COMMS=A ./scripts/llc-test-harness-AI123-AO56 acq2106_110
+AI123-AO56 acq2106_110
+setting external clock / 10
+sites: 1 2 3 4
+y: run the shot, n: abort
+```
+
+## Control Program Window
+```
+cd PROJECTS/AFHBA404/
+DEVNUM=0 AOCHAN=64 DUP1=0 AICHAN=128 ./LLCONTROL/afhba-llcontrol-cpucopy 100000
+AICHAN (nchan) set 128
+AOCHAN set 64
+failed to set RT priority: Operation not permitted
+AI buf pa: 0x65100000 len 320
+AO buf pa: 0x65101000 len 128
+ready for data
+```
+
+## Control Script Window
+```
+y
+start transient
+```
+
+## Control Program Window
+```
+finished
+[dt100@brotto AFHBA404]$ ls -l afhba.0.log
+-rw-rw-r--. 1 dt100 dt100 32000320 Sep 6 14:20 afhba.0.log
+```
+
 
