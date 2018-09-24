@@ -67,4 +67,23 @@ finished
 -rw-rw-r--. 1 dt100 dt100 32000320 Sep 6 14:20 afhba.0.log
 ```
 
+# 11 Analyse the Data
+## Plot Window
+```
+cd PROJECTS/ACQ400/HAPI/acq400_hapi
+./user_apps/analysis/host_demux.py --src $HOME/PROJECTS/AFHBA404/afhba.0.log \
+    --nchan=160 --egu=0 --pchan=1,33,65,97,129 acq2106_110
+```
+
+## Install kst 
+pykst apparently only work on Linux. Surprising..
+```
+sudo yum install kst
+wget https://kst-plot.kde.org/pykst.tgz
+tar xvzf pykst.tgz
+cd pyKst
+sudo python2.7 setup.py install
+sudo yum install PySide
+sudo yum install python2-pyside.x86_64
+```
 
