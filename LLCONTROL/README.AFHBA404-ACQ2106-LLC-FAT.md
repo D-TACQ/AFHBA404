@@ -1,5 +1,5 @@
-# text input to match afhba404-acq2106-llc-fat.pdf
-# some users report difficulty in cut and paste from pdf.
+#text input to match afhba404-acq2106-llc-fat.pdf
+some users report difficulty in cut and paste from pdf.
 
 # 2 INSTALL
 
