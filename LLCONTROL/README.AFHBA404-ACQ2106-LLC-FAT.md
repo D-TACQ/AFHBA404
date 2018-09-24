@@ -130,6 +130,69 @@ pchan=1,33,65,97 acq2106_110
 args.pc_list [0, 32, 64, 96]
 ```
 
+# 16 Variations: Use PortA, AIx4, AOx1
+## Control Script Window
+```
+cd PROJECTS/AFHBA404
+SOFT_TRIGGER=1 AISITES=1,2,3,4 AOSITES=5 ./scripts/llc-test-harness-AI123-AO56 acq2106_110
+y: run the shot, n: abort
+```
+
+## Control Program Window
+```
+cd PROJECTS/AFHBA404/
+DEVNUM=0 AOCHAN=32 DUP1=0 AICHAN=128 ./LLCONTROL/afhba-llcontrol-cpucopy 100000
+AICHAN (nchan) set 128
+AOCHAN set 32
+failed to set RT priority: Operation not permitted
+AI buf pa: 0x7a500000 len 320
+AO buf pa: 0x7a501000 len 64
+ready for data
+```
+
+## Control Script Window
+```
+y
+start transient
+```
+
+## Control Program Window
+```
+finished
+[dt100@brotto AFHBA404]$ ls -l afhba.1.log
+-rw-rw-r--. 1 dt100 dt100 25600256 Sep 6 14:40 afhba.1.log
+```
+
+## Plot Window
+```
+cd PROJECTS/ACQ400/HAPI/acq400_hapi
+./user_apps/analysis/host_demux.py --src $HOME/PROJECTS/AFHBA404/afhba.1.log --nchan=128 \
+--egu=0 --pchan=1,33,65,97 acq2106_110
+args.pc_list [0, 32, 64, 96]
+```
+
+# 19 Longer Shots
+
+## Control Script Window
+```
+cd PROJECTS/AFHBA404
+SOFT_TRIGGER=1 AISITES=1,2,3,4 AOSITES=5 TRANSIENT=10000000 ./scripts/llc-test-harness-AI123-AO56 \
+    acq2106_110
+y: run the shot, n: abort
+```
+
+## Control Program Window
+```
+cd PROJECTS/AFHBA404/
+DEVNUM=0 AOCHAN=32 DUP1=0 AICHAN=128 ./LLCONTROL/afhba-llcontrol-cpucopy 10000000
+AICHAN (nchan) set 96
+AOCHAN set 64
+failed to set RT priority: Operation not permitted
+AI buf pa: 0x7a500000 len 320
+AO buf pa: 0x7a501000 len 64
+ready for data
+```
+
 
 
 
