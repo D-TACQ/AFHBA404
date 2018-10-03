@@ -13,7 +13,7 @@ import os
 
 
 AISITES = os.getenv("AISITES", "1")
-
+SPAD_LEN = os.getenv("SPAD_LEN", 8)
 
 def hit_resets(svc):    
     for knob in svc.help():
@@ -28,7 +28,7 @@ def clear_counters(uuts):
     
 def init_ai(uut):
     bolo_chan_factor = 24
-    spad_len = 8
+    spad_len = int(SPAD_LEN)
     uut.s0.spad = '1,{},0'.format(spad_len)
     uut.cA.spad = '1'
     uut.cA.aggregator = 'sites={}'.format(AISITES)
