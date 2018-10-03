@@ -30,7 +30,7 @@ LLC_CLK=${LLC_CLK:-ext}
 SOFT_TRIGGER=${SOFT_TRIGGER:-0}
 
 # default transient mode, set # samples.  "no": run continuous mode
-TRANSIENT=${TRANSIENT:-100000}
+TRANSIENT=${TRANSIENT:-2000000}
 
 
 AISITES=${AISITES:-1,2,3}

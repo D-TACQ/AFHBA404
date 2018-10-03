@@ -47,7 +47,7 @@ def init_ao(uut, slave=False):
         print("AOSITES NOT INITIALIZED")
         return
     aosites_list = AOSITES.split(',')
-    if len(aosites_list) == 0
+    #if len(aosites_list) == 0
     aom = "s{}".format(AOSITES.split(',')[0])
     if slave:
 	uut.svc[aom].clk = '1,2,1'
