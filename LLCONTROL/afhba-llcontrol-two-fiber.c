@@ -83,13 +83,15 @@ struct XLLC_DEF ai_def = {
 };
 
 #define AO_CHAN	64
+#define DO_CHAN 32
 //#define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
-#define VO_LEN	(AO_CHAN*sizeof(short))
+#define VO_LEN	(AO_CHAN*sizeof(short) + DO_CHAN*sizeof(short))
 
 
 #define DO_IX	(16)		/* longwords */
 
-int MAXCOPY = AO_CHAN;
+//int MAXCOPY = AO_CHAN;
+int MAXCOPY = AO_CHAN + DO_CHAN;
 
 struct XLLC_DEF ao_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -175,7 +177,7 @@ short* make_ao_ident(int ao_ident)
 	short* ids = calloc(MAXCOPY, sizeof(short));
 	if (ao_ident){
 		int ic;
-		
+
 		for (ic = 0; ic < MAXCOPY; ++ic){
 			ids[ic] = ic*MV100*ao_ident;
 		}
@@ -207,7 +209,7 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("DUP1")){
 		DUP1 = atoi(getenv("DUP1"));
-		control = control_dup1;		
+		control = control_dup1;
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_AI_BUF")){
@@ -312,6 +314,17 @@ void control_dup1(short *ao, short *ai)
         for (ii = 0; ii < MAXCOPY; ii ++){
 		ao[ii] = AO_IDENT[ii] + ai[DUP1];
         }
+
+        int bit;
+        bit = (ao[0] >> 15);
+        if(bit == -1) {
+            ao[64] = 0x0000;
+            ao[65] = 0x0000;
+        } else {
+            ao[64] = 0xFFFF;
+            ao[65] = 0xFFFF;
+        };
+
         if (has_do32){
                 copy_tlatch_to_do32(ao, ai);
         }
