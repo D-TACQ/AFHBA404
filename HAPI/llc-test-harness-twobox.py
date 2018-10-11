@@ -63,24 +63,16 @@ def init_ao(uut, slave=False):
 
     if DOSITES != "":
 
-        print "configuring for DO"
+        print "configuring system for DO"
         dom = "s{}".format(DOSITES.split(',')[0])
-        print "dom = ", dom
-        # uut.svc[dom].clkdiv = 1
         uut.svc[dom].mode = "0"
         uut.svc[dom].lotide = "256"
         uut.svc[dom].byte_is_output = "1,1,1,1"
         uut.svc[dom].clk = "1,1,1"
         uut.svc[dom].trg = "1,0,1"
-        #uut.svc[dom].trg = "0,0,0"
-        #uut.svc[dom].clkdiv=67
         uut.svc[dom].mode = "1"
-        #uut.svc[dom].mode = "2"
         XOSITES = "{},{}".format(AOSITES, DOSITES)
-        #XOSITES = "{}".format(AOSITES)
-        #TCAN = str(16 - 1)
-        TCAN = "15"
-        print "XOSITES = {}, TCAN = {}, XOCOMMS = {}".format(XOSITES, TCAN, XOCOMMS)
+        TCAN = str(16 - len(DOSITES.split(",")))
         uut.s0.distributor = "sites={} pad={} comms={} off".format(XOSITES, TCAN, XOCOMMS)
         uut.s0.distributor = "sites={} pad={} comms={} on".format(XOSITES, TCAN, XOCOMMS)
 
