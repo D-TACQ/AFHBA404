@@ -17,7 +17,7 @@ export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
 set_clocks() {
-	(cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests
+	(cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq2106/
 #	 SITECLIENT_TRACE=1
 	./acq2106_set_sync_role.py \
 	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=$EXTCLKDIV \
@@ -27,7 +27,7 @@ set_clocks() {
 control_program() {
 	cd PROJECTS/AFHBA404/LLCONTROL
 	#echo CONTROL PROGRAM 01
-#	export ZCOPY=1 
+#	export ZCOPY=1
 # DUP1: index from zero, 1 is CH02
 	export DUP1=1
 # skip this many shorts ie 192AI
@@ -58,11 +58,11 @@ control_program() {
 control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
         echo CONTROL SCRIPT 01
-#        SITECLIENT_TRACE=1 
+#        SITECLIENT_TRACE=1
 	./llc-test-harness-twobox.py $UUT1 $UUT2
         echo CONTROL SCRIPT 99
        )
-       (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
+       (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
         STATUSMONITOR_TRACE=0 ./acq400_capture.py \
 		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
 		$UUT1
@@ -84,7 +84,7 @@ xcontrol_script)
 	sudo $0 control_program &
 
 	control_script
-	wait 
+	wait
 	echo wait complete
 	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats)
 	;;
