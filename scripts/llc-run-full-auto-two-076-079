@@ -5,8 +5,8 @@
 POST=${POST:-100000}
 let TLEN="$POST*120/100"
 
-UUT1=acq2106_076
-UUT2=acq2106_079
+UUT1=acq2106_085
+UUT2=acq2106_054
 # INBOX: acq2106_076, 6 x AI424
 # OUTBOX: acq2106_079, 2 x AO424
 
@@ -17,9 +17,9 @@ export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
 set_clocks() {
-	(cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq2106/
+    (cd PROJECTS/ACQ400/HAPI/acq400_hapi
 #	 SITECLIENT_TRACE=1
-	./acq2106_set_sync_role.py \
+	./user_apps/acq2106/acq2106_set_sync_role.py \
 	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=$EXTCLKDIV \
 	$UUT1 $UUT2
 	)

@@ -45,7 +45,7 @@ struct AFHBA_DEV;	/* opaque structure */
 
 int hba_sfp_get_value(struct AFHBA_DEV *adev, unsigned gpio)
 {
-	int rn = adev->sfp == SFP_A? SFP_I2C_DATA_REGA: SFP_I2C_DATA_REGB;
+	int rn = SFP_I2C_DATA_REG(adev->sfp);
 	u32 reg = afhba_read_reg(adev, rn);
 	int bit = (reg&(1 << gpio)) != 0;
 	dev_dbg(pdev(adev), "read:%d", bit);
@@ -53,7 +53,7 @@ int hba_sfp_get_value(struct AFHBA_DEV *adev, unsigned gpio)
 }
 void hba_sfp_set_value(struct AFHBA_DEV *adev, unsigned gpio, int value)
 {
-	int rn = adev->sfp == SFP_A? SFP_I2C_DATA_REGA: SFP_I2C_DATA_REGB;
+	int rn = SFP_I2C_DATA_REG(adev->sfp);
 	u32 reg = afhba_read_reg(adev, rn);
 
 	dev_dbg(pdev(adev), "write:%d", value);

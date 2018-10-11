@@ -50,6 +50,7 @@ Now refer to INSTALL
 make
 sudo ./scripts/install-hotplug
 
+
 [dt100@brotto AFHBA404]$ sudo ./scripts/afhba404-get-ident 
 brotto Device d1ac:4104 Device Serial Number af-ba-40-40-11-00-41-0b
 

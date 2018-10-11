@@ -318,6 +318,15 @@ void setup()
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
 	ao_buffer = (short*)((void*)host_buffer+HB_LEN);
+
+	if (has_do32){
+		/* marker pattern for the PAD area for hardware trace */
+		unsigned* dox = (unsigned *)ao_buffer;
+		int ii;
+		for (ii = 0; ii <= 0xf; ++ii){
+		        dox[DO_IX+ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+		}
+	}
 }
 
 void print_sample(unsigned sample, unsigned tl)
