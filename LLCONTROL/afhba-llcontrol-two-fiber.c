@@ -316,16 +316,17 @@ void control_dup1(short *ao, short *ai)
         }
 
         if (has_do32){
-                // copy_tlatch_to_do32(ao, ai);
-                int bit;
-                bit = (ao[0] >> 15);
-                if(bit == -1) {
+                if(ao[0] < 0) {
                     ao[64] = 0x0000;
                     ao[65] = 0x0000;
                 } else {
                     ao[64] = 0xFFFF;
                     ao[65] = 0xFFFF;
                 };
+        }
+        
+        if(has_do32 > 1) {
+            copy_tlatch_to_do32(ao, ai);
         }
 }
 
