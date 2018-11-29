@@ -15,6 +15,12 @@ import os
 AISITES = os.getenv("AISITES", "1")
 SPAD_LEN = os.getenv("SPAD_LEN", 8)
 
+if AISITES != "1":
+    for value in ["2","3","4","5","6"]:
+        if AISITES == value:
+           print "Doing this can cause system issues. Set AI sites to '1,2' etc."
+           quit()
+
 def hit_resets(svc):    
     for knob in svc.help():
         if (knob.endswith('RESET')):
