@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 """ 
-llc-bolo-harness.py UUT1 
+Usage:
+
+AISITES="1" SPAD_LEN=8 python HAPI/llc-bolo-harness.py acq2106_123
+
+AISITES="1,2" SPAD_LEN=16 python HAPI/llc-bolo-harness.py acq2106_123
 """
 
 
