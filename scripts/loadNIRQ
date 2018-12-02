@@ -11,8 +11,9 @@ echo 9 > /proc/sys/kernel/printk
 
 /sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
 	afhba4_stream=1 \
-	aurora_monitor=$AMON nbuffers=$BN eot_interrupt=0 WORK_TO=1  \
-	buffer_len=$BL
-#	dyndbg="\" func afhba_map +pf\""
+	afhba_nports=${NPORTS} \
+	aurora_monitor=$AMON nbuffers=$BN buffer_len=$BL \
+	eot_interrupt=0 WORK_TO=1 \
+        dma_descriptor_ram=1 assume_stuck_buffers_are_ok=1
 
 
