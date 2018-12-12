@@ -170,7 +170,10 @@ void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);
 void control_threshold_history(short* ao, short *ai);
 
-void (*G_control)(short *ao, short *ai) = control_none;
+int G_buffer_copy_overruns;
+
+void control_check_overrun(short *xo, short* ai);
+void (*G_control)(short *ao, short *ai) = control_check_overrun;
 
 #define MV100   (32768/100)
 
@@ -341,6 +344,17 @@ void control_none(short *xo, short *ai)
 #define MARKER 0xdeadc0d1
 
 
+short G_b0_post_copy;
+
+void control_check_overrun(short *xo, short* ai)
+{
+	if (ai[0] != G_b0_post_copy){
+		++G_buffer_copy_overruns;
+	}	
+}
+
+
+
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
@@ -374,6 +388,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			++pollcat;
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
+		G_b0_post_copy = ((short *)bufferAB[ab])[0];
 		EOB(bufferAB[ab]) = MARKER;
 		control(xo_buffer, ai_buffer);
 		action(ai_buffer);
@@ -383,7 +398,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		}
 	}
 	if (rtfails){
-		fprintf(stderr, "ERROR: rtfails:%d out of %d buffers %d %%\n", rtfails, nbuffers, rtfails*100/nbuffers);
+		fprintf(stderr, "ERROR:i BCO:%d  rtfails:%d out of %d buffers %d %%\n", G_buffer_copy_overruns, rtfails, nbuffers, rtfails*100/nbuffers);
 	}
 }
 
