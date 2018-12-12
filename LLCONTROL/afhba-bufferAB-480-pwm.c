@@ -89,11 +89,13 @@ int has_do32;
 
 
 
-struct XLLC_DEF xllc_def = {
+struct XLLC_DEF xllc_def_ai = {
 		.pa = RTM_T_USE_HOSTBUF,
 
 };
-
+struct XLLC_DEF xllc_def_ao = {
+		.pa = RTM_T_USE_HOSTBUF,
+};
 #define VO_LEN  (32*sizeof(long))
 
 #define DO_IX   0
@@ -206,7 +208,7 @@ void ui(int argc, char* argv[])
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
-		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
+		xllc_def_ai.pa = strtoul(getenv("PA_BUF"), 0, 0);
 	}
 	if (getenv("DO32")){
 		has_do32 = atoi(getenv("DO32"));
@@ -226,7 +228,7 @@ void ui(int argc, char* argv[])
                 setAffinity(strtol(getenv("AFFINITY"), 0, 0));
     }
 
-	xllc_def.len = VI_LEN;
+	xllc_def_ai.len = VI_LEN;
 
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
@@ -257,7 +259,7 @@ void setup()
 		exit(1);
 	}
 
-	ab_def.buffers[0].pa = xllc_def.pa;
+	ab_def.buffers[0].pa = xllc_def_ai.pa;
 	ab_def.buffers[1].pa = BUFFER_AB_OFFSET;
 	ab_def.buffers[0].len =
 	ab_def.buffers[1].len = VI_LEN;
@@ -271,14 +273,14 @@ void setup()
 	printf("AI buf pa: %c 0x%08x len %d\n", 'B',
 			ab_def.buffers[1].pa, ab_def.buffers[1].len);
 
-	xllc_def.pa = ab_def.buffers[0].pa + XO_OFF;
-	xllc_def.len = VO_LEN;
+	xllc_def_ai.pa = ab_def.buffers[0].pa + XO_OFF;
+	xllc_def_ai.len = VO_LEN;
 
-	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
+	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ai)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
-	printf("AO buf pa:   0x%08x len %d\n", xllc_def.pa, xllc_def.len);
+	printf("AO buf pa:   0x%08x len %d\n", xllc_def_ai.pa, xllc_def_ai.len);
 
 	xo_buffer = (short*)((void*)host_buffer+XO_OFF);
 
