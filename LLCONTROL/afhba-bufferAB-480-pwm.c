@@ -383,7 +383,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		}
 	}
 	if (rtfails){
-		fprintf(stderr, "ERROR: rtfails:%d\n", rtfails);
+		fprintf(stderr, "ERROR: rtfails:%d out of %d buffers %d %%\n", rtfails, nbuffers, rtfails*100/nbuffers);
 	}
 }
 
