@@ -73,7 +73,7 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	8
+#define DEF_NCHAN 	16
 int nchan = DEF_NCHAN;
 int spadlongs = 0;
 
@@ -182,6 +182,9 @@ int G_buffer_copy_overruns;
 int control_check_overrun(short *xo, short* ai, short ai10);
 int (*G_control)(short *ao, short *ai, short ai10) = control_check_overrun;
 
+
+int control_check_mean(short *xo, short* ai, short ai10);
+
 #define MV100   (32768/100)
 
 
@@ -214,6 +217,9 @@ void ui(int argc, char* argv[])
 	if (getenv("NCHAN")){
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
+	}
+	if (getenv("CONTROL_CHECK_MEAN")){
+		G_control = control_check_mean;
 	}
 
     if (getenv("AFFINITY")){
@@ -301,11 +307,29 @@ int control_none(short *xo, short *ai, short ai10)
 int control_check_overrun(short *xo, short* ai, short ai10)
 {
 	if (ai[0] != ai10){
-		++G_buffer_copy_overruns;
-	}	
+		return ++G_buffer_copy_overruns;
+	}else{
+		return 0;
+	}
 }
 
+int totals[DEF_NCHAN];
+int control_check_mean(short *xo, short* ai, short ai10)
+{
+	memset(totals, 0, sizeof(totals));
 
+	if (control_check_overrun(xo, ai, ai10) == 0){
+		int tt;
+		int ic;
+
+		for (tt = 0; tt < samples_buffer; ++tt){
+			for (ic = 0; ic < nchan; ++ic){
+				totals[ic] += ai[tt*nchan + ic];
+			}
+		}
+	}
+	memcpy(shm+SHM_CH0, totals, sizeof(totals));
+}
 
 void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*))
 {
