@@ -83,9 +83,9 @@ int has_do32;
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
 #define NSHORTS		(NSHORTS1*samples_buffer)
 #define VI_LEN 		(NSHORTS*sizeof(short))
-#define VI_LONGS	(VI_LEN/sizeof(long))
+#define VI_LONGS	(VI_LEN/sizeof(unsigned))
 
-#define EOB(buf)	(((volatile unsigned*)&(buf))[VI_LONGS-1])
+#define EOB(buf)	(((volatile unsigned*)(buf))[VI_LONGS-1])
 
 
 struct XLLC_DEF xllc_def = {
@@ -354,10 +354,14 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 
 	mlockall(MCL_CURRENT);
 	memset(bufferAB[0], 0, VI_LEN);
-	memset(bufferAB[1], 0, VI_LEN);
+	memset(bufferAB[1], 1, VI_LEN);
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
-
+#if 0
+	fprintf(stderr, "bufferA %p EOB at %p wrote %x read %x\n", bufferAB[0], &EOB(bufferAB[0]), MARKER, EOB(bufferAB[0]));
+	fprintf(stderr, "bufferB %p EOB at %p wrote %x read %x\n", bufferAB[1], &EOB(bufferAB[1]), MARKER, EOB(bufferAB[1]));
+	return;
+#endif
 	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
