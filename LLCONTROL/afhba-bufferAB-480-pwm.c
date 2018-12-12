@@ -88,6 +88,7 @@ int has_do32;
 #define EOB(buf)	(((volatile unsigned*)(buf))[VI_LONGS-1])
 
 
+
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
 
@@ -96,6 +97,13 @@ struct XLLC_DEF xllc_def = {
 #define VO_LEN  (32*sizeof(long))
 
 #define DO_IX   0
+
+#define SHM_RTERR 		1
+#define SHM_BCO 		2
+#define SHM_POLLCATMIN 	3
+#define SHM_POLLCATMAX 	4
+
+#define SHM_CH0	5
 
 /* SPLIT single HB into 2
  * [0] : AI
@@ -234,6 +242,7 @@ void setup()
 	char logfile[80];
 	sprintf(logfile, log_file, devnum);
 	get_mapping();
+	shm_connect();
 	goRealTime();
 	struct AB ab_def;
 	fp_log = fopen(logfile, "w");
@@ -266,6 +275,7 @@ void setup()
 	printf("AO buf pa:   0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
 	xo_buffer = (short*)((void*)host_buffer+XO_OFF);
+
 }
 
 void print_sample(unsigned sample, unsigned tl)
@@ -336,6 +346,14 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 
 		if (verbose){
 			print_sample(ib, tl1);
+		}
+		shm[SHM_SAMPLE] = ib;
+		shm[SHM_RTERR] = rtfails;
+		shm[SHM_BCO] = G_buffer_copy_overruns;
+		if (pollcat < shm[SHM_POLLCATMIN]){
+			shm[SHM_POLLCATMIN] = pollcat;
+		}else if (pollcat > shm[SHM_POLLCATMAX]){
+			shm[SHM_POLLCATMAX] = pollcat;
 		}
 	}
 	if (rtfails){

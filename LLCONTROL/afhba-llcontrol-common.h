@@ -79,5 +79,17 @@ unsigned difftime_us(void)
 	return dt;
 }
 
+extern int *shm;
+
+extern void shm_connect();
+
+
+#define SHM_INTS	128
+
+#define SHM_LEN 	(SHM_INTS*sizeof(int))
+
+#define SHM_SAMPLE	0
+
+
 
 #endif /* LLCONTROL_AFHBA_LLCONTROL_COMMON_H_ */

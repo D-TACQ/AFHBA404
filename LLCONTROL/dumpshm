@@ -1,0 +1,2 @@
+hexdump -e '128/4 "%08x," "\n"' /dev/shm/afhba-llcontrol | cut -d, -f1-10
+

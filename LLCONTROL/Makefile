@@ -12,7 +12,7 @@ SPI_SUPPORT=
 endif
 
 CFLAGS += -O2
-LDLIBS += -lm
+LDLIBS += -lm -lrt
 
 # default build is the local kernel.
 # build other kernels like this example:
@@ -35,8 +35,13 @@ apps: $(APPS)
 afhba-llcontrol-example: afhba-llcontrol-example.c
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	-lpthread
 
+afhba-bufferAB-480-pwm: afhba-bufferAB-480-pwm.c shm.o
+	cc -o afhba-bufferAB-480-pwm afhba-bufferAB-480-pwm.c shm.o -lrt -lpopt	-lpthread
+
 afhba-llcontrol-testharness: afhba-llcontrol-testharness.cpp
 	$(CXX) -o afhba-llcontrol-testharness afhba-llcontrol-testharness.cpp -lpopt	
+
+
 
 clean:
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS)
