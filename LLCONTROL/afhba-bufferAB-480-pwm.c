@@ -166,14 +166,13 @@ void write_action(void *data)
 }
 
 
-void control_none(short* xo, short* ai);
-void control_thresholds(short* ao, short *ai);
-void control_threshold_history(short* ao, short *ai);
+int control_none(short* xo, short* ai, short ai10);
+
 
 int G_buffer_copy_overruns;
 
-void control_check_overrun(short *xo, short* ai);
-void (*G_control)(short *ao, short *ai) = control_check_overrun;
+int control_check_overrun(short *xo, short* ai, short ai10);
+int (*G_control)(short *ao, short *ai, short ai10) = control_check_overrun;
 
 #define MV100   (32768/100)
 
@@ -208,26 +207,11 @@ void ui(int argc, char* argv[])
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
 	}
-	if (getenv("POLARITY")){
-		G_POLARITY = atoi(getenv("POLARITY"));
-		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
-	}
-        if (getenv("AFFINITY")){
+
+    if (getenv("AFFINITY")){
                 setAffinity(strtol(getenv("AFFINITY"), 0, 0));
-        }
-        if (getenv("DO_THRESHOLDS")){
-		G_control = control_thresholds;
-	}
-        if (getenv("CONTROL_THRESHOLD_HISTORY")){
-        	mon_chan = atoi(getenv("CONTROL_THRESHOLD_HISTORY"));
-        	G_control = control_threshold_history;
-        	fprintf(stderr, "control set %s mon_chan %d\n",
-        			"control_threshold_history", mon_chan);
-        }
-	if (getenv("SPADLONGS")){
-		spadlongs = atoi(getenv("SPADLONGS"));
-		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
-	}
+    }
+
 	xllc_def.len = VI_LEN;
 
 	if (argc > 1){
@@ -291,48 +275,8 @@ void print_sample(unsigned sample, unsigned tl)
 	}
 }
 
-/* this is bogus and will have to change ..
- * - it's not a DO32 output
- * - it's not a 32CH input
- * Ideally: FFT 16 channels. Output a PWM value proportionate to bin number..
- *
- */
-void control_thresholds(short *xo, short *ai)
-/* set DO bit for corresponding AI > 0 */
-{
-	unsigned *do32 = (unsigned*)xo;
-	int ii;
-	static unsigned yy = 0;
-	
-	for (ii = 0; ii < 32; ++ii){
-		if (ai[ii] > 100){
-			yy |= 1<<ii;
-		}else if (ai[ii] < -100){
-			yy &= ~(1<<ii);
-		}
-	}
 
-	do32[DO_IX] = yy;
-}
-
-void control_threshold_history(short *xo, short *ai)
-/* set DO bit for corresponding AI[mon_chan][t] > 0 t=0:31 */
-{
-	unsigned *do32 = (unsigned*)xo;
-	int ii;
-	static unsigned yy = 0;
-
-	for (ii = 0; ii < 32; ++ii){
-		if (ai[ii*NSHORTS1 + mon_chan] > 100){
-			yy |= 1<<ii;
-		}else if (ai[ii*NSHORTS1 + mon_chan] < -100){
-			yy &= ~(1<<ii);
-		}
-	}
-
-	do32[DO_IX] = yy;
-}
-void control_none(short *xo, short *ai)
+int control_none(short *xo, short *ai, short ai10)
 {
 	unsigned* dox = (unsigned *)xo;
 	unsigned* tlx = (unsigned *)ai;
@@ -344,18 +288,16 @@ void control_none(short *xo, short *ai)
 #define MARKER 0xdeadc0d1
 
 
-short G_b0_post_copy;
-
-void control_check_overrun(short *xo, short* ai)
+int control_check_overrun(short *xo, short* ai, short ai10)
 {
-	if (ai[0] != G_b0_post_copy){
+	if (ai[0] != ai10){
 		++G_buffer_copy_overruns;
 	}	
 }
 
 
 
-void run(void (*control)(short *ao, short *ai), void (*action)(void*))
+void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl1;
@@ -388,9 +330,8 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			++pollcat;
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
-		G_b0_post_copy = ((short *)bufferAB[ab])[0];
 		EOB(bufferAB[ab]) = MARKER;
-		control(xo_buffer, ai_buffer);
+		control(xo_buffer, ai_buffer, ((short *)bufferAB[ab])[0]);
 		action(ai_buffer);
 
 		if (verbose){
