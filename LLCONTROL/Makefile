@@ -27,7 +27,7 @@ APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
 	afhba-llcontrol-do32-threshold \
 	afhba-bufferAB-do32-threshold \
 	afhba-llcontrol-two-fiber \
-	afhba-bufferAB-480-pwm
+	afhba-bufferAB-480-pwm pwm_set_channel
 	
 apps: $(APPS)
 
@@ -35,8 +35,11 @@ apps: $(APPS)
 afhba-llcontrol-example: afhba-llcontrol-example.c
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	-lpthread
 
-afhba-bufferAB-480-pwm: afhba-bufferAB-480-pwm.c shm.o
-	cc -o afhba-bufferAB-480-pwm afhba-bufferAB-480-pwm.c shm.o -lrt -lpopt	-lpthread
+afhba-bufferAB-480-pwm: afhba-bufferAB-480-pwm.o afhba-get_shared_mapping.o shm.o
+	cc -o afhba-bufferAB-480-pwm afhba-bufferAB-480-pwm.o afhba-get_shared_mapping.o shm.o -lrt -lpopt	-lpthread
+
+pwm_set_channel: pwm_set_channel.o afhba-get_shared_mapping.o
+	cc -o pwm_set_channel pwm_set_channel.o afhba-get_shared_mapping.o -lrt -lpopt	-lpthread
 
 afhba-llcontrol-testharness: afhba-llcontrol-testharness.cpp
 	$(CXX) -o afhba-llcontrol-testharness afhba-llcontrol-testharness.cpp -lpopt	

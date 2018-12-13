@@ -44,6 +44,8 @@
 
 #include "afhba-llcontrol-common.h"
 
+#define INSTRUMENT 1			/* instrument key values in external buffer */
+
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 
 #define BUFFER_AB_OFFSET 0x040000	/* BUFFERB starts here */
@@ -77,7 +79,7 @@ int G_POLARITY = 1;
 int nchan = DEF_NCHAN;
 int spadlongs = 0;
 
-short* xo_buffer;
+short* bufferXO;
 int has_do32;
 
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
@@ -93,9 +95,10 @@ struct XLLC_DEF xllc_def_ai = {
 		.pa = RTM_T_USE_HOSTBUF,
 
 };
-struct XLLC_DEF xllc_def_ao = {
-		.pa = RTM_T_USE_HOSTBUF,
-};
+struct XLLC_DEF xllc_def_ao;
+
+
+
 #define VO_LEN  (32*sizeof(long))
 
 #define DO_IX   0
@@ -111,6 +114,8 @@ struct XLLC_DEF xllc_def_ao = {
  * [0] : AI
  * [1] : AO
  */
+
+
 void get_mapping() {
 	char fname[80];
 	sprintf(fname, HB_FILE, devnum);
@@ -250,6 +255,7 @@ void setup()
 	char logfile[80];
 	sprintf(logfile, log_file, devnum);
 	get_mapping();
+	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&bufferXO);
 	shm_connect();
 	goRealTime();
 	struct AB ab_def;
@@ -273,16 +279,15 @@ void setup()
 	printf("AI buf pa: %c 0x%08x len %d\n", 'B',
 			ab_def.buffers[1].pa, ab_def.buffers[1].len);
 
-	xllc_def_ai.pa = ab_def.buffers[0].pa + XO_OFF;
-	xllc_def_ai.len = VO_LEN;
+	xllc_def_ao.len = VO_LEN;
 
-	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ai)){
+	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ao)){
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
-	printf("AO buf pa:   0x%08x len %d\n", xllc_def_ai.pa, xllc_def_ai.len);
+	printf("AO buf pa:   0x%08x len %d\n", xllc_def_ao.pa, xllc_def_ao.len);
 
-	xo_buffer = (short*)((void*)host_buffer+XO_OFF);
+	bufferXO = (short*)((void*)host_buffer+XO_OFF);
 
 }
 
@@ -317,12 +322,14 @@ int control_check_overrun(short *xo, short* ai, short ai10)
 
 int totals[DEF_NCHAN];
 int control_check_mean(short *xo, short* ai, short ai10)
+/* means aren't super relevant to high speed ADC, but they are simple to calculate .. */
 {
+	int tt;
+	int ic;
+
 	memset(totals, 0, sizeof(totals));
 
 	if (control_check_overrun(xo, ai, ai10) == 0){
-		int tt;
-		int ic;
 
 		for (tt = 0; tt < samples_buffer; ++tt){
 			for (ic = 0; ic < nchan; ++ic){
@@ -330,7 +337,13 @@ int control_check_mean(short *xo, short* ai, short ai10)
 			}
 		}
 	}
+
+	for (ic = 0; ic < nchan; ++ic){
+		totals[ic] /= samples_buffer;
+	}
+#ifdef INSTRUMENT
 	memcpy(shm+SHM_CH0, totals, sizeof(totals));
+#endif
 }
 
 void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*))
@@ -349,11 +362,7 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 	memset(bufferAB[1], 1, VI_LEN);
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
-#if 0
-	fprintf(stderr, "bufferA %p EOB at %p wrote %x read %x\n", bufferAB[0], &EOB(bufferAB[0]), MARKER, EOB(bufferAB[0]));
-	fprintf(stderr, "bufferB %p EOB at %p wrote %x read %x\n", bufferAB[1], &EOB(bufferAB[1]), MARKER, EOB(bufferAB[1]));
-	return;
-#endif
+
 	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
@@ -367,9 +376,10 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		EOB(bufferAB[ab]) = MARKER;
-		control(xo_buffer, ai_buffer, ((short *)bufferAB[ab])[0]);
+		control(bufferXO, ai_buffer, ((short *)bufferAB[ab])[0]);
 		action(ai_buffer);
 
+#ifdef INSTRUMENT
 		if (verbose){
 			print_sample(ib, tl1);
 		}
@@ -381,6 +391,7 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 		}else if (pollcat > shm[SHM_POLLCATMAX]){
 			shm[SHM_POLLCATMAX] = pollcat;
 		}
+#endif
 	}
 	if (rtfails){
 		fprintf(stderr, "ERROR:i BCO:%d  rtfails:%d out of %d buffers %d %%\n", G_buffer_copy_overruns, rtfails, nbuffers, rtfails*100/nbuffers);

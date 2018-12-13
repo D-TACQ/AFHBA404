@@ -40,14 +40,13 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
+#include "afhba-get_shared_mapping.h"
 
-#include "../rtm-t_ioctl.h"
+
 #define HB_FILE "/dev/rtm-t.%d"
 #define LOG_FILE	"afhba.%d.log"
+
+#define HB1	"/dev/rtm-t.%d.data/hb01"
 
 
 #include <time.h>
