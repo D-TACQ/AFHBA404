@@ -64,7 +64,7 @@ void get_shared_mapping(int devnum, int ibuf, struct XLLC_DEF* xllc_def, void** 
 
 		while (fgets(aline, sizeof(aline)-1, fp)){
 // [00] ffff880005d00000 05d00000 100000 100000 05d000a0 BS_EMPTY
-			if (sscanf(aline, "[%02d] %lx %x", &ib, &va, &pa) == 3 && ib == ibuf){
+			if (sscanf(aline, "[%02d] %p %x", &ib, &va, &pa) == 3 && ib == ibuf){
 				printf("found: ib=%d pa=0x%08x\n", ib, pa);
 				xllc_def->pa = pa;
 				xllc_def->len = HB_LEN;

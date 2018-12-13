@@ -27,12 +27,13 @@ void shm_connect()
 
 	int shm_fd;
 	void *ptr;
+	int rc;
 
 	/* create the shared memory segment */
 	shm_fd = shm_open("afhba-llcontrol", O_CREAT | O_RDWR, 0666);
 
 	/* configure the size of the shared memory segment */
-	ftruncate(shm_fd,SIZE);
+	rc = ftruncate(shm_fd,SIZE);
 
 	/* now map the shared memory segment in the address space of the process */
 	ptr = mmap(0,SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
