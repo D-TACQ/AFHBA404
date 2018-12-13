@@ -40,11 +40,11 @@
 
 
 
+#define HB_LEN	0x1000
 
 #include "afhba-llcontrol-common.h"
 
 
-#define HB_LEN	0x1000
 
 
 

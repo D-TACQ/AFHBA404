@@ -16,7 +16,9 @@ typedef unsigned char  u8;
 
 #include "../rtm-t_ioctl.h"
 
+#ifndef HB_LEN
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
+#endif
 
 void get_shared_mapping(int devnum, int ibuf, struct XLLC_DEF* xllc_def, void** pbuf);
 
