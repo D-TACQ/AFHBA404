@@ -94,7 +94,10 @@ int main(int argc, char* argv[])
 
 	assert(sizeof(struct PWM_CTRL) == sizeof(unsigned));
 
-	fprintf(stderr, "pwm_set_channel chan is group icount ocount ");
+	if (argc > 1 && strpbrk(argv[1], "h?H")){
+		fprintf(stderr, "pwm_set_channel chan is group icount ocount ");
+		return 0;
+	}
 	get_shared_mapping(devnum, ibuf, 0, (void**)&pbuf);
 
 	if (argc > 1) chan = alimit(argv[1], MAXCHAN);
