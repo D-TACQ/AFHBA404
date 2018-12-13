@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-FILE=${1:=/dev/shm/afhba-llcontrol}
+FILE=${1:-/dev/shm/afhba-llcontrol}
 FIELDS=${2:-1-10}
 
 
