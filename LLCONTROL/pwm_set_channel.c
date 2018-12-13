@@ -33,6 +33,32 @@ struct PWM_CTRL {
 #define MAX_OC  0x3FF
 #define MAX_IC	0x3FF
 
+#define SHL_IS	31
+#define SHL_GP	20
+#define SHL_OC	10
+#define SHL_IC   0
+
+struct PWM_CTRL raw2pwm(unsigned raw){
+	struct PWM_CTRL pwm;
+	pwm.PWM_IS = (raw << SHL_IS)|MAX_IS;
+	pwm.PWM_GP = (raw << SHL_GP)|MAX_GP;
+	pwm.PWM_OC = (raw << SHL_OC)|MAX_OC;
+	pwm.PWM_IC = (raw << SHL_IC)|MAX_IC;
+	return pwm;
+}
+
+unsigned pwm2raw(struct PWM_CTRL pwm)
+{
+	unsigned raw = 0;
+	raw |= pwm.PWM_IS << SHL_IS;
+	raw |= pwm.PWM_GP << SHL_GP;
+	raw |= pwm.PWM_OC << SHL_OC;
+	raw |= pwm.PWM_IC << SHL_IC;
+	return raw;
+}
+
+
+
 int devnum = 0;
 int ibuf = 1;
 
@@ -41,7 +67,7 @@ unsigned *pbuf;
 
 void _set(int chan, struct PWM_CTRL pwm)
 {
-	memcpy(&pbuf[ICHAN(chan)], &pwm, sizeof(unsigned));
+	pbuf[ICHAN(chan)] = pwm2raw(pwm);
 }
 
 void set(int chan, struct PWM_CTRL pwm){
@@ -56,9 +82,8 @@ void set(int chan, struct PWM_CTRL pwm){
 }
 void _query(int chan)
 {
-	struct PWM_CTRL pwm;
+	struct PWM_CTRL pwm = raw2pwm(pbuf[ICHAN(chan)]);
 
-	memcpy(&pwm, &pbuf[ICHAN(chan)], sizeof(unsigned));
 	printf("{ ch:%02d,is:%d,gp:%4d,ic:%d,oc:%d } ", chan,
 			pwm.PWM_IS, pwm.PWM_GP, pwm.PWM_IC, pwm.PWM_OC);
 }
