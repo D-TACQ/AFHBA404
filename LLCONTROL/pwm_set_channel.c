@@ -34,7 +34,7 @@ struct PWM_CTRL {
 #define MAX_IC	0x3FF
 
 int devnum = 0;
-int ibuf = 0;
+int ibuf = 1;
 
 unsigned *pbuf;
 
@@ -97,6 +97,13 @@ int main(int argc, char* argv[])
 	if (argc > 1 && strpbrk(argv[1], "h?H")){
 		fprintf(stderr, "pwm_set_channel chan is group icount ocount ");
 		return 0;
+	}
+
+	if (getenv("DEVNUM")){
+		devnum = atoi(getenv("DEVNUM"));
+	}
+	if (getenv("IBUF")){
+		ibuf = atoi(getenv("IBUF"));
 	}
 	get_shared_mapping(devnum, ibuf, 0, (void**)&pbuf);
 
