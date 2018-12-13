@@ -59,7 +59,7 @@ void _query(int chan)
 	struct PWM_CTRL pwm;
 
 	memcpy(&pwm, &pbuf[ICHAN(chan)], sizeof(unsigned));
-	printf("ch:%02d, is:%d gp:%4d, ic:%d oc:%d ", chan,
+	printf("{ ch:%02d,is:%d,gp:%4d,ic:%d,oc:%d } ", chan,
 			pwm.PWM_IS, pwm.PWM_GP, pwm.PWM_IC, pwm.PWM_OC);
 }
 
@@ -78,7 +78,7 @@ void query(int chan)
 
 unsigned limit(unsigned xx, unsigned _max)
 {
-	return xx > _max? xx: _max;
+	return xx <= _max? xx: _max;
 }
 
 unsigned alimit(const char *xxs, unsigned _max)
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 {
 
 	struct PWM_CTRL pwm_ctrl = {};
-	int chan;
+	int chan = CHAN_ALL;
 
 	assert(sizeof(struct PWM_CTRL) == sizeof(unsigned));
 
