@@ -15,48 +15,13 @@
 
 #include "afhba-get_shared_mapping.h"
 
-#define MAXCHAN	32
+
 
 #define ICHAN(chan) ((chan)-1)
 
 #define CHAN_ALL 0
 
-struct PWM_CTRL {
-	unsigned PWM_IS:1;
-	unsigned PWM_GP:11;
-	unsigned PWM_OC:10;
-	unsigned PWM_IC:10;
-};
-
-#define MAX_IS	1
-#define MAX_GP  0x7FF
-#define MAX_OC  0x3FF
-#define MAX_IC	0x3FF
-
-#define SHL_IS	31
-#define SHL_GP	20
-#define SHL_OC	10
-#define SHL_IC   0
-
-struct PWM_CTRL raw2pwm(unsigned raw){
-	struct PWM_CTRL pwm;
-	pwm.PWM_IS = (raw << SHL_IS)|MAX_IS;
-	pwm.PWM_GP = (raw << SHL_GP)|MAX_GP;
-	pwm.PWM_OC = (raw << SHL_OC)|MAX_OC;
-	pwm.PWM_IC = (raw << SHL_IC)|MAX_IC;
-	return pwm;
-}
-
-unsigned pwm2raw(struct PWM_CTRL pwm)
-{
-	unsigned raw = 0;
-	raw |= pwm.PWM_IS << SHL_IS;
-	raw |= pwm.PWM_GP << SHL_GP;
-	raw |= pwm.PWM_OC << SHL_OC;
-	raw |= pwm.PWM_IC << SHL_IC;
-	return raw;
-}
-
+#include "pwm_internals.h"
 
 
 int devnum = 0;
@@ -73,7 +38,7 @@ void _set(int chan, struct PWM_CTRL pwm)
 void set(int chan, struct PWM_CTRL pwm){
 	if (chan == CHAN_ALL){
 		int cc;
-		for (cc = 1; cc <= MAXCHAN; ++cc){
+		for (cc = 1; cc <= PWM_MAXCHAN; ++cc){
 			_set(cc, pwm);
 		}
 	}else{
@@ -92,7 +57,7 @@ void query(int chan)
 {
 	if (chan == CHAN_ALL){
 		int cc;
-		for (cc = 1; cc <= MAXCHAN; ++cc){
+		for (cc = 1; cc <= PWM_MAXCHAN; ++cc){
 			_query(cc);
 		}
 	}else{
@@ -120,7 +85,7 @@ int main(int argc, char* argv[])
 	assert(sizeof(struct PWM_CTRL) == sizeof(unsigned));
 
 	if (argc > 1 && strpbrk(argv[1], "h?H")){
-		fprintf(stderr, "pwm_set_channel chan is group icount ocount ");
+		fprintf(stderr, "pwm_set_channel chan is group icount ocount\n");
 		return 0;
 	}
 
@@ -132,7 +97,7 @@ int main(int argc, char* argv[])
 	}
 	get_shared_mapping(devnum, ibuf, 0, (void**)&pbuf);
 
-	if (argc > 1) chan = alimit(argv[1], MAXCHAN);
+	if (argc > 1) chan = alimit(argv[1], PWM_MAXCHAN);
 	if (argc > 2){
 		pwm_ctrl.PWM_IS = alimit(argv[2], MAX_IS);
 		if (argc > 3){

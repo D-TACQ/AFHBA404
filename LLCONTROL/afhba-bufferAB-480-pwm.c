@@ -44,6 +44,8 @@
 
 #include "afhba-llcontrol-common.h"
 
+#include "pwm_internals.h"
+
 #define INSTRUMENT 1			/* instrument key values in external buffer */
 
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
