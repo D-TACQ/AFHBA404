@@ -101,7 +101,7 @@ struct XLLC_DEF xllc_def_ao;
 
 
 
-#define VO_LEN  (32*sizeof(long))
+#define VO_LEN  (32*sizeof(unsigned))
 
 #define DO_IX   0
 
