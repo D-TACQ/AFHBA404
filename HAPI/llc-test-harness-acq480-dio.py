@@ -64,7 +64,7 @@ def init_do(uut, slave=False):
         uut.svc[sn].byte_is_output = '1,1,1,1'
         uut.svc[sn].mode = 1
 
-    npad = 16 - len(DOSITES.split(','))
+    npad = 0
     uut.s0.distributor = "sites={} comms=2 pad={} on".format(DOSITES, npad)
     print("init_ao() done {} {}".format(uut.uut, DOSITES))
      
