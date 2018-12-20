@@ -1,0 +1,7 @@
+#!/bin/bash
+FILE=${1:-/dev/shm/afhba-llcontrol}
+FIELDS=${2:-6-}
+
+
+../mmap -f $FILE | hexdump -e '21/4 "%6d," "\n"' | cut -d, -f$FIELDS | head -n 1
+

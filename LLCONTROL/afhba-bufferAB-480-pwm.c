@@ -365,7 +365,7 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
 
-	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
+	for (ib = 0; nbuffers == 0 || ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
 			EOB(bufferAB[ab]) = MARKER;
