@@ -6,7 +6,7 @@
  *   Copyright (C) 2018 Peter Milne, D-TACQ Solutions Ltd
  *                      <peter dot milne at D hyphen TACQ dot com>
  *                         www.d-tacq.com
- *   Created on: 18 September 2014
+ *   Created on: 18 December 2018
  *    Author: pgm
  *                                                                           *
  *  This program is free software; you can redistribute it and/or modify     *
@@ -37,8 +37,6 @@
      run the control algorithm on the new AI, store new AO
  }
 
- DO32=1 : copy tlatch (sample number to DO32
- DO32=2 : run a threshold crossing algorithm, AI[0:31] -> DO[0:31] 
 */
 
 
@@ -51,7 +49,6 @@
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 
 #define BUFFER_AB_OFFSET 0x040000	/* BUFFERB starts here */
-#define XO_OFF  0x080000		/* XO buffer at this offset */
 
 #define LOG_FILE	"afhba.%d.log"
 
@@ -70,12 +67,6 @@ int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
-int dummy_first_loop;
-/** potentially good for cache fill, but sets initial value zero */
-int G_POLARITY = 1;		
-/** env POLARITY=-1 negates feedback this is usefult to know that the 
- *  software is in fact doing something 					 */
-
 
 #define DEF_NCHAN 	16
 int nchan = DEF_NCHAN;
@@ -105,17 +96,13 @@ struct XLLC_DEF xllc_def_ao;
 
 #define DO_IX   0
 
+/* intermediate values are copied to a local shared memory for co-routines to observe */
 #define SHM_RTERR 		1
 #define SHM_BCO 		2
 #define SHM_POLLCATMIN 	3
 #define SHM_POLLCATMAX 	4
 
-#define SHM_CH0	5
-
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
+#define SHM_CH0	5				/* FIRST AO chan at this index */
 
 
 void get_mapping() {
@@ -220,9 +207,6 @@ void ui(int argc, char* argv[])
 	if (getenv("DO32")){
 		has_do32 = atoi(getenv("DO32"));
 	}
-	if (getenv("DUMMY_FIRST_LOOP")){
-		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
-	}
 	if (getenv("NCHAN")){
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
@@ -288,9 +272,6 @@ void setup()
 		exit(1);
 	}
 	printf("AO buf pa:   0x%08x len %d\n", xllc_def_ao.pa, xllc_def_ao.len);
-
-	bufferXO = (short*)((void*)host_buffer+XO_OFF);
-
 }
 
 void print_sample(unsigned sample, unsigned tl)
