@@ -8,12 +8,12 @@
 
 #include "pwm_internals.h"
 
-unsigned *pbuf;
+unsigned *pbufferXO;
 
 
 void _set(int chan, struct PWM_CTRL pwm)
 {
-	pbuf[ICHAN(chan)] = pwm2raw(pwm);
+	pbufferXO[ICHAN(chan)] = pwm2raw(pwm);
 }
 
 void set(int chan, struct PWM_CTRL pwm){
@@ -28,7 +28,7 @@ void set(int chan, struct PWM_CTRL pwm){
 }
 void _query(int chan)
 {
-	struct PWM_CTRL pwm = raw2pwm(pbuf[ICHAN(chan)]);
+	struct PWM_CTRL pwm = raw2pwm(pbufferXO[ICHAN(chan)]);
 
 	printf("{ ch:%02d,is:%d,gp:%4d,ic:%d,oc:%d } ", chan,
 			pwm.PWM_IS, pwm.PWM_GP, pwm.PWM_IC, pwm.PWM_OC);

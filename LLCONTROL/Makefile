@@ -35,7 +35,7 @@ apps: $(APPS)
 afhba-llcontrol-example: afhba-llcontrol-example.c
 	cc -o afhba-llcontrol-example afhba-llcontrol-example.c -lpopt	-lpthread
 
-afhba-bufferAB-480-pwm: afhba-bufferAB-480-pwm.o afhba-get_shared_mapping.o shm.o
+afhba-bufferAB-480-pwm: afhba-bufferAB-480-pwm.o pwm_internals.o afhba-get_shared_mapping.o shm.o
 	$(CC) -o $@ $^ $(LDLIBS)
 
 #pwm_set_channel: pwm_set_channel.o afhba-get_shared_mapping.o pwm_internals.o

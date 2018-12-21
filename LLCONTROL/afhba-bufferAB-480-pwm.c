@@ -72,8 +72,9 @@ int devnum = 0;
 int nchan = DEF_NCHAN;
 int spadlongs = 0;
 
-short* bufferXO;
 int has_do32;
+
+float G_setpoint = 1000;
 
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
 #define NSHORTS		(NSHORTS1*samples_buffer)
@@ -170,16 +171,18 @@ void write_action(void *data)
 }
 
 
-int control_none(short* xo, short* ai, short ai10);
+int control_none(unsigned* xo, short* ai, short ai10);
 
 
 int G_buffer_copy_overruns;
 
-int control_check_overrun(short *xo, short* ai, short ai10);
-int (*G_control)(short *ao, short *ai, short ai10) = control_check_overrun;
+int control_check_overrun(unsigned *xo, short* ai, short ai10);
+int (*G_control)(unsigned *ao, short *ai, short ai10) = control_check_overrun;
 
 
-int control_check_mean(short *xo, short* ai, short ai10);
+int control_check_mean(unsigned *xo, short* ai, short ai10);
+
+int control_proportional_control(unsigned *xo, short* ai, short ai10);
 
 #define MV100   (32768/100)
 
@@ -188,6 +191,7 @@ int mon_chan = 0;
 
 void ui(int argc, char* argv[])
 {
+	const char* env;
 	if (getenv("LOG_FILE")){
 		log_file = getenv("LOG_FILE");
 	}
@@ -213,6 +217,9 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("CONTROL_CHECK_MEAN")){
 		G_control = control_check_mean;
+	}else if ((env = getenv("CONTROL_SETPOINT"))){
+		G_setpoint = atof(env);
+		G_control = control_proportional_control;
 	}
 
     if (getenv("AFFINITY")){
@@ -241,7 +248,7 @@ void setup()
 	char logfile[80];
 	sprintf(logfile, log_file, devnum);
 	get_mapping();
-	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&bufferXO);
+	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&pbufferXO);
 	shm_connect();
 	goRealTime();
 	struct AB ab_def;
@@ -282,7 +289,7 @@ void print_sample(unsigned sample, unsigned tl)
 }
 
 
-int control_none(short *xo, short *ai, short ai10)
+int control_none(unsigned *xo, short *ai, short ai10)
 {
 	unsigned* dox = (unsigned *)xo;
 	unsigned* tlx = (unsigned *)ai;
@@ -294,7 +301,7 @@ int control_none(short *xo, short *ai, short ai10)
 #define MARKER 0xdeadc0d1
 
 
-int control_check_overrun(short *xo, short* ai, short ai10)
+int control_check_overrun(unsigned *xo, short* ai, short ai10)
 {
 	if (ai[0] != ai10){
 		return ++G_buffer_copy_overruns;
@@ -304,7 +311,7 @@ int control_check_overrun(short *xo, short* ai, short ai10)
 }
 
 int totals[DEF_NCHAN];
-int control_check_mean(short *xo, short* ai, short ai10)
+int control_check_mean(unsigned *xo, short* ai, short ai10)
 /* means aren't super relevant to high speed ADC, but they are simple to calculate .. */
 {
 	int tt;
@@ -329,7 +336,34 @@ int control_check_mean(short *xo, short* ai, short ai10)
 #endif
 }
 
-void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*))
+static float gain = 10.0/3000 *.5;		/* gain codes per pwm% */
+struct PWM_CTRL pwm[DEF_NCHAN];
+
+int cpc(unsigned *xo, int actuals[], float duty[])
+/* proportional control: run one step for each channel */
+{
+	int ic;
+
+	// assume first 16 channels have feedback
+	for (ic = 0; ic < DEF_NCHAN; ++ic){
+		float error = G_setpoint - actuals[ic];
+		float duty1 = duty[ic] + error*gain;
+
+		pwm[ic] = set_duty(pwm[ic], duty1, 0);
+		set(ic+1, pwm[ic]);							/* api index from 1 */
+		duty[ic] = duty1;
+	}
+}
+
+float dutys[DEF_NCHAN];
+
+int control_proportional_control(unsigned *xo, short* ai, short ai10)
+{
+	if (control_check_mean(xo, ai, ai10) == 0){
+		return cpc(xo, totals, dutys);
+	}
+}
+void run(int (*control)(unsigned *ao, short *ai, short ai10), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl1;
@@ -359,7 +393,7 @@ void run(int (*control)(short *ao, short *ai, short ai10), void (*action)(void*)
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		EOB(bufferAB[ab]) = MARKER;
-		control(bufferXO, ai_buffer, ((short *)bufferAB[ab])[0]);
+		control(pbufferXO, ai_buffer, ((short *)bufferAB[ab])[0]);
 		action(ai_buffer);
 
 #ifdef INSTRUMENT

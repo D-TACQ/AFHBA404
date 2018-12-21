@@ -28,7 +28,7 @@
 int devnum = 0;
 int ibuf = 1;
 
-unsigned *pbuf;
+unsigned *pbufferXO;
 
 #define GP_DEFAULT 800		/* 125M/800 = 150k, run at 2x78 kHz */
 
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 	if (getenv("IBUF")){
 		ibuf = atoi(getenv("IBUF"));
 	}
-	get_shared_mapping(devnum, ibuf, 0, (void**)&pbuf);
+	get_shared_mapping(devnum, ibuf, 0, (void**)&pbufferXO);
 
 	if (argc > 1) chan = falimit(argv[1], PWM_MAXCHAN);
 	if (argc > 2){

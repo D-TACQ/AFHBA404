@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	}else{
 		pwm_ctrl.PWM_GP = GP_DEFAULT;
 	}
-	get_shared_mapping(devnum, ibuf, 0, (void**)&pbuf);
+	get_shared_mapping(devnum, ibuf, 0, (void**)&pbufferXO);
 
 	if (argc > 1) chan = alimit(argv[1], PWM_MAXCHAN);
 	if (argc > 2){

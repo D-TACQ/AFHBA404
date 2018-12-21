@@ -54,7 +54,7 @@ static unsigned pwm2raw(struct PWM_CTRL pwm)
 
 #define CHAN_ALL 0
 
-extern unsigned *pbuf;					/* client MUST initialize to PWM SHM */
+extern unsigned *pbufferXO;					/* client MUST initialize to PWM SHM */
 
 void set(int chan, struct PWM_CTRL pwm);
 void query(int chan);
