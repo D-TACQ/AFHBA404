@@ -47,5 +47,18 @@ static unsigned pwm2raw(struct PWM_CTRL pwm)
 	return raw;
 }
 
+#define GP_DEFAULT 800		/* 125M/800 = 150k, run at 2x78 kHz */
+
+
+#define ICHAN(chan) ((chan)-1)
+
+#define CHAN_ALL 0
+
+extern unsigned *pbuf;					/* client MUST initialize to PWM SHM */
+
+void set(int chan, struct PWM_CTRL pwm);
+void query(int chan);
+
+struct PWM_CTRL set_duty(struct PWM_CTRL pwm, float duty_pc, float delay_pc);
 
 #endif /* LLCONTROL_PWM_INTERNALS_H_ */
