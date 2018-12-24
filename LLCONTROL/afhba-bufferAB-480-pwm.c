@@ -74,6 +74,8 @@ int spadlongs = 0;
 
 int has_do32;
 
+#define MAX_DO32	32
+
 float G_setpoint = 1000;
 
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
@@ -189,6 +191,7 @@ int control_proportional_control(unsigned *xo, short* ai, short ai10);
 
 int mon_chan = 0;
 
+int G_chan_step = 1;
 void ui(int argc, char* argv[])
 {
 	const char* env;
@@ -214,6 +217,9 @@ void ui(int argc, char* argv[])
 	if (getenv("NCHAN")){
 		nchan = atoi(getenv("NCHAN"));
 		fprintf(stderr, "NCHAN set %d\n", nchan);
+	}
+	if ((env = getenv("CHAN_STEP"))){
+		G_chan_step = atoi(env);
 	}
 	if (getenv("CONTROL_CHECK_MEAN")){
 		G_control = control_check_mean;
@@ -338,7 +344,7 @@ int control_check_mean(unsigned *xo, short* ai, short ai10)
 }
 
 static float gain = 10.0/3000 *.01;		/* gain codes per pwm% */
-static struct PWM_CTRL pwm[DEF_NCHAN];
+static struct PWM_CTRL pwm[MAX_DO32];
 
 void cpc_init()
 {
@@ -363,7 +369,7 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 	if (cycle++ < 2){
 		unsigned gp = cycle==1? 0: GP_DEFAULT;
 	
-		for (ic = 0; ic < DEF_NCHAN; ++ic){
+		for (ic = 0; ic < MAX_DO32; ++ic){
 			set(ic+1, pwm[ic]);
 			pwm[ic].PWM_GP = gp;
 			pbufferXO[ic] = pwm2raw(pwm[ic]);
@@ -372,12 +378,12 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 	}
 
 	// assume first 16 channels have feedback
-	for (ic = 0; ic < DEF_NCHAN; ++ic){
+	for (ic = 0; ic < DEF_NCHAN; ic += 1){
 		float error = G_setpoint - actuals[ic];
 		float duty1 = duty[ic] + error*gain;
 
 		pwm[ic] = set_duty(pwm[ic], duty1, 0);
-		pbufferXO[ic] = pwm2raw(pwm[ic]);
+		pbufferXO[ic*G_chan_step] = pwm2raw(pwm[ic]);
 		duty[ic] = duty1;
 	}
 	return 0;
