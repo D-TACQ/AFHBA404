@@ -372,6 +372,7 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 		for (ic = 0; ic < MAX_DO32; ++ic){
 			set(ic+1, pwm[ic]);
 			pwm[ic].PWM_GP = gp;
+			pwm[ic].PWM_IC = gp-2;
 			pbufferXO[ic] = pwm2raw(pwm[ic]);
 		}
 		return 0;
