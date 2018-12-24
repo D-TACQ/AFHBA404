@@ -334,15 +334,42 @@ int control_check_mean(unsigned *xo, short* ai, short ai10)
 #ifdef INSTRUMENT
 	memcpy(shm+SHM_CH0, totals, sizeof(totals));
 #endif
+	return 0;
 }
 
-static float gain = 10.0/3000 *.5;		/* gain codes per pwm% */
-struct PWM_CTRL pwm[DEF_NCHAN];
+static float gain = 10.0/3000 *.01;		/* gain codes per pwm% */
+static struct PWM_CTRL pwm[DEF_NCHAN];
+
+void cpc_init()
+{
+	int ic;
+	
+	if (pwm[0].PWM_GP == 0){
+		for (ic = 0; ic < DEF_NCHAN; ++ic){
+			set(ic+1, pwm[ic]);
+			pwm[ic].PWM_GP = 0;
+			pbufferXO[ic] = pwm2raw(pwm[ic]);
+		}
+	}
+}
+
 
 int cpc(unsigned *xo, int actuals[], float duty[])
 /* proportional control: run one step for each channel */
 {
 	int ic;
+	static int cycle;
+
+	if (cycle++ < 2){
+		unsigned gp = cycle==1? 0: GP_DEFAULT;
+	
+		for (ic = 0; ic < DEF_NCHAN; ++ic){
+			set(ic+1, pwm[ic]);
+			pwm[ic].PWM_GP = gp;
+			pbufferXO[ic] = pwm2raw(pwm[ic]);
+		}
+		return 0;
+	}
 
 	// assume first 16 channels have feedback
 	for (ic = 0; ic < DEF_NCHAN; ++ic){
@@ -350,9 +377,10 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 		float duty1 = duty[ic] + error*gain;
 
 		pwm[ic] = set_duty(pwm[ic], duty1, 0);
-		set(ic+1, pwm[ic]);							/* api index from 1 */
+		pbufferXO[ic] = pwm2raw(pwm[ic]);
 		duty[ic] = duty1;
 	}
+	return 0;
 }
 
 float dutys[DEF_NCHAN];
@@ -424,6 +452,10 @@ int main(int argc, char* argv[])
 {
 	ui(argc, argv);
 	setup();
+	if (G_control == control_proportional_control){
+
+		cpc_init();
+	}
 	printf("ready for data\n");
 	run(G_control, G_action);
 	printf("finished\n");
