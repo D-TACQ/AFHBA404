@@ -192,6 +192,8 @@ int control_proportional_control(unsigned *xo, short* ai, short ai10);
 int mon_chan = 0;
 
 int G_chan_step = 1;
+float G_phase_per_channel = 0;
+
 void ui(int argc, char* argv[])
 {
 	const char* env;
@@ -220,6 +222,9 @@ void ui(int argc, char* argv[])
 	}
 	if ((env = getenv("CHAN_STEP"))){
 		G_chan_step = atoi(env);
+	}
+	if ((env = getenv("PHASE_PER_CHANNEL"))){
+		G_phase_per_channel = atof(env);
 	}
 	if (getenv("CONTROL_CHECK_MEAN")){
 		G_control = control_check_mean;
@@ -351,7 +356,7 @@ void cpc_init()
 	int ic;
 	
 	if (pwm[0].PWM_GP == 0){
-		for (ic = 0; ic < DEF_NCHAN; ++ic){
+		for (ic = 0; ic < MAX_DO32; ++ic){
 			set(ic+1, pwm[ic]);
 			pwm[ic].PWM_GP = 0;
 			pbufferXO[ic] = pwm2raw(pwm[ic]);
@@ -383,7 +388,7 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 		float error = G_setpoint - actuals[ic];
 		float duty1 = duty[ic] + error*gain;
 
-		pwm[ic] = set_duty(pwm[ic], duty1, 0);
+		pwm[ic] = set_duty(pwm[ic], duty1, ic*G_phase_per_channel);
 		pbufferXO[ic*G_chan_step] = pwm2raw(pwm[ic]);
 		duty[ic] = duty1;
 	}
