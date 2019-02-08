@@ -64,6 +64,7 @@ int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer;			/* set > 1 to decimate max 16*64bytes */
 int sched_fifo_priority = 1;
 int verbose;
+int debug;
 FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
@@ -86,6 +87,7 @@ float G_setpoint = 1000;
 #define EOB(buf)	(((volatile unsigned*)(buf))[VI_LONGS-1])
 
 
+#define DEBUG(str)  while(debug) { printf("%d %s say when\n", __LINE__, str); getchar(); break; }
 
 struct XLLC_DEF xllc_def_ai = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -209,6 +211,9 @@ void ui(int argc, char* argv[])
 	if (getenv("DEVNUM")){
 		devnum = atoi(getenv("DEVNUM"));
 	}
+	if (getenv("DEBUG")){
+		debug = atoi(getenv("DEBUG"));
+	}
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
 		xllc_def_ai.pa = strtoul(getenv("PA_BUF"), 0, 0);
@@ -260,6 +265,7 @@ void setup()
 	sprintf(logfile, log_file, devnum);
 	get_mapping();
 	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&pbufferXO);
+	DEBUG("get_shared_mapping");
 	shm_connect();
 	goRealTime();
 	struct AB ab_def;
@@ -289,6 +295,7 @@ void setup()
 		perror("ioctl AFHBA_START_AO_LLC");
 		exit(1);
 	}
+	DEBUG("setup99");
 	printf("AO buf pa:   0x%08x len %d\n", xllc_def_ao.pa, xllc_def_ao.len);
 }
 
@@ -372,7 +379,7 @@ int cpc(unsigned *xo, int actuals[], float duty[])
 	static int cycle;
 
 	if (cycle++ < 2){
-		unsigned gp = cycle==1? 0: GP_DEFAULT;
+		unsigned gp = GP_DEFAULT;
 	
 		for (ic = 0; ic < MAX_DO32; ++ic){
 			set(ic+1, pwm[ic]);
@@ -420,6 +427,8 @@ void run(int (*control)(unsigned *ao, short *ai, short ai10), void (*action)(voi
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
 
+	DEBUG("run");
+
 	for (ib = 0; nbuffers == 0 || ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
@@ -466,7 +475,7 @@ int main(int argc, char* argv[])
 	setup();
 	if (G_control == control_proportional_control){
 
-		cpc_init();
+//		cpc_init();
 	}
 	printf("ready for data\n");
 	run(G_control, G_action);

@@ -60,9 +60,12 @@ struct PWM_CTRL set_duty(struct PWM_CTRL pwm, float duty_pc, float delay_pc)
 		pwm.PWM_OC = delay_pc*pwm.PWM_GP/100;
 		pwm.PWM_IC = duty_pc*pwm.PWM_GP/100 + pwm.PWM_OC - pwm.PWM_GP;
 	}
-	/*
+/*	
 	fprintf(stderr, "duty %.1f delay %.1f GP %u IS %u IC %u OC %u\n",
 			duty_pc, delay_pc, pwm.PWM_GP, pwm.PWM_IS, pwm.PWM_IC, pwm.PWM_OC);
-	*/
+
+*/
+	assert(pwm.PWM_GP == GP_DEFAULT);
+	assert(pwm.PWM_GP != 0);
 	return pwm;
 }
