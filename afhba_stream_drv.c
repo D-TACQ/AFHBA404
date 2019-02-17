@@ -611,7 +611,7 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 	unsigned z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
 	unsigned z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
 
-	if (z_ident2 == 0xffffffff || (z_ident2&0x0ffff) == 0xdead0000){
+	if (z_ident2 == 0xffffffff || (z_ident2&~0x0ffff) == 0xdead0000){
 		dev_err(pdev(adev), "ERROR reading Z_IDENT %08x, please reboot now", z_ident2);
 		return -1;
 	}else{
@@ -784,20 +784,20 @@ static void report_inflight(
 		return;
 	}
 	if (dma_descriptor_ram){
-		(is_error? dev_err: dev_warn)(pdev(adev),
-				"%s: buffer %02d", msg, ibuf);
+		dev_warn(pdev(adev), "%s: buffer %02d %s",
+				msg, ibuf, is_error? "ERROR": "WARNING");
 	}else{
 		u32 inflight_descr = DMA_PUSH_DESC_STA_RD(adev);
 		struct HostBuffer*  inflight = hb_from_descr(adev, inflight_descr);
 		u32 fifsta = DMA_DESC_FIFSTA_RD(adev);
 
-		(is_error? dev_err: dev_warn)(pdev(adev),
-				"%s: buffer %02d  last descr:%08x [%02d] fifo:%08x",
+		dev_warn(pdev(adev), "%s: buffer %02d  last descr:%08x [%02d] fifo:%08x %s",
 				msg,
 				ibuf,
 				inflight_descr,
 				inflight? inflight->ibuf: -1,
-				fifsta);
+				fifsta,
+				is_error? "ERROR": "WARNING");
 	}
 
 }
@@ -1851,6 +1851,35 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
+
+
+long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct JOB* job = &sdev->job;
+
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	spin_unlock(&sdev->job_lock);
+	sdev->onStopPush = afs_stop_llc_push;
+
+	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
+		int ib;
+		abn->buffers[0].pa = sdev->hbx[0].pa;
+
+		for (ib = 1; ib < abn->ndesc; ++ib){
+			abn->buffers[ib].pa = abn->buffers[ib-1].pa + PAGE_SIZE;
+		}
+	}
+
+	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, abn->buffers, abn->ndesc);
+
+	spin_lock(&sdev->job_lock);
+	job->please_stop = PS_OFF;
+	job->on_push_dma_timeout = 0;
+	spin_unlock(&sdev->job_lock);
+	return 0;
+}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
@@ -1889,6 +1918,13 @@ long afs_dma_ioctl(struct file *file,
 		rc = afs_start_AI_AB(adev, &ab);
 		COPY_TO_USER(varg, &ab, sizeof(struct AB));
 		return rc;
+	}
+	case AFHBA_START_AI_ABN: {
+		struct ABN *abn = kmalloc(sizeof(struct ABN), GFP_KERNEL);
+		long rc;
+		COPY_FROM_USER(abn, varg, sizeof(struct ABN));
+		rc = afs_start_AI_ABN(adev, abn);
+		COPY_TO_USER(varg, abn, sizeof(struct ABN));
 	}
 	default:
 		return -ENOTTY;
