@@ -442,8 +442,9 @@ static void afs_load_dram_descriptors(
 
 
 #define LL_MAX_CNT	16
+#define LL_BLOCK	64
 #define LL_NB(cnt)	((cnt)-1)
-#define LL_MAX_LEN	(LL_MAX_CNT*64)
+#define LL_MAX_LEN	(LL_MAX_CNT*LL_BLOCK)
 
 static void afs_load_dram_descriptors_ll(
 	struct AFHBA_DEV *adev, enum DMA_SEL dma_sel,
@@ -460,8 +461,15 @@ static void afs_load_dram_descriptors_ll(
 		struct XLLC_DEF* bd = &buffers[ib];
 		int idb = 0;
 		for ( ; idb*LL_MAX_LEN < bd->len; ++idb, ++cursor){
-			u32 dma_desc = (bd->pa + idb*LL_MAX_LEN)
-					| LL_NB(LL_MAX_CNT)<< AFDMAC_DESC_LEN_SHL
+			u32 dma_desc;
+			int cnt;
+			int residue = bd->len - idb*LL_MAX_LEN;
+			
+			residue = min(residue, LL_MAX_LEN);
+			cnt = residue/LL_BLOCK;
+
+			dma_desc = (bd->pa + idb*LL_MAX_LEN)
+					| LL_NB(cnt)<< AFDMAC_DESC_LEN_SHL
 					| (idb&0x0f);
 			dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
 				"afs_load_dram_descriptors_ll", idb, dma_desc);
@@ -1857,6 +1865,7 @@ long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
+	int ib;
 
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
@@ -1864,7 +1873,6 @@ long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
 	sdev->onStopPush = afs_stop_llc_push;
 
 	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
-		int ib;
 		abn->buffers[0].pa = sdev->hbx[0].pa;
 
 		for (ib = 1; ib < abn->ndesc; ++ib){
@@ -1872,7 +1880,12 @@ long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
 		}
 	}
 
-	afs_load_dram_descriptors(adev, DMA_PUSH_SEL, abn->buffers, abn->ndesc);
+	for (ib = 0; ib < abn->ndesc; ++ib){
+		dev_dbg(pdev(adev), "%s [%2d] pa:%08x len:%d", 
+				__FUNCTION__, ib, abn->buffers[ib].pa, abn->buffers[ib].len);
+	}
+
+	afs_load_dram_descriptors_ll(adev, DMA_PUSH_SEL, abn->buffers, abn->ndesc);
 
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
@@ -1925,6 +1938,7 @@ long afs_dma_ioctl(struct file *file,
 		COPY_FROM_USER(abn, varg, sizeof(struct ABN));
 		rc = afs_start_AI_ABN(adev, abn);
 		COPY_TO_USER(varg, abn, sizeof(struct ABN));
+		return rc;
 	}
 	default:
 		return -ENOTTY;
