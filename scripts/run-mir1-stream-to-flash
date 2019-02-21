@@ -8,7 +8,11 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+HN=$(/home/dt100/bin/get-ident $DN | awk '{ print $3 }')
 
-cd /home/ecei/PROJECTS/AFHBA404
-mate-terminal --title="mir-stream-to-flash $DN" \
-    -e "./scripts/mir1-stream-to-flash $DN" &
+cd /home/dt100/PROJECTS/AFHBA404
+
+#mate-terminal --title="mir-stream-to-flash $DN" \
+#    -e "./scripts/mir1-stream-to-flash $DN" &
+
+unbuffer ./scripts/mir1-stream-to-flash $DN > /tmp/$HN.hts &

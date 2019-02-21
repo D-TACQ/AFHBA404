@@ -30,7 +30,7 @@ LLC_CLK=${LLC_CLK:-ext}
 SOFT_TRIGGER=${SOFT_TRIGGER:-0}
 
 # default transient mode, set # samples.  "no": run continuous mode
-TRANSIENT=${TRANSIENT:-100000}
+TRANSIENT=${TRANSIENT:-2000000}
 
 
 AISITES=${AISITES:-1,2,3}
@@ -42,13 +42,21 @@ AOSITES=${AOSITES:-5,6}
 # pick off the first AO site as M.
 AO=${AOSITES%,*}
 
+# DO assume ALL OUTPUTS. 
+DOSITES=${DOSITES:-""}
+DO="${DOSITES/,/ }"
+
 # route AI data to both CA and CB
 CA_SITES=${AISITES}
 CB_SITES=${AISITES}
 
 XO_COMMS=${XO_COMMS:-A}
 
+NSPAD=16
 
+XISITES=$AISITES
+XOSITES=$AOSITES
+PAD=0
 
 init_comms() {	
 	cx=$1
@@ -81,15 +89,42 @@ init_2106() {
 		remote_cmd $AI CLKDIV=$INTCLKDIV
 		echo setting internal clock / $INTCLKDIV
 	fi
-	remote_cmd $SC distributor sites=$AOSITES comms=$XO_COMMS on
+	
+	
+	if [ "x$DOSITES" != "x" ]; then
+#		if [ "x$XISITES" != "x" ]; then
+#			XISITES=$XISITES,$DOSITES
+#		else
+#			XISITES=$DOSITES
+#		fi
+		if [ "x$XOSITES" != "x" ]; then
+			XOSITES=$XOSITES,$DOSITES
+		else
+			XOSITES=$DOSITES
+		fi
+		PAD=16		
+		for dox in $DO; do
+			remote_cmd $dox clkdiv 1
+			remote_cmd $dox lotide 256
+			remote_cmd $dox byte_is_output 1,1,1,1
+			remote_cmd $dox mode 1
+			# slave AO on AI site 1 master clock
+			remote_cmd $dox clk=1,2,1
+			remote_cmd $dox clkdiv=1 
+			let NSPAD=$NSPAD-1
+			let PAD=$PAD-1
+		done
+	fi
+	remote_cmd $SC distributor sites=$XOSITES pad=$PAD comms=$XO_COMMS on
 	remote_cmd $AO lotide 256
 	# slave AO on AI site 1 master clock
 	remote_cmd $AO clk=1,2,1
 	remote_cmd $AO clkdiv=1 
+	
 
-	# 16 word scratchpad, include TLATCH at 0.
-	remote_cmd $SC spad=1,16,0	
-	remote_cmd $SC run0 $AISITES
+	# scratchpad, include TLATCH at 0, pad to 64 bytes
+	remote_cmd $SC spad=1,$NSPAD,0	
+	remote_cmd $SC run0 $XISITES
 	
 	init_comms $CA $CA_SITES
 	init_comms $CB $CB_SITES

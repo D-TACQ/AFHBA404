@@ -1,0 +1,6 @@
+
+for ch in 1 2 3 4 5 6 7 8
+do
+	./pwm_control $ch ${ch}000 2>/dev/null >/dev/null &
+done
+

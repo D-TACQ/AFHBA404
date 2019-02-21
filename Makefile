@@ -1,6 +1,6 @@
 obj-m += afhba.o
 #obj-m += afhbaspi.o
-obj-m += afhbasfp.o
+#obj-m += afhbasfp.o
 
 SRC := $(shell pwd)
 LDRV:= $(SRC)/linux/drivers

@@ -52,6 +52,14 @@ struct AB {
 	struct XLLC_DEF buffers[2];
 };
 
+#define MAXABN	16
+
+struct ABN {
+	int ndesc;
+	struct XLLC_DEF buffers[MAXABN];
+	/* others tag on behind */
+};
+
 #define RTM_T_USE_HOSTBUF	0
 
 #define DMAGIC 0xDB
@@ -79,6 +87,8 @@ struct AB {
 /**< ioctl ACQ2106 Start AI, Buffer A/B struct XLLC_DEF [2]. 
  * streaming rules: 4K boundary, 1K size modulus
  */
+
+#define AFHBA_START_AI_ABN	_IOWR(DMAGIC, 8, struct ABN)
 
 struct StreamBufferDef {
 	u32 ibuf;

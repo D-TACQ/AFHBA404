@@ -40,14 +40,13 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
-/* Kludge alert */
-typedef unsigned       u32;
-typedef unsigned short u16;
-typedef unsigned char  u8;
+#include "afhba-get_shared_mapping.h"
 
-#include "../rtm-t_ioctl.h"
+
 #define HB_FILE "/dev/rtm-t.%d"
 #define LOG_FILE	"afhba.%d.log"
+
+#define HB1	"/dev/rtm-t.%d.data/hb01"
 
 
 #include <time.h>
@@ -78,6 +77,18 @@ unsigned difftime_us(void)
 	ts0 = ts1;
 	return dt;
 }
+
+extern int *shm;
+
+extern void shm_connect();
+
+
+#define SHM_INTS	128
+
+#define SHM_LEN 	(SHM_INTS*sizeof(int))
+
+#define SHM_SAMPLE	0
+
 
 
 #endif /* LLCONTROL_AFHBA_LLCONTROL_COMMON_H_ */

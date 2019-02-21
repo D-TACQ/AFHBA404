@@ -35,6 +35,7 @@ export RECYCLE=0 RTM_DEVNUM=$DN OUTROOT=/mnt/datastream/ACQ400DATA/$DN/${ACQ2106
 mkdir -p ${OUTROOT}
 export PUT4KPERFILE=1
 fan_hi
+echo values MB/s
 ./STREAM/rtm-t-stream-disk | pv > /dev/null
 fan_lo
 
