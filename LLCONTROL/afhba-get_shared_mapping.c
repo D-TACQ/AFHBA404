@@ -45,8 +45,13 @@ void get_shared_mapping(int devnum, int ibuf, struct XLLC_DEF* xllc_def, void** 
 		perror( "mmap" );
 	    exit(errno);
 	}else{
+		unsigned pwm_offset = 0;
+		if (getenv("PWM_OFFSET") != 0){
+			pwm_offset = strtoul(getenv("PWM_OFFSET"), 0, 0);
+			printf("PWM_OFFSET set %d\n", pwm_offset);
+		}
 		if (pbuf != 0){
-			*pbuf = va;
+			*pbuf = va + pwm_offset;
 		}
 	}
 	if (xllc_def == 0){
