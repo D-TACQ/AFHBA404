@@ -83,7 +83,9 @@ struct XLLC_DEF ai_def = {
 };
 
 #define AO_CHAN	64
-#define DO_CHAN 32
+//#define DO_CHAN 32
+#define DO_CHAN 96
+
 //#define VO_LEN  (AO_CHAN*sizeof(short) + sizeof(unsigned))
 #define VO_LEN	(AO_CHAN*sizeof(short) + DO_CHAN*sizeof(short))
 
