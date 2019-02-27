@@ -77,12 +77,7 @@ int has_do32;
 #undef NSHORTS
 #define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
-#undef SPIX
-#define SPIX	(NSHORTS/2-spadlongs)
-#undef TLATCH
-#define TLATCH(buf) (&((volatile unsigned*)(buf))[SPIX])      /* actually, sample counter */
-#undef SPAD1
-#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
+
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,

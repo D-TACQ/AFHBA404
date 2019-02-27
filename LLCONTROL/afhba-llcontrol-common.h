@@ -65,13 +65,14 @@ int spadlongs = 16;
 
 #define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
 #define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
+#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))			/* Scratch Pad IndeX */
 /* ai_buffer is a local copy of host buffer */
 #define CH01 (((volatile short*)ai_buffer)[0])
 #define CH02 (((volatile short*)ai_buffer)[1])
 #define CH03 (((volatile short*)ai_buffer)[2])
 #define CH04 (((volatile short*)ai_buffer)[3])
-#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
+
+#define TLATCH(lb) (&((volatile unsigned*)(lb))[SPIX])      /* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 
@@ -194,7 +195,7 @@ void check_tlatch_action(void *local_buffer)
 	static int errcount;
 	short *ai_buffer = local_buffer;
 
-	unsigned tl1 = *TLATCH;
+	unsigned tl1 = *TLATCH(local_buffer);
 	if (tl1 != tl0+1){
 		if (++errcount < 100){
 			printf("%d => %d\n", tl0, tl1);

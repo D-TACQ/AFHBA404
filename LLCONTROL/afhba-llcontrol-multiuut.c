@@ -38,8 +38,6 @@
 
 */
 
-
-
 #include "afhba-llcontrol-common.h"
 
 /* SPLIT single HB into 2
@@ -66,9 +64,6 @@ struct Dev devs[4] = {
 int devmax = 4;
 
 #define FORALL for (int id = 0; id < devmax; ++id)
-
-#undef TLATCH
-#define TLATCH(id) ((volatile unsigned*)(devs[id].lbuf)+SPIX)      /* actually, sample counter */
 
 
 void* host_buffer;
@@ -196,12 +191,12 @@ void run(void (*action)(void*))
 
 
 	mlockall(MCL_CURRENT);
-	FORALL TLATCH(id)[0] = tl0;
+	FORALL TLATCH(devs[id].lbuf)[0] = tl0;
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
 			memcpy(devs[id].lbuf, devs[id].host_buffer, VI_LEN);
-			while((tl1 = TLATCH(id)[0]) == tl0){
+			while((tl1 = TLATCH(devs[id].lbuf)[0]) == tl0){
 				sched_yield();
 				memcpy(devs[id].lbuf, devs[id].host_buffer, VI_LEN);
 				++pollcat[id];
@@ -209,8 +204,8 @@ void run(void (*action)(void*))
 		}
 
 		FORALL {
-			TLATCH(id)[1] = pollcat[id];
-			TLATCH(id)[2] = difftime_us();
+			TLATCH(devs[id].lbuf)[1] = pollcat[id];
+			TLATCH(devs[id].lbuf)[2] = difftime_us();
 			action(devs[id].lbuf);
 		}
 

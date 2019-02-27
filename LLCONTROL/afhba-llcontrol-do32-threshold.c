@@ -228,19 +228,19 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
 	if (!dummy_first_loop){
-		TLATCH[0] = tl0;
+		TLATCH(ai_buffer)[0] = tl0;
 	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = TLATCH[0]) == tl0){
+		while((tl1 = TLATCH(ai_buffer)[0]) == tl0){
 //			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
 		}
 		control(xo_buffer, ai_buffer);
-		TLATCH[1] = sample > 1 ? pollcat: 0;
-		TLATCH[2] = sample > 1 ? difftime_us(): 0;
+		TLATCH(ai_buffer)[1] = sample > 1 ? pollcat: 0;
+		TLATCH(ai_buffer)[2] = sample > 1 ? difftime_us(): 0;
 		action(ai_buffer);
 
 		if (verbose){
