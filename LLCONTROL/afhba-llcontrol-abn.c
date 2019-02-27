@@ -61,7 +61,7 @@ int fd;
 int NDESC = MAXABN;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-int sched_fifo_priority = 1;
+
 int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
@@ -102,62 +102,6 @@ struct XLLC_DEF xllc_def = {
  * [0] : AI
  * [1] : AO
  */
-void get_mapping() {
-	char fname[80];
-	int ib;
-	sprintf(fname, HB_FILE, devnum);
-	fd = open(fname, O_RDWR);
-	if (fd < 0){
-		perror(fname);
-		exit(errno);
-	}
-
-	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (host_buffer == (caddr_t)-1 ){
-		perror( "mmap" );
-	        exit(errno);
-	}
-	for (ib = 0; ib < NDESC; ++ib){
-		bufferABN[ib] = host_buffer + ib * PAGE_SIZE;
-	}
-}
-
-void setAffinity(unsigned cpu_mask)
-{
-       int cpu = 0;
-        cpu_set_t cpu_set;
-        CPU_ZERO(&cpu_set);
-        for (cpu = 0; cpu < 32; ++cpu){
-                if ((1<<cpu) &cpu_mask){
-                        CPU_SET(cpu, &cpu_set);
-                }
-        }
-        printf("setAffinity: %d,%d,%d,%d\n",
-                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
-                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
-                        );
-
-        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
-        if (rc != 0){
-                perror("sched_set_affinity");
-                exit(1);
-        }
-}
-
-
-void goRealTime(void)
-{
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
-
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
-}
 
 
 void write_action(void *data)
@@ -264,7 +208,7 @@ void setup()
 	char logfile[80];
 	int ib;
 	sprintf(logfile, log_file, devnum);
-	get_mapping();
+	host_buffer = get_mapping(devnum, &fd);
 	goRealTime();
 	struct ABN abn;
 	fp_log = fopen(logfile, "w");

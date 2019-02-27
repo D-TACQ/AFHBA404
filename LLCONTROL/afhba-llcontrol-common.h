@@ -43,11 +43,12 @@
 #include "afhba-get_shared_mapping.h"
 
 
-#define HB_FILE "/dev/rtm-t.%d"
+#define HB_FILE 	"/dev/rtm-t.%d"
 #define LOG_FILE	"afhba.%d.log"
 
-#define HB1	"/dev/rtm-t.%d.data/hb01"
+#define HB1		"/dev/rtm-t.%d.data/hb01"
 
+#define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 
 #include <time.h>
 
@@ -82,6 +83,7 @@ extern int *shm;
 
 extern void shm_connect();
 
+int sched_fifo_priority = 1;
 
 #define SHM_INTS	128
 
@@ -89,6 +91,63 @@ extern void shm_connect();
 
 #define SHM_SAMPLE	0
 
+void* get_mapping(dev_t devnum, int *pfd) {
+	char fname[80];
+	int fd;
+	void *host_buffer;
+
+	sprintf(fname, HB_FILE, devnum);
+	fd = open(fname, O_RDWR);
+	if (fd < 0){
+		perror(fname);
+		exit(errno);
+	}
+
+	host_buffer = mmap(0, HB_LEN*2, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	if (host_buffer == (caddr_t)-1 ){
+		perror( "mmap" );
+	        exit(errno);
+	}
+	if(pfd) *pfd = fd;
+	return host_buffer;
+}
+
+void setAffinity(unsigned cpu_mask)
+{
+	int cpu = 0;
+        cpu_set_t cpu_set;
+        CPU_ZERO(&cpu_set);
+        for (cpu = 0; cpu < 32; ++cpu){
+                if ((1<<cpu) &cpu_mask){
+                        CPU_SET(cpu, &cpu_set);
+                }
+        }
+        printf("setAffinity: %d,%d,%d,%d\n",
+                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
+                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
+                        );
+
+        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
+        if (rc != 0){
+                perror("sched_set_affinity");
+                exit(1);
+        }
+}
+
+
+void goRealTime(void)
+{
+	struct sched_param p = {};
+	p.sched_priority = sched_fifo_priority;
+
+
+
+	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
+
+	if (rc){
+		perror("failed to set RT priority");
+	}
+}
 
 
 #endif /* LLCONTROL_AFHBA_LLCONTROL_COMMON_H_ */
