@@ -69,9 +69,6 @@ FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 0;
 
 int has_do32;
 
@@ -80,7 +77,9 @@ int has_do32;
 float G_setpoint = 1000;
 
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#undef NSHORTS
 #define NSHORTS		(NSHORTS1*samples_buffer)
+#undef VI_LEN
 #define VI_LEN 		(NSHORTS*sizeof(short))
 #define VI_LONGS	(VI_LEN/sizeof(unsigned))
 
@@ -114,12 +113,6 @@ struct XLLC_DEF xllc_def_ao;
 
 void null_action(void* data)
 {}
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
 
 int control_none(unsigned* xo, short* ai, short ai10);
 

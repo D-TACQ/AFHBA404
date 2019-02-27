@@ -70,19 +70,18 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 16;
-
 short* xo_buffer;
 int has_do32;
 
 #define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#undef NSHORTS
 #define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
+#undef SPIX
 #define SPIX	(NSHORTS/2-spadlongs)
-
+#undef TLATCH
 #define TLATCH(buf) (&((volatile unsigned*)(buf))[SPIX])      /* actually, sample counter */
+#undef SPAD1
 #define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
@@ -94,41 +93,6 @@ struct XLLC_DEF xllc_def = {
 
 #define DO_IX   0
 
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
-
-
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-	static int errcount;
-	static int call_count;
-	short *ai_buffer = local_buffer;
-
-	++call_count;
-
-	if (tl0 == 0){
-		tl0 = *TLATCH(ai_buffer);
-	}else{
-		unsigned tl1 = *TLATCH(ai_buffer);
-		if (tl1 != tl0+samples_buffer){
-			if (++errcount < 100){
-				printf("ERROR:%5d %08x => %08x\n", call_count, tl0, tl1);
-			}else if (errcount == 100){
-				printf("stop reporting at 100 errors ..\n");
-			}
-		}
-		tl0 = tl1;
-	}
-}
 
 void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);

@@ -56,6 +56,25 @@
 #define US 1000000
 #define NSUS (NS/US)
 
+#ifndef DEF_NCHAN
+#define DEF_NCHAN 	16
+#endif
+int nchan = DEF_NCHAN;
+int spadlongs = 16;
+
+
+#define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
+#define VI_LEN 	(NSHORTS*sizeof(short))
+#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
+/* ai_buffer is a local copy of host buffer */
+#define CH01 (((volatile short*)ai_buffer)[0])
+#define CH02 (((volatile short*)ai_buffer)[1])
+#define CH03 (((volatile short*)ai_buffer)[2])
+#define CH04 (((volatile short*)ai_buffer)[3])
+#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
+#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
+
+
 unsigned difftime_us(void)
 /* return delta time in usec */
 {
@@ -149,5 +168,41 @@ void goRealTime(void)
 	}
 }
 
+FILE* fp_log;
+
+void write_action(void *data)
+{
+	fwrite(data, sizeof(short), NSHORTS, fp_log);
+}
+
+void setup_logging(int devnum)
+{
+	char logfile[80];
+	sprintf(logfile, LOG_FILE, devnum);
+
+	fp_log = fopen(logfile, "w");
+	if (fp_log == 0){
+		perror(logfile);
+		exit(1);
+	}
+
+}
+
+void check_tlatch_action(void *local_buffer)
+{
+	static unsigned tl0;
+	static int errcount;
+	short *ai_buffer = local_buffer;
+
+	unsigned tl1 = *TLATCH;
+	if (tl1 != tl0+1){
+		if (++errcount < 100){
+			printf("%d => %d\n", tl0, tl1);
+		}else if (errcount == 100){
+			printf("stop reporting at 100 errors ..\n");
+		}
+	}
+	tl0 = tl1;
+}
 
 #endif /* LLCONTROL_AFHBA_LLCONTROL_COMMON_H_ */

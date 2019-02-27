@@ -42,6 +42,11 @@
 
 #include "afhba-llcontrol-common.h"
 
+/* SPLIT single HB into 2
+ * [0] : AI
+ * [1] : AO
+ */
+
 #define AO_OFFSET (HB_LEN/2)
 
 
@@ -52,7 +57,7 @@ int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
 
 int verbose;
-FILE* fp_log;
+
 void (*G_action)(void*);
 int devnum = 0;
 int dummy_first_loop;
@@ -62,9 +67,6 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 16;
 
 short* ao_buffer;
 int has_do32;
@@ -72,16 +74,6 @@ int has_do32;
 int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
 short *AO_IDENT;
 
-#define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
-#define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
-/* ai_buffer is a local copy of host buffer */
-#define CH01 (((volatile short*)ai_buffer)[0])
-#define CH02 (((volatile short*)ai_buffer)[1])
-#define CH03 (((volatile short*)ai_buffer)[2])
-#define CH04 (((volatile short*)ai_buffer)[3])
-#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -95,33 +87,6 @@ int aochan = DEF_AO_CHAN;
 #define DO_IX	(16)		/* longwords */
 
 
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
-
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-	static int errcount;
-	short *ai_buffer = local_buffer;
-
-	unsigned tl1 = *TLATCH;
-	if (tl1 != tl0+1){
-		if (++errcount < 100){
-			printf("%d => %d\n", tl0, tl1);
-		}else if (errcount == 100){
-			printf("stop reporting at 100 errors ..\n");
-		}
-	}
-	tl0 = tl1;
-}
 
 void control_dup1(short *ao, short *ai);
 void (*G_control)(short *ao, short *ai) = control_dup1;
@@ -226,15 +191,9 @@ void ui(int argc, char* argv[])
 
 void setup()
 {
-	char logfile[80];
-	sprintf(logfile, LOG_FILE, devnum);
+	setup_logging(devnum);
 	host_buffer = get_mapping(devnum, &fd);
 	goRealTime();
-	fp_log = fopen(logfile, "w");
-	if (fp_log == 0){
-		perror(logfile);
-		exit(1);
-	}
 
 	xllc_def.len = samples_buffer*VI_LEN;
 	if (xllc_def.len > 16*64){
