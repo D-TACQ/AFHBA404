@@ -27,6 +27,7 @@ APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
 	afhba-llcontrol-do32-threshold \
 	afhba-bufferAB-do32-threshold \
 	afhba-llcontrol-two-fiber \
+	afhba-llcontrol-multiuut \
 	afhba-bufferAB-480-pwm pwm_set_channel pwm_set_duty pwm_control \
 	afhba-llcontrol-abn
 	
