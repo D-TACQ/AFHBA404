@@ -12,7 +12,7 @@ UUT2=acq2106_079
 
 echo llc-run-full-auto-two-076-079 UUT1=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
-export acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
+export acq2106_076_path=andros:://home/dt100/TREES/acq2106_076
 
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
@@ -46,11 +46,15 @@ control_program() {
 # isolcpus=4,5,6,7,8...
 # taskset 0x10 means "run on processor 4"
 	export TASKSET="taskset 0x10"
+# New variable to offset the PWM dataset in the VO Buffer
+        export PWM_OFFSET=132
 	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 	$TASKSET ./afhba-llcontrol-two-fiber $POST &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
 	echo CONTROL PROGRAM 99
+        sleep 5
+        echo "MDSput slice"
 	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
 		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
 		$UUT1 afhba.0.log
@@ -58,10 +62,10 @@ control_program() {
 
 control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
-        echo CONTROL SCRIPT 01
-#        SITECLIENT_TRACE=1
-	./llc-test-harness-twobox.py $UUT1 $UUT2
-        echo CONTROL SCRIPT 99
+       echo CONTROL SCRIPT 01
+       SITECLIENT_TRACE=1
+       SIMULATE="5,6" DOSITES="5,6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
+       echo CONTROL SCRIPT 99
        )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
         STATUSMONITOR_TRACE=0 ./acq400_capture.py \
