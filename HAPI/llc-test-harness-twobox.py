@@ -16,8 +16,11 @@ EXTCLKDIV = int(os.getenv("EXTCLKDIV", "10"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 AOSITES = os.getenv("AOSITES", "1,2")
+# If you have two DIO cards then include them below
+# even if one (or both) is a PWM.
 DOSITES = os.getenv("DOSITES", "5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
+PWMSITES = os.getenv("PWMSITES", "")
 
 def hit_resets(svc):
     return None
@@ -41,6 +44,7 @@ def init_ai(uut):
     for s in uut.modules:
         uut.modules[s].simulate = '1' if str(s) in SIMULATE else '0'
     uut.s0.spad = '1,16,0'
+    uut.s0.aggregator = 'sites={}'.format(AISITES)
     uut.cA.spad = '1'
     uut.cA.aggregator = 'sites={}'.format(AISITES)
     uut.cB.spad = '1'
@@ -62,6 +66,11 @@ def init_ao(uut, slave=False):
         # uut.s0.distributor = "sites={} comms=2 pad=0 on".format(AOSITES)
         uut.s0.distributor = "sites={} comms=A pad=0 on".format(AOSITES)
         print "DEBUG -- distributor"
+
+    if PWMSITES != "":
+        for pwmsite in PWMSITES.split(','):
+            pwm = "s{}".format(pwmsite)
+            uut.svc[pwm].pwm_clkdiv = "3e8" # 1000 in hex.
 
     if DOSITES != "":
 
