@@ -64,7 +64,7 @@ control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
        echo CONTROL SCRIPT 01
        SITECLIENT_TRACE=1
-       SIMULATE="5,6" DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
+       DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
        echo CONTROL SCRIPT 99
        )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
