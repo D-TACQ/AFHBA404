@@ -64,7 +64,7 @@ control_script() {
        (cd PROJECTS/AFHBA404/HAPI;
        echo CONTROL SCRIPT 01
        SITECLIENT_TRACE=1
-       SIMULATE="5,6" DOSITES="5,6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
+       SIMULATE="5,6" DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
        echo CONTROL SCRIPT 99
        )
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
@@ -74,6 +74,16 @@ control_script() {
        )
 }
 
+
+pwm_control() {
+    cd ~/PROJECTS/AFHBA404/LLCONTROL/
+    # Inserts PWM control data into the host buffer. 
+    # Set all channels to 0. 
+    PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel 0 0
+    # Set first channel for test. 
+    PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel 0 1 1000 250 750
+    cd ~
+}
 
 
 case "x$1" in
@@ -85,6 +95,7 @@ xcontrol_script)
 	control_script;;
 *)
 	set_clocks
+        pwm_control
 	new_shot --verbose 1 $UUT1
 	sudo $0 control_program &
 
