@@ -92,8 +92,7 @@ struct XLLC_DEF ai_def = {
 
 #define DO_IX	(16)		/* longwords */
 
-//int MAXCOPY = AO_CHAN;
-int MAXCOPY = AO_CHAN + DO_CHAN;
+int MAXCOPY = AO_CHAN;
 
 struct XLLC_DEF ao_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -326,7 +325,7 @@ void control_dup1(short *ao, short *ai)
                     ao[65] = 0xFFFF;
                 };
         }
-        
+
         if(has_do32 > 1) {
             copy_tlatch_to_do32(ao, ai);
         }
