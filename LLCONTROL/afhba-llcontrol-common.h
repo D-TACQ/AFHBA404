@@ -123,7 +123,7 @@ void* get_mapping(dev_t devnum, int *pfd) {
 		exit(errno);
 	}
 
-	host_buffer = mmap(0, HB_LEN*2, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 	if (host_buffer == (caddr_t)-1 ){
 		perror( "mmap" );
 	        exit(errno);
