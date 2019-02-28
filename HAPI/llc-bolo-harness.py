@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 """ 
-llc-bolo-harness.py UUT1 
+Usage:
+
+AISITES="1" SPAD_LEN=8 python HAPI/llc-bolo-harness.py acq2106_123
+
+AISITES="1,2" SPAD_LEN=16 python HAPI/llc-bolo-harness.py acq2106_123
 """
 
 
@@ -14,6 +18,12 @@ import os
 
 AISITES = os.getenv("AISITES", "1")
 SPAD_LEN = os.getenv("SPAD_LEN", 8)
+
+if AISITES != "1":
+    for value in ["2","3","4","5","6"]:
+        if AISITES == value:
+           print "Doing this can cause system issues. Set AI sites to '1,2' etc."
+           quit()
 
 def hit_resets(svc):    
     for knob in svc.help():
