@@ -41,7 +41,7 @@ void get_shared_mapping(int devnum, int ibuf, struct XLLC_DEF* xllc_def, void** 
 		exit(errno);
 	}
 	va = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (va == (caddr_t)-1 ){
+	if (va == (void*)-1 ){
 		perror( "mmap" );
 	    exit(errno);
 	}else{

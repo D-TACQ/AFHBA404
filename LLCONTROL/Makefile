@@ -11,7 +11,7 @@ else
 SPI_SUPPORT=
 endif
 
-CFLAGS += -O2
+CFLAGS += -O2 -std=c99
 LDLIBS += -lm -lrt -lpopt -lpthread
 
 # default build is the local kernel.
