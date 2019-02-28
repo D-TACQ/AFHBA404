@@ -96,6 +96,7 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("DEVMAX")){
 		devmax = atoi(getenv("DEVMAX"));
+		printf("DEVMAX set %d\n", devmax);
 	}
 	/* own PA eg from GPU */
 	if (getenv("PA_BUF")){
@@ -168,7 +169,7 @@ void get_connected()
 void setup()
 {
 	setup_logging(devnum);
-	host_buffer = get_mapping(devnum, &fd);
+	get_connected();
 	goRealTime();
 }
 
@@ -182,13 +183,11 @@ void print_sample(unsigned sample, unsigned tl)
 
 void run(void (*action)(void*))
 {
-	short* ai_buffer = calloc(NSHORTS, sizeof(short));
 	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
 	unsigned tl1;
 	unsigned sample;
 	int println = 0;
 	int pollcat[4] = {};
-
 
 	mlockall(MCL_CURRENT);
 	FORALL TLATCH(devs[id].lbuf)[0] = tl0;
@@ -204,8 +203,9 @@ void run(void (*action)(void*))
 		}
 
 		FORALL {
-			TLATCH(devs[id].lbuf)[1] = pollcat[id];
-			TLATCH(devs[id].lbuf)[2] = difftime_us();
+			/* TLATCH [1] is usecs from HW */
+			TLATCH(devs[id].lbuf)[2] = pollcat[id];
+			TLATCH(devs[id].lbuf)[3] = difftime_us();
 			action(devs[id].lbuf);
 		}
 

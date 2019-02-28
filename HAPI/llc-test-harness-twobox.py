@@ -12,7 +12,7 @@ import time
 import os
 
 
-EXTCLKDIV = int(os.getenv("EXTCLKDIV", "10"))
+EXTCLKDIV = int(os.getenv("EXTCLKDIV", "100"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 AOSITES = os.getenv("AOSITES", "1,2")
@@ -88,9 +88,9 @@ def run_main(args):
     # if two boxes ASSUME second box AO
     if len(uuts) > 1:
         init_ao(uuts[1], slave=True)
-    else:
-    	print("init_ao {}".format(uuts[0].uut))
-        init_ao(uuts[0], slave=True)
+    #else:
+    	#print("init_ao {}".format(uuts[0].uut))
+        #init_ao(uuts[0], slave=True)
 
 
 if __name__ == '__main__':
