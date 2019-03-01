@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-acq2106_llc-run-full-auto-two.py UUT1 UUT2
+thomson_config.py
 """
 
 
@@ -13,8 +13,6 @@ import os
 EXTCLKDIV = int(os.getenv("EXTCLKDIV", "100"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
-AOSITES = os.getenv("AOSITES", "1,2")
-DOSITES = os.getenv("DOSITES", "5")
 XOCOMMS = os.getenv("XOCOMMS", "A")
 
 
@@ -25,22 +23,26 @@ def hit_resets(svc):
 
 
 def clear_counters(uuts):
+    uutn = 0
     for uut in uuts:
         for cx in [ 'cA', 'cB']:
             hit_resets(uut.svc[cx])
+        uut.s0.spad4 = "{}{}{}{}{}".format('4444', uutn, uutn, uutn, uutn)
+        uut.s0.spad5 = "{}{}{}{}{}".format('5555', uutn, uutn, uutn, uutn)
+        uut.s0.spad6 = "{}{}{}{}{}".format('6666', uutn, uutn, uutn, uutn)
+        uut.s0.spad7 = "{}{}{}{}{}".format('7777', uutn, uutn, uutn, uutn)
+        uutn += 1
 
 
 def init_clks(uut):
     uut.s1.CLKDIV = EXTCLKDIV
     uut.s1.clkdiv = EXTCLKDIV
-    uut.s0.SIG_SYNC_OUT_CLK_DX = "d2"
+# use raw clock, avoid sync with slow sample clock
+#    uut.s0.SIG_SYNC_OUT_CLK_DX = "d2"
 
 
 def init_spad_us(uut):
-    trg = uut.s1.trg
-    trg = trg[4:9]
-    print "trg = ", trg
-    uut.s0.spad1_us = trg
+    uut.s0.spad1_us = '1,2,1' 			# start counting on derived trigger
 
 
 def init_ai(uut):
@@ -68,7 +70,7 @@ def run_main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="aq2106_llc-run-full-auto-two.py")
+    parser = argparse.ArgumentParser(description="thomson_config.py")
     parser.add_argument("uuts", nargs='+', help="name the uuts")
     run_main(parser.parse_args())
 
