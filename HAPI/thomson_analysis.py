@@ -18,37 +18,39 @@ def plot_chan(data, chan, total_systems):
     plt.show()
 
 
-#short_data = np.fromfile("LLCONTROL/afhba.0.log", dtype=np.int16)
-#long_data = np.fromfile("LLCONTROL/afhba.0.log", dtype=np.int32)
-short_data = np.fromfile("afhba.0.log", dtype=np.int16)
-long_data = np.fromfile("afhba.0.log", dtype=np.int32)
+def run_analysis(args):
+    short_data = np.fromfile("afhba.0.log", dtype=np.int16)
+    long_data = np.fromfile("afhba.0.log", dtype=np.int32)
 
 
-sample_count = check_column(long_data, 96, 112, 4)
+    sample_count = check_column(long_data, 96, 112, 4)
 
-for num, counter in enumerate(sample_count[0]):
-    print "1:  {0:10}  ".format(sample_count[0][num]), "2:  {0:10}  ".format(sample_count[1][num]), "3:  {0:10}  ".format(sample_count[2][num]), "4:  {0:10}  ".format(sample_count[3][num])
+    for num, counter in enumerate(sample_count[0]):
+        print "1:  {0:10}  ".format(sample_count[0][num]), "2:  {0:10}  ".format(sample_count[1][num]), "3:  {0:10}  ".format(sample_count[2][num]), "4:  {0:10}  ".format(sample_count[3][num])
 
-print "\n \n"
+    print "\n \n"
 
-usec_count = check_column(long_data, 97, 112, 4)
+    usec_count = check_column(long_data, 97, 112, 4)
 
-for num, counter in enumerate(usec_count[0]):
-    print "1:  {0:10}  ".format(usec_count[0][num]), "2:  {0:10}  ".format(usec_count[1][num]), "3:  {0:10}  ".format(usec_count[2][num]), "4:  {0:10}  ".format(usec_count[3][num])
-
-
-if sample_count[0] == sample_count[1] and sample_count[1] == sample_count[2] and sample_count[2] == sample_count[3]:
-    print "Sample numbers identical"
+    for num, counter in enumerate(usec_count[0]):
+        print "1:  {0:10}  ".format(usec_count[0][num]), "2:  {0:10}  ".format(usec_count[1][num]), "3:  {0:10}  ".format(usec_count[2][num]), "4:  {0:10}  ".format(usec_count[3][num])
 
 
-#for item in sample_count:
-#    print item
+    if sample_count[0] == sample_count[1] and sample_count[1] == sample_count[2] and sample_count[2] == sample_count[3]:
+        print "Sample numbers identical"
 
-plot_chan(short_data, 1, 4)
 
-#data = short_data[0:191]
+    plot_chan(short_data, 1, 4)
+    return None
 
-#for channel in short_data[]
-#print "Average data value"
+
+def run_main():
+    parser = argparse.ArgumentParser(description='thomson analysis')
+    parser.add_argument('--verbose', type=int, default=0, help="verbose")
+    run_analysis(parser.parse_args())
+
+
+if __name__  == '__main__':
+    run_main()
 
 
