@@ -126,7 +126,7 @@ void get_mapping(struct Device *device) {
 
 	device->mapping = mmap(0, HB_LEN*2,
 			PROT_READ|PROT_WRITE, MAP_SHARED, device->fd, 0);
-	if (device->mapping == (caddr_t)-1 ){
+	if (device->mapping == (void*)-1 ){
 		perror( "mmap" );
 	        exit(errno);
 	}

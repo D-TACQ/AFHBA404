@@ -40,11 +40,14 @@
 
 
 
-#define HB_LEN	0x1000
-
 #include "afhba-llcontrol-common.h"
 
+/* SPLIT single HB into 2
+ * [0] : AI
+ * [1] : AO
+ */
 
+#define AO_OFFSET (HB_LEN/2)
 
 
 
@@ -52,9 +55,9 @@ void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-int sched_fifo_priority = 1;
+
 int verbose;
-FILE* fp_log;
+
 void (*G_action)(void*);
 int devnum = 0;
 int dummy_first_loop;
@@ -64,9 +67,6 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 16;
 
 short* ao_buffer;
 int has_do32;
@@ -74,16 +74,6 @@ int has_do32;
 int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
 short *AO_IDENT;
 
-#define NSHORTS	(nchan+spadlongs*sizeof(unsigned)/sizeof(short))
-#define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(nchan*sizeof(short)/sizeof(unsigned))
-/* ai_buffer is a local copy of host buffer */
-#define CH01 (((volatile short*)ai_buffer)[0])
-#define CH02 (((volatile short*)ai_buffer)[1])
-#define CH03 (((volatile short*)ai_buffer)[2])
-#define CH04 (((volatile short*)ai_buffer)[3])
-#define TLATCH (&((volatile unsigned*)ai_buffer)[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -97,85 +87,6 @@ int aochan = DEF_AO_CHAN;
 #define DO_IX	(16)		/* longwords */
 
 
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
-void get_mapping() {
-	char fname[80];
-	sprintf(fname, HB_FILE, devnum);
-	fd = open(fname, O_RDWR);
-	if (fd < 0){
-		perror(fname);
-		exit(errno);
-	}
-
-	host_buffer = mmap(0, HB_LEN*2, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (host_buffer == (caddr_t)-1 ){
-		perror( "mmap" );
-	        exit(errno);
-	}
-}
-
-void setAffinity(unsigned cpu_mask)
-{
-       int cpu = 0;
-        cpu_set_t cpu_set;
-        CPU_ZERO(&cpu_set);
-        for (cpu = 0; cpu < 32; ++cpu){
-                if ((1<<cpu) &cpu_mask){
-                        CPU_SET(cpu, &cpu_set);
-                }
-        }
-        printf("setAffinity: %d,%d,%d,%d\n",
-                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
-                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
-                        );
-
-        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
-        if (rc != 0){
-                perror("sched_set_affinity");
-                exit(1);
-        }
-}
-
-
-void goRealTime(void)
-{
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
-
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
-}
-
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-	static int errcount;
-	short *ai_buffer = local_buffer;
-
-	unsigned tl1 = *TLATCH;
-	if (tl1 != tl0+1){
-		if (++errcount < 100){
-			printf("%d => %d\n", tl0, tl1);
-		}else if (errcount == 100){
-			printf("stop reporting at 100 errors ..\n");
-		}
-	}
-	tl0 = tl1;
-}
 
 void control_dup1(short *ao, short *ai);
 void (*G_control)(short *ao, short *ai) = control_dup1;
@@ -280,15 +191,9 @@ void ui(int argc, char* argv[])
 
 void setup()
 {
-	char logfile[80];
-	sprintf(logfile, LOG_FILE, devnum);
-	get_mapping();
+	setup_logging(devnum);
+	host_buffer = get_mapping(devnum, &fd);
 	goRealTime();
-	fp_log = fopen(logfile, "w");
-	if (fp_log == 0){
-		perror(logfile);
-		exit(1);
-	}
 
 	xllc_def.len = samples_buffer*VI_LEN;
 	if (xllc_def.len > 16*64){
@@ -304,7 +209,7 @@ void setup()
 
 
 
-	xllc_def.pa += HB_LEN;
+	xllc_def.pa += AO_OFFSET;
 	xllc_def.len = VO_LEN;
 
 	if (has_do32){
@@ -317,7 +222,7 @@ void setup()
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
-	ao_buffer = (short*)((void*)host_buffer+HB_LEN);
+	ao_buffer = (short*)((void*)host_buffer+AO_OFFSET);
 
 	if (has_do32){
 		/* marker pattern for the PAD area for hardware trace */
@@ -415,19 +320,19 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
 	if (!dummy_first_loop){
-		TLATCH[0] = tl0;
+		TLATCH(ai_buffer)[0] = tl0;
 	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = TLATCH[0]) == tl0){
+		while((tl1 = TLATCH(ai_buffer)[0]) == tl0){
 			sched_yield();
 			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
 		}
 		control(ao_buffer, ai_buffer);
-		TLATCH[1] = pollcat;
-		TLATCH[2] = difftime_us();
+		TLATCH(ai_buffer)[1] = pollcat;
+		TLATCH(ai_buffer)[2] = difftime_us();
 		action(ai_buffer);
 
 		if (verbose){

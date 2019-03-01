@@ -6,6 +6,8 @@
  */
 
 
+#define _XOPEN_SOURCE 
+#define _XOPEN_SOURCE_EXTENDED
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +16,8 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <sys/types.h>
+
 
 #define SHM_INTS	128
 

@@ -58,7 +58,7 @@ void* bufferAB[2];
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-int sched_fifo_priority = 1;
+
 int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
@@ -70,20 +70,14 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 16;
-
 short* xo_buffer;
 int has_do32;
 
 #define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#undef NSHORTS
 #define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
-#define SPIX	(NSHORTS/2-spadlongs)
 
-#define TLATCH(buf) (&((volatile unsigned*)(buf))[SPIX])      /* actually, sample counter */
-#define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
 struct XLLC_DEF xllc_def = {
 		.pa = RTM_T_USE_HOSTBUF,
@@ -94,94 +88,6 @@ struct XLLC_DEF xllc_def = {
 
 #define DO_IX   0
 
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
-void get_mapping() {
-	char fname[80];
-	sprintf(fname, HB_FILE, devnum);
-	fd = open(fname, O_RDWR);
-	if (fd < 0){
-		perror(fname);
-		exit(errno);
-	}
-
-	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (host_buffer == (caddr_t)-1 ){
-		perror( "mmap" );
-	        exit(errno);
-	}
-	bufferAB[0] = host_buffer;
-	bufferAB[1] = host_buffer + BUFFER_AB_OFFSET;
-}
-
-void setAffinity(unsigned cpu_mask)
-{
-       int cpu = 0;
-        cpu_set_t cpu_set;
-        CPU_ZERO(&cpu_set);
-        for (cpu = 0; cpu < 32; ++cpu){
-                if ((1<<cpu) &cpu_mask){
-                        CPU_SET(cpu, &cpu_set);
-                }
-        }
-        printf("setAffinity: %d,%d,%d,%d\n",
-                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
-                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
-                        );
-
-        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
-        if (rc != 0){
-                perror("sched_set_affinity");
-                exit(1);
-        }
-}
-
-
-void goRealTime(void)
-{
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
-
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
-}
-
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-	static int errcount;
-	static int call_count;
-	short *ai_buffer = local_buffer;
-
-	++call_count;
-
-	if (tl0 == 0){
-		tl0 = *TLATCH(ai_buffer);
-	}else{
-		unsigned tl1 = *TLATCH(ai_buffer);
-		if (tl1 != tl0+samples_buffer){
-			if (++errcount < 100){
-				printf("ERROR:%5d %08x => %08x\n", call_count, tl0, tl1);
-			}else if (errcount == 100){
-				printf("stop reporting at 100 errors ..\n");
-			}
-		}
-		tl0 = tl1;
-	}
-}
 
 void control_none(short* xo, short* ai);
 void control_thresholds(short* ao, short *ai);
@@ -263,7 +169,7 @@ void setup()
 {
 	char logfile[80];
 	sprintf(logfile, log_file, devnum);
-	get_mapping();
+	host_buffer = get_mapping(devnum, &fd);
 	goRealTime();
 	struct AB ab_def;
 	fp_log = fopen(logfile, "w");

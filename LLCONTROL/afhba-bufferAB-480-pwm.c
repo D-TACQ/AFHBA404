@@ -62,16 +62,13 @@ void* bufferAB[2];
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer;			/* set > 1 to decimate max 16*64bytes */
-int sched_fifo_priority = 1;
+
 int verbose;
 int debug;
 FILE* fp_log;
 void (*G_action)(void*);
 int devnum = 0;
 
-#define DEF_NCHAN 	16
-int nchan = DEF_NCHAN;
-int spadlongs = 0;
 
 int has_do32;
 
@@ -80,7 +77,9 @@ int has_do32;
 float G_setpoint = 1000;
 
 #define NSHORTS1 	(nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#undef NSHORTS
 #define NSHORTS		(NSHORTS1*samples_buffer)
+#undef VI_LEN
 #define VI_LEN 		(NSHORTS*sizeof(short))
 #define VI_LONGS	(VI_LEN/sizeof(unsigned))
 
@@ -110,70 +109,10 @@ struct XLLC_DEF xllc_def_ao;
 #define SHM_CH0	5				/* FIRST AO chan at this index */
 
 
-void get_mapping() {
-	char fname[80];
-	sprintf(fname, HB_FILE, devnum);
-	fd = open(fname, O_RDWR);
-	if (fd < 0){
-		perror(fname);
-		exit(errno);
-	}
-
-	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (host_buffer == (caddr_t)-1 ){
-		perror( "mmap" );
-	        exit(errno);
-	}
-	bufferAB[0] = host_buffer;
-	bufferAB[1] = host_buffer + BUFFER_AB_OFFSET;
-}
-
-void setAffinity(unsigned cpu_mask)
-{
-       int cpu = 0;
-        cpu_set_t cpu_set;
-        CPU_ZERO(&cpu_set);
-        for (cpu = 0; cpu < 32; ++cpu){
-                if ((1<<cpu) &cpu_mask){
-                        CPU_SET(cpu, &cpu_set);
-                }
-        }
-        printf("setAffinity: %d,%d,%d,%d\n",
-                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
-                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
-                        );
-
-        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
-        if (rc != 0){
-                perror("sched_set_affinity");
-                exit(1);
-        }
-}
-
-
-void goRealTime(void)
-{
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
-
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
-}
 
 
 void null_action(void* data)
 {}
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
 
 int control_none(unsigned* xo, short* ai, short ai10);
 
@@ -263,7 +202,7 @@ void setup()
 {
 	char logfile[80];
 	sprintf(logfile, log_file, devnum);
-	get_mapping();
+	host_buffer = get_mapping(devnum, &fd);
 	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&pbufferXO);
 	DEBUG("get_shared_mapping");
 	shm_connect();
