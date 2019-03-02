@@ -8,6 +8,7 @@ let TLEN="$POST*120/100"
 
 UUTS="acq2106_145 acq2106_147 acq2106_148 acq2106_149"
 HAPIDIR=/home/dt100/PROJECTS/acq400_hapi
+AFHBA404DIR=/home/dt100/PROJECTS/AFHBA404
 
 echo llc-run-full-auto-thomson $UUTS=$UUT1 UUT2=$UUT2 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
@@ -40,13 +41,14 @@ control_program() {
 control_script() {
 #	 SITECLIENT_TRACE=1
 #       SIMULATE=1 /home/dt100/PROJECTS/AFHBA404/HAPI/thomson_config.py --delay=$DELAY $UUTS
-       SITECLIENT_TRACE=1 SIMULATE=0 /home/dt100/PROJECTS/AFHBA404/HAPI/thomson_config.py $UUTS
-
-    (cd $HAPIDIR
+#       SITECLIENT_TRACE=1 SIMULATE=0 /home/dt100/PROJECTS/AFHBA404/HAPI/thomson_config.py $UUTS
+	SITECLIENT_TRACE=1 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_clockondemand.py --delay=$DELAY $UUTS
+	(
+ 	cd $HAPIDIR
         STATUSMONITOR_TRACE=1 ./user_apps/acq400/acq400_capture.py \
 		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=0" --soft_trigger=0 \
 		$UUTS
-       )
+	)
 }
 
 
