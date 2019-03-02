@@ -23,7 +23,10 @@ def fix_args(args):
     args.shorts = args.longs*2
     args.SPIX = args.AI/2
     args.sp_plot = set(('IX', 'SC', 'US', 'DUS') if args.spcols == "ALL" else tuple(args.spcols.split(",")))
-    args.ai_plot = [ (c-1) for c in tuple(map(int, args.aicols.split(",")))]
+    try:
+        args.ai_plot = [ (c-1) for c in tuple(map(int, args.aicols.split(",")))]
+    except ValueError:
+        args.ai_plot = None
     return args
 
 
@@ -34,11 +37,12 @@ def run_analysis(args):
     sample_count = check_column(long_data, args.SPIX+0, args.longs, args.nuuts)
     usec_count = check_column(long_data,   args.SPIX+1, args.longs, args.nuuts)
 
-    aicols = []
-    for col in args.ai_plot:
-        aicols.append(check_column(short_data, col, args.shorts, args.nuuts))
+    if args.ai_plot != None:
+        aicols = []
+        for col in args.ai_plot:
+            aicols.append(check_column(short_data, col, args.shorts, args.nuuts))
 
-    FF = "{0:10}"					# Field Format
+    FF = "{0:8}"					# Field Format
     UUTS = range(0, args.nuuts)
 
     for num, counter in enumerate(sample_count[0]):
@@ -56,11 +60,14 @@ def run_analysis(args):
             for uut in UUTS:
                 rc.append(FF.format(0 if num <= 2 else usec_count[uut][num]-usec_count[uut][num-1]))
 
-        for uut in UUTS:
-	    for col, ch in enumerate(args.ai_plot):
-                rc.append(FF.format(aicols[col][uut][num]))
-
-	print(",".join(rc))
+        if args.ai_plot != None:
+            for uut in UUTS:
+	        for col, ch in enumerate(args.ai_plot):
+                    rc.append(FF.format(aicols[col][uut][num]))
+        try:
+	    print(",".join(rc))
+        except IOError:
+            break
 
 
     #print "\n \n"
