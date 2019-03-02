@@ -22,6 +22,7 @@ def fix_args(args):
     args.longs = args.AI/2 + args.SP
     args.shorts = args.longs*2
     args.SPIX = args.AI/2
+    args.sp_plot = set(('IX', 'SC', 'US', 'DUS') if args.spcols == "ALL" else tuple(args.spcols.split(",")))
     args.ai_plot = [ (c-1) for c in tuple(map(int, args.aicols.split(",")))]
     return args
 
@@ -42,14 +43,18 @@ def run_analysis(args):
 
     for num, counter in enumerate(sample_count[0]):
 	rc = []						# report columns 
-	rc.append(FF.format(num))
+        if 'IX' in args.sp_plot:
+	    rc.append(FF.format(num))
 
-	for uut in UUTS:
-	    rc.append(FF.format(sample_count[uut][num]))
-        for uut in UUTS:
-            rc.append(FF.format(usec_count[uut][num]))
-        for uut in UUTS:
-            rc.append(FF.format(0 if num <= 2 else usec_count[uut][num]-usec_count[uut][num-1]))
+	if 'SC' in args.sp_plot:
+            for uut in UUTS:
+	        rc.append(FF.format(sample_count[uut][num]))
+        if 'US' in args.sp_plot:
+            for uut in UUTS:
+                rc.append(FF.format(usec_count[uut][num]))
+        if 'DUS' in args.sp_plot:
+            for uut in UUTS:
+                rc.append(FF.format(0 if num <= 2 else usec_count[uut][num]-usec_count[uut][num-1]))
 
         for uut in UUTS:
 	    for col, ch in enumerate(args.ai_plot):
@@ -74,6 +79,7 @@ def run_main():
     parser.add_argument('--AI', type=int, default=192, help="number of AI channels (int16)")
     parser.add_argument('--SP', type=int, default=16, help="number of columns in scratchpad (int32)")
     parser.add_argument('--src', default="../LLCONTROL/afhba.0.log", help="source log file")
+    parser.add_argument('--spcols', default="ALL", help="SP cols to plot, default: ALL, opts: IX, SC, US, DUS")
     parser.add_argument('--aicols', default="", help="list of AI channels to dump index from 1")
     parser.add_argument('--verbose', type=int, default=0, help="verbose")
     run_analysis(fix_args(parser.parse_args()))
