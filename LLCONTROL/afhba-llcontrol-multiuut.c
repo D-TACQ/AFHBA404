@@ -133,6 +133,7 @@ void ui(int argc, char* argv[])
 	}
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+		fprintf(stderr, "nsamples set %d\n", nsamples);
 	}
 	if (argc > 2){
 		samples_buffer = atoi(argv[2]);

@@ -25,7 +25,8 @@ def hit_resets(svc):
 
 def clear_counters(uuts):
     for uut in uuts:
-        for cx in [ 'cA', 'cB']:
+        print("clear_counters {}".format(uut.uut))
+        for cx in [ 's0', 'cA', 'cB']:
             hit_resets(uut.svc[cx])
 
 
@@ -87,7 +88,11 @@ def run_main(args):
     uutm = uuts[0]
 
     print("initialise {} uuts {}".format(len(uuts), args.uuts))
-    clear_counters(uuts)
+
+    if args.clear_counters:
+        clear_counters(uuts)
+    else:
+        print("clear_counters() commented out (slow)")
     init_clks(uuts)
     set_delay(uutm, args)
     for uut in uuts:
@@ -98,6 +103,7 @@ def run_main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="thomson_config.py")
     parser.add_argument("--delay", type=int, default=5, help="delay in usecs (min 5)")
+    parser.add_argument("--clear_counters", type=int, default=0, help="clear counters before shot (slow)")
     parser.add_argument("--verbose", type=int, default=0, help="verbosity, default 0")
     parser.add_argument("uuts", nargs='+', help="name the uuts")
     run_main(parser.parse_args())
