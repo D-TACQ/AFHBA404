@@ -56,7 +56,7 @@ def run_analysis(args):
             aicols.append(check_column(short_data, col, args.shorts, args.nuuts))
 
     FF = "{:>8}"					# Field Format, right justify 8 chars
-    UUTS = range(0, args.nuuts)
+    UUTS = range(0, args.nuuts) if args.uutcols == None else [ (c-1) for c in tuple(map(int, args.uutcols.split(',')))]
 
     for num, counter in enumerate(sample_count[0]):
 	hc = []
@@ -109,6 +109,7 @@ def run_main():
     parser.add_argument('--capstat', default="/home/dt100/PROJECTS/AFHBA404/LLCONTROL/llc-run-full-auto-thomson.txt", help="capture status log file")
     parser.add_argument('--spcols', default="ALL", help="SP cols to plot, default: ALL, opts: IX, SC, US, DUS")
     parser.add_argument('--aicols', default="", help="list of AI channels to dump index from 1")
+    parser.add_argument('--uutcols', default=None, help="list uuts to include in --aicols dump [default:ALL]")
     parser.add_argument('--verbose', type=int, default=0, help="verbose")
     run_analysis(fix_args(parser.parse_args()))
 

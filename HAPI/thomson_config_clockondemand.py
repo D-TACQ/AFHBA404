@@ -39,7 +39,7 @@ def init_clks(uuts):
         print("shot trigger role:{} value:{}".format(role, uut.s0.SIG_SRC_TRG_0))
         uut.s0.SIG_SYNC_OUT_TRG = 'TRG'
         uut.s0.SIG_SYNC_OUT_TRG_DX = 'd0'
-        uut.s0.spad1_us = '1,0,0'
+        uut.s0.spad1_us = '1,0,1'
 
         if role=="master":
             uut.s0.SIG_SRC_TRG_1 = 'FP_SYNC'
