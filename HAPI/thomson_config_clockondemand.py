@@ -67,6 +67,8 @@ def set_delay(uut, args):
 
     uut.load_gpg(stl)
     uut.s0.gpg_trg = '1,1,0'
+    uut.s0.gpg_clk = '1,1,1'
+    uut.s0.SIG_CLK_MB_SET = '10000000'
     uut.s0.GPG_MODE = 'LOOPWAIT'
     uut.s0.GPG_ENABLE = '1'
 
