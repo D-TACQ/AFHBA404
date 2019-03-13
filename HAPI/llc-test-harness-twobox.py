@@ -12,7 +12,7 @@ import time
 import os
 
 
-EXTCLKDIV = int(os.getenv("EXTCLKDIV", "100"))
+EXTCLKDIV = int(os.getenv("EXTCLKDIV", "10"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 AOSITES = os.getenv("AOSITES", "1,2")
@@ -21,6 +21,8 @@ AOSITES = os.getenv("AOSITES", "1,2")
 DOSITES = os.getenv("DOSITES", "5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
 PWMSITES = os.getenv("PWMSITES", "")
+CONFIGAO = os.getenv("CONFIGAO", "1")
+
 
 def hit_resets(svc):
     return None
@@ -71,7 +73,6 @@ def init_ao(uut, slave=False):
         for pwmsite in PWMSITES.split(','):
             pwm = "s{}".format(pwmsite)
             uut.svc[pwm].pwm_clkdiv = "%x" % (1000)
-            
     if DOSITES != "":
 
         print "configuring for DO"
@@ -108,7 +109,7 @@ def run_main(args):
     # if two boxes ASSUME second box AO
     if len(uuts) > 1:
         init_ao(uuts[1], slave=True)
-    else:
+    elif CONFIGAO != "0":
      	print("init_ao {}".format(uuts[0].uut))
         init_ao(uuts[0], slave=True)
 

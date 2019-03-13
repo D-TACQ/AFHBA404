@@ -133,6 +133,7 @@ void ui(int argc, char* argv[])
 	}
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+		fprintf(stderr, "nsamples set %d\n", nsamples);
 	}
 	if (argc > 2){
 		samples_buffer = atoi(argv[2]);
@@ -183,23 +184,23 @@ void print_sample(unsigned sample, unsigned tl)
 
 void run(void (*action)(void*))
 {
-	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
+	unsigned tl0[4];
+	int pollcat[4] = {};
 	unsigned tl1;
 	unsigned sample;
-	int println = 0;
-	int pollcat[4] = {};
 
 	mlockall(MCL_CURRENT);
-	FORALL TLATCH(devs[id].lbuf)[0] = tl0;
+	FORALL TLATCH(devs[id].lbuf)[0] = tl0[id] = 0xdeadbeef; /* always run one dummy loop */
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, memset(pollcat, 0, sizeof(pollcat))){
+	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
 			memcpy(devs[id].lbuf, devs[id].host_buffer, VI_LEN);
-			while((tl1 = TLATCH(devs[id].lbuf)[0]) == tl0){
+			while((tl1 = TLATCH(devs[id].lbuf)[0]) == tl0[id]){
 				sched_yield();
 				memcpy(devs[id].lbuf, devs[id].host_buffer, VI_LEN);
 				++pollcat[id];
 			}
+			tl0[id] = tl1;
 		}
 
 		FORALL {

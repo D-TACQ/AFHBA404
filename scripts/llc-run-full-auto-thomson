@@ -1,0 +1,78 @@
+#!/bin/bash
+# file PROJECTS/AFHBA404/scripts/llc-run-full-auto-thomson
+# POST is number of samples in LLC control loop
+# TLEN is the transient capture, overrun to make sure LLC terminates
+POST=${POST:-1000}
+DELAY=${DELAY:-10}
+let TLEN="$POST*120/100"
+
+UUTS="acq2106_145 acq2106_147 acq2106_148 acq2106_149"
+HAPIDIR=/home/dt100/PROJECTS/acq400_hapi
+AFHBA404DIR=/home/dt100/PROJECTS/AFHBA404
+LLCDIR=${AFHBA404DIR}/LLCONTROL
+
+export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
+acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
+
+export EXTCLKDIV=${EXTCLKDIV:-10}
+
+set_clocks() {
+	echo "set_clocks stub"
+}
+
+control_program() {
+	cd $LLCDIR
+	#echo CONTROL PROGRAM 01
+	export AICHAN=192
+	export SPADLONGS=16
+# isolcpus=4,5,6,7,8...
+# taskset 0x10 means "run on processor 4"
+	export TASKSET="taskset 0x8"
+	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+	$TASKSET ./afhba-llcontrol-multiuut $1 &
+	echo wait for llcontrol, PID $CTRLPID
+	wait
+	echo CONTROL PROGRAM 99
+#	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
+#		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
+#		$UUT1 afhba.0.log
+}
+
+control_script() {
+	echo control_script       
+#	 SITECLIENT_TRACE=1
+#       SIMULATE=1 /home/dt100/PROJECTS/AFHBA404/HAPI/thomson_config.py --delay=$DELAY $UUTS
+#       SITECLIENT_TRACE=1 SIMULATE=0 /home/dt100/PROJECTS/AFHBA404/HAPI/thomson_config.py $UUTS
+	echo SITECLIENT_TRACE=1 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_clockondemand.py --delay=$DELAY $UUTS
+	SITECLIENT_TRACE=0 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_clockondemand.py --delay=$DELAY $UUTS
+       	echo "$HAPIDIR/user_apps/acq400/acq400_capture.py $UUTS" 
+        STATUSMONITOR_TRACE=1 $HAPIDIR/user_apps/acq400/acq400_capture.py \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=0" --soft_trigger=0 \
+		$UUTS
+	echo control_script over
+}
+
+
+
+case "x$1" in
+xset_clocks)
+	set_clocks;;
+xcontrol_program)
+	shift
+	control_program $*;;
+xcontrol_script)
+	control_script;;
+*)
+	echo llc-run-full-auto-thomson $UUTS POST=$POST TLEN=$TLEN DELAY=$DELAY | tee $LLCDIR/llc-run-full-auto-thomson.txt
+
+	set_clocks
+#	new_shot --verbose 1 $UUT1
+	echo sudo $0 control_program $POST
+	sudo $0 control_program $POST &
+
+	control_script
+	wait
+	echo wait complete
+	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats)
+	;;
+esac
