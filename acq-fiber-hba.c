@@ -29,7 +29,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1108";
+char afhba__driver_version[] = "B1112";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 

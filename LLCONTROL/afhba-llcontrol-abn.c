@@ -41,7 +41,7 @@
  DO32=2 : run a threshold crossing algorithm, AI[0:31] -> DO[0:31] 
 */
 
-
+#define DEF_NCHAN 	192			/* eg TCV THOMSON, 6 x ACQ423 */
 #include "afhba-llcontrol-common.h"
 
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
@@ -61,7 +61,7 @@ int fd;
 int NDESC = MAXABN;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-int sched_fifo_priority = 1;
+
 int verbose;
 FILE* fp_log;
 void (*G_action)(void*);
@@ -73,20 +73,18 @@ int G_POLARITY = 1;
  *  software is in fact doing something 					 */
 
 
-#define DEF_NCHAN 	192			/* eg TCV THOMSON, 6 x ACQ423 */
-int nchan = DEF_NCHAN;
-int spadlongs = 16;
-
 short* xo_buffer;
 int has_do32;
 
 #define PAGE_SIZE	0x1000
 
 #define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
+#undef NSHORTS
 #define NSHORTS	(NSHORTS1*samples_buffer)
 #define VI_LEN 	(NSHORTS*sizeof(short))
+#undef SPIX
 #define SPIX	(NSHORTS/2-spadlongs)
-
+#undef TLATCH
 #define TLATCH(buf) (&((volatile unsigned*)(buf))[SPIX])      /* actually, sample counter */
 #define SPAD1	(((volatile unsigned*)ai_buffer)[SPIX+1])   /* user signal from ACQ */
 
@@ -98,96 +96,6 @@ struct XLLC_DEF xllc_def = {
 
 #define DO_IX   0
 
-/* SPLIT single HB into 2
- * [0] : AI
- * [1] : AO
- */
-void get_mapping() {
-	char fname[80];
-	int ib;
-	sprintf(fname, HB_FILE, devnum);
-	fd = open(fname, O_RDWR);
-	if (fd < 0){
-		perror(fname);
-		exit(errno);
-	}
-
-	host_buffer = mmap(0, HB_LEN, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	if (host_buffer == (caddr_t)-1 ){
-		perror( "mmap" );
-	        exit(errno);
-	}
-	for (ib = 0; ib < NDESC; ++ib){
-		bufferABN[ib] = host_buffer + ib * PAGE_SIZE;
-	}
-}
-
-void setAffinity(unsigned cpu_mask)
-{
-       int cpu = 0;
-        cpu_set_t cpu_set;
-        CPU_ZERO(&cpu_set);
-        for (cpu = 0; cpu < 32; ++cpu){
-                if ((1<<cpu) &cpu_mask){
-                        CPU_SET(cpu, &cpu_set);
-                }
-        }
-        printf("setAffinity: %d,%d,%d,%d\n",
-                        CPU_ISSET(0, &cpu_set), CPU_ISSET(1, &cpu_set),
-                        CPU_ISSET(2, &cpu_set), CPU_ISSET(3, &cpu_set)
-                        );
-
-        int rc = sched_setaffinity(0,  sizeof(cpu_set_t), &cpu_set);
-        if (rc != 0){
-                perror("sched_set_affinity");
-                exit(1);
-        }
-}
-
-
-void goRealTime(void)
-{
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
-
-
-
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
-
-	if (rc){
-		perror("failed to set RT priority");
-	}
-}
-
-
-void write_action(void *data)
-{
-	fwrite(data, sizeof(short), NSHORTS, fp_log);
-}
-
-void check_tlatch_action(void *local_buffer)
-{
-	static unsigned tl0;
-	static int errcount;
-	static int call_count;
-	short *ai_buffer = local_buffer;
-
-	++call_count;
-
-	if (tl0 == 0){
-		tl0 = *TLATCH(ai_buffer);
-	}else{
-		unsigned tl1 = *TLATCH(ai_buffer);
-		if (tl1 != tl0+samples_buffer){
-			if (++errcount < 100){
-				printf("ERROR:%5d %08x => %08x\n", call_count, tl0, tl1);
-			}else if (errcount == 100){
-				printf("stop reporting at 100 errors ..\n");
-			}
-		}
-		tl0 = tl1;
-	}
-}
 
 void control_none(short* xo, short* ai) {}
 void (*G_control)(short *ao, short *ai) = control_none;
@@ -261,17 +169,12 @@ void ui(int argc, char* argv[])
 
 void setup()
 {
-	char logfile[80];
-	int ib;
-	sprintf(logfile, log_file, devnum);
-	get_mapping();
-	goRealTime();
 	struct ABN abn;
-	fp_log = fopen(logfile, "w");
-	if (fp_log == 0){
-		perror(logfile);
-		exit(1);
-	}
+	int ib;
+
+	setup_logging(devnum);
+	host_buffer = get_mapping(devnum, &fd);
+	goRealTime();
 
 	abn.ndesc = NDESC;
 	abn.buffers[0].pa = xllc_def.pa;
