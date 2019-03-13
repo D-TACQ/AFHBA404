@@ -11,7 +11,7 @@ else
 SPI_SUPPORT=
 endif
 
-CFLAGS += -O2
+CFLAGS += -O2 -std=c99
 LDLIBS += -lm -lrt -lpopt -lpthread
 
 # default build is the local kernel.
@@ -27,6 +27,7 @@ APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
 	afhba-llcontrol-do32-threshold \
 	afhba-bufferAB-do32-threshold \
 	afhba-llcontrol-two-fiber \
+	afhba-llcontrol-multiuut \
 	afhba-bufferAB-480-pwm pwm_set_channel pwm_set_duty pwm_control \
 	afhba-llcontrol-abn
 	
