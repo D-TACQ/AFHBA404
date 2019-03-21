@@ -1,5 +1,12 @@
 #!/bin/bash
-DN=${1:-0}
+
+if [ "$1" = "-v" ]; then
+	verbose=1
+else
+	verbose=0
+fi
+
+PORTS=(A B C D)
 
 for DN in 0 1 2 3
 do
@@ -9,7 +16,11 @@ do
 		   [ "$ID" != "acq2106_65535" ] && 
 		   [ "$ID" != "${ID#acq2106_*}" ]; then
 			PORT=$(cat /dev/rtm-t.$DN.ctrl/acq_port)
-			echo "$(hostname) $DN $ID $PORT"
+			if [ $verbose -eq 0 ]; then
+				echo "$(hostname) $DN $ID $PORT"
+			else
+				echo "lhost=$(hostname) ldev=ahfba.$DN lport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID rport=$PORT"
+			fi
 		fi
 	fi
 done
