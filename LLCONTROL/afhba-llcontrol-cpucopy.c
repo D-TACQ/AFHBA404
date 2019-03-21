@@ -331,8 +331,8 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			++pollcat;
 		}
 		control(ao_buffer, ai_buffer);
-		TLATCH(ai_buffer)[1] = pollcat;
-		TLATCH(ai_buffer)[2] = difftime_us();
+		TLATCH(ai_buffer)[2] = pollcat;
+		TLATCH(ai_buffer)[3] = difftime_us();
 		action(ai_buffer);
 
 		if (verbose){
