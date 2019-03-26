@@ -19,7 +19,7 @@ do
 			if [ $verbose -eq 0 ]; then
 				echo "$(hostname) $DN $ID $PORT"
 			else
-				echo "lhost=$(hostname) ldev=ahfba.$DN lport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID rport=$PORT"
+				echo "host=$(hostname) hdev=afhba.$DN hport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID uport=$PORT"
 			fi
 		fi
 	fi
