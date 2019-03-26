@@ -4,7 +4,7 @@
 AHFBA404 is a PCI-express Gen2 4 lane card to fit standard PC enclosure
 On the front panel: 4xSFP marked A,B,C,D
 
-AFHBA404 is used to connect 1 to 4 ACQ2106 units to a HOST PC, extablishing a 
+AFHBA404 is used to connect 1 to 4 ACQ2106 units to a HOST PC, establishing a 
 fiber-optic link that may be used in one of two ways:
 
 #### 1.1 HTS High Throughput Stream
@@ -16,8 +16,8 @@ In theory it's possible to run all 4 links at full speed, but to date
 D-TACQ has not tested a PC that is capable of handling this.
 
 More typical usage:
-1 x 400MB/s, single box, full rate to local disk (NVMe SSD recommended)
-4 x 100MB/s, connect 4 x ACQ2106 to single host.
+* 1 x 400MB/s, single box, full rate to local disk (NVMe SSD recommended)
+* 4 x 100MB/s, connect 4 x ACQ2106 to single host.
 
 AFHBA404 may also be used to send a common trigger to multiple ACQ2106.
 
@@ -32,23 +32,22 @@ ACQ2106 boxes.
 
 Typical use case:
 
-ACQ2106+4xACQ424ELF-32+2xAO424ELF32 :
-
-128AI, 64AO, run in an LLC loop at 100kSPS.
-
+* ACQ2106+4xACQ424ELF-32+2xAO424ELF32 : 128AI, 64AO, run in an LLC loop at 100kSPS.
 
 ### 2. Device driver
 
 Download from git:
-
+<pre>
 mkdir PROJECTS
 cd PROJECTS
 git clone https://github.com/D-TACQ/AFHBA404.git
 cd AFHBA404
-
+</pre>
 Now refer to INSTALL
+<pre>
 make
 sudo ./scripts/install-hotplug
+</pre>
 
 ### 3. Check AFHBA404 firmware
 <pre>
@@ -100,9 +99,9 @@ Ideally, the HOSTPC has a DNS system (/etc/hosts if no DNS) that will allow
 network software to connect to the UUT by name.
 
 For further details, please refer to
-INSTALL
-README.ACQ2106.HTS
-LLCONTROL/README.AFHBA404
+* INSTALL
+* README.ACQ2106.HTS
+* LLCONTROL/README.AFHBA404
 
 
 
