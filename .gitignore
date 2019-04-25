@@ -47,3 +47,30 @@ modules.order
 *.x86_64
 *.hex
 
+*.swp
+*.log
+
+checkES
+checkramp
+checkramp480
+hbfarm425
+multisitecheckramp
+afhba-bufferAB-480-pwm
+afhba-bufferAB-do32-threshold
+afhba-llcontrol-abn
+afhba-llcontrol-cpucopy
+afhba-llcontrol-do32-threshold
+afhba-llcontrol-example
+afhba-llcontrol-multiuut
+afhba-llcontrol-testharness
+afhba-llcontrol-two-fiber
+afhba-llcontrol-zcopy
+#	LLCONTROL/afhba.0.simulate.lot
+#	LLCONTROL/afhba.0.thursdaypersonality.log
+#	LLCONTROL/check-tlatch
+#	LLCONTROL/llc-run-full-auto-thomson.txt
+pwm_control
+pwm_set_channel
+pwm_set_duty
+Module.symvers
+
