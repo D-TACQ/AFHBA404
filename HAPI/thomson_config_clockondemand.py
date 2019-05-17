@@ -10,6 +10,16 @@ import argparse
 import acq400_hapi
 import os
 
+# https://gist.github.com/endolith/114336/eff2dc13535f139d0d6a2db68597fad2826b53c3
+def gcd(a,b):
+    """Compute the greatest common divisor of a and b"""
+    while b > 0:
+        a, b = b, a % b
+    return a
+    
+def lcm(a, b):
+    """Compute the lowest common multiple of a and b"""
+    return a * b / gcd(a, b)
 
 EXTCLKDIV = int(os.getenv("EXTCLKDIV", "100"))
 SIMULATE = os.getenv("SIMULATE", "")
@@ -85,6 +95,8 @@ def init_ai(uut):
     uut.s1.sod = '1'
     uut.s1.trg = '0,0,0'
     uut.s1.clk = '1,0,1'
+    ssb = int(uut.s0.NCHAN)*2
+    uut.s0.bufferlen = lcm(ssb, 4096)
 
 
 def run_main(args):

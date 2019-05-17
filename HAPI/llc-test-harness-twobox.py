@@ -51,6 +51,7 @@ def init_ai(uut):
     uut.cA.aggregator = 'sites={}'.format(AISITES)
     uut.cB.spad = '1'
     uut.cB.aggregator = 'sites={}'.format(AISITES)
+    uut.s0.run0 = AISITES # This recalculates NCHAN
 
 def init_ao(uut, slave=False):
     if len(AOSITES) == 0:
