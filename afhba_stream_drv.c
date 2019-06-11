@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1067"
+#define REVID	"R1069"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -2134,7 +2134,7 @@ static const struct attribute *dev_attrs[] = {
 
 void afs_create_sysfs(struct AFHBA_DEV *adev)
 {
-	static const struct attribute ** attrs = dev_attrs;
+	const struct attribute ** attrs = dev_attrs;
 	int rc;
 
 	if (adev->remote_com_bar == -1 ){
@@ -2152,7 +2152,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init %s", REVID);
+	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
 	hook_interrupts(adev);
