@@ -39,7 +39,7 @@
 
 #include <linux/version.h>
 
-#define REVID	"R1069"
+#define REVID	"R1070"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -986,103 +986,34 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	return 0;
 }
 
-#ifdef INTERRUPTS_WORK_OK
-static irqreturn_t afs_rx_isr(int irq, void *data)
-{
-	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
-	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-
-	dev_dbg(pdev(adev), "01 irq %d", irq);
-
-
-       if (sdev->job.buffers_demand == 0 &&
-		       sdev->job.please_stop != PS_PLEASE_STOP){
-	       return !IRQ_HANDLED;
-       }
-
-       sdev->job.ints++;
-       set_bit(WORK_REQUEST, &sdev->work.w_to_do);
-       wake_up_interruptible(&sdev->work.w_waitq);
-
-       dev_dbg(pdev(adev), "99");
-       return IRQ_HANDLED;
-}
-
-static irqreturn_t afs_null_isr(int irq, void* data)
+static irqreturn_t afs_cos_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
-	dev_info(pdev(adev), "afs_null_isr %d", irq);
+	unsigned cr = afhba_read_reg(adev, HOST_PCIE_INTERRUPT_REG);
+	afhba_write_reg(adev, HOST_PCIE_INTERRUPT_REG, cr);
+	dev_info(pdev(adev), "afs_cos_isr %08x", cr);
+
 	return IRQ_HANDLED;
 }
 
 
-static int port_request_irq(struct AFHBA_DEV* adev, int port)
-{
-	static const char* irq_names[4] = {
-		"%sA-dma", "%sB-dma", "%s-Aline", "%s-Bline"
-	};
-	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	struct pci_dev *dev = adev->pci_dev;
-	int rc;
-
-	snprintf(sdev->irq_names[port+0], 32, irq_names[port+0], adev->name);
-
-	rc = request_irq(dev->irq+port+0, afs_rx_isr,
-		 	IRQF_SHARED, sdev->irq_names[port+0], adev);
-	if (rc){
-		dev_err(pdev(adev), "request_irq %d failed", dev->irq+port+0);
-		return rc;
-	}
-
-	snprintf(sdev->irq_names[port+2], 32, irq_names[port+2], adev->name);
-	rc = request_irq(dev->irq+port+2, afs_null_isr, IRQF_SHARED,
-			sdev->irq_names[port+2], adev);
-	if (rc){
-		dev_err(pdev(adev), "request_irq %d failed", dev->irq+port+2);
-	}else{
-		dev_info(pdev(adev), "request_irq %s %d OK",
-				sdev->irq_names[port+2], dev->irq+port+2);
-	}
-	return rc;
-}
-#endif
 
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
-#ifdef INTERRUPTS_WORK_OK
-	/* non peer case must happen first */
-	if (adev->peer == 0){
-		struct pci_dev *dev = adev->pci_dev;
-		int nvec = 4;
-		int rc;
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
-		rc = pci_enable_msi_block(dev, nvec = 4);
-		if (rc < 0){
-			dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
-			rc = pci_enable_msi(dev);
-			nvec = 1;
-			if (rc < 0){
-				dev_warn(pdev(adev), "pci_enable_msi() failed");
-			}
-			return rc;
-		}
-#else
-		rc = pci_enable_msi_exact(dev, nvec);
-#endif
-		if (rc < 0){
-			dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", nvec);
-			return rc;
-		}
-
-		return port_request_irq(adev, 0);
-	}else{
-		return port_request_irq(adev, 1);
+	int rc = pci_enable_msi(adev->pci_dev);
+	if (rc < 0){
+		dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", 1);
+		return rc;
 	}
-#else
+	rc = request_irq(adev->pci_dev->irq, afs_cos_isr, IRQF_SHARED, "afhba", adev);
+	if (rc < 0) {
+		pr_warn("afhba.%d: request_irq =%d failed!\n",
+				adev->idx, adev->pci_dev->irq);
+		pci_disable_msi(adev->pci_dev);
+		return rc;
+	}
 	return 0;
-#endif
 }
 
 
@@ -2155,7 +2086,9 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
-	hook_interrupts(adev);
+	if (adev->peer == 0){
+		hook_interrupts(adev);
+	}
 	startWork(adev);
 	adev->stream_fops = &afs_fops;
 	afs_init_procfs(adev);
