@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+"""
+A script that configures the aggregator and/or distributor depending on what
+modules are inside the system.
+
+Usage:
+./llc-config-utility.py [uut name 1] [uut name 2] ... [uut name N]
+"""
 
 import numpy
 import acq400_hapi
