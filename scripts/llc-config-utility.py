@@ -31,8 +31,9 @@ def calculate_vector_length(uut, SITES, DIOSITES):
         else:
             vector_length += (nchan * 2)
 
-    for site in DIOSITES:
-        vector_length += 4
+    if DIOSITES:
+        for site in DIOSITES:
+            vector_length += 4
 
     return vector_length
 
@@ -41,6 +42,17 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
     # This function calculates the ai vector size from the number of channels
     # and word size of the AISITES argument provided to it and then sets the
     # spad, aggregator and NCHAN parameters accordingly.
+
+    if args.include_dio_in_aggregator:
+        TOTAL_SITES = (AISITES + DIOSITES)
+    else:
+        TOTAL_SITES = AISITES
+        DIOSITES = None
+
+    TOTAL_SITES.sort()
+    TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
+    print TOTAL_SITES
+
     ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES)
 
     # now check if we need a spad
@@ -50,15 +62,6 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
         uut.cA.spad = 1
         # uut.cB.spad = 1 commented out because this is NOT always true.
 
-    # set the aggregator
-    if args.include_dio_in_aggregator:
-        TOTAL_SITES = (AISITES + DIOSITES)
-    else:
-        TOTAL_SITES = AISITES
-
-    TOTAL_SITES.sort()
-    TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print TOTAL_SITES
     print 'Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad)
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
     uut.cA.aggregator = 'sites={}'.format(TOTAL_SITES)
