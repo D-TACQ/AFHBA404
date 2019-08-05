@@ -238,12 +238,13 @@ void setup()
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
+	xllc_def.len = VO_ONLY_LEN;
 	// Use ioctl to communicate AO LLC to AHBA404
-	if (ioctl(ao_fd, AFHBA_START_AO_LLC, &ao_only_xllc_def)){
+	if (ioctl(ao_fd, AFHBA_START_AO_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC for AO only system.");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x len %d\n", ao_only_xllc_def.pa, ao_only_xllc_def.len);
+	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
 	ao_buffer = (short*)((void*)host_buffer+AO_OFFSET);
 
@@ -357,8 +358,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		TLATCH(ai_buffer)[2] = pollcat;
 		TLATCH(ai_buffer)[3] = difftime_us();
 		action(ai_buffer);
-		// Copy first 4 channels from ao_buffer into the ao_only_buffer.
-		memcpy(ao_only_buffer, ao_buffer, VO_ONLY_LEN);
+		
 		if (verbose){
 			print_sample(sample, tl1);
 		}
