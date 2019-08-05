@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------------- *
- * afhba-llcontrol-zcopy.c
- * simple llcontrol example, but feeds AO from AI same buffer, no copy
+ * afhba-llcontrol-zcopy-remote-ao.c
+ * simple llcontrol example, but feeds TWO AOs from AI same buffer, no copy
  * ------------------------------------------------------------------------- *
- *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd
- *                      <peter dot milne at D hyphen TACQ dot com>
+ *   Copyright (C) 2019 Sean Alsop, D-TACQ Solutions Ltd
+ *                      <sean dot alsop at D hyphen TACQ dot com>
  *                         www.d-tacq.com
- *   Created on: 18 September 2014
- *    Author: pgm
+ *   Created on: 5 August 2019
+ *    Author: Sean Alsop
  *                                                                           *
  *  This program is free software; you can redistribute it and/or modify     *
  *  it under the terms of Version 2 of the GNU General Public License        *
