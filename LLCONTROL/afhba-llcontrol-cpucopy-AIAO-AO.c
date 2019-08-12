@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------------- *
- * afhba-llcontrol-cpucopy.c
- * simple llcontrol example, ONE HBA, two buffers, CPU copy (realistic).
+ * afhba-llcontrol-cpucopy-AIAO-AO.c
+ * simple llcontrol example, ONE AFHBA404, three buffers, CPU copy (realistic).
  * ------------------------------------------------------------------------- *
- *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd
- *                      <peter dot milne at D hyphen TACQ dot com>
+ *   Copyright (C) 2014 Sean Alsop, D-TACQ Solutions Ltd
+ *                      <sean dot alsop at D hyphen TACQ dot com>
  *                         www.d-tacq.com
- *   Created on: 18 September 2014
- *    Author: pgm
+ *   Created on: 12 September 2019
+ *    Author: Sean Alsop
  *                                                                           *
  *  This program is free software; you can redistribute it and/or modify     *
  *  it under the terms of Version 2 of the GNU General Public License        *
@@ -24,6 +24,8 @@
 
 /** Description of Program
  *
+ Get two buffers from AOAI box and one buffer from AO only box. Copy the
+ data from site 1 AI to site 5 AO in both boxes.
 
  getMapping() from device driver : this is where the data appears
  goRealTime() isolate the process for best RT performance
@@ -185,7 +187,11 @@ void ui(int argc, char* argv[])
 		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
 	}
 	xllc_def.len = VI_LEN;
+<<<<<<< HEAD
     ao_only_xllc_def.len = VO_ONLY_LEN;
+=======
+	ao_only_xllc_def.len = VO_ONLY_LEN;
+>>>>>>> 5a95de85c4eeb21c4a2f4b7796d9ea5d23f4b382
 
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
@@ -205,8 +211,13 @@ void setup()
 {
 	setup_logging(devnum);
 	host_buffer = get_mapping(devnum, &fd);
+<<<<<<< HEAD
     // Get the ao_buffer from the get_mapping function.
     ao_only_buffer = get_mapping(ao_devnum, &ao_fd);
+=======
+	// Get the ao_buffer from the get_mapping function.
+	ao_only_buffer = get_mapping(ao_devnum, &ao_fd);
+>>>>>>> 5a95de85c4eeb21c4a2f4b7796d9ea5d23f4b382
 	goRealTime();
 
 	xllc_def.len = samples_buffer*VI_LEN;
@@ -236,12 +247,22 @@ void setup()
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
+<<<<<<< HEAD
     // Use ioctl to communicate AO LLC to AHBA404
     if (ioctl(ao_fd, AFHBA_START_AO_LLC, &ao_only_xllc_def)){
         perror("ioctl AFHBA_START_AO_LLC for AO only system.");
         exit(1);
     }
     printf("AO buf pa: 0x%08x len %d\n", ao_only_xllc_def.pa, ao_only_xllc_def.len);
+=======
+	xllc_def.len = VO_ONLY_LEN;
+	// Use ioctl to communicate AO LLC to AHBA404
+	if (ioctl(ao_fd, AFHBA_START_AO_LLC, &xllc_def)){
+		perror("ioctl AFHBA_START_AO_LLC for AO only system.");
+		exit(1);
+	}
+	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
+>>>>>>> 5a95de85c4eeb21c4a2f4b7796d9ea5d23f4b382
 
 	ao_buffer = (short*)((void*)host_buffer+AO_OFFSET);
 
@@ -355,8 +376,12 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		TLATCH(ai_buffer)[2] = pollcat;
 		TLATCH(ai_buffer)[3] = difftime_us();
 		action(ai_buffer);
+<<<<<<< HEAD
         // Copy first 4 channels from ao_buffer into the ao_only_buffer.
         memcpy(ao_only_buffer, ao_buffer, VO_ONLY_LEN);
+=======
+		
+>>>>>>> 5a95de85c4eeb21c4a2f4b7796d9ea5d23f4b382
 		if (verbose){
 			print_sample(sample, tl1);
 		}
