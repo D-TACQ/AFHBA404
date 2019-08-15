@@ -316,6 +316,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	unsigned sample;
 	int println = 0;
 	int pollcat = 0;
+	int we_blew_it = 0;
 
 	mlockall(MCL_CURRENT);
 	memset(host_buffer, 0, VI_LEN);
@@ -324,11 +325,13 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
-		memcpy(ai_buffer, host_buffer, VI_LEN);
-		while((tl1 = TLATCH(ai_buffer)[0]) == tl0){
+		while((tl1 = TLATCH(host_buffer)[0]) == tl0){
 			sched_yield();
-			memcpy(ai_buffer, host_buffer, VI_LEN);
 			++pollcat;
+		}
+		memcpy(ai_buffer, host_buffer, VI_LEN);
+		if (TLATCH(ai_buffer)[0] != tl1){
+			++we_blew_it;
 		}
 		control(ao_buffer, ai_buffer);
 		TLATCH(ai_buffer)[2] = pollcat;
@@ -338,6 +341,10 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		if (verbose){
 			print_sample(sample, tl1);
 		}
+	}
+	
+	if (we_blew_it){
+		fprintf(stderr, "we_blew_it %d\n", we_blew_it);
 	}
 }
 
