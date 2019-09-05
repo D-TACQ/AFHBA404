@@ -1,0 +1,107 @@
+#!/bin/bash
+# file PROJECTS/AFHBA404/scripts/llc-run-full-auto-two-076-079
+# POST is number of samples in LLC control loop
+# TLEN is the transient capture, overrun to make sure LLC terminates
+POST=${POST:-100000}
+NSB=${NSB:-32}			# Number Samples Buffer
+let TLEN="$POST*120/100"
+
+UUT1=acq2106_126
+HAPI_DIR=/home/dt100/PROJECTS/ACQ400/HAPI/acq400_hapi/
+# site1,2,3,4=ACQ424, site6=DIO432
+
+echo llc-run-full-auto-082 UUT1=$UUT1 POST=$POST TLEN=$TLEN
+export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
+export acq2106_126_path=andros::/home/dt100/TREES/acq2106_126
+#export acq2106_126_path=/home/dt100/TREES/acq2106_126
+
+# We tested with ACQ2106_082 plugged into AFHBA404 PORT A
+# for PORT A set DEVNUM=0
+echo "setting DEVNUM=0"
+export DEVNUM=0
+
+export EXTCLKDIV=${EXTCLKDIV:-10}
+
+set_clocks() {
+#	(cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests
+	(cd $HAPI_DIR
+#	 SITECLIENT_TRACE=1
+#	./acq2106_set_sync_role.py \
+	./user_apps/acq2106/acq2106_set_sync_role.py \
+	--master_clk fp,1000000,1000000 --master_trg=soft --clkdiv=$EXTCLKDIV \
+	$UUT1
+	)
+}
+control_program() {
+	cd PROJECTS/AFHBA404/LLCONTROL
+	#echo CONTROL PROGRAM 01
+#	export ZCOPY=1 
+	export DO_THRESHOLDS=1
+# total SPAD 16 longs, + 16 AI longs
+	export NCHAN=160
+	export RTPRIO=40
+	export DO32=1
+#	export LOG_FILE="/ramdisk/afhba.%d.log"
+	export LOG_FILE="/home/dt100/PROJECTS/AFHBA404/LLCONTROL/afhba.%d.log"
+#	export ACTION=check_tlatch
+#	export VERBOSE=1
+# isolcpus=4,5,6,7,8...
+# taskset 0x10 means "run on processor 4"
+	export TASKSET="taskset 0x10"
+	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+	echo "$TASKSET ./afhba-bufferAB-do32-threshold $POST $NSB"
+	$TASKSET ./afhba-bufferAB-do32-threshold $POST $NSB &
+	echo wait for llcontrol, PID $CTRLPID
+	wait
+	echo CONTROL PROGRAM 99
+	echo $UUT1 $acq2106_088_path
+	export NCOLS=96
+	export STORE_COLS=80:83
+	logfile=$(printf $LOG_FILE $DEVNUM)
+	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 \
+		--store_cols $STORE_COLS \
+		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
+		$UUT1 $logfile
+}
+
+control_script() {
+       (cd PROJECTS/AFHBA404/HAPI;
+        echo CONTROL SCRIPT 01
+#        export SITECLIENT_TRACE=1 
+	export AISITES=1,2,3,4,5
+# enable SIMULATE=1 to get some dummy AI data. DO NO use with 1:1 loopback!
+	export SIMULATE=1,2,3
+	export FEEDFORWARD=1000
+        export AOSITES=6
+	./llc-test-harness-ai4-dio32.py $UUT1
+        echo CONTROL SCRIPT 99
+       )
+       export AUTO_SOFT_TRIGGER=0
+#       (cd PROJECTS/ACQ400/HAPI/acq400_hapi_tests;
+	(cd $HAPI_DIR
+        STATUSMONITOR_TRACE=1 ./user_apps/acq400/acq400_capture.py \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=$AUTO_SOFT_TRIGGER" \
+		$UUT1
+       )
+}
+
+
+
+case "x$1" in
+xset_clocks)
+	set_clocks;;
+xcontrol_program)
+	control_program;;
+xcontrol_script)
+	control_script;;
+*)
+#	set_clocks
+	new_shot --verbose 1 $UUT1
+	sudo $0 control_program &
+
+	control_script
+	wait 
+	echo wait complete
+	(cd PROJECTS/AFHBA404; sudo ./scripts/get_latstats $DEVNUM)
+	;;
+esac
