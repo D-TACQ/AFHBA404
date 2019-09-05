@@ -34,7 +34,6 @@ def init_common(uut):
     
 def init_ai(uut):
     init_common(uut)
-    
     for s in uut.modules:
         uut.modules[s].simulate = '1' if str(s) in SIMULATE else '0'
     uut.s0.spad = '1,16,0'
@@ -42,6 +41,7 @@ def init_ai(uut):
     uut.cA.aggregator = 'sites={}'.format(AISITES)
     uut.cB.spad = '1'
     uut.cB.aggregator = 'sites={}'.format(AISITES)
+    uut.s0.run0 = str(AISITES)
 
 def init_ao(uut, slave=False):
     aom = "s{}".format(AOSITES.split(',')[0])

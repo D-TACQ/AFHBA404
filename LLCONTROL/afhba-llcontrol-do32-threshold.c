@@ -197,9 +197,9 @@ void control_thresholds(short *xo, short *ai)
 	static unsigned yy = 0;
 	
 	for (ii = 0; ii < 32; ++ii){
-		if (ai[ii] > 100){
+		if (ai[ii] > 10){
 			yy |= 1<<ii;
-		}else if (ai[ii] < -100){
+		}else if (ai[ii] < -10){
 			yy &= ~(1<<ii);
 		}
 	}
@@ -230,7 +230,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	if (!dummy_first_loop){
 		TLATCH(ai_buffer)[0] = tl0;
 	}
-
+	printf("We got to here! \n");
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		memcpy(ai_buffer, host_buffer, VI_LEN);
 		while((tl1 = TLATCH(ai_buffer)[0]) == tl0){
