@@ -51,7 +51,7 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
 
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print TOTAL_SITES
+    print(TOTAL_SITES)
 
     ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES)
 
@@ -62,7 +62,7 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
         uut.cA.spad = 1
         # uut.cB.spad = 1 commented out because this is NOT always true.
 
-    print 'Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad)
+    print('Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad))
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
     uut.cA.aggregator = 'sites={}'.format(TOTAL_SITES)
     # uut.cB.aggregator = AISITES commented out because this is NOT always true.
@@ -105,8 +105,8 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     XOCOMMS = 'A' if len(AISITES) == 0 else 'A'
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print TOTAL_SITES
-    print 'Distributor settings: sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS)
+    print(TOTAL_SITES)
+    print('Distributor settings: sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS)
 
     return None
