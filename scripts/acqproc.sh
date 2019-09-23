@@ -43,7 +43,7 @@ control_script() {
 }
 
 
-configure_script() {
+configure_uut() {
 
     # Setup is done here.
     cd $AFHBA404_DIR
@@ -66,7 +66,7 @@ xcontrol_script)
     control_script;;
 *)
     # Execution starts here.
-    configure_script
+    configure_uut
     sudo $0 control_program &
     control_script
     ;;
