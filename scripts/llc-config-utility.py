@@ -143,7 +143,7 @@ def config_auto(args, uut):
 def run_main():
     parser = argparse.ArgumentParser(description='Auto LLC config tool.')
 
-    parser.add_argument('--include_dio_in_aggregator', type=int, default=1,
+    parser.add_argument('--include_dio_in_aggregator', type=int, default=0,
     help='Since DIO cards can be used as input or output we can decide whether' \
     'or not to include them in the aggregator set.')
 
