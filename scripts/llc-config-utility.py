@@ -70,14 +70,6 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
     return None
 
 
-# def config_ao_sites(args, uut, AOSITES):
-#     # This function configures the relevant AO sites
-#     for site in AOSITES:
-#         eval('uut.s{}.lotide = 256')
-#     uut.s0.distributor = AOSITES
-#     return None
-
-
 def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
 
     for site in AOSITES:
