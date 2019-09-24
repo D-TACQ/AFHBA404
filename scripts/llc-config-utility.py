@@ -13,6 +13,25 @@ import acq400_hapi
 import argparse
 
 
+def get_devnum(args, uut):
+    import subprocess
+    hostname = uut.s0.HN
+
+    try:
+        pwd = subprocess.check_output(['pwd'])
+        if pwd.decode("utf-8").split("/")[-1] == "AFHBA404\n":
+            ident = subprocess.check_output(['./scripts/get-ident-all']).decode("utf-8").split("\n")
+            for item in ident:
+                if hostname in item:
+                    devnum = item.split(" ")[1]
+                    break
+
+    except Exception:
+        print("Not in AFHBA404 directory. Defaulting to devnum = 0")
+        devnum = 0
+    return devnum
+
+
 def calculate_spad(ai_vector_length):
     number_of_bytes_in_a_long = 4
     # Modulo 16 because we need multiples of 16 long words (64 bytes).
@@ -129,6 +148,22 @@ def config_auto(args, uut):
         # config_distributor(args, uut, AOSITES, DIO)
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
+
+    if args.cmd == 1:
+        # Create and print a representitive cpucopy command.
+        # We need to iterate over the sites as s0 NCHAN now includes the spad.
+        nchan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
+        aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AOSITES])
+        DO32 = 1 if DIOSITES else 0
+        spad_longs = uut.s0.spad.split(",")[1]
+        devnum = get_devnum(args, uut)
+
+        command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={}" \
+        " LLCONTROL/afhba-llcontrol-cpucopy" \
+        .format(nchan, aochan, DO32, spad_longs, devnum)
+
+        print("\n", command, sep="")
+
     return None
 
 
@@ -141,6 +176,10 @@ def run_main():
 
     parser.add_argument('--auto', type=int, default=1,
     help='Whether or not to automatically configure the UUTs.')
+
+    parser.add_argument('--cmd', type=int, default=1,
+    help='Whether or not to include an example cpucopy command for the system' \
+    ' being configured')
 
     parser.add_argument('uuts', nargs='+', help="uuts")
 
