@@ -31,6 +31,8 @@ HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
 MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
 
+PYTHON="python3.6"
+
 export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
 # Below is the UUT_path for MDSplus. The server is set
 # to andros as this is the internal D-TACQ MDSplus server.
@@ -62,7 +64,7 @@ analysis() {
     NCHAN=$(echo $cmd | cut -d" " -f2 | cut -d"=" -f2)
     SPADLONGS=$(echo $cmd | cut -d" " -f5 | cut -d"=" -f2)
     # echo $DEVNUM
-    python3.6 test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
+    $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
 
 }
 
@@ -97,18 +99,18 @@ control_program() {
 
 control_script() {
     cd $HAPI_DIR
-    python3.6 user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
+    $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
 }
 
 
 configure_uut() {
     # Setup is done here.
     cd $AFHBA404_DIR
-    cmd=$(python3.6 scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1 | tail -n1)
+    cmd=$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1 | tail -n1)
 
     cd $HAPI_DIR
     # The sync_role command can be changed to 'fpmaster' for external clk and trg.
-    python3.6 user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUT1
+    $PYTHON user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUT1
 
     cd $AFHBA404_DIR
 }
