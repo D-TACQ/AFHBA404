@@ -1,12 +1,31 @@
 #!/bin/bash
 
+
+# This script is intended to be a "catch-all" script for Low Latency Control
+# systems. What this script WILL do:
+# - Configure the clocks
+# - Configure the system for LLC capture.
+# - Start the control program. At present this is always a cpucopy.
+# - Take a transient capture.
+# - Analyse the T_LATCH from the data acquired.
+#
+# What this script will NOT do:
+# - Set up isolated cpus for use with taskset.
+# - Set up the python environment for the user.
+# - Set ANY OUTPUT_DELAY values for the AO.
+# - Configure any of the latency measurement FPGA registers.
+# - Analyse the latency of the system. This is best done by hand and done
+#   according to the LLC-system-latency-measurement-guide
+#   (https://github.com/seanalsop/LLC-system-latency-measurement-guide)
+#
+# Please note:
+# - This script should be run as root if the user wishes to use tasket.
+# - The script does not have to be run as root if taskset is not to be used.
+
 UUT1=acq2106_085
-UUT2=acq2106_085
-UUT3=acq2106_085
-UUTS=$UUT1,$UUT2,$UUT3
-echo $UUTS
 
 POST=400000 # 20kHz for 20s
+CLK=100000 # Set clock speed here
 
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
@@ -15,9 +34,10 @@ MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
 export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
 # Below is the UUT_path for MDSplus. The server is set
 # to andros as this is the internal D-TACQ MDSplus server.
-# Please change this to the name of your MDSplus server 
+# Please change this to the name of your MDSplus server
 # if you wish to use MDSplus.
 export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
+
 
 mdsplus_upload() {
     # An optional function that uploads the scratchpad data to MDSplus.
@@ -32,28 +52,44 @@ mdsplus_upload() {
 }
 
 
+analysis() {
+    echo ""
+    echo "Running analysis now."
+    echo "--------------------"
+    # Takes the LLC data and runs various analysis scripts.
+    cd $HAPI_DIR
+    DEVNUM=$(echo $cmd | cut -d" " -f6 | cut -d"=" -f2)
+    NCHAN=$(echo $cmd | cut -d" " -f2 | cut -d"=" -f2)
+    SPADLONGS=$(echo $cmd | cut -d" " -f5 | cut -d"=" -f2)
+    # echo $DEVNUM
+    python3.6 test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
+
+}
+
+
 control_program() {
     # Run the control program here
     cd $AFHBA404_DIR
-    # Which channel to duplicate. 1 is CH02.
-    export DUP1=0
-    # Number of AI channels in the system.
-    export NCHAN=128
-    # Number of AO channels in the system.
-    export AOCHAN=32
-    # Number of DO Longwords in the system.
-    export DO32=1
-    # Number of longwords in the scratch pad.
-    export SPADLONGS=16
-    # Which port to use.
-    export DEVNUM=0
-    # Whether or not to print samples.
-    export VERBOSE=1 
+
+
+    # Export all of the environment variables the system needs to run the
+    # correct cpucopy.
+    for ii in 1 2 3 4 5 6
+    do
+        var=$(echo $cmd | cut -d" " -f$ii)
+        export $var
+    done
+
+    # Cut off all of the environment variables as they have been exported.
+    runcmd=$(echo $cmd | cut -d" " -f7)
+    runcmd="${runcmd} ${POST}"
+    echo "Command: $cmd"
+
     export TASKET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
-    $TASKSET ./LLCONTROL/afhba-llcontrol-cpucopy $POST &
-    wait
 
+    eval "${TASKET} ${runcmd}"
+    wait
     # Optional MDSplus upload. Comment out if not required.
     mdsplus_upload
 }
@@ -61,19 +97,19 @@ control_program() {
 
 control_script() {
     cd $HAPI_DIR
-    python3.6 user_apps/acq400/acq400_capture.py --transient='POST=400000' $UUT1
+    python3.6 user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
 }
 
 
 configure_uut() {
     # Setup is done here.
     cd $AFHBA404_DIR
-    python3.6 scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1
+    cmd=$(python3.6 scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1 | tail -n1)
 
     cd $HAPI_DIR
     # The sync_role command can be changed to 'fpmaster' for external clk and trg.
-    python3.6 user_apps/acq400/sync_role.py --toprole="master" --fclk=20000 $UUT1
-    
+    python3.6 user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUT1
+
     cd $AFHBA404_DIR
 }
 
@@ -88,7 +124,8 @@ xcontrol_script)
 *)
     # Execution starts here.
     configure_uut
-    sudo $0 control_program &
+    control_program &
     control_script
+    analysis
     ;;
 esac
