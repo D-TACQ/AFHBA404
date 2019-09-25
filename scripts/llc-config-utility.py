@@ -25,6 +25,10 @@ def get_devnum(args, uut):
                 if hostname in item:
                     devnum = item.split(" ")[1]
                     break
+                elif item == ident[-1]:
+                    # if we have not matched by the last entry error out.
+                    print("No AFHBA404 port populated by {}. Please check connections.".format(hostname))
+                    exit(1)
 
     except Exception:
         print("Not in AFHBA404 directory. Defaulting to devnum = 0")
