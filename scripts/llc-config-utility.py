@@ -13,6 +13,29 @@ import acq400_hapi
 import argparse
 
 
+def get_devnum(args, uut):
+    import subprocess
+    hostname = uut.s0.HN
+
+    try:
+        pwd = subprocess.check_output(['pwd'])
+        if pwd.decode("utf-8").split("/")[-1] == "AFHBA404\n":
+            ident = subprocess.check_output(['./scripts/get-ident-all']).decode("utf-8").split("\n")
+            for item in ident:
+                if hostname in item:
+                    devnum = item.split(" ")[1]
+                    break
+                elif item == ident[-1]:
+                    # if we have not matched by the last entry error out.
+                    print("No AFHBA404 port populated by {}. Please check connections.".format(hostname))
+                    exit(1)
+
+    except Exception:
+        print("Not in AFHBA404 directory. Defaulting to devnum = 0")
+        devnum = 0
+    return devnum
+
+
 def calculate_spad(ai_vector_length):
     number_of_bytes_in_a_long = 4
     # Modulo 16 because we need multiples of 16 long words (64 bytes).
@@ -51,7 +74,7 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
 
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print TOTAL_SITES
+    print(TOTAL_SITES)
 
     ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES)
 
@@ -62,20 +85,12 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
         uut.cA.spad = 1
         # uut.cB.spad = 1 commented out because this is NOT always true.
 
-    print 'Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad)
+    print('Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad))
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
     uut.cA.aggregator = 'sites={}'.format(TOTAL_SITES)
     # uut.cB.aggregator = AISITES commented out because this is NOT always true.
     uut.s0.run0 = TOTAL_SITES
     return None
-
-
-# def config_ao_sites(args, uut, AOSITES):
-#     # This function configures the relevant AO sites
-#     for site in AOSITES:
-#         eval('uut.s{}.lotide = 256')
-#     uut.s0.distributor = AOSITES
-#     return None
 
 
 def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
@@ -105,8 +120,8 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     XOCOMMS = 'A' if len(AISITES) == 0 else 'A'
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print TOTAL_SITES
-    print 'Distributor settings: sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS)
+    print(TOTAL_SITES)
+    print('Distributor settings: sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(TOTAL_SITES, TCAN, XOCOMMS)
 
     return None
@@ -137,18 +152,38 @@ def config_auto(args, uut):
         # config_distributor(args, uut, AOSITES, DIO)
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
+
+    if args.cmd == 1:
+        # Create and print a representitive cpucopy command.
+        # We need to iterate over the sites as s0 NCHAN now includes the spad.
+        nchan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
+        aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AOSITES])
+        DO32 = 1 if DIOSITES else 0
+        spad_longs = uut.s0.spad.split(",")[1]
+        devnum = get_devnum(args, uut)
+
+        command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={}" \
+        " LLCONTROL/afhba-llcontrol-cpucopy" \
+        .format(nchan, aochan, DO32, spad_longs, devnum)
+
+        print("\n", command, sep="")
+
     return None
 
 
 def run_main():
     parser = argparse.ArgumentParser(description='Auto LLC config tool.')
 
-    parser.add_argument('--include_dio_in_aggregator', type=int, default=1,
+    parser.add_argument('--include_dio_in_aggregator', type=int, default=0,
     help='Since DIO cards can be used as input or output we can decide whether' \
     'or not to include them in the aggregator set.')
 
     parser.add_argument('--auto', type=int, default=1,
     help='Whether or not to automatically configure the UUTs.')
+
+    parser.add_argument('--cmd', type=int, default=1,
+    help='Whether or not to include an example cpucopy command for the system' \
+    ' being configured')
 
     parser.add_argument('uuts', nargs='+', help="uuts")
 
