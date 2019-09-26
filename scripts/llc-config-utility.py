@@ -153,6 +153,10 @@ def config_auto(args, uut):
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
 
+    if args.us == 1:
+        trg = uut.s1.trg.split(" ")[0].split("=")[1]
+        uut.s0.spad1_us = trg # set the usec counter to the same as trg.
+
     if args.cmd == 1:
         # Create and print a representitive cpucopy command.
         # We need to iterate over the sites as s0 NCHAN now includes the spad.
@@ -184,6 +188,9 @@ def run_main():
     parser.add_argument('--cmd', type=int, default=1,
     help='Whether or not to include an example cpucopy command for the system' \
     ' being configured')
+
+    parser.add_argument('--us', type=int, default=1,
+    help='Whether or not to set the microsecond counter.')
 
     parser.add_argument('uuts', nargs='+', help="uuts")
 
