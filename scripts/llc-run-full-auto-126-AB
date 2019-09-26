@@ -12,8 +12,12 @@ HAPI_DIR=/home/dt100/PROJECTS/ACQ400/HAPI/acq400_hapi/
 
 echo llc-run-full-auto-082 UUT1=$UUT1 POST=$POST TLEN=$TLEN
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
+
+USE_MDSPLUS=0
+if [ $USE_MDSPLUS -eq 1 ]; then
 export acq2106_126_path=andros::/home/dt100/TREES/acq2106_126
 #export acq2106_126_path=/home/dt100/TREES/acq2106_126
+fi
 
 # We tested with ACQ2106_082 plugged into AFHBA404 PORT A
 # for PORT A set DEVNUM=0
@@ -58,7 +62,8 @@ control_program() {
 	export NCOLS=96
 	export STORE_COLS=80:83
 	logfile=$(printf $LOG_FILE $DEVNUM)
-	/home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 \
+	[ $USE_MDSPLUS -eq 1 ] && /home/dt100/bin/mds_put_slice.py \
+		--ncols $NCOLS --dtype np.uint32 \
 		--store_cols $STORE_COLS \
 		--tlatch_report=1 --node_name "CH%02d" --default_node ST \
 		$UUT1 $logfile
