@@ -95,7 +95,7 @@ xcontrol_script)
 	control_script;;
 *)
 #	set_clocks
-	new_shot --verbose 1 $UUT1
+	[ $USE_MDSPLUS -eq 1 ] && new_shot --verbose 1 $UUT1
 	sudo $0 control_program &
 
 	control_script
