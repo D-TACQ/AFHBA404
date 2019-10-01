@@ -25,19 +25,20 @@
 UUT1=acq2106_085
 
 POST=400000 # 20kHz for 20s
-CLK=100000 # Set clock speed here
+CLK=20000 # Set clock speed here
 
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
 MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
+ANALYSIS=true # Whether or not to run the analysis scripts.
 
 PYTHON="python3.6"
 
 export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
-# Below is the UUT_path for MDSplus. The server is set
-# to andros as this is the internal D-TACQ MDSplus server.
-# Please change this to the name of your MDSplus server
-# if you wish to use MDSplus.
+
+# Below is the UUT_path for MDSplus. The server is set to andros as this
+# is the internal D-TACQ MDSplus server. Please change this to the name of
+# your MDSplus server if you wish to use MDSplus.
 export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
 
 
@@ -54,6 +55,15 @@ mdsplus_upload() {
 }
 
 
+check_uut() {
+    ping -c 1 $UUT1 &>/dev/null
+    if ! [ $? -eq 0 ]; then
+        echo "Cannot ping $UUT1, please check UUT is available."
+        exit 1
+    fi
+}
+
+
 analysis() {
     echo ""
     echo "Running analysis now."
@@ -66,13 +76,14 @@ analysis() {
     # echo $DEVNUM
     $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
 
+    cd $AFHBA404_DIR
+    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.0.log" $UUT1
 }
 
 
 control_program() {
     # Run the control program here
     cd $AFHBA404_DIR
-
 
     # Export all of the environment variables the system needs to run the
     # correct cpucopy.
@@ -132,9 +143,13 @@ xcontrol_script)
     control_script;;
 *)
     # Execution starts here.
+    check_uut
     configure_uut
     control_program &
     control_script
-    analysis
+
+    if $ANALYSIS; then
+        analysis
+    fi
     ;;
 esac
