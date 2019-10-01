@@ -25,19 +25,25 @@
 UUT1=acq2106_085
 
 POST=400000 # 20kHz for 20s
-CLK=100000 # Set clock speed here
+CLK=20000 # Set clock speed here
 
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
 MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
 
+ANALYSIS=true # Whether or not to run the analysis scripts.
+TRANSIENT=true # Take a transient capture if true, else stream.
+
 PYTHON="python3.6"
+# comment out if NOT using MDSplus
+USE_MDSPLUS=1
 
 export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
-# Below is the UUT_path for MDSplus. The server is set
-# to andros as this is the internal D-TACQ MDSplus server.
-# Please change this to the name of your MDSplus server
-# if you wish to use MDSplus.
+
+if [ "$USE_MDSPLUS" = "1" ]; then
+# Below is the UUT_path for MDSplus. The server is set to andros as this
+# is the internal D-TACQ MDSplus server. Please change this to the name of
+# your MDSplus server if you wish to use MDSplus. Ignore if not using MDSplus
 export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
 
 
@@ -51,6 +57,17 @@ mdsplus_upload() {
 
     cd $AFHBA404_DIR
 
+}
+fi
+
+
+
+check_uut() {
+    ping -c 1 $UUT1 &>/dev/null
+    if ! [ $? -eq 0 ]; then
+        echo "Cannot ping $UUT1, please check UUT is available."
+        exit 1
+    fi
 }
 
 
@@ -66,13 +83,14 @@ analysis() {
     # echo $DEVNUM
     $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
 
+    cd $AFHBA404_DIR
+    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.0.log" $UUT1
 }
 
 
 control_program() {
     # Run the control program here
     cd $AFHBA404_DIR
-
 
     # Export all of the environment variables the system needs to run the
     # correct cpucopy.
@@ -90,16 +108,22 @@ control_program() {
     export TASKET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 
-    eval "${TASKET} ${runcmd}"
+    eval "${TASKSET} ${runcmd}"
     wait
-    # Optional MDSplus upload. Comment out if not required.
-    mdsplus_upload
+    
+    [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
 
 control_script() {
+
     cd $HAPI_DIR
-    $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
+    if $TRANSIENT; then
+        $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
+    else
+        $PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $UUT1
+    fi
+
 }
 
 
@@ -132,9 +156,13 @@ xcontrol_script)
     control_script;;
 *)
     # Execution starts here.
+    check_uut
     configure_uut
     control_program &
     control_script
-    analysis
+
+    if $ANALYSIS; then
+        analysis
+    fi
     ;;
 esac
