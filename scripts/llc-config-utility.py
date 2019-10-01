@@ -157,6 +157,9 @@ def config_auto(args, uut):
         trg = uut.s1.trg.split(" ")[0].split("=")[1]
         uut.s0.spad1_us = trg # set the usec counter to the same as trg.
 
+    if args.lat == 1:
+        uut.s0.LLC_instrument_latency = 1
+
     if args.cmd == 1:
         # Create and print a representitive cpucopy command.
         # We need to iterate over the sites as s0 NCHAN now includes the spad.
@@ -191,6 +194,9 @@ def run_main():
 
     parser.add_argument('--us', type=int, default=1,
     help='Whether or not to set the microsecond counter.')
+
+    parser.add_argument('--lat', type=int, default=1,
+    help='Whether or not to set the latency statistics on the acq2106.')
 
     parser.add_argument('uuts', nargs='+', help="uuts")
 
