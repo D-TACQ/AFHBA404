@@ -90,7 +90,7 @@ control_program() {
     export TASKET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 
-    eval "${TASKET} ${runcmd}"
+    eval "${TASKSET} ${runcmd}"
     wait
     # Optional MDSplus upload. Comment out if not required.
     mdsplus_upload
