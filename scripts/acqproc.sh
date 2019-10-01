@@ -8,13 +8,15 @@
 # - Start the control program. At present this is always a cpucopy.
 # - Take a transient capture.
 # - Analyse the T_LATCH from the data acquired.
+# - Configure the latency measurement FPGA registers.
+# - Analyse the FPGA register data encoded in the SPAD.
 #
 # What this script will NOT do:
 # - Set up isolated cpus for use with taskset.
 # - Set up the python environment for the user.
 # - Set ANY OUTPUT_DELAY values for the AO.
-# - Configure any of the latency measurement FPGA registers.
-# - Analyse the latency of the system. This is best done by hand and done
+
+# - Analyse the full latency of the system. This is best done by hand and done
 #   according to the LLC-system-latency-measurement-guide
 #   (https://github.com/seanalsop/LLC-system-latency-measurement-guide)
 #
