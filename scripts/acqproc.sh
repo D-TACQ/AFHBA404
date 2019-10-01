@@ -30,7 +30,9 @@ CLK=20000 # Set clock speed here
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
 MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
+
 ANALYSIS=true # Whether or not to run the analysis scripts.
+TRANSIENT=true # Take a transient capture if true, else stream.
 
 PYTHON="python3.6"
 
@@ -109,8 +111,14 @@ control_program() {
 
 
 control_script() {
+
     cd $HAPI_DIR
-    $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
+    if $TRANSIENT; then
+        $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUT1
+    else
+        $PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $UUT1
+    fi
+
 }
 
 
