@@ -40,7 +40,7 @@ export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
 
 # Below is the UUT_path for MDSplus. The server is set to andros as this
 # is the internal D-TACQ MDSplus server. Please change this to the name of
-# your MDSplus server if you wish to use MDSplus.
+# your MDSplus server if you wish to use MDSplus. Ignore if not using MDSplus
 export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
 
 
