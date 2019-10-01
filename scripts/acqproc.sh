@@ -37,12 +37,15 @@ ANALYSIS=true # Whether or not to run the analysis scripts.
 TRANSIENT=true # Take a transient capture if true, else stream.
 
 PYTHON="python3.6"
+# comment out if NOT using MDSplus
+USE_MDSPLUS=1
 
 export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
 
+if [ "$USE_MDSPLUS" = "1" ]; then
 # Below is the UUT_path for MDSplus. The server is set to andros as this
 # is the internal D-TACQ MDSplus server. Please change this to the name of
-# your MDSplus server if you wish to use MDSplus.
+# your MDSplus server if you wish to use MDSplus. Ignore if not using MDSplus
 export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
 
 
@@ -57,6 +60,8 @@ mdsplus_upload() {
     cd $AFHBA404_DIR
 
 }
+fi
+
 
 
 check_uut() {
@@ -107,8 +112,8 @@ control_program() {
 
     eval "${TASKSET} ${runcmd}"
     wait
-    # Optional MDSplus upload. Comment out if not required.
-    mdsplus_upload
+    
+    [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
 
