@@ -72,13 +72,14 @@ def main():
     # axs[0].set_xlabel('Time in microseconds.')
     # axs[0].set_ylabel('Frequency')
     # axs[0].set_yscale('log', nonposy='clip')
-    print("len diffs = {}".format(len(diff_locations)))    
+    print("len diffs = {}".format(len(diff_locations)))
     print("max data = {}".format(max_data))
     #for item in max_data:
     #    if item != max_data[0]:
     #        print("It's not fucked")
-    num_bins = np.arange(min(max_data)-0.5, max(max_data)+0.5, (max(max_data) - min(max_data))/np.sqrt(len(max_data))*4)
-    axs.hist(max_data, bins=num_bins, label="A histogram of the maximum latency data")
+    hist_bins = np.histogram_bin_edges(max_data, bins='doane')
+    axs.hist(max_data, bins=hist_bins, label="A histogram of the maximum latency data")
+
     axs.title.set_text("histogram of max data on a log scale (n = {})".format(len(max_data)))
     axs.set_xlabel('Time in microseconds.')
     axs.set_ylabel('Frequency')
