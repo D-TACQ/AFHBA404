@@ -55,7 +55,7 @@ mdsplus_upload() {
     export STORE_COLS="0:15"
     $MDS_DIR/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
         --tlatch_report=1 --node_name "CH%02d" --default_node ST \
-        $UUT1 afhba.0.log
+        $UUT1 afhba.$DEVNUM.log
 
     cd $AFHBA404_DIR
 
@@ -86,7 +86,7 @@ analysis() {
     $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
 
     cd $AFHBA404_DIR
-    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.0.log" $UUT1
+    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.$DEVNUM.log" $UUT1
 }
 
 
