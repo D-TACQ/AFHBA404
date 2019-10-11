@@ -8,6 +8,7 @@ Usage:
 ./llc-config-utility.py [uut name 1] [uut name 2] ... [uut name N]
 """
 
+from __future__ import print_function
 import numpy
 import acq400_hapi
 import argparse
@@ -29,7 +30,8 @@ def get_devnum(args, uut):
                     # if we have not matched by the last entry error out.
                     print("No AFHBA404 port populated by {}. Please check connections.".format(hostname))
                     exit(1)
-
+        else:
+            devnum = 0
     except Exception:
         print("Not in AFHBA404 directory. Defaulting to devnum = 0")
         devnum = 0
