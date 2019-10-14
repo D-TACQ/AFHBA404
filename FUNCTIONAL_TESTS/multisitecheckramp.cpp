@@ -203,8 +203,10 @@ int check_length(const char* fname)
 		if (flen != AcqData::bl){
 			fprintf(stderr, "ERROR: length mismatch %s %d != %d\n",
 				fname, flen, AcqData::bl);
+			return 1;
 		}
 	}
+	return 0;
 }
 
 int calc_NGRP() {

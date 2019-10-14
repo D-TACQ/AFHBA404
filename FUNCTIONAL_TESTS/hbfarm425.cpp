@@ -8,12 +8,12 @@
 int verbose;
 
 #define MAXSITES	6
- 
+
 class HBFarm {
 	const char* process;
 	const char* outroot;
 	FILE *fp_out[MAXSITES+1];	/* index from 1 */
-	
+
 	int ii;
 	int sitelw;
 	unsigned *lw;
@@ -29,8 +29,9 @@ public:
 	{
 		while(fread(lw, sizeof(unsigned), sitelw, fin) == sitelw){
 			fwrite(lw, sizeof(unsigned), sitelw, fp_out[ii]);
-			ii = next(ii);	
+			ii = next(ii);
 		}
+		return 0;
 	}
 	int addSite(int site) {
 		if (site < 1 || site > MAXSITES){
@@ -63,7 +64,7 @@ public:
 		memset(fp_out, 0, sizeof(fp_out));
 		if (getenv("HBFARM_PROCESS")){
 			process = getenv("HBFARM_PROCESS");
-			if (verbose) fprintf(stderr, "HBFarm process:%s lw:%d\n", process, sitelw);		
+			if (verbose) fprintf(stderr, "HBFarm process:%s lw:%d\n", process, sitelw);
 		}else{
 			process = 0;
 		}
@@ -87,9 +88,9 @@ char* chomp(char* str) {
 int main(int argc, char* argv[])
 {
 	if (argc < 2){
-		fprintf(stderr, "hbfarm425 site1 site2 site3 site4\n");	
+		fprintf(stderr, "hbfarm425 site1 site2 site3 site4\n");
 		return 1;
-	}	
+	}
 
 	int sinks = 0;
 	int sitelw = 8;
@@ -99,7 +100,7 @@ int main(int argc, char* argv[])
 
 	for (int ii = 1; ii < argc; ++ii, ++sinks){
 		if (hbfarm.addSite(atoi(argv[ii]))){
-			return -1;	
+			return -1;
 		}
 	}
 	if (sinks == 0){
