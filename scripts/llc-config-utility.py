@@ -176,17 +176,16 @@ def config_auto(args, uut):
         " LLCONTROL/afhba-llcontrol-cpucopy" \
         .format(nchan, aochan, DO32, spad_longs, devnum)
 
-        print("\n", command, sep="")
-
         print("Outbound vector composition: {} short words of AI, "
         "{} longword(s) of DI, and {} longwords of SPAD.".format(nchan*2, DO32, spad_longs))
 
-        print(in_vector = "Inbound vector composition: {} short words of AO, "
+        print("Inbound vector composition: {} short words of AO, "
         "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan*2, DO32, tcan_longs))
 
-        print(spad_info = "The scratchpad will start at position {} in the vector.".format(nchan/2))
+        print("The scratchpad will start at position {} in the vector. \n".format(nchan/2))
 
-
+        # print("\n", command, sep="")
+        print("\n", command)
 
     return None
 
