@@ -137,8 +137,11 @@ configure_uut() {
     $PYTHON user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUT1
 
     cd $AFHBA404_DIR
-    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1)"
+    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 $UUT1)"
     success=$?
+    info=$(echo "$cmd" | tail -n6 | sed '$d')
+    printf "$info"
+    echo -e "\n"
     cmd="$(echo "$cmd" | tail -n1)"
     if ! [ $success -eq 0 ]; then
         echo "Host did not find $UUT1 connected the AFHBA404 card. Please check connections."
