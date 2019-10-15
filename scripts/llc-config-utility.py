@@ -169,6 +169,7 @@ def config_auto(args, uut):
         aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AOSITES])
         DO32 = 1 if DIOSITES else 0
         spad_longs = uut.s0.spad.split(",")[1]
+        tcan_longs = uut.s0.distributor.split(" ")[3].split("=")[1]
         devnum = get_devnum(args, uut)
 
         command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={}" \
@@ -176,6 +177,16 @@ def config_auto(args, uut):
         .format(nchan, aochan, DO32, spad_longs, devnum)
 
         print("\n", command, sep="")
+
+        print("Outbound vector composition: {} short words of AI, "
+        "{} longword(s) of DI, and {} longwords of SPAD.".format(nchan*2, DO32, spad_longs))
+
+        print(in_vector = "Inbound vector composition: {} short words of AO, "
+        "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan*2, DO32, tcan_longs))
+
+        print(spad_info = "The scratchpad will start at position {} in the vector.".format(nchan/2))
+
+
 
     return None
 
