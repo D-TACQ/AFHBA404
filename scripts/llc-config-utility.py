@@ -165,8 +165,11 @@ def config_auto(args, uut):
     if args.cmd == 1:
         # Create and print a representitive cpucopy command.
         # We need to iterate over the sites as s0 NCHAN now includes the spad.
-        nchan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
+        TOTAL_SITES = AISITES + DIOSITES if args.include_dio_in_aggregator else AISITES
+        print("DEBUG = ", TOTAL_SITES)
+        aichan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
         aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AOSITES])
+        nshorts = (aichan) + (2 * len(DIOSITES))
         DO32 = 1 if DIOSITES else 0
         spad_longs = uut.s0.spad.split(",")[1]
         tcan_longs = uut.s0.distributor.split(" ")[3].split("=")[1]
@@ -174,15 +177,15 @@ def config_auto(args, uut):
 
         command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={}" \
         " LLCONTROL/afhba-llcontrol-cpucopy" \
-        .format(nchan, aochan, DO32, spad_longs, devnum)
+        .format(nshorts, aochan, DO32, spad_longs, devnum)
 
         print("Outbound vector composition: {} short words of AI, "
-        "{} longword(s) of DI, and {} longwords of SPAD.".format(nchan*2, DO32, spad_longs))
+        "{} longword(s) of DI, and {} longwords of SPAD.".format(aichan*2, DO32, spad_longs))
 
         print("Inbound vector composition: {} short words of AO, "
         "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan*2, DO32, tcan_longs))
 
-        print("The scratchpad will start at position {} in the vector. \n".format(nchan/2))
+        print("The scratchpad will start at position {} in the vector. \n".format(int(nshorts/2)))
 
         # print("\n", command, sep="")
         print("\n", command)
