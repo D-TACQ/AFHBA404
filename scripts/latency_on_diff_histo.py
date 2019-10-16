@@ -26,11 +26,7 @@ def main():
     # get data_end by taking nchan and subtracting the spad, then subtracting 1.
     data_end = nchan - (2 * int(uut.s0.spad.split(",")[1])) - 1
     print("data end = {}".format(data_end))
-    #latest_spad_offset = 5
-    #mean_spad_offset = 6
-    #min_spad_offset = 7
-    #max_spad_offset = 8
-    #diffs_offset = 9
+
 
     latest_spad_offset = 9
     mean_spad_offset = 10
@@ -65,20 +61,13 @@ def main():
 
     fig, axs = plt.subplots(1, 1, sharey=False, sharex=False, tight_layout=True)
 
-    # num_bins = np.arange(min(latest_data), max(latest_data),
-    #             (max(latest_data)-min(latest_data))/np.sqrt(len(latest_data))*4)
-    # axs[0].hist(latest_data, bins=num_bins)
-    # axs[0].title.set_text('Histogram of latest data on a log scale (n = {})'.format(len(latest_data)))
-    # axs[0].set_xlabel('Time in microseconds.')
-    # axs[0].set_ylabel('Frequency')
-    # axs[0].set_yscale('log', nonposy='clip')
-    print("len diffs = {}".format(len(diff_locations)))    
+
+    print("len diffs = {}".format(len(diff_locations)))
     print("max data = {}".format(max_data))
-    #for item in max_data:
-    #    if item != max_data[0]:
-    #        print("It's not fucked")
-    num_bins = np.arange(min(max_data)-0.5, max(max_data)+0.5, (max(max_data) - min(max_data))/np.sqrt(len(max_data))*4)
-    axs.hist(max_data, bins=num_bins, label="A histogram of the maximum latency data")
+
+    hist_bins = np.histogram_bin_edges(max_data, bins='doane')
+    axs.hist(max_data, bins=hist_bins, label="A histogram of the maximum latency data")
+
     axs.title.set_text("histogram of max data on a log scale (n = {})".format(len(max_data)))
     axs.set_xlabel('Time in microseconds.')
     axs.set_ylabel('Frequency')

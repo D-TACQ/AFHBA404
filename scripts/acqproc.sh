@@ -55,7 +55,7 @@ mdsplus_upload() {
     export STORE_COLS="0:15"
     $MDS_DIR/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
         --tlatch_report=1 --node_name "CH%02d" --default_node ST \
-        $UUT1 afhba.0.log
+        $UUT1 afhba.$DEVNUM.log
 
     cd $AFHBA404_DIR
 
@@ -86,7 +86,7 @@ analysis() {
     $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/afhba.$DEVNUM.log --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
 
     cd $AFHBA404_DIR
-    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.0.log" $UUT1
+    $PYTHON ./scripts/latency_on_diff_histo.py --file="./afhba.$DEVNUM.log" $UUT1
 }
 
 
@@ -137,8 +137,11 @@ configure_uut() {
     $PYTHON user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUT1
 
     cd $AFHBA404_DIR
-    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=0 $UUT1)"
+    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 $UUT1)"
     success=$?
+    info=$(echo "$cmd" | tail -n6 | sed '$d')
+    printf "$info"
+    echo -e "\n"
     cmd="$(echo "$cmd" | tail -n1)"
     if ! [ $success -eq 0 ]; then
         echo "Host did not find $UUT1 connected the AFHBA404 card. Please check connections."

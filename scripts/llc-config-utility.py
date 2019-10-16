@@ -8,6 +8,7 @@ Usage:
 ./llc-config-utility.py [uut name 1] [uut name 2] ... [uut name N]
 """
 
+from __future__ import print_function
 import numpy
 import acq400_hapi
 import argparse
@@ -29,7 +30,8 @@ def get_devnum(args, uut):
                     # if we have not matched by the last entry error out.
                     print("No AFHBA404 port populated by {}. Please check connections.".format(hostname))
                     exit(1)
-
+        else:
+            devnum = 0
     except Exception:
         print("Not in AFHBA404 directory. Defaulting to devnum = 0")
         devnum = 0
@@ -103,7 +105,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
         dio = "s{}".format(site)
         uut.svc[dio].mode = '0'
         uut.svc[dio].lotide = '256'
-        uut.svc[dio].byte_is_output = '1,1,1,1'
+        uut.svc[dio].byte_is_output = '1,1,0,0'
         uut.svc[dio].clk = '1,1,1'
         uut.svc[dio].trg = '1,0,1'
         uut.svc[dio].mode = '1'
@@ -163,17 +165,30 @@ def config_auto(args, uut):
     if args.cmd == 1:
         # Create and print a representitive cpucopy command.
         # We need to iterate over the sites as s0 NCHAN now includes the spad.
-        nchan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
+        TOTAL_SITES = AISITES + DIOSITES if args.include_dio_in_aggregator else AISITES
+        print("DEBUG = ", TOTAL_SITES)
+        aichan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AISITES])
         aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN")) for site in AOSITES])
+        nshorts = (aichan) + (2 * len(DIOSITES))
         DO32 = 1 if DIOSITES else 0
         spad_longs = uut.s0.spad.split(",")[1]
+        tcan_longs = uut.s0.distributor.split(" ")[3].split("=")[1]
         devnum = get_devnum(args, uut)
 
         command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={}" \
         " LLCONTROL/afhba-llcontrol-cpucopy" \
-        .format(nchan, aochan, DO32, spad_longs, devnum)
+        .format(nshorts, aochan, DO32, spad_longs, devnum)
 
-        print("\n", command, sep="")
+        print("Outbound vector composition: {} short words of AI, "
+        "{} longword(s) of DI, and {} longwords of SPAD.".format(aichan*2, DO32, spad_longs))
+
+        print("Inbound vector composition: {} short words of AO, "
+        "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan*2, DO32, tcan_longs))
+
+        print("The scratchpad will start at position {} in the vector. \n".format(int(nshorts/2)))
+
+        # print("\n", command, sep="")
+        print("\n", command)
 
     return None
 
