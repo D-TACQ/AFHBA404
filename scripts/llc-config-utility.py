@@ -20,6 +20,7 @@ def config_sync_clk(uut):
     """
     uut.s0.SIG_SRC_SYNC_0 = 'MBCLK'
     uut.s0.SIG_FP_SYNC = 'SYNC0'
+    return None
 
 
 def get_devnum(args, uut):
