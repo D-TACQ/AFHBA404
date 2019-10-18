@@ -14,6 +14,14 @@ import acq400_hapi
 import argparse
 
 
+def config_sync_clk(uut):
+    """
+    Configures the MBCLK to be output on the front panel SYNC connector.
+    """
+    uut.s0.SIG_SRC_SYNC_0 = 'MBCLK'
+    uut.s0.SIG_FP_SYNC = 'SYNC0'
+
+
 def get_devnum(args, uut):
     import subprocess
     hostname = uut.s0.HN
@@ -154,6 +162,8 @@ def config_auto(args, uut):
         # config_distributor(args, uut, AOSITES, DIO)
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
+
+    config_sync_clk(uut)
 
     if args.us == 1:
         trg = uut.s1.trg.split(" ")[0].split("=")[1]
