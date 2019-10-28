@@ -191,10 +191,10 @@ def config_auto(args, uut):
         .format(nshorts, aochan, DO32, spad_longs, devnum)
 
         print("Outbound vector composition: {} short words of AI, "
-        "{} longword(s) of DI, and {} longwords of SPAD.".format(aichan*2, DO32, spad_longs))
+        "{} longword(s) of DI, and {} longwords of SPAD.".format(aichan, DO32, spad_longs))
 
         print("Inbound vector composition: {} short words of AO, "
-        "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan*2, DO32, tcan_longs))
+        "{} longword(s) of DO, and {} longwords of TCAN.".format(aochan, DO32, tcan_longs))
 
         print("The scratchpad will start at position {} in the vector. \n".format(int(nshorts/2)))
 
