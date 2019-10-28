@@ -312,7 +312,7 @@ void dio_watchdog(short *ao, short *ai)
 {
         unsigned* dox = (unsigned *)ao;
 
-	dox[DO_IX] = dox[DO_IX]  ^ WD_BIT;
+	dox[DO_IX] ^= WD_BIT;
 }
 
 
