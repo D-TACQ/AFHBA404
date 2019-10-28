@@ -116,7 +116,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
         uut.svc[dio].lotide = '256'
         uut.svc[dio].byte_is_output = '1,1,0,0'
         uut.svc[dio].clk = '1,1,1'
-        uut.svc[dio].trg = '1,0,1'
+        uut.svc[dio].trg = '1,1,1'
         uut.svc[dio].mode = '1'
 
     TOTAL_SITES = (AOSITES + DIOSITES)

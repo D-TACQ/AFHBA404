@@ -55,7 +55,7 @@ void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-
+#define WD_BIT 1
 int verbose;
 
 void (*G_action)(void*);
@@ -308,6 +308,14 @@ void control_example2(short *ao, short *ai)
 }
 
 
+void dio_watchdog(short *ao, short *ai)
+{
+        unsigned* dox = (unsigned *)ao;
+
+	dox[DO_IX] = dox[DO_IX]  ^ WD_BIT;
+}
+
+
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
@@ -326,6 +334,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 		while((tl1 = TLATCH(host_buffer)[0]) == tl0){
+			dio_watchdog(ao_buffer, ai_buffer);
 			sched_yield();
 			++pollcat;
 		}
