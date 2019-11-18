@@ -268,7 +268,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 
 	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
-			while((tl1 = TLATCH(devs[id].lbuf)[0]) == tl0[id]){
+			while((tl1 = TLATCH(devs[id].host_buffer)[0]) == tl0[id]){
 				dio_watchdog(AO_BUFFER(devs+id));
 				sched_fifo_priority>1 || sched_yield();
 				++pollcat[id];
