@@ -1,11 +1,11 @@
 /* ------------------------------------------------------------------------- *
- * afhba-llcontrol-cpucopy.c
- * simple llcontrol example, ONE HBA, two buffers, CPU copy (realistic).
+ * afhba-llcontrol-multiuut-4AI1AO1DX.c
+ * read incoming data from 1..4 uuts, control standardized payload.
  * ------------------------------------------------------------------------- *
- *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd
+ *   Copyright (C) 2019 Peter Milne, D-TACQ Solutions Ltd
  *                      <peter dot milne at D hyphen TACQ dot com>
  *                         www.d-tacq.com
- *   Created on: 18 September 2014
+ *   Created on: 18 November 2019
  *    Author: pgm
  *                                                                           *
  *  This program is free software; you can redistribute it and/or modify     *
@@ -24,6 +24,7 @@
 
 /** Description of Program
  *
+ * Assume standardized ACQ2106+4xACQ424+AO32+DIO32 (128AI,32DI,32AO,32DO)
 
  getMapping() from device driver : this is where the data appears
  goRealTime() isolate the process for best RT performance
@@ -38,8 +39,6 @@
 
 */
 
-
-
 #include "afhba-llcontrol-common.h"
 
 /* SPLIT single HB into 2
@@ -49,14 +48,37 @@
 
 #define AO_OFFSET (HB_LEN/2)
 
+/* hardcoded for 4 devs */
+
+struct Dev {
+	int devnum;
+	int fd;
+	void* host_buffer;
+	void* lbuf;
+	struct XLLC_DEF xllc_def;
+};
+
+struct Dev devs[4] = {
+		{ 0, }, { 1, }, {2, }, {3, }
+};
+
+#define AO_BUFFER(dev)	((short*)((dev)->host_buffer)+AO_OFFSET)
+
+/* limit with devmax */
+int devmax = 4;
+
+#define FORALL for (int id = 0; id < devmax; ++id)
 
 
 void* host_buffer;
 int fd;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
-#define WD_BIT 1
+
 int verbose;
+
+void control_dup1(short *ao, short *ai);
+void (*G_control)(short *ao, short *ai) = control_dup1;
 
 void (*G_action)(void*);
 int devnum = 0;
@@ -65,168 +87,16 @@ int dummy_first_loop;
 int G_POLARITY = 1;		
 /** env POLARITY=-1 negates feedback this is usefult to know that the 
  *  software is in fact doing something 					 */
-
-
-
-short* ao_buffer;
-int has_do32;
-
-int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
-short *AO_IDENT;
-
-
-struct XLLC_DEF xllc_def = {
-		.pa = RTM_T_USE_HOSTBUF,
-
-};
-
-#define DEF_AO_CHAN	32
-int ao_chan = DEF_AO_CHAN;
+int has_do32 = 1;
+int ao_chan = 32;
 #define VO_LEN  (ao_chan*sizeof(short) + (has_do32?sizeof(unsigned):0))
 
+int DUP1 = 0; 			/* duplicate AI[DUP1], default 0 */
+short *AO_IDENT;		/* AO, identity output (offset = f(chan)) */
+
+
 #define DO_IX	(16)		/* longwords */
-
-
-
-void control_dup1(short *ao, short *ai);
-void (*G_control)(short *ao, short *ai) = control_dup1;
-
-#define MV100   (32768/100)
-
-int FFNLUT;
-void control_feedforward(short *ao, short *ai);
-
-void ui(int argc, char* argv[])
-{
-        if (getenv("RTPRIO")){
-		sched_fifo_priority = atoi(getenv("RTPRIO"));
-        }
-	if (getenv("VERBOSE")){
-		verbose = atoi(getenv("VERBOSE"));
-	}
-	if (getenv("DEVNUM")){
-		devnum = atoi(getenv("DEVNUM"));
-	}
-	/* own PA eg from GPU */
-	if (getenv("PA_BUF")){
-		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
-	}
-	if (getenv("DO32")){
-		has_do32 = atoi(getenv("DO32"));
-	}
-	if (getenv("DUMMY_FIRST_LOOP")){
-		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
-	}
-	if (getenv("NCHAN")){
-		nchan = atoi(getenv("NCHAN"));
-		fprintf(stderr, "NCHAN set %d\n", nchan);
-	}
-	if (getenv("AICHAN")){
-		nchan = atoi(getenv("AICHAN"));
-		fprintf(stderr, "AICHAN (nchan) set %d\n", nchan);
-	}
-	if (getenv("AOCHAN")){
-		ao_chan = atoi(getenv("AOCHAN"));
-		fprintf(stderr, "AOCHAN set %d\n", ao_chan);
-	}
-	if (getenv("POLARITY")){
-		G_POLARITY = atoi(getenv("POLARITY"));
-		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
-	}
-        if (getenv("AFFINITY")){
-                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
-        }
-        if (getenv("DUP1")){
-                DUP1 = atoi(getenv("DUP1"));
-                G_control = control_dup1;
-        }
-	if (getenv("FEED_FORWARD")){
-		int ff = atoi(getenv("FEED_FORWARD"));
-		if (ff){
-			G_control = control_feedforward;
-			FFNLUT = ff;
-		}
-	}
-
-        {
-                int ao_ident = 0;
-                if (getenv("AO_IDENT")){
-                        ao_ident = atoi(getenv("AO_IDENT"));
-                }
-                AO_IDENT = make_ao_ident(ao_chan, ao_ident);
-        }
-
-	if (getenv("SPADLONGS")){
-		spadlongs = atoi(getenv("SPADLONGS"));
-		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
-	}
-	xllc_def.len = VI_LEN;
-
-	if (argc > 1){
-		nsamples = atoi(argv[1]);
-	}
-	if (argc > 2){
-		samples_buffer = atoi(argv[2]);
-	}
-	G_action = write_action;
-	if (getenv("ACTION")){
-		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
-			G_action = check_tlatch_action;
-		}
-	}
-}
-
-void setup()
-{
-	setup_logging(devnum);
-	host_buffer = get_mapping(devnum, &fd);
-	goRealTime();
-
-	xllc_def.len = samples_buffer*VI_LEN;
-	if (xllc_def.len > 16*64){
-		xllc_def.len = 16*64;
-		samples_buffer = xllc_def.len/VI_LEN;
-		fprintf(stderr, "WARNING: samples_buffer clipped to %d\n", samples_buffer);
-	}
-	if (ioctl(fd, AFHBA_START_AI_LLC, &xllc_def)){
-		perror("ioctl AFHBA_START_AI_LLC");
-		exit(1);
-	}
-	printf("AI buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
-
-
-
-	xllc_def.pa += AO_OFFSET;
-	xllc_def.len = VO_LEN;
-
-	if (has_do32){
-		int ll = xllc_def.len/64;
-		xllc_def.len = ++ll*64;
-	}
-	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def)){
-		perror("ioctl AFHBA_START_AO_LLC");
-		exit(1);
-	}
-	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
-
-	ao_buffer = (short*)((void*)host_buffer+AO_OFFSET);
-
-	if (has_do32){
-		/* marker pattern for the PAD area for hardware trace */
-		unsigned* dox = (unsigned *)ao_buffer;
-		int ii;
-		for (ii = 0; ii <= 0xf; ++ii){
-		        dox[DO_IX+ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
-		}
-	}
-}
-
-void print_sample(unsigned sample, unsigned tl)
-{
-	if (sample%10000 == 0){
-		printf("[%10u] %10u\n", sample, tl);
-	}
-}
+#define WD_BIT 	0x00000001	/* bit d0 is the Watchdog */
 
 void copy_tlatch_to_do32(void *ao, void *ai)
 {
@@ -235,6 +105,7 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 	dox[DO_IX] = tlx[SPIX];
 }
+
 
 void control_dup1(short *ao, short *ai)
 {
@@ -249,98 +120,174 @@ void control_dup1(short *ao, short *ai)
         }
 }
 
-#include <math.h>
-
-
-
-short ff(int ii)
+void ui(int argc, char* argv[])
 {
-	static short* lut;
-	if (lut == 0){
-		int ii;
-		lut = calloc(FFNLUT, sizeof(short));
-		for (ii = 0; ii < FFNLUT; ++ii){
-			lut[ii] = MV100 * sin((double)ii * 2*M_PI/FFNLUT);
+        if (getenv("RTPRIO")){
+		sched_fifo_priority = atoi(getenv("RTPRIO"));
+        }
+	if (getenv("VERBOSE")){
+		verbose = atoi(getenv("VERBOSE"));
+	}
+	if (getenv("DEVNUM")){
+		devnum = atoi(getenv("DEVNUM"));
+	}
+	if (getenv("DEVMAX")){
+		devmax = atoi(getenv("DEVMAX"));
+		printf("DEVMAX set %d\n", devmax);
+	}
+	/* own PA eg from GPU */
+	if (getenv("PA_BUF")){
+		unsigned pa_buf = strtoul(getenv("PA_BUF"), 0, 0);
+		FORALL {
+			devs[id].xllc_def.pa = pa_buf;
+			pa_buf += VI_LEN;
+		}
+
+	}
+
+	if (getenv("DUMMY_FIRST_LOOP")){
+		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
+	}
+	if (getenv("NCHAN")){
+		nchan = atoi(getenv("NCHAN"));
+		fprintf(stderr, "NCHAN set %d\n", nchan);
+	}
+	if (getenv("AICHAN")){
+		nchan = atoi(getenv("AICHAN"));
+		fprintf(stderr, "AICHAN (nchan) set %d\n", nchan);
+	}
+	if (getenv("POLARITY")){
+		G_POLARITY = atoi(getenv("POLARITY"));
+		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
+	}
+        if (getenv("AFFINITY")){
+                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        }
+
+	if (getenv("SPADLONGS")){
+		spadlongs = atoi(getenv("SPADLONGS"));
+		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
+	}
+	if (argc > 1){
+		nsamples = atoi(argv[1]);
+		fprintf(stderr, "nsamples set %d\n", nsamples);
+	}
+	if (argc > 2){
+		samples_buffer = atoi(argv[2]);
+	}
+	G_action = write_action;
+	if (getenv("ACTION")){
+		if (strcmp(getenv("ACTION"), "check_tlatch") == 0){
+			G_action = check_tlatch_action;
 		}
 	}
-	return lut[ii%FFNLUT];
-}
-void control_feedforward(short *ao, short *ai)
-{
-        int ii;
-	static int cursor;
-
-	short xx = ff(cursor++);
-
-        for (ii = 0; ii < ao_chan; ii++){
-                ao[ii] = AO_IDENT[ii] + xx;
-        }
-
-        if (has_do32){
-                copy_tlatch_to_do32(ao, ai);
+        {
+                int ao_ident = 0;
+                if (getenv("AO_IDENT")){
+                        ao_ident = atoi(getenv("AO_IDENT"));
+                }
+                AO_IDENT = make_ao_ident(ao_chan, ao_ident);
         }
 }
 
-
-void control_example2(short *ao, short *ai)
+void _get_connected(struct Dev* dev)
 {
-	int ii;
-	for (ii = 0; ii < ao_chan; ii += 2){
-		ao[ii] = G_POLARITY * ai[0];
-		ao[ii+1] = (((ii&1) != 0? ii: -ii)*ai[0])/ao_chan;
+	struct XLLC_DEF xo_xllc_def;
+
+	dev->host_buffer = get_mapping(dev->devnum, &dev->fd);
+	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
+	dev->xllc_def.len = samples_buffer*VI_LEN;
+	memset(dev->host_buffer, 0, VI_LEN);
+	dev->lbuf = calloc(VI_LEN, 1);
+	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
+		perror("ioctl AFHBA_START_AI_LLC");
+		exit(1);
 	}
+	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+
+	xo_xllc_def = dev->xllc_def;
+	xo_xllc_def.pa += AO_OFFSET;
+	xo_xllc_def.len = VO_LEN;
+
 	if (has_do32){
-		copy_tlatch_to_do32(ao, ai);
+		int ll = xo_xllc_def.len/64;
+		xo_xllc_def.len = ++ll*64;
+	}
+	if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
+		perror("ioctl AFHBA_START_AO_LLC");
+		exit(1);
+	}
+	printf("AO buf pa: 0x%08x len %d\n", xo_xllc_def.pa, xo_xllc_def.len);
+
+	if (has_do32){
+		/* marker pattern for the PAD area for hardware trace */
+		unsigned* dox = (unsigned *)AO_BUFFER(dev);
+		int ii;
+		for (ii = 0; ii <= 0xf; ++ii){
+		        dox[DO_IX+ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+		}
+	}
+}
+void get_connected()
+{
+	int idev;
+	for (idev = 0; idev < devmax; ++idev){
+		_get_connected(&devs[idev]);
+	}
+}
+void setup()
+{
+	setup_logging(devnum);
+	get_connected();
+	goRealTime();
+}
+
+void print_sample(unsigned sample, unsigned tl)
+{
+	if (sample%10000 == 0){
+		printf("[%10u] %10u\n", sample, tl);
 	}
 }
 
-
-void dio_watchdog(short *ao, short *ai)
+void dio_watchdog(short *ao)
 {
         unsigned* dox = (unsigned *)ao;
 
 	dox[DO_IX] ^= WD_BIT;
 }
 
-
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
-	short* ai_buffer = calloc(NSHORTS, sizeof(short));
-	unsigned tl0 = 0xdeadbeef;	/* always run one dummy loop */
+	unsigned tl0[4];
+	int pollcat[4] = {};
 	unsigned tl1;
 	unsigned sample;
-	int println = 0;
-	int pollcat = 0;
-	int we_blew_it = 0;
 
 	mlockall(MCL_CURRENT);
-	memset(host_buffer, 0, VI_LEN);
-	if (!dummy_first_loop){
-		TLATCH(ai_buffer)[0] = tl0;
-	}
+	FORALL TLATCH(devs[id].lbuf)[0] = tl0[id] = 0xdeadbeef; /* always run one dummy loop */
 
-	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
-		while((tl1 = TLATCH(host_buffer)[0]) == tl0){
-			dio_watchdog(ao_buffer, ai_buffer);
-			sched_fifo_priority>1 || sched_yield();
-			++pollcat;
+	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
+		FORALL {
+			while((tl1 = TLATCH(devs[id].lbuf)[0]) == tl0[id]){
+				dio_watchdog(AO_BUFFER(devs+id));
+				sched_fifo_priority>1 || sched_yield();
+				++pollcat[id];
+			}
+			memcpy(devs[id].lbuf, devs[id].host_buffer, VI_LEN);
+			tl0[id] = tl1;
 		}
-		memcpy(ai_buffer, host_buffer, VI_LEN);
-		if (TLATCH(ai_buffer)[0] != tl1){
-			++we_blew_it;
+
+		FORALL {
+			control(AO_BUFFER(devs+id), devs[id].lbuf);
+			/* TLATCH [1] is usecs from HW */
+			TLATCH(devs[id].lbuf)[2] = pollcat[id];
+			TLATCH(devs[id].lbuf)[3] = difftime_us();
+			action(devs[id].lbuf);
 		}
-		control(ao_buffer, ai_buffer);
-		TLATCH(ai_buffer)[2] = pollcat;
-		TLATCH(ai_buffer)[3] = difftime_us();
-		action(ai_buffer);
 
 		if (verbose){
 			print_sample(sample, tl1);
 		}
-	}
-	
-	if (we_blew_it){
-		fprintf(stderr, "we_blew_it %d\n", we_blew_it);
 	}
 }
 

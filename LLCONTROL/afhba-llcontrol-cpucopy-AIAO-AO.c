@@ -93,7 +93,7 @@ struct XLLC_DEF ao_only_xllc_def = {
 
 #define DEF_AO_CHAN	32
 #define DEF_AO_ONLY_CHAN 4
-int aochan = DEF_AO_CHAN;
+int ao_chan = DEF_AO_CHAN;
 int ao_only_chan = DEF_AO_ONLY_CHAN;
 #define VO_LEN  (aochan*sizeof(short) + (has_do32?sizeof(unsigned):0))
 #define VO_ONLY_LEN  (ao_only_chan*sizeof(short))
@@ -104,20 +104,6 @@ int ao_only_chan = DEF_AO_ONLY_CHAN;
 void control_dup1(short *ao, short *ai);
 void (*G_control)(short *ao, short *ai) = control_dup1;
 
-#define MV100   (32768/100)
-
-short* make_ao_ident(int ao_ident)
-{
-        short* ids = calloc(aochan, sizeof(short));
-        if (ao_ident){
-                int ic;
-
-                for (ic = 0; ic < aochan; ++ic){
-                        ids[ic] = ic*MV100*ao_ident;
-                }
-        }
-        return ids;
-}
 
 int FFNLUT;
 void control_feedforward(short *ao, short *ai);
@@ -152,8 +138,8 @@ void ui(int argc, char* argv[])
 		fprintf(stderr, "AICHAN (nchan) set %d\n", nchan);
 	}
 	if (getenv("AOCHAN")){
-		aochan = atoi(getenv("AOCHAN"));
-		fprintf(stderr, "AOCHAN set %d\n", aochan);
+		ao_chan = atoi(getenv("AOCHAN"));
+		fprintf(stderr, "AOCHAN set %d\n", ao_chan);
 	}
 	if (getenv("POLARITY")){
 		G_POLARITY = atoi(getenv("POLARITY"));
@@ -277,7 +263,7 @@ void control_dup1(short *ao, short *ai)
 {
         int ii;
 
-        for (ii = 0; ii < aochan; ii++){
+        for (ii = 0; ii < ao_chan; ii++){
                 ao[ii] = AO_IDENT[ii] + ai[DUP1];
         }
 
@@ -309,7 +295,7 @@ void control_feedforward(short *ao, short *ai)
 
 	short xx = ff(cursor++);
 
-        for (ii = 0; ii < aochan; ii++){
+        for (ii = 0; ii < ao_chan; ii++){
                 ao[ii] = AO_IDENT[ii] + xx;
         }
 
@@ -322,9 +308,9 @@ void control_feedforward(short *ao, short *ai)
 void control_example2(short *ao, short *ai)
 {
 	int ii;
-	for (ii = 0; ii < aochan; ii += 2){
+	for (ii = 0; ii < ao_chan; ii += 2){
 		ao[ii] = G_POLARITY * ai[0];
-		ao[ii+1] = (((ii&1) != 0? ii: -ii)*ai[0])/aochan;
+		ao[ii+1] = (((ii&1) != 0? ii: -ii)*ai[0])/ao_chan;
 	}
 	if (has_do32){
 		copy_tlatch_to_do32(ao, ai);

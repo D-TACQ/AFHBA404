@@ -154,6 +154,21 @@ void setAffinity(unsigned cpu_mask)
         }
 }
 
+#define MV100   (32768/100)
+
+short* make_ao_ident(int ao_chan, int ao_ident)
+{
+        short* ids = calloc(ao_chan, sizeof(short));
+        if (ao_ident){
+                int ic;
+
+                for (ic = 0; ic < ao_chan; ++ic){
+                        ids[ic] = ic*MV100*ao_ident;
+                }
+        }
+        return ids;
+}
+
 
 void goRealTime(void)
 {
