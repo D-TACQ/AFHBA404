@@ -88,6 +88,7 @@ int G_POLARITY = 1;
 /** env POLARITY=-1 negates feedback this is usefult to know that the 
  *  software is in fact doing something 					 */
 int has_do32 = 1;
+int ai_chan = 128;
 int ao_chan = 32;
 #define VO_LEN  (ao_chan*sizeof(short) + (has_do32?sizeof(unsigned):0))
 
@@ -148,14 +149,13 @@ void ui(int argc, char* argv[])
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
-	if (getenv("NCHAN")){
-		nchan = atoi(getenv("NCHAN"));
-		fprintf(stderr, "NCHAN set %d\n", nchan);
-	}
+
 	if (getenv("AICHAN")){
-		nchan = atoi(getenv("AICHAN"));
-		fprintf(stderr, "AICHAN (nchan) set %d\n", nchan);
+		ai_chan = atoi(getenv("AICHAN"));
+		fprintf(stderr, "AICHAN set %d\n", nchan);
 	}
+	nchan = ai_chan + has_do32*(sizeof(u32)/sizeof(short));
+
 	if (getenv("POLARITY")){
 		G_POLARITY = atoi(getenv("POLARITY"));
 		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
