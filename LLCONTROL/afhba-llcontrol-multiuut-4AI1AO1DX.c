@@ -62,7 +62,7 @@ struct Dev devs[4] = {
 		{ 0, }, { 1, }, {2, }, {3, }
 };
 
-#define AO_BUFFER(dev)	((short*)((dev)->host_buffer)+AO_OFFSET)
+#define AO_BUFFER(dev) ((short*)((dev)->host_buffer+AO_OFFSET))
 
 /* limit with devmax */
 int devmax = 4;
