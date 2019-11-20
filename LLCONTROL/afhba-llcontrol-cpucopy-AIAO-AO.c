@@ -116,22 +116,11 @@ void ui(int argc, char* argv[])
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
-	if (getenv("DEVNUM")){
-		devnum = atoi(getenv("DEVNUM"));
-	}
-	/* own PA eg from GPU */
-	if (getenv("PA_BUF")){
-		xllc_def.pa = strtoul(getenv("PA_BUF"), 0, 0);
-	}
 	if (getenv("DO32")){
 		has_do32 = atoi(getenv("DO32"));
 	}
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
-	}
-	if (getenv("NCHAN")){
-		nchan = atoi(getenv("NCHAN"));
-		fprintf(stderr, "NCHAN set %d\n", nchan);
 	}
 	if (getenv("AICHAN")){
 		nchan = atoi(getenv("AICHAN"));
