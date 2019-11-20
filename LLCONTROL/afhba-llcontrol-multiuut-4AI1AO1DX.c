@@ -25,6 +25,10 @@
 /** Description of Program
  *
  * Assume standardized ACQ2106+4xACQ424+AO32+DIO32 (128AI,32DI,32AO,32DO)
+ *
+ * UI
+ *
+ DEVMAX=N 	// 1..4 sets number of devs. AFHBA404 MUST be populated from port 0 up.
 
  getMapping() from device driver : this is where the data appears
  goRealTime() isolate the process for best RT performance
@@ -85,8 +89,12 @@ int devnum = 0;
 int dummy_first_loop;
 /** potentially good for cache fill, but sets initial value zero */
 int G_POLARITY = 1;		
-/** env POLARITY=-1 negates feedback this is usefult to know that the 
- *  software is in fact doing something 					 */
+/** env POLARITY=-1 negates feedback this is useful to show that the
+ *  software is in fact doing something
+ */
+
+/** PAYLOAD : per box. */
+
 int has_do32 = 1;
 int ai_chan = 128;
 int ao_chan = 32;
@@ -123,51 +131,37 @@ void control_dup1(short *ao, short *ai)
 
 void ui(int argc, char* argv[])
 {
-        if (getenv("RTPRIO")){
-		sched_fifo_priority = atoi(getenv("RTPRIO"));
-        }
-	if (getenv("VERBOSE")){
-		verbose = atoi(getenv("VERBOSE"));
-	}
-	if (getenv("DEVNUM")){
-		devnum = atoi(getenv("DEVNUM"));
-	}
 	if (getenv("DEVMAX")){
 		devmax = atoi(getenv("DEVMAX"));
 		printf("DEVMAX set %d\n", devmax);
 	}
-	/* own PA eg from GPU */
-	if (getenv("PA_BUF")){
-		unsigned pa_buf = strtoul(getenv("PA_BUF"), 0, 0);
-		FORALL {
-			devs[id].xllc_def.pa = pa_buf;
-			pa_buf += VI_LEN;
-		}
 
+        if (getenv("RTPRIO")){
+		sched_fifo_priority = atoi(getenv("RTPRIO"));
+        }
+        if (getenv("AFFINITY")){
+                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        }
+
+	if (getenv("VERBOSE")){
+		verbose = atoi(getenv("VERBOSE"));
 	}
+
+
 
 	if (getenv("DUMMY_FIRST_LOOP")){
 		dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
 
-	if (getenv("AICHAN")){
-		ai_chan = atoi(getenv("AICHAN"));
-		fprintf(stderr, "AICHAN set %d\n", nchan);
-	}
 	nchan = ai_chan + has_do32*(sizeof(u32)/sizeof(short));
 
 	if (getenv("POLARITY")){
 		G_POLARITY = atoi(getenv("POLARITY"));
 		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
 	}
-        if (getenv("AFFINITY")){
-                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
-        }
 
-	if (getenv("SPADLONGS")){
-		spadlongs = atoi(getenv("SPADLONGS"));
-		fprintf(stderr, "SPADLONGS set %d\n", spadlongs);
-	}
+	spadlongs = has_do32? 15: 16;
+
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
 		fprintf(stderr, "nsamples set %d\n", nsamples);
