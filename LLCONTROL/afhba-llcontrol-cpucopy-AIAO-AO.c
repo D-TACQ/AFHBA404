@@ -137,12 +137,12 @@ void ui(int argc, char* argv[])
         if (getenv("AFFINITY")){
                 setAffinity(strtol(getenv("AFFINITY"), 0, 0));
         }
-        if (getenv("DUP1")){
-                DUP1 = atoi(getenv("DUP1"));
+        if (getenv("CONTROL_DUP1")){
+                DUP1 = atoi(getenv("CONTROL_DUP1"));
                 G_control = control_dup1;
         }
-	if (getenv("FEED_FORWARD")){
-		int ff = atoi(getenv("FEED_FORWARD"));
+	if (getenv("CONTROL_FF")){
+		int ff = atoi(getenv("CONTROL_FF"));
 		if (ff){
 			G_control = control_feedforward;
 			FFNLUT = ff;
@@ -262,8 +262,6 @@ void control_dup1(short *ao, short *ai)
 }
 
 #include <math.h>
-
-
 
 short ff(int ii)
 {
