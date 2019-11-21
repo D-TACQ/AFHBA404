@@ -28,11 +28,11 @@ UUT1=acq2106_085
 UUT2=acq2106_130
 UUT3=acq2106_176
 
-# If you are using more than one UUT uncomment and fill in the UUTs:
+# If you are using more than one UUT fill in the UUTs:
 UUTS="$UUT1 $UUT2 $UUT3"
 
-POST=100000 # 20kHz for 20s
-CLK=20000 # Set clock speed here
+POST=400000 # Number of samples to capture
+CLK=20000 # Set desired clock speed here.
 
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
