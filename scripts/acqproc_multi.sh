@@ -31,8 +31,14 @@ UUT3=acq2106_176
 # If you are using more than one UUT fill in the UUTs:
 UUTS="${UUTS:-$UUT1 $UUT2 $UUT3}"
 
+DEVMAX=0
+for u in $UUTS; do
+	DEVMAX=$(($DEVMAX+1))
+done
+
 POST=${POST:-400000} 	# Number of samples to capture
 CLK=${CLK:-20000} 		# Set desired clock speed here.
+VERBOSE=${VERBOSE:-1}
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -120,11 +126,9 @@ control_program() {
 
     export TASKET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
-    export DEVMAX=3
-    export VERBOSE=1
-    export AICHAN=128
-    export AOCHAN=32
-    export SPADLONGS=15
+    export DEVMAX=$DEVMAX
+    export VERBOSE=$VERBOSE
+    
     $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
     wait
     echo "Splitting data now."
