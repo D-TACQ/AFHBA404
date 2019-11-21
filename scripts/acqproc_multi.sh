@@ -91,8 +91,6 @@ analysis() {
     echo "Running analysis now."
     echo "--------------------"
     # Takes the LLC data and runs various analysis scripts.
-    cd $AFHBA404_DIR
-    ./scripts/split_multi_uut_data.py
     cd $HAPI_DIR
     
     NCHAN=130
@@ -125,6 +123,8 @@ control_program() {
     export SPADLONGS=15
     $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
     wait
+    echo "Splitting data now."
+    ./scripts/split_multi_uut_data.py
     echo "Starting MDSplus put now."
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
