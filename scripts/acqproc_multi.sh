@@ -31,8 +31,12 @@ UUT3=acq2106_176
 # If you are using more than one UUT fill in the UUTs:
 UUTS="${UUTS:-$UUT1 $UUT2 $UUT3}"
 
-POST=400000 # Number of samples to capture
-CLK=20000 # Set desired clock speed here.
+POST=${POST:-400000} 	# Number of samples to capture
+CLK=${CLK:-20000} 		# Set desired clock speed here.
+
+# UUT1 is the master in clock/trigger terms.
+# The sync_role command can be changed to 'fpmaster' for external clk and trg.
+TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
 
 HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
 AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
@@ -146,8 +150,8 @@ configure_uut() {
     # Setup is done here.
 
     cd $HAPI_DIR
-    # The sync_role command can be changed to 'fpmaster' for external clk and trg.
-    $PYTHON user_apps/acq400/sync_role.py --toprole="master" --fclk=$CLK $UUTS
+    
+    $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS
 
     cd $AFHBA404_DIR
     cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 $UUTS)"
