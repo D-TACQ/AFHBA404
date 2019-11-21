@@ -29,7 +29,7 @@ UUT2=acq2106_130
 UUT3=acq2106_176
 
 # If you are using more than one UUT fill in the UUTs:
-UUTS="$UUT1 $UUT2 $UUT3"
+UUTS="${UUTS:-$UUT1 $UUT2 $UUT3}"
 
 POST=400000 # Number of samples to capture
 CLK=20000 # Set desired clock speed here.
