@@ -2,11 +2,11 @@
 
 
 # This script is intended to be a "catch-all" script for Low Latency Control
-# systems. What this script WILL do:
-# - Configure the clocks
+# systems, with use for three systems at once. What this script WILL do:
+# - Configure the clocks on all three systems (one master and two HDMI slaves)
 # - Configure the system for LLC capture.
-# - Start the control program. At present this is always a cpucopy.
-# - Take a transient capture.
+# - Start the control program. This is always a multiuut-4AI1AO1DX.
+# - Take a transient capture (or stream if specified).
 # - Analyse the T_LATCH from the data acquired.
 # - Configure the latency measurement FPGA registers.
 # - Analyse the FPGA register data encoded in the SPAD.
