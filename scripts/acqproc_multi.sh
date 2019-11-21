@@ -51,17 +51,22 @@ if [ "$USE_MDSPLUS" = "1" ]; then
 # Below is the UUT_path for MDSplus. The server is set to andros as this
 # is the internal D-TACQ MDSplus server. Please change this to the name of
 # your MDSplus server if you wish to use MDSplus. Ignore if not using MDSplus
-export $UUT1'_path=andros:://home/dt100/TREES/'$UUT1
-
+for uut in $UUTS;do
+    export $uut'_path=andros:://home/dt100/TREES/'$uut
+done
 
 mdsplus_upload() {
     # An optional function that uploads the scratchpad data to MDSplus.
-    export NCOLS=16
-    export STORE_COLS="0:15"
-    $MDS_DIR/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
-        --tlatch_report=1 --node_name "CH%02d" --default_node ST \
-        $UUT1 afhba.$DEVNUM.log
-
+    export NCOLS=15
+    export STORE_COLS="0:14"
+    DEVNUM=0
+    for uut in $UUTS; do
+        filename=uut${DEVNUM}_data.dat
+        $MDS_DIR/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
+            --tlatch_report=1 --node_name "CH%02d" --default_node ST $uut $filename
+        DEVNUM=$((DEVNUM+1))
+        echo ""
+    done
     cd $AFHBA404_DIR
 
 }
