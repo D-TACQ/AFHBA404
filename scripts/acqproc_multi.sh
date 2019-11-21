@@ -132,7 +132,7 @@ control_program() {
     $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
     wait
     echo "Splitting data now."
-    ./scripts/split_multi_uut_data.py
+    ./scripts/split_multi_uut_data.py --nuuts=$DEVMAX
     echo "Starting MDSplus put now."
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
