@@ -113,14 +113,14 @@ control_program() {
 
     export TASKET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
-    DEVMAX=3
-    VERBOSE=1
-    AICHAN=128
-    AOCHAN=32
-    SPADLONGS=15
-    $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST
+    export DEVMAX=3
+    export VERBOSE=1
+    export AICHAN=128
+    export AOCHAN=32
+    export SPADLONGS=15
+    $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
     wait
-    
+    echo "Starting MDSplus put now."
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
