@@ -9,7 +9,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description='multi-uut spad test.')
 
-    parser.add_argument('--file', default='./afhba.2.log', type=str,
+    parser.add_argument('--file', default='./afhba.0.log', type=str,
     help='Which file to split into 3 for easier analysis.')
 
     parser.add_argument('--nuuts', default=3, type=int,
