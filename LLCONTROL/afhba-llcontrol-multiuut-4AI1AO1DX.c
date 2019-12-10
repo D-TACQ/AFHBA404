@@ -118,16 +118,16 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 
 void control_dup1(short *ao, short *ai)
 {
-        int ii;
-        short* ai_01 = devs[0].lbuf;
+         int ii;
+         short* ai_01 = devs[0].lbuf;
 
-        for (ii = 0; ii < ao_chan; ii++){
-                ao[ii] = AO_IDENT[ii] + ai_01[DUP1];
-        }
+         for (ii = 0; ii < ao_chan; ii++){
+                 ao[ii] = AO_IDENT[ii] + ai_01[DUP1];
+         }
 
-        if (has_do32){
-                copy_tlatch_to_do32(ao, ai);
-        }
+         if (has_do32){
+                 copy_tlatch_to_do32(ao, ai);
+         }
 }
 
 void ui(int argc, char* argv[])
