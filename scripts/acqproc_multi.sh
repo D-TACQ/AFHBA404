@@ -44,9 +44,10 @@ VERBOSE=${VERBOSE:-1}
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
 TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
 
-HAPI_DIR=/home/dt100/PROJECTS/acq400_hapi/
-AFHBA404_DIR=/home/dt100/PROJECTS/AFHBA404/
-MDS_DIR=/home/dt100/PROJECTS/ACQ400_MDSplus/
+TOP=${TOP:-/home/dt100/PROJECTS/}
+HAPI_DIR=$TOP/acq400_hapi/
+AFHBA404_DIR=$TOP/AFHBA404/
+MDS_DIR=$TOP/ACQ400_MDSplus/
 
 ANALYSIS=true # Whether or not to run the analysis scripts.
 TRANSIENT=false # Take a transient capture if true, else stream.
