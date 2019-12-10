@@ -119,9 +119,10 @@ void copy_tlatch_to_do32(void *ao, void *ai)
 void control_dup1(short *ao, short *ai)
 {
         int ii;
+        short* ai_01 = devs[0].lbuf;
 
         for (ii = 0; ii < ao_chan; ii++){
-                ao[ii] = AO_IDENT[ii] + ai[DUP1];
+                ao[ii] = AO_IDENT[ii] + ai_01[DUP1];
         }
 
         if (has_do32){
