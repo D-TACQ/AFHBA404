@@ -263,6 +263,9 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	FORALL TLATCH(devs[id].host_buffer)[0] = 
 	       TLATCH(devs[id].lbuf)[0] = 
 	       tl0[id] = 0xdeadbeef; 
+	if (dummy_first_loop){
+		TLATCH(devs[0].host_buffer)[0] -= 3;	/* force first time pass thru */
+	}
 
 	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
