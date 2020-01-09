@@ -259,7 +259,6 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	unsigned sample;
 
 	mlockall(MCL_CURRENT);
-	FORALL TLATCH(devs[id].lbuf)[0] = tl0[id] = 0xdeadbeef; /* always run one dummy loop */
 
 	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
