@@ -39,7 +39,7 @@ done
 POST=${POST:-400000} 	# Number of samples to capture
 CLK=${CLK:-20000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-1}
-SYNC_ROLE_PARALLEL=${SYNC_ROLE_PARALLEL:-true}
+SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-serial}
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -156,7 +156,7 @@ configure_uut() {
     # Setup is done here.
 
     cd $HAPI_DIR
-    if $SYNC_ROLE_PARALLEL; then
+    if [ "$SYNC_ROLE_MODE" = "parallel" ]; then
 
         for uut in $UUTS; do
             $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
@@ -165,7 +165,7 @@ configure_uut() {
         for uut in $UUTS; do
             wait
         done
-    else
+    elif [ "$SYNC_ROLE_MODE" = "serial" ]; then
         $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS
     fi
 
