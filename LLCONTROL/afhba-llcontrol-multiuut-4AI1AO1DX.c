@@ -71,7 +71,7 @@ struct Dev devs[4] = {
 /* limit with devmax */
 int devmax = 4;
 
-#define FORALL for (int id = 0; id < devmax; ++id)
+
 
 
 void* host_buffer;
@@ -80,7 +80,11 @@ int nsamples = 10000000;		/* 10s at 1MSPS */
 int samples_buffer = 1;			/* set > 1 to decimate max 16*64bytes */
 
 int verbose;
+int bolodev = -1;			/* bolodev does LLC, but the phase will be different to ACQ424 SAR. So, don't wait for the TLATCH, just log the data that is there */
 
+
+#define FORALL 	for (int id = 0; id < devmax; ++id)
+#define IS_BOLO (id == bolodev)
 void control_dup1(short *ao, short *ai);
 void (*G_control)(short *ao, short *ai) = control_dup1;
 
@@ -147,7 +151,9 @@ void ui(int argc, char* argv[])
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
-
+	if (getenv("BOLODEV")){
+		bolodev = atoi(getenv("BOLODEV"));
+	}
 
 
 	if (getenv("DUMMY_FIRST_LOOP")){
@@ -269,7 +275,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 
 	for (sample = 0; sample <= nsamples; ++sample, memset(pollcat, 0, sizeof(pollcat))){
 		FORALL {
-			while((tl1 = TLATCH(devs[id].host_buffer)[0]) == tl0[id]){
+			while(!IS_BOLO && (tl1 = TLATCH(devs[id].host_buffer)[0]) == tl0[id]){
 				dio_watchdog(AO_BUFFER(devs+id));
 				sched_fifo_priority>1 || sched_yield();
 				++pollcat[id];
@@ -279,10 +285,12 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		}
 
 		FORALL {
-			control(AO_BUFFER(devs+id), devs[id].lbuf);
-			/* TLATCH [1] is usecs from HW */
-			TLATCH(devs[id].lbuf)[2] = pollcat[id];
-			TLATCH(devs[id].lbuf)[3] = difftime_us();
+			if (!IS_BOLO){
+				control(AO_BUFFER(devs+id), devs[id].lbuf);
+				/* TLATCH [1] is usecs from HW */
+				TLATCH(devs[id].lbuf)[2] = pollcat[id];
+				TLATCH(devs[id].lbuf)[3] = difftime_us();
+			}
 			action(devs[id].lbuf);
 		}
 
