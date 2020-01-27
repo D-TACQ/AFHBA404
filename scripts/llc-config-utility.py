@@ -77,6 +77,8 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
     # and word size of the AISITES argument provided to it and then sets the
     # spad, aggregator and NCHAN parameters accordingly.
 
+    uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
+
     if args.include_dio_in_aggregator:
         TOTAL_SITES = (AISITES + DIOSITES)
     else:
@@ -109,7 +111,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     for site in AOSITES:
         aom = "s{}".format(site)
         uut.svc[aom].lotide = 256
-        uut.svc[aom].clk = '1,1,1'
+        uut.svc[aom].clk = '1,2,1'
         uut.svc[aom].clkdiv = '1'
 
     for site in DIOSITES:
@@ -117,7 +119,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
         uut.svc[dio].mode = '0'
         uut.svc[dio].lotide = '256'
         uut.svc[dio].byte_is_output = '1,1,0,0'
-        uut.svc[dio].clk = '1,1,1'
+        uut.svc[dio].clk = '1,2,1'
         uut.svc[dio].trg = '1,1,1'
         uut.svc[dio].mode = '1'
 
