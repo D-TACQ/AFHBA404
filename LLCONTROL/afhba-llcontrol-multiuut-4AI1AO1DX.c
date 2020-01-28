@@ -111,6 +111,10 @@ short *AO_IDENT;		/* AO, identity output (offset = f(chan)) */
 #define DO_IX	(16)		/* longwords */
 #define WD_BIT 	0x00000001	/* bit d0 is the Watchdog */
 
+#define BOLO_MODULES	2
+#define BOLO_DATA_SIZE  (8 * 3 * sizeof(unsigned))
+int bololen = BOLO_MODULES*BOLO_DATA_SIZE + 16*sizeof(unsigned);
+
 void copy_tlatch_to_do32(void *ao, void *ai)
 {
 	unsigned* dox = (unsigned *)ao;
@@ -153,6 +157,9 @@ void ui(int argc, char* argv[])
 	}
 	if (getenv("BOLODEV")){
 		bolodev = atoi(getenv("BOLODEV"));
+		if (getenv("BOLOLEN")) {
+			bololen = atoi(getenv("BOLOLEN"));
+		}
 	}
 
 
@@ -191,15 +198,15 @@ void ui(int argc, char* argv[])
         }
 }
 
-void _get_connected(struct Dev* dev)
+void _get_connected(struct Dev* dev, unsigned vi_len)
 {
 	struct XLLC_DEF xo_xllc_def;
 
 	dev->host_buffer = get_mapping(dev->devnum, &dev->fd);
 	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
-	dev->xllc_def.len = samples_buffer*VI_LEN;
-	memset(dev->host_buffer, 0, VI_LEN);
-	dev->lbuf = calloc(VI_LEN, 1);
+	dev->xllc_def.len = samples_buffer*vi_len;
+	memset(dev->host_buffer, 0, vi_len);
+	dev->lbuf = calloc(vi_len, 1);
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
@@ -231,9 +238,8 @@ void _get_connected(struct Dev* dev)
 }
 void get_connected()
 {
-	int idev;
-	for (idev = 0; idev < devmax; ++idev){
-		_get_connected(&devs[idev]);
+	FORALL {
+		_get_connected(&devs[id], IS_BOLO? bololen: VI_LEN);
 	}
 }
 void setup()
