@@ -49,6 +49,7 @@ def init_ai(uut):
     # the uut. uut assumes bolo has 8 channels, but post dsp each site has 
     # 24 channels. 
     uut.s0.NCHAN = int(AISITES.split(",")[-1])*bolo_chan_factor+spad_len
+    uut.s1.trg = "1,0,1"
     
 def run_main(args):
     uuts = [ acq400_hapi.Acq2106(addr) for addr in args.uuts ]
