@@ -107,7 +107,7 @@ control_program() {
     runcmd="${runcmd} ${POST}"
     echo "Command: $cmd"
 
-    export TASKET="taskset --cpu-list 1"
+    export TASKSET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 
     eval "${TASKSET} ${runcmd}"
