@@ -133,7 +133,7 @@ control_program() {
     # Run the control program here
     cd $AFHBA404_DIR
 
-    export TASKET="taskset --cpu-list 1"
+    export TASKSET="taskset --cpu-list 1"
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
     export DEVMAX=$DEVMAX
     export VERBOSE=$VERBOSE
