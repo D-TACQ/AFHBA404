@@ -36,26 +36,44 @@ VO::VO() {
 VO& VO::operator += (const VO& right) {
 	this->AO16 += right.AO16;
 	this->DO32 += right.DO32;
-	return *this
+	return *this;
 }
 
 int VO::len(void) const {
 	return AO16*2 + DO32*4;
 }
 
-void HBA::dump_config(void)
+IO::IO(string _name, VI _vi, VO _vo): name(_name), vi(_vi), vo(_vo), _string(0)
 {
 
+}
+
+IO::~IO()
+{
+	if (_string) delete _string;
+}
+
+string IO::toString(void)
+{
+	return name + " VI:" + to_string(vi.len()) + " VO:" + to_string(vo.len());
+}
+
+void HBA::dump_config(void)
+{
+	cerr << toString() << endl;
+	for (auto uut: uuts){
+		cerr << "\t" << uut->toString() <<endl;
+	}
 }
 void HBA::dump_data(const char* basename)
 {
 	cerr << "dump_data" <<endl;
-	cerr
 }
 
 
-ACQ::ACQ(VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
-		vi(_vi), vo(_vo), vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor)
+ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
+		IO(_name, _vi, _vo),
+		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor)
 {
 	// @@todo hook the device driver.
 	sys_vi_cursor += vi;
@@ -86,8 +104,12 @@ int get_int(json j)
 	}
 }
 
-HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo): uuts(_uuts), vi(_vi), vo(_vo)
+HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
+		IO("HBA"+to_string(_devnum), _vi, _vo),
+		uuts(_uuts), vi(_vi), vo(_vo)
 {}
+
+int devnum;
 
 HBA& HBA::create(const char* json_def)
 {
@@ -110,9 +132,9 @@ HBA& HBA::create(const char* json_def)
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["AO16"]);
-		uuts.push_back(new ACQ(vi, vo, VI_sys, VO_sys));
+		uuts.push_back(new ACQ(uut["name"], vi, vo, VI_sys, VO_sys));
 	}
-	return * new HBA(uuts);
+	return * new HBA(::devnum, uuts, VI_sys, VO_sys);
 }
 
 

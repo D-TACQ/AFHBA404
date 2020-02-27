@@ -6,7 +6,10 @@
  */
 
 
-
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
 
 #include "AcqSys.h"
 
@@ -19,6 +22,6 @@ int main(int argc, char* argv[])
 
 	HBA hba = HBA::create(config_file);
 
-	hba.dump_data("runtime_config.json");
+	hba.dump_config();
 }
 
