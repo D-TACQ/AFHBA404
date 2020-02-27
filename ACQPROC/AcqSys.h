@@ -28,7 +28,7 @@ struct VI {
 	int AI16;
 	int AI32;
 	int DI32;
-	int SPAD;
+	int SP32;
 	VI();
 };
 
@@ -67,6 +67,8 @@ public:
 	const VI vi_cursor;	/* offset for each Input type in Interface vector */
 	const VO vo_cursor;	/* offset for each Output type in Interface vector */
 
+	virtual string toString();
+
 	virtual bool newSample(void);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual unsigned tlatch(void);
@@ -75,6 +77,8 @@ public:
 	/*< prepare to run a shot nsamples long, arm the UUT. */
 friend class HBA;
 };
+
+
 class HBA: public IO
 /*< modules a Host Bus Adapter like AFHBA404. */
 {
@@ -87,7 +91,7 @@ public:
 
 	static HBA& create(const char* json_def);
 
-	void dump_config(void);
+	void dump_config();
 	/*< output complete configuration with calculated offsets */
 	void dump_data(const char* basename);
 	/*< output raw data for each ACQ */

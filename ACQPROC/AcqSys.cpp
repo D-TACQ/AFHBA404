@@ -20,13 +20,13 @@ VI::VI() {
 }
 
 int VI::len(void) const {
-	return AI16*2 + AI32*4 + DI32*4 + SPAD*4;
+	return AI16*2 + AI32*4 + DI32*4 + SP32*4;
 }
 VI& VI::operator += (const VI& right) {
 	this->AI16 += right.AI16;
 	this->AI32 += right.AI32;
 	this->DI32 += right.DI32;
-	this->SPAD += right.SPAD;
+	this->SP32 += right.SP32;
 	return *this;
 }
 
@@ -58,7 +58,7 @@ string IO::toString(void)
 	return name + " VI:" + to_string(vi.len()) + " VO:" + to_string(vo.len());
 }
 
-void HBA::dump_config(void)
+void HBA::dump_config()
 {
 	cerr << toString() << endl;
 	for (auto uut: uuts){
@@ -80,6 +80,9 @@ ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 	sys_vo_cursor += vo;
 }
 
+string ACQ::toString() {
+	return IO::toString() + "SPAD:" + to_string(vi_cursor.SP32) + " VI Offsets " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32);
+}
 bool ACQ::newSample(void)
 {
 	return false;
@@ -109,6 +112,28 @@ HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		uuts(_uuts), vi(_vi), vo(_vo)
 {}
 
+void store_config(json j, string fname, HBA hba)
+{
+	int ii = 0;
+	j["OFFSETS"] = json::array();
+	for (auto uut : hba.uuts){
+		json &offsets = j["OFFSETS"][ii++];
+		std::map<std::string, int> vi_map {
+			{ "AI16", uut->vi_cursor.AI16 },
+			{ "DI32", uut->vi_cursor.DI32 },
+			{ "SP32", uut->vi_cursor.SP32 }
+		};
+		offsets.push_back(json::object_t::value_type("VI", vi_map));
+		std::map<std::string, int> vo_map {
+			{ "AO16", uut->vo_cursor.AO16 },
+			{ "DO32", uut->vo_cursor.DO32 }
+		};
+		offsets.push_back(json::object_t::value_type("VO", vo_map));
+	}
+	std::ofstream o("runtime.json");
+	o << std::setw(4) << j << std::endl;
+}
+
 int devnum;
 
 HBA& HBA::create(const char* json_def)
@@ -127,14 +152,16 @@ HBA& HBA::create(const char* json_def)
 		vi.AI16 = get_int(uut["VI"]["AI16"]);
 		vi.AI32 = get_int(uut["VI"]["AI32"]);
 		vi.DI32 = get_int(uut["VI"]["DI32"]);
-		vi.SPAD = get_int(uut["VI"]["SPAD"]);
+		vi.SP32 = get_int(uut["VI"]["SP32"]);
 
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["AO16"]);
 		uuts.push_back(new ACQ(uut["name"], vi, vo, VI_sys, VO_sys));
 	}
-	return * new HBA(::devnum, uuts, VI_sys, VO_sys);
+	HBA& the_hba = * new HBA(::devnum, uuts, VI_sys, VO_sys);
+	store_config(j, "runtime.json", the_hba);
+	return the_hba;
 }
 
 

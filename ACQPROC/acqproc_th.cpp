@@ -17,9 +17,11 @@
 
 int main(int argc, char* argv[])
 {
-	const char* config_file = "configs/pcs1.json";
 
-
+	const char* config_file;
+	if (argc > 1){
+		config_file = argv[1];
+	}
 	HBA hba = HBA::create(config_file);
 
 	hba.dump_config();
