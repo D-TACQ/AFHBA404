@@ -13,8 +13,16 @@
 
 #include "AcqSys.h"
 
+#define NSAM	2		// typ: 200000
 
-
+void fake_a_shot(HBA& hba)
+{
+	for (int sample = 0; sample < NSAM; ++sample){
+		for (auto uut : hba.uuts){
+			uut->newSample(sample);
+		}
+	}
+}
 int main(int argc, char* argv[])
 {
 
@@ -25,5 +33,8 @@ int main(int argc, char* argv[])
 	HBA hba = HBA::create(config_file);
 
 	hba.dump_config();
+
+
+	fake_a_shot(hba);
 }
 

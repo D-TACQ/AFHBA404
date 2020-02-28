@@ -83,8 +83,9 @@ ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 string ACQ::toString() {
 	return IO::toString() + "SPAD:" + to_string(vi_cursor.SP32) + " VI Offsets " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32);
 }
-bool ACQ::newSample(void)
+bool ACQ::newSample(int sample)
 {
+	cerr << " new sample: " << sample << " " << getName() << endl;
 	return false;
 }
 

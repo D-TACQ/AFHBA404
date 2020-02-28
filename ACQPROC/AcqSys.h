@@ -44,6 +44,7 @@ struct VO {
 
 /* IO Base Class */
 class IO {
+
 	string name;
 	string* _string;
 public:
@@ -53,6 +54,9 @@ public:
 	IO(string _name, VI _vi, VO _vo);
 	virtual ~IO();
 	virtual string toString();
+	string getName() {
+		return name;
+	}
 };
 
 
@@ -69,7 +73,7 @@ public:
 
 	virtual string toString();
 
-	virtual bool newSample(void);
+	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual unsigned tlatch(void);
 	/*< returns latest tlatch from lbuf */
