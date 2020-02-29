@@ -1,5 +1,5 @@
 
-
+CXXFLAGS+=-I.
 
 all: acqproc_th
 
