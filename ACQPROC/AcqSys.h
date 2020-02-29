@@ -67,6 +67,10 @@ class ACQ: public IO
 
 	ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor);
 
+protected:
+	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
+	unsigned wd_mask;
+
 public:
 	const VI vi_cursor;	/* offset for each Input type in Interface vector */
 	const VO vo_cursor;	/* offset for each Output type in Interface vector */

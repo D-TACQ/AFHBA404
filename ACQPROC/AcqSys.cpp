@@ -13,6 +13,8 @@
 #include "nlohmann/json.hpp"
 #include <string.h>
 
+#include <stdio.h>		// because sprintf()
+
 using json = nlohmann::json;
 
 VI::VI() {
@@ -73,7 +75,7 @@ void HBA::dump_data(const char* basename)
 
 ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		IO(_name, _vi, _vo),
-		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor)
+		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor), nowait(false), wd_mask(0)
 {
 	// @@todo hook the device driver.
 	sys_vi_cursor += vi;
@@ -81,7 +83,12 @@ ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 }
 
 string ACQ::toString() {
-	return IO::toString() + "SPAD:" + to_string(vi_cursor.SP32) + " VI Offsets " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32);
+	char wd[80] = {};
+	if (wd_mask){
+		sprintf(wd, " WD mask: 0x%08x", wd_mask);
+	}
+	return IO::toString() + " SPAD:" + to_string(vi_cursor.SP32) + 
+			" VI Offsets " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32) + wd;
 }
 bool ACQ::newSample(int sample)
 {
@@ -146,6 +153,7 @@ HBA& HBA::create(const char* json_def)
 	struct VI VI_sys;
 	struct VO VO_sys;
 	vector <ACQ*> uuts;
+	int port = 0;
 
 	for (auto uut : j["AFHBA"]["UUT"]) {
 		VI vi;
@@ -158,7 +166,21 @@ HBA& HBA::create(const char* json_def)
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["AO16"]);
-		uuts.push_back(new ACQ(uut["name"], vi, vo, VI_sys, VO_sys));
+		ACQ *acq = new ACQ(uut["name"], vi, vo, VI_sys, VO_sys);
+
+		try {
+			int wd_bit = uut["WD_BIT"].get<int>();
+			if (port == 0){
+				acq->wd_mask = 1 << wd_bit;
+			}else{
+				cerr << "WARNING: " << uut["name"] << " attempted to set WD_BIT when PORT (" << port << ") != 0" <<endl;
+			}
+		} catch (exception& e) {
+			;
+		}
+
+		uuts.push_back(acq);
+		++port;
 	}
 	HBA& the_hba = * new HBA(::devnum, uuts, VI_sys, VO_sys);
 	store_config(j, "runtime.json", the_hba);
