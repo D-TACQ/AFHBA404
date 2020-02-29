@@ -63,8 +63,10 @@ string IO::toString(void)
 void HBA::dump_config()
 {
 	cerr << toString() << endl;
+	int port = 0;
 	for (auto uut: uuts){
-		cerr << "\t" << uut->toString() <<endl;
+		cerr << "\t" << "[" << port << "] " << uut->toString() <<endl;
+		++port;
 	}
 }
 void HBA::dump_data(const char* basename)
@@ -154,6 +156,7 @@ HBA& HBA::create(const char* json_def)
 	struct VO VO_sys;
 	vector <ACQ*> uuts;
 	int port = 0;
+	string port0_type;
 
 	for (auto uut : j["AFHBA"]["UUT"]) {
 		VI vi;
@@ -178,7 +181,17 @@ HBA& HBA::create(const char* json_def)
 		} catch (exception& e) {
 			;
 		}
-
+		// check unit compatibility
+		if (port == 0){
+			port0_type = uut["type"];
+		}else{
+			if (port0_type == "pcs" && uut["type"] == "bolo"){
+				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
+				acq->nowait = true;
+			}else if (port0_type == "bolo" && uut["type"] != "bolo"){
+				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
+			}
+		}
 		uuts.push_back(acq);
 		++port;
 	}
