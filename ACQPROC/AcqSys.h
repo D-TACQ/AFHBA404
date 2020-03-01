@@ -103,6 +103,8 @@ class ACQ_HW: public ACQ
 	Dev* dev;
 	unsigned tl0;
 
+	unsigned *dox;
+
 	ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 

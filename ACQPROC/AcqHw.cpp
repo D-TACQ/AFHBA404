@@ -83,10 +83,10 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 	if (vo.DO32){
 		/* marker pattern for the PAD area for hardware trace */
-		unsigned* dox = (unsigned *)(dev->host_buffer+AO_OFFSET);
+		dox = (unsigned *)(dev->host_buffer+AO_OFFSET + vo_offsets.DO32);
 		int ii;
 		for (ii = 0; ii <= 0xf; ++ii){
-		        dox[vo_offsets.DO32/2+ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+		        dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
 		}
 	}
 }
@@ -102,8 +102,7 @@ bool ACQ_HW::newSample(int sample)
 		memcpy(dev->lbuf, dev->host_buffer, vi.len());
 		return true;
 	}else if (sample == 0 && wd_mask){
-		unsigned* dox = (unsigned *)(dev->host_buffer+AO_OFFSET);
-		dox[vo_offsets.DO32/2] ^= wd_mask;
+		dox[0] ^= wd_mask;
 		return false;
 	}else{
 		return false;
