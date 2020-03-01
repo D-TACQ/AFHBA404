@@ -43,7 +43,7 @@
 #include "afhba-get_shared_mapping.h"
 
 
-#define HB_FILE 	"/dev/rtm-t.%d"
+#define HB_FILE 	"/dev/rtm-t.%lu"
 #define LOG_FILE	"afhba.%d.log"
 
 #define HB1		"/dev/rtm-t.%d.data/hb01"
@@ -158,7 +158,7 @@ void setAffinity(unsigned cpu_mask)
 
 short* make_ao_ident(int ao_chan, int ao_ident)
 {
-        short* ids = calloc(ao_chan, sizeof(short));
+        short* ids = (short*)calloc(ao_chan, sizeof(short));
         if (ao_ident){
                 int ic;
 
@@ -208,7 +208,7 @@ void check_tlatch_action(void *local_buffer)
 {
 	static unsigned tl0;
 	static int errcount;
-	short *ai_buffer = local_buffer;
+	short *ai_buffer = (short*)local_buffer;
 
 	unsigned tl1 = *TLATCH(local_buffer);
 	if (tl1 != tl0+1){

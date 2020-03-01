@@ -13,13 +13,6 @@
 
 using namespace std;
 
-struct Dev {
-	int devnum;
-	int fd;
-	void* host_buffer;
-	void* lbuf;
-//	struct XLLC_DEF xllc_def;
-};
 
 /* VI : models Vector Input */
 struct VI {
@@ -78,8 +71,6 @@ public:
 class ACQ: public IO
 /*< models an ACQ2106 box. */
 {
-	struct Dev dev;
-
 	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 
 protected:
@@ -101,8 +92,31 @@ public:
 	virtual void arm(int nsamples);
 	/*< prepare to run a shot nsamples long, arm the UUT. */
 friend class HBA;
+friend class ACQ_HW;
 };
 
+struct Dev;
+
+class ACQ_HW: public ACQ
+/*< models an ACQ2106 box. with hardware links */
+{
+	Dev* dev;
+	unsigned tl0;
+
+	ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
+
+protected:
+
+public:
+	virtual bool newSample(int sample);
+	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual unsigned tlatch(void);
+	/*< returns latest tlatch from lbuf */
+	virtual void arm(int nsamples);
+	/*< prepare to run a shot nsamples long, arm the UUT. */
+friend class HBA;
+};
 
 class HBA: public IO
 /*< modules a Host Bus Adapter like AFHBA404. */
@@ -121,6 +135,8 @@ public:
 	void dump_data(const char* basename);
 	/*< output raw data for each ACQ */
 };
+
+
 
 
 #endif /* ACQPROC_ACQSYS_H_ */

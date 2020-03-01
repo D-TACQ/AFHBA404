@@ -17,6 +17,8 @@
 
 #include <assert.h>
 
+
+
 using json = nlohmann::json;
 
 VI::VI() {
@@ -199,6 +201,8 @@ HBA& HBA::create(const char* json_def)
 	int port = 0;
 	string port0_type;
 
+	bool HW = getenv("HW") != 0 && atoi(getenv("HW"));
+
 	for (auto uut : j["AFHBA"]["UUT"]) {
 		VI vi;
 
@@ -210,7 +214,9 @@ HBA& HBA::create(const char* json_def)
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["AO16"]);
-		ACQ *acq = new ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
+
+		ACQ *acq = HW? new ACQ_HW(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
+					   new    ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
 		try {
 			int wd_bit = uut["WD_BIT"].get<int>();
