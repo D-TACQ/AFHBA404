@@ -25,6 +25,7 @@ struct Dev {
 struct VI {
 	int len(void) const;
 	VI& operator+= (const VI& right);
+	VI offsets(void) const;
 	int AI16;
 	int AI32;
 	int DI32;
@@ -36,11 +37,24 @@ struct VI {
 struct VO {
 	int len(void) const;
 	VO& operator+= (const VO& right);
+	VO offsets(void) const;
 	int AO16;
 	int DO32;
 	VO();
 };
 
+struct SystemInterface {
+	struct Inputs {
+		short *AI16;
+		int *AI32;
+		unsigned *DI32;
+		unsigned *SP32;
+	} IN;
+	struct Outputs {
+		short* AO16;
+		unsigned *DO32;
+	};
+};
 
 /* IO Base Class */
 class IO {
@@ -60,20 +74,23 @@ public:
 };
 
 
+
 class ACQ: public IO
 /*< models an ACQ2106 box. */
 {
 	struct Dev dev;
 
-	ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor);
+	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 
 protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
 
 public:
-	const VI vi_cursor;	/* offset for each Input type in Interface vector */
-	const VO vo_cursor;	/* offset for each Output type in Interface vector */
+	const VI vi_offsets; /* byte offset for each Input type in Local Vector In */
+	const VO vo_offsets; /* byte offset for each Output type in Local Vector Out */
+	const VI vi_cursor;	/* offset for each Input type in System Interface */
+	const VO vo_cursor;	/* offset for each Output type in System Interface */
 
 	virtual string toString();
 

@@ -15,6 +15,8 @@
 
 #include <stdio.h>		// because sprintf()
 
+#include <assert.h>
+
 using json = nlohmann::json;
 
 VI::VI() {
@@ -32,6 +34,18 @@ VI& VI::operator += (const VI& right) {
 	return *this;
 }
 
+VI VI::offsets(void) const
+{
+	VI viff;
+	viff.AI16 = 0;
+	viff.AI32 = 0;
+	assert(!(AI16 != 0 && AI32 != 0));
+	assert(sizeof(int) == 4);
+	viff.DI32 = AI16*sizeof(short) + AI32*sizeof(int);
+	viff.SP32 = viff.DI32 + DI32*sizeof(int);
+	return viff;
+}
+
 VO::VO() {
 	memset(this, 0, sizeof(VO));
 }
@@ -40,6 +54,15 @@ VO& VO::operator += (const VO& right) {
 	this->DO32 += right.DO32;
 	return *this;
 }
+
+VO VO::offsets(void) const
+{
+	VO voff;
+	voff.AO16 = 0;
+	voff.DO32 = AO16*sizeof(short);
+	return voff;
+}
+
 
 int VO::len(void) const {
 	return AO16*2 + DO32*4;
@@ -69,14 +92,16 @@ void HBA::dump_config()
 		++port;
 	}
 }
+
 void HBA::dump_data(const char* basename)
 {
 	cerr << "dump_data" <<endl;
 }
 
 
-ACQ::ACQ(string _name, VI _vi, VO _vo, VI& sys_vi_cursor, VO& sys_vo_cursor) :
+ACQ::ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		IO(_name, _vi, _vo),
+		vi_offsets(_vi_offsets), vo_offsets(_vo_offsets),
 		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor), nowait(false), wd_mask(0)
 {
 	// @@todo hook the device driver.
@@ -89,8 +114,8 @@ string ACQ::toString() {
 	if (wd_mask){
 		sprintf(wd, " WD mask: 0x%08x", wd_mask);
 	}
-	return IO::toString() + " SPAD:" + to_string(vi_cursor.SP32) + 
-			" VI Offsets " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32) + wd;
+	return IO::toString() + " Offset of SPAD IN VI :" + to_string(vi_offsets.SP32) + "\n"
+			" System Interface Indices " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32) + wd;
 }
 bool ACQ::newSample(int sample)
 {
@@ -105,7 +130,7 @@ unsigned ACQ::tlatch(void)
 
 void ACQ::arm(int nsamples)
 {
-
+	cerr << "placeholder: ARM unit " << getName() << " now" <<endl;
 }
 
 int get_int(json j)
@@ -122,23 +147,39 @@ HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		uuts(_uuts), vi(_vi), vo(_vo)
 {}
 
+#define INSERT_IF(map, vx, vxo, field) \
+	if (uut->vx.field){	\
+		map.insert(pair<std::string, int>(#field, uut->vxo.field)); \
+	}
+
 void store_config(json j, string fname, HBA hba)
 {
 	int ii = 0;
-	j["OFFSETS"] = json::array();
 	for (auto uut : hba.uuts){
-		json &offsets = j["OFFSETS"][ii++];
-		std::map<std::string, int> vi_map {
-			{ "AI16", uut->vi_cursor.AI16 },
-			{ "DI32", uut->vi_cursor.DI32 },
-			{ "SP32", uut->vi_cursor.SP32 }
-		};
-		offsets.push_back(json::object_t::value_type("VI", vi_map));
-		std::map<std::string, int> vo_map {
-			{ "AO16", uut->vo_cursor.AO16 },
-			{ "DO32", uut->vo_cursor.DO32 }
-		};
-		offsets.push_back(json::object_t::value_type("VO", vo_map));
+
+		json &jlo = j["SYS"]["UUT"]["LOCAL_OFFSETS"][ii];
+		std::map <std::string, int> vi_offsets_map;
+		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI16);
+		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI32);
+		INSERT_IF(vi_offsets_map, vi, vi_offsets, DI32);
+		INSERT_IF(vi_offsets_map, vi, vi_offsets, SP32);
+		jlo.push_back(json::object_t::value_type("VI", vi_offsets_map));
+		std::map<std::string, int> vo_offsets_map;
+		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
+		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
+		jlo.push_back(json::object_t::value_type("VO", vo_offsets_map));
+
+		json &jix = j["SYS"]["UUT"]["GLOBAL_INDICES"][ii++];
+		std::map<std::string, int> vi_map;
+		INSERT_IF(vi_map, vi, vi_cursor, AI16);
+		INSERT_IF(vi_map, vi, vi_cursor, AI32);
+		INSERT_IF(vi_map, vi, vi_cursor, DI32);
+		INSERT_IF(vi_map, vi, vi_cursor, SP32);
+		jix.push_back(json::object_t::value_type("VI", vi_map));
+		std::map<std::string, int> vo_map;
+		INSERT_IF(vo_map, vo, vo_cursor, AO16);
+		INSERT_IF(vo_map, vo, vo_cursor, DO32);
+		jix.push_back(json::object_t::value_type("VO", vo_map));
 	}
 	std::ofstream o("runtime.json");
 	o << std::setw(4) << j << std::endl;
@@ -169,7 +210,7 @@ HBA& HBA::create(const char* json_def)
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["AO16"]);
-		ACQ *acq = new ACQ(uut["name"], vi, vo, VI_sys, VO_sys);
+		ACQ *acq = new ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
 		try {
 			int wd_bit = uut["WD_BIT"].get<int>();
