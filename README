@@ -1,0 +1,13 @@
+next steps:
+- configure kbuf for archive
+publishInputSample()
+... scatter VI to SystemInterface
+getOutputSample()
+... gather VO from System
+archiveSample()
+.. HBA needs to know NSAMPLES at the getgo.
+client choice when to do the steps above.
+
+SystemInterfaceFactory..
+
+

@@ -47,6 +47,7 @@ struct SystemInterface {
 		short* AO16;
 		unsigned *DO32;
 	};
+	virtual void ringDoorbell(int sample);
 };
 
 /* IO Base Class */
