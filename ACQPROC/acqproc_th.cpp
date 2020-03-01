@@ -25,7 +25,6 @@ void fake_a_shot(HBA& hba)
 }
 int main(int argc, char* argv[])
 {
-
 	const char* config_file;
 	if (argc > 1){
 		config_file = argv[1];
@@ -33,7 +32,6 @@ int main(int argc, char* argv[])
 	HBA hba = HBA::create(config_file);
 
 	hba.dump_config();
-
 
 	fake_a_shot(hba);
 }

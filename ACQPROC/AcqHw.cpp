@@ -101,6 +101,10 @@ bool ACQ_HW::newSample(int sample)
 	if (nowait || TLATCH != tl0){
 		memcpy(dev->lbuf, dev->host_buffer, vi.len());
 		return true;
+	}else if (sample == 0 && wd_mask){
+		unsigned* dox = (unsigned *)(dev->host_buffer+AO_OFFSET);
+		dox[vo_offsets.DO32/2] ^= wd_mask;
+		return false;
 	}else{
 		return false;
 	}
