@@ -14,7 +14,7 @@
 using namespace std;
 
 
-/* VI : models Vector Input */
+/** VI : models Vector Input */
 struct VI {
 	int len(void) const;
 	VI& operator+= (const VI& right);
@@ -26,7 +26,7 @@ struct VI {
 	VI();
 };
 
-/* VO : Modules Vector Output */
+/** VO : Models Vector Output */
 struct VO {
 	int len(void) const;
 	VO& operator+= (const VO& right);
@@ -36,6 +36,7 @@ struct VO {
 	VO();
 };
 
+/** SystemInterface : Models interface with external PCS. */
 struct SystemInterface {
 	struct Inputs {
 		short *AI16;
@@ -52,7 +53,7 @@ struct SystemInterface {
 	virtual void ringDoorbell(int sample) {}
 };
 
-/* IO Base Class */
+/** IO Base Class */
 class IO {
 
 	string name;
@@ -70,9 +71,8 @@ public:
 };
 
 
-
+/** class ACQ abstract model of an ACQ2106 box. */
 class ACQ: public IO
-/*< models an ACQ2106 box. */
 {
 	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
     virtual ~ACQ() {}
@@ -99,10 +99,11 @@ friend class HBA;
 friend class ACQ_HW;
 };
 
+/** struct Dev : interface to AFHBA404 device driver. */
 struct Dev;
 
+/** class ACQ_HW : concrete model of ACQ2106 box. */
 class ACQ_HW: public ACQ
-/*< models an ACQ2106 box. with hardware links */
 {
 	Dev* dev;
 	unsigned tl0;
@@ -126,8 +127,8 @@ public:
 friend class HBA;
 };
 
+/** models a Host Bus Adapter like AFHBA404. */
 class HBA: public IO
-/*< modules a Host Bus Adapter like AFHBA404. */
 {
 	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
 

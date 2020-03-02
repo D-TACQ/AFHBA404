@@ -20,7 +20,7 @@ extern "C" {
 
 #include <assert.h>
 
-
+/** struct Dev : interface to AFHBA404 device driver. */
 struct Dev {
 	int devnum;
 	int fd;
@@ -95,21 +95,23 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 	}
 }
 
-#define TOSI(field, sz) \
+
+#define VITOSI(field, sz) \
 	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf+vi_offsets.field, vi.field*sz))
 
-#define SITO(field, sz) \
+#define SITOVO(field, sz) \
 	(vo.field && memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
 
 void ACQ_HW::action(SystemInterface& systemInterface)
+/**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
-	SITO(AO16, sizeof(short));
-	SITO(DO32, sizeof(unsigned));
+	SITOVO(AO16, sizeof(short));
+	SITOVO(DO32, sizeof(unsigned));
 
-	TOSI(AI16, sizeof(short));
-	TOSI(AI32, sizeof(unsigned));
-	TOSI(DI32, sizeof(unsigned));
-	TOSI(SP32, sizeof(unsigned));
+	VITOSI(AI16, sizeof(short));
+	VITOSI(AI32, sizeof(unsigned));
+	VITOSI(DI32, sizeof(unsigned));
+	VITOSI(SP32, sizeof(unsigned));
 	dev->lbuf += vi.len();
 }
 ACQ_HW::~ACQ_HW() {
@@ -126,8 +128,8 @@ ACQ_HW::~ACQ_HW() {
 #undef TLATCH
 #define TLATCH	(dev->host_buffer[vi_offsets.SP32])
 
+/** checks host buffer for new sample, if so copies to lbuf and reports true */
 bool ACQ_HW::newSample(int sample)
-/*< checks host buffer for new sample, if so copies to lbuf and reports true */
 {
 	if (nowait || TLATCH != tl0){
 		memcpy(dev->lbuf, dev->host_buffer, vi.len());
@@ -139,13 +141,14 @@ bool ACQ_HW::newSample(int sample)
 		return false;
 	}
 }
+
+/** returns latest tlatch from lbuf */
 unsigned ACQ_HW::tlatch(void)
-/*< returns latest tlatch from lbuf */
 {
 	return dev->lbuf[vi_offsets.SP32];
 }
+/** prepare to run a shot nsamples long, arm the UUT. */
 void ACQ_HW:: arm(int nsamples)
-/*< prepare to run a shot nsamples long, arm the UUT. */
 {
 
 }
