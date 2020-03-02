@@ -54,11 +54,11 @@ const char* ui(int argc, char* argv[])
 		fprintf(stderr, "USAGE acqproc_th CONFIG_FILE NSAMPLES [SAMPLES_BUFFER]\n");
 	}
 	if (argc > 2){
-		G::nsamples = atoi(argv[1]);
+		G::nsamples = atoi(argv[2]);
 		fprintf(stderr, "nsamples set %d\n", G::nsamples);
 	}
 	if (argc > 3){
-		samples_buffer = atoi(argv[2]);
+		samples_buffer = atoi(argv[3]);
 	}
 	return config_file;
 }

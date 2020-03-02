@@ -123,7 +123,7 @@ string ACQ::toString() {
 bool ACQ::newSample(int sample)
 {
 	cerr << " new sample: " << sample << " " << getName() << endl;
-	return false;
+	return true;
 }
 
 unsigned ACQ::tlatch(void)

@@ -1,12 +1,11 @@
 
 CXXFLAGS+=-I.
 
-all: acqproc_th
-
+all: acqproc
 
 clean:
-	rm -f *.o acqproc_th
+	rm -f *.o acqproc
 
 
-acqproc_th: acqproc_th.o AcqSys.o AcqHw.o afhba-llcontrol.o
+acqproc: acqproc.o AcqSys.o AcqHw.o afhba-llcontrol.o
 	$(CXX) -O3 -o $@ $^	
