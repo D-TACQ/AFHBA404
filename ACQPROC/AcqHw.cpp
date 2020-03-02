@@ -26,6 +26,7 @@ struct Dev {
 	int fd;
 	char* host_buffer;
 	char* lbuf;
+	char* _lbuffer;
 	struct XLLC_DEF xllc_def;
 
 	Dev() {
@@ -36,6 +37,8 @@ struct Dev {
 int samples_buffer = 1;
 
 #define AO_OFFSET 0x1000
+
+#define XO_HOST	(dev->host_buffer+AO_OFFSET)
 
 
 void _get_connected(struct Dev* dev, unsigned vi_len)
@@ -60,7 +63,8 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 	dev->xllc_def.len = samples_buffer*vi.len();
 	memset(dev->host_buffer, 0, vi.len());
-	dev->lbuf = (char*)calloc(vi.len(), 1);
+	dev->_lbuffer = (char*)calloc(vi.len(), HBA::maxsam);
+	dev->lbuf = dev->_lbuffer;
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
@@ -83,12 +87,39 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 	if (vo.DO32){
 		/* marker pattern for the PAD area for hardware trace */
-		dox = (unsigned *)(dev->host_buffer+AO_OFFSET + vo_offsets.DO32);
+		dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
 		int ii;
 		for (ii = 0; ii <= 0xf; ++ii){
 		        dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
 		}
 	}
+}
+
+#define TOSI(field, sz) \
+	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf+vi_offsets.field, vi.field*sz))
+
+#define SITO(field, sz) \
+	(vo.field && memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
+
+void ACQ_HW::action(SystemInterface& systemInterface)
+{
+	SITO(AO16, sizeof(short));
+	SITO(DO32, sizeof(unsigned));
+
+	TOSI(AI16, sizeof(short));
+	TOSI(AI32, sizeof(unsigned));
+	TOSI(DI32, sizeof(unsigned));
+	TOSI(SP32, sizeof(unsigned));
+	dev->lbuf += vi.len();
+}
+ACQ_HW::~ACQ_HW() {
+	const char* fname = (getName()+".dat").c_str();
+	FILE *fp = fopen(fname, "w");
+	if (fp == 0){
+		perror(fname);
+	}
+	fwrite(dev->_lbuffer, vi.len(), HBA::maxsam, fp);
+	fclose(fp);
 }
 
 /* TLATCH now uses the dynamic set value */

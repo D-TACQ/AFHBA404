@@ -46,8 +46,10 @@ struct SystemInterface {
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
-	};
-	virtual void ringDoorbell(int sample);
+	} OUT;
+	SystemInterface();
+	virtual ~SystemInterface() {}
+	virtual void ringDoorbell(int sample) {}
 };
 
 /* IO Base Class */
@@ -73,7 +75,7 @@ class ACQ: public IO
 /*< models an ACQ2106 box. */
 {
 	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
-
+    virtual ~ACQ() {}
 protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
@@ -88,6 +90,7 @@ public:
 
 	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual void action(SystemInterface& systemInterface) {}
 	virtual unsigned tlatch(void);
 	/*< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
@@ -108,12 +111,14 @@ class ACQ_HW: public ACQ
 
 	ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
+	virtual ~ACQ_HW();
 
 protected:
 
 public:
 	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual void action(SystemInterface& systemInterface);
 	virtual unsigned tlatch(void);
 	/*< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
@@ -125,13 +130,17 @@ class HBA: public IO
 /*< modules a Host Bus Adapter like AFHBA404. */
 {
 	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
+
 public:
+	virtual ~HBA() {}
 	int devnum;
 	vector<ACQ*> uuts;
 	const VI vi;
 	const VO vo;
+	static int maxsam;
+	static HBA& create(const char* json_def, int _maxsam);
 
-	static HBA& create(const char* json_def);
+	virtual void processSample(SystemInterface& systemInterface, int sample);
 
 	void dump_config();
 	/*< output complete configuration with calculated offsets */

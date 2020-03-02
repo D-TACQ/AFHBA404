@@ -149,6 +149,18 @@ HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		uuts(_uuts), vi(_vi), vo(_vo)
 {}
 
+void HBA::processSample(SystemInterface& systemInterface, int sample)
+{
+	for (auto uut : uuts){
+		uut->newSample(sample);
+	}
+	for (auto uut : uuts){
+		uut->action(systemInterface);
+	}
+	systemInterface.ringDoorbell(sample);
+}
+
+
 #define INSERT_IF(map, vx, vxo, field) \
 	if (uut->vx.field){	\
 		map.insert(pair<std::string, int>(#field, uut->vxo.field)); \
@@ -189,12 +201,15 @@ void store_config(json j, string fname, HBA hba)
 
 int devnum;
 
-HBA& HBA::create(const char* json_def)
+int HBA::maxsam;
+
+HBA& HBA::create(const char* json_def, int _maxsam)
 {
 	json j;
 	std::ifstream i(json_def);
 	i >> j;
 
+	maxsam = _maxsam;
 	struct VI VI_sys;
 	struct VO VO_sys;
 	vector <ACQ*> uuts;
@@ -247,4 +262,16 @@ HBA& HBA::create(const char* json_def)
 	return the_hba;
 }
 
+
+SystemInterface::SystemInterface()
+/* make a gash SI to allow simulated operation. The real shm is customer specific */
+{
+	IN.AI16 = (short*)calloc(4*192, sizeof(short));
+	IN.AI32 = (int*)calloc(4*192, sizeof(int));
+	IN.DI32 = (unsigned*)calloc(4*6, sizeof(unsigned));    // needs to be bigger for PWM
+	IN.SP32 = (unsigned*)calloc(4*16, sizeof(unsigned));
+
+	OUT.AO16 = (short*)calloc(6*192, sizeof(short));
+	OUT.DO32 = (unsigned*)calloc(6*4, sizeof(unsigned));
+}
 

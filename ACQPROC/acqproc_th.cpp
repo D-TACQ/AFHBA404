@@ -15,12 +15,10 @@
 
 #define NSAM	2		// typ: 200000
 
-void fake_a_shot(HBA& hba)
+void fake_a_shot(HBA& hba, SystemInterface& systemInterface)
 {
 	for (int sample = 0; sample < NSAM; ++sample){
-		for (auto uut : hba.uuts){
-			uut->newSample(sample);
-		}
+		hba.processSample(systemInterface, sample);
 	}
 }
 int main(int argc, char* argv[])
@@ -29,10 +27,12 @@ int main(int argc, char* argv[])
 	if (argc > 1){
 		config_file = argv[1];
 	}
-	HBA hba = HBA::create(config_file);
+	HBA hba = HBA::create(config_file, NSAM);
 
 	hba.dump_config();
 
-	fake_a_shot(hba);
+	SystemInterface si;
+
+	fake_a_shot(hba, si);
 }
 
