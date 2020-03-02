@@ -23,6 +23,8 @@ extern "C" {
 
 #include <assert.h>
 
+#include <sys/mman.h>
+
 /** struct Dev : interface to AFHBA404 device driver. */
 struct Dev {
 	int devnum;
@@ -103,6 +105,11 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 	TLATCH = 0xdeadbeef;
 }
 
+void HBA::start_shot()
+{
+	mlockall(MCL_CURRENT);
+	goRealTime();
+}
 
 #define VITOSI(field, sz) \
 	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf+vi_offsets.field, vi.field*sz))
@@ -132,6 +139,7 @@ ACQ_HW::~ACQ_HW() {
 	}
 	fwrite(dev->_lbuffer, vi.len(), HBA::maxsam, fp);
 	fclose(fp);
+	clear_mapping(dev->fd, dev->host_buffer);
 }
 
 
@@ -158,5 +166,5 @@ unsigned ACQ_HW::tlatch(void)
 /** prepare to run a shot nsamples long, arm the UUT. */
 void ACQ_HW:: arm(int nsamples)
 {
-
+	cerr << "ACQ_HW::arm: TODO" <<endl;
 }

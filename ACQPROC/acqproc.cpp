@@ -52,6 +52,7 @@ const char* ui(int argc, char* argv[])
 		config_file = argv[1];
 	}else{
 		fprintf(stderr, "USAGE acqproc_th CONFIG_FILE NSAMPLES [SAMPLES_BUFFER]\n");
+		exit(1);
 	}
 	if (argc > 2){
 		G::nsamples = atoi(argv[2]);
@@ -80,6 +81,7 @@ int main(int argc, char* argv[])
 
 	SystemInterface si;
 
+	hba.start_shot();
 	run_shot(hba, si);
 }
 

@@ -44,6 +44,7 @@
 
 unsigned difftime_us(void);
 void* get_mapping(dev_t devnum, int *pfd);
+void clear_mapping(int fd, void* hb);
 void setAffinity(unsigned cpu_mask);
 void goRealTime(void);
 

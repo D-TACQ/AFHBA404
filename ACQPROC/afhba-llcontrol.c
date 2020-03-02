@@ -102,6 +102,11 @@ void* get_mapping(dev_t devnum, int *pfd) {
 	return host_buffer;
 }
 
+void clear_mapping(int fd, void* hb)
+{
+	munmap(hb, HB_LEN);
+	close(fd);
+}
 void setAffinity(unsigned cpu_mask)
 {
 	int cpu = 0;
