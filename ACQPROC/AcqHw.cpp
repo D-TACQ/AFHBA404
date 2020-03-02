@@ -51,6 +51,10 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 extern int devnum;
 
+/* TLATCH now uses the dynamic set value */
+#undef TLATCH
+#define TLATCH	(*(unsigned*)(dev->host_buffer + vi_offsets.SP32))
+
 ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 				ACQ(_name, _vi, _vo, _vi_offsets,
@@ -96,6 +100,7 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 		        dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
 		}
 	}
+	TLATCH = 0xdeadbeef;
 }
 
 
@@ -114,6 +119,8 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(AI16, sizeof(short));
 	VITOSI(AI32, sizeof(unsigned));
 	VITOSI(DI32, sizeof(unsigned));
+	((unsigned*)dev->lbuf+vi_offsets.SP32)[2] = pollcount;
+	pollcount = 0;
 	VITOSI(SP32, sizeof(unsigned));
 	dev->lbuf += vi.len();
 }
@@ -127,9 +134,7 @@ ACQ_HW::~ACQ_HW() {
 	fclose(fp);
 }
 
-/* TLATCH now uses the dynamic set value */
-#undef TLATCH
-#define TLATCH	(dev->host_buffer[vi_offsets.SP32])
+
 
 /** checks host buffer for new sample, if so copies to lbuf and reports true */
 bool ACQ_HW::newSample(int sample)

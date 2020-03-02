@@ -104,7 +104,8 @@ void HBA::dump_data(const char* basename)
 ACQ::ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		IO(_name, _vi, _vo),
 		vi_offsets(_vi_offsets), vo_offsets(_vo_offsets),
-		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor), nowait(false), wd_mask(0)
+		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor),
+		nowait(false), wd_mask(0), pollcount(0)
 {
 	// @@todo hook the device driver.
 	sys_vi_cursor += vi;
@@ -149,10 +150,17 @@ HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		uuts(_uuts), vi(_vi), vo(_vo)
 {}
 
+extern "C" {
+	int sched_fifo_priority;
+}
+
 void HBA::processSample(SystemInterface& systemInterface, int sample)
 {
 	for (auto uut : uuts){
-		uut->newSample(sample);
+		while(!uut->newSample(sample)){
+			sched_fifo_priority>1 || sched_yield();
+			++uut->pollcount;
+		}
 	}
 	for (auto uut : uuts){
 		uut->action(systemInterface);

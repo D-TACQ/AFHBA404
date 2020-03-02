@@ -26,7 +26,9 @@
 #ifndef LLCONTROL_AFHBA_LLCONTROL_COMMON_H_
 #define LLCONTROL_AFHBA_LLCONTROL_COMMON_H_
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <sched.h>
 
 #include <stdio.h>

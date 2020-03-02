@@ -64,7 +64,7 @@ const char* ui(int argc, char* argv[])
 }
 
 
-void fake_a_shot(HBA& hba, SystemInterface& systemInterface)
+void run_shot(HBA& hba, SystemInterface& systemInterface)
 {
 	for (int sample = 0; sample < G::nsamples; ++sample){
 		hba.processSample(systemInterface, sample);
@@ -80,6 +80,6 @@ int main(int argc, char* argv[])
 
 	SystemInterface si;
 
-	fake_a_shot(hba, si);
+	run_shot(hba, si);
 }
 

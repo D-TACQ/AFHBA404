@@ -79,7 +79,7 @@ class ACQ: public IO
 protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
-
+	int pollcount;
 public:
 	const VI vi_offsets; /* byte offset for each Input type in Local Vector In */
 	const VO vo_offsets; /* byte offset for each Output type in Local Vector Out */
