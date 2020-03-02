@@ -6,7 +6,10 @@
  */
 
 extern "C" {
-#include "../LLCONTROL/afhba-llcontrol-common.h"
+#include "../local.h"
+#include "../rtm-t_ioctl.h"
+#include "afhba-llcontrol.h"
+
 }
 
 #include "AcqSys.h"
