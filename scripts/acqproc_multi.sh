@@ -24,12 +24,12 @@
 # - This script should be run as root if the user wishes to use tasket.
 # - The script does not have to be run as root if taskset is not to be used.
 
-UUT1=acq2106_085
-UUT2=acq2106_130
-UUT3=acq2106_176
+UUT1=acq2106_183
+UUT2=acq2106_184
+#UUT3=acq2106_176
 
 # If you are using more than one UUT fill in the UUTs:
-UUTS="${UUTS:-$UUT1 $UUT2 $UUT3}"
+UUTS="${UUTS:-$UUT1 $UUT2}"
 
 DEVMAX=0
 for u in $UUTS; do
@@ -43,7 +43,7 @@ SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-serial} # serial: default, parallel, none
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
-TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
+TOPROLE=${TOPROLE:-fpmaster}		# alt: fpmaster for front panel clk/trg.
 
 TOP=${TOP:-/home/dt100/PROJECTS/}
 HAPI_DIR=$TOP/acq400_hapi/
@@ -130,8 +130,11 @@ control_program() {
     [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
     export DEVMAX=$DEVMAX
     export VERBOSE=$VERBOSE
-    
+   
+    export HW=1
     $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
+    $TASKSET ./ACQPROC/acqproc ./ACQPROC/configs/swip.json $POST 
+
     wait
     echo "Splitting data now."
     ./scripts/split_multi_uut_data.py --nuuts=$DEVMAX
