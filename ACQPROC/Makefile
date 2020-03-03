@@ -1,5 +1,5 @@
 
-CXXFLAGS+=-I.
+CXXFLAGS+=-I. -std=c++11
 
 all: acqproc
 
