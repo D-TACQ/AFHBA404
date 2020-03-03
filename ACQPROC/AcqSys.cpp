@@ -112,6 +112,9 @@ ACQ::ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_v
 	sys_vo_cursor += vo;
 }
 
+ACQ::~ACQ() {
+
+}
 string ACQ::toString() {
 	char wd[80] = {};
 	if (wd_mask){
@@ -148,8 +151,15 @@ int get_int(json j)
 HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		IO("HBA"+to_string(_devnum), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
-{}
+{
 
+}
+
+HBA::~HBA() {
+    for (auto uut : uuts){
+        delete uut;
+    }
+}
 extern "C" {
 	int sched_fifo_priority;
 }
@@ -175,7 +185,7 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 		map.insert(pair<std::string, int>(#field, uut->vxo.field)); \
 	}
 
-void store_config(json j, string fname, HBA hba)
+void store_config(json j, string fname, HBA& hba)
 {
 	int ii = 0;
 	for (auto uut : hba.uuts){

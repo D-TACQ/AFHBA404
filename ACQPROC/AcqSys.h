@@ -87,7 +87,7 @@ public:
 class ACQ: public IO
 {
 	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
-    virtual ~ACQ() {}
+        virtual ~ACQ();
 protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
@@ -146,7 +146,7 @@ class HBA: public IO
 	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
 
 public:
-	virtual ~HBA() {}
+	virtual ~HBA();
 	int devnum;
 	vector<ACQ*> uuts;	/**< vector if ACQ. */
 	const VI vi;		/**< total system size each Input type. */
