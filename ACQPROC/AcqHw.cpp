@@ -63,7 +63,6 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 							_vo_offsets, sys_vi_cursor, sys_vo_cursor),
 				tl0(0xdeadbeef), dev(new Dev)
 {
-
 	// @@todo init dev.
 	struct XLLC_DEF xo_xllc_def;
 	dev->devnum = ::devnum++;
@@ -147,8 +146,11 @@ ACQ_HW::~ACQ_HW() {
 /** checks host buffer for new sample, if so copies to lbuf and reports true */
 bool ACQ_HW::newSample(int sample)
 {
-	if (nowait || TLATCH != tl0){
+        unsigned tl1;
+
+	if (nowait || (tl1 = TLATCH) != tl0){
 		memcpy(dev->lbuf, dev->host_buffer, vi.len());
+                tl0 = tl1;
 		return true;
 	}else if (sample == 0 && wd_mask){
 		dox[0] ^= wd_mask;
