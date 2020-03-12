@@ -66,6 +66,8 @@ struct SystemInterface {
 	/**< alert PCS that there is new data .. implement by subclass.
 	 */
 	{}
+
+	static SystemInterface& factory(const char* key);
 };
 
 /** IO Base Class */

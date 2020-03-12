@@ -29,6 +29,7 @@ namespace G {
 extern int samples_buffer;	// AcqHw.cpp, should be in namespace G
 
 
+
 const char* ui(int argc, char* argv[])
 {
 	const char* config_file;
@@ -47,7 +48,6 @@ const char* ui(int argc, char* argv[])
 	if (getenv("DUMMY_FIRST_LOOP")){
 		G::dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
-
 	if (argc > 1){
 		config_file = argv[1];
 	}else{
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	hba.dump_config();
 
-	SystemInterface si;
+	SystemInterface si(SystemInterface::factory(getenv("SINGLE_THREAD_CONTROL")));
 
 	hba.start_shot();
 	run_shot(hba, si);

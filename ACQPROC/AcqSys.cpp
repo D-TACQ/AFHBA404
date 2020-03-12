@@ -239,6 +239,8 @@ int devnum;
 
 int HBA::maxsam;
 
+HBA* the_hba;
+
 HBA& HBA::create(const char* json_def, int _maxsam)
 {
 	json j;
@@ -295,9 +297,9 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		uuts.push_back(acq);
 		++port;
 	}
-	HBA& the_hba = * new HBA(::devnum, uuts, VI_sys, VO_sys);
-	store_config(j, "runtime.json", the_hba);
-	return the_hba;
+	the_hba = new HBA(::devnum, uuts, VI_sys, VO_sys);
+	store_config(j, "runtime.json", *the_hba);
+	return *the_hba;
 }
 
 
@@ -313,4 +315,31 @@ SystemInterface::SystemInterface()
 	OUT.DO32 = (unsigned*)calloc(4*4, sizeof(unsigned));
 	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
 }
+
+class DummySingleThreadControlSystemInterface: public SystemInterface {
+public:
+	virtual void ringDoorbell(int sample){
+		int imax = the_hba->vo.AO16;
+		short xx = IN.AI16[0];
+		for (int ii = 0; ii < imax; ++ii){
+			OUT.AO16[ii] = xx;
+		}
+		unsigned tl = the_hba->uuts[0]->tlatch();
+		for (int ii = 0; ii < the_hba->vo.DO32; ++ii){
+			OUT.DO32[ii] = tl;
+		}
+	}
+};
+
+SystemInterface& SystemInterface::factory(const char* key)
+{
+	if (key){
+		if (strcmp(key, "control_dup1")){
+			return * new DummySingleThreadControlSystemInterface();
+		}
+	}
+
+	return * new SystemInterface();
+}
+
 
