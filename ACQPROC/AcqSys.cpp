@@ -190,17 +190,22 @@ void store_config(json j, string fname, HBA& hba)
 	int ii = 0;
 	for (auto uut : hba.uuts){
 
-		json &jlo = j["SYS"]["UUT"]["LOCAL_OFFSETS"][ii];
+		json &jlo = j["SYS"]["UUT"]["LOCAL"][ii];
 		std::map <std::string, int> vi_offsets_map;
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI16);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI32);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, DI32);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, SP32);
-		jlo.push_back(json::object_t::value_type("VI", vi_offsets_map));
+		jlo.push_back(json::object_t::value_type("VI_OFFSETS", vi_offsets_map));
 		std::map<std::string, int> vo_offsets_map;
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
-		jlo.push_back(json::object_t::value_type("VO", vo_offsets_map));
+		jlo.push_back(json::object_t::value_type("VO_OFFSETS", vo_offsets_map));
+
+		std::map <std::string, int> len_map;
+		len_map.insert(pair<std::string, int>("VI", uut->vi.len()));
+		len_map.insert(pair<std::string, int>("VO", uut->vo.len()));
+		jlo.push_back(json::object_t::value_type("VX_LEN", len_map));
 
 		json &jix = j["SYS"]["UUT"]["GLOBAL_INDICES"][ii++];
 		std::map<std::string, int> vi_map;
@@ -209,6 +214,7 @@ void store_config(json j, string fname, HBA& hba)
 		INSERT_IF(vi_map, vi, vi_cursor, DI32);
 		INSERT_IF(vi_map, vi, vi_cursor, SP32);
 		jix.push_back(json::object_t::value_type("VI", vi_map));
+
 		std::map<std::string, int> vo_map;
 		INSERT_IF(vo_map, vo, vo_cursor, AO16);
 		INSERT_IF(vo_map, vo, vo_cursor, DO32);
