@@ -30,8 +30,11 @@ struct Dev {
 	int devnum;
 	int fd;
 	char* host_buffer;
-	char* lbuf;
-	char* _lbuffer;
+	struct LBUF {
+		char* base;
+		char* cursor;
+	} lbuf_vi, lbuf_vo;
+
 	struct XLLC_DEF xllc_def;
 
 	Dev() {
@@ -71,8 +74,11 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 	dev->xllc_def.len = samples_buffer*vi.len();
 	memset(dev->host_buffer, 0, vi.len());
-	dev->_lbuffer = (char*)calloc(vi.len(), HBA::maxsam);
-	dev->lbuf = dev->_lbuffer;
+	dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
+	dev->lbuf_vi.cursor = dev->lbuf_vi.base;
+	dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
+	dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
@@ -111,7 +117,7 @@ void HBA::start_shot()
 }
 
 #define VITOSI(field, sz) \
-	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf+vi_offsets.field, vi.field*sz))
+	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf_vi.cursor+vi_offsets.field, vi.field*sz))
 
 #define SITOVO(field, sz) \
 	(vo.field && memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
@@ -125,19 +131,25 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(AI16, sizeof(short));
 	VITOSI(AI32, sizeof(unsigned));
 	VITOSI(DI32, sizeof(unsigned));
-	((unsigned*)dev->lbuf+vi_offsets.SP32)[2] = pollcount;
+	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[2] = pollcount;
 	pollcount = 0;
 	VITOSI(SP32, sizeof(unsigned));
-	dev->lbuf += vi.len();
+	dev->lbuf_vi.cursor += vi.len();
 }
-ACQ_HW::~ACQ_HW() {
-	const char* fname = (getName()+".dat").c_str();
+
+void raw_store(const char* fname, const char* base, int len)
+{
 	FILE *fp = fopen(fname, "w");
 	if (fp == 0){
 		perror(fname);
 	}
-	fwrite(dev->_lbuffer, vi.len(), HBA::maxsam, fp);
+	fwrite(base, len, HBA::maxsam, fp);
 	fclose(fp);
+}
+ACQ_HW::~ACQ_HW() {
+	raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
+	raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
+
 	clear_mapping(dev->fd, dev->host_buffer);
 }
 
@@ -149,7 +161,7 @@ bool ACQ_HW::newSample(int sample)
         unsigned tl1;
 
 	if (nowait || (tl1 = TLATCH) != tl0){
-		memcpy(dev->lbuf, dev->host_buffer, vi.len());
+		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
                 tl0 = tl1;
 		return true;
 	}else if (sample == 0 && wd_mask){
@@ -163,7 +175,7 @@ bool ACQ_HW::newSample(int sample)
 /** returns latest tlatch from lbuf */
 unsigned ACQ_HW::tlatch(void)
 {
-	return dev->lbuf[vi_offsets.SP32];
+	return dev->lbuf_vi.cursor[vi_offsets.SP32];
 }
 /** prepare to run a shot nsamples long, arm the UUT. */
 void ACQ_HW:: arm(int nsamples)

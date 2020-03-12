@@ -54,6 +54,7 @@ struct SystemInterface {
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
+		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
 	} OUT;
 	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
 	 */
