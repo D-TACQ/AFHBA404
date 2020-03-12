@@ -33,10 +33,12 @@ struct VI {
  */
 struct VO {
 	int len(void) const;
+	int hwlen(void) const;
 	VO& operator+= (const VO& right);
 	VO offsets(void) const;
 	int AO16;
 	int DO32;
+	int CC32;		/* CALC values from the algorithm. NOT OUTPUT to HW */
 	VO();
 };
 
@@ -104,6 +106,7 @@ public:
 	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual void action(SystemInterface& systemInterface) {}
+	virtual void action2(SystemInterface& systemInterface) {}
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
@@ -134,6 +137,8 @@ public:
 	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual void action(SystemInterface& systemInterface);
 	/**< on newSample, copy VO from SI, copy VI to SI */
+	virtual void action2(SystemInterface& systemInterface);
+	/**< late action(), cleanup */
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);

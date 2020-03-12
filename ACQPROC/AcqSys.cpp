@@ -54,6 +54,7 @@ VO::VO() {
 VO& VO::operator += (const VO& right) {
 	this->AO16 += right.AO16;
 	this->DO32 += right.DO32;
+	this->CC32 += right.CC32;
 	return *this;
 }
 
@@ -62,11 +63,16 @@ VO VO::offsets(void) const
 	VO voff;
 	voff.AO16 = 0;
 	voff.DO32 = AO16*sizeof(short);
+	voff.CC32 = voff.DO32 + DO32*sizeof(unsigned);
 	return voff;
 }
 
 
 int VO::len(void) const {
+	return AO16*2 + DO32*4 + CC32*4;
+}
+
+int VO::hwlen(void) const {
 	return AO16*2 + DO32*4;
 }
 
@@ -177,6 +183,9 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 		uut->action(systemInterface);
 	}
 	systemInterface.ringDoorbell(sample);
+	for (auto uut : uuts){
+		uut->action2(systemInterface);
+	}
 }
 
 
@@ -200,6 +209,7 @@ void store_config(json j, string fname, HBA& hba)
 		std::map<std::string, int> vo_offsets_map;
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
+		INSERT_IF(vo_offsets_map, vo, vo_offsets, CC32);
 		jlo.push_back(json::object_t::value_type("VO_OFFSETS", vo_offsets_map));
 
 		std::map <std::string, int> len_map;
@@ -218,6 +228,7 @@ void store_config(json j, string fname, HBA& hba)
 		std::map<std::string, int> vo_map;
 		INSERT_IF(vo_map, vo, vo_cursor, AO16);
 		INSERT_IF(vo_map, vo, vo_cursor, DO32);
+		INSERT_IF(vo_map, vo, vo_cursor, CC32);
 		jix.push_back(json::object_t::value_type("VO", vo_map));
 	}
 	std::ofstream o("runtime.json");
@@ -253,10 +264,12 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
-		vo.DO32 = get_int(uut["VO"]["AO16"]);
+		vo.DO32 = get_int(uut["VO"]["DO32"]);
+		vo.CC32 = get_int(uut["VO"]["CC32"]);
 
-		ACQ *acq = HW? new ACQ_HW(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
-					   new    ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
+		ACQ *acq = HW?
+				new ACQ_HW(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
+				new    ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
 		try {
 			int wd_bit = uut["WD_BIT"].get<int>();
@@ -296,7 +309,8 @@ SystemInterface::SystemInterface()
 	IN.DI32 = (unsigned*)calloc(4*6, sizeof(unsigned));    // needs to be bigger for PWM
 	IN.SP32 = (unsigned*)calloc(4*16, sizeof(unsigned));
 
-	OUT.AO16 = (short*)calloc(6*192, sizeof(short));
-	OUT.DO32 = (unsigned*)calloc(6*4, sizeof(unsigned));
+	OUT.AO16 = (short*)calloc(4*192, sizeof(short));
+	OUT.DO32 = (unsigned*)calloc(4*4, sizeof(unsigned));
+	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
 }
 

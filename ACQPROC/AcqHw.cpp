@@ -87,7 +87,7 @@ ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 	xo_xllc_def = dev->xllc_def;
 	xo_xllc_def.pa += AO_OFFSET;
-	xo_xllc_def.len = vo.len();
+	xo_xllc_def.len = vo.hwlen();
 
 	if (vo.DO32){
 		int ll = xo_xllc_def.len/64;
@@ -135,6 +135,15 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	pollcount = 0;
 	VITOSI(SP32, sizeof(unsigned));
 	dev->lbuf_vi.cursor += vi.len();
+}
+
+#define SITOVO2(field, sz) \
+	(vo.field && memcpy(dev->lbuf_vo.cursor+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
+
+void ACQ_HW::action2(SystemInterface& systemInterface) {
+	SITOVO(AO16, sizeof(short));
+	SITOVO(DO32, sizeof(unsigned));
+	SITOVO(CC32, sizeof(unsigned));
 }
 
 void raw_store(const char* fname, const char* base, int len)

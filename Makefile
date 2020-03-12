@@ -40,7 +40,7 @@ modules:
 
 
 APPS := mmap xiloader
-apps: $(APPS) stream functional_tests llc_support
+apps: $(APPS) stream functional_tests llc_support acqproc
 
 
 flasherase:
@@ -55,6 +55,9 @@ xiloader:
 
 llc_support:
 	cd LLCONTROL && $(MAKE)
+	
+acqproc:
+	cd ACQPROC && $(MAKE)
 
 stream:
 	cd STREAM && $(MAKE)
