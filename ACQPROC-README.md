@@ -7,12 +7,12 @@
  it's assumed that the PCS is another process on other cores that interacts with the SHM.
 - acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
 - logic to handle special cases - eg 
- - BOLO8 (data not in phase), 
- - WATCHDOG (a pulse output before trigger).
+  - BOLO8 (data not in phase), 
+  - WATCHDOG (a pulse output before trigger).
 
 - For a NEW PCS:
- - Define the config file
- - Subclass the shared memory interface SystemInterface to connect to your system.
+  - Define the config file
+  - Subclass the shared memory interface SystemInterface to connect to your system.
 
 eg the Subclass could be a SIMULINK wrapper.
 
