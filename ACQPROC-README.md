@@ -29,6 +29,197 @@ Glossary:
 - DO32 : Digital Output, 32 bit, (eg DI423ELF)
 - CP32 : Calc Value, 32 bit, an intermediate calc result from the PCS. This is NOT sent to the UUT, but is stored in the raw output.
 
+Typical Dummy Run:
+
+[pgm@hoy5 AFHBA404]$ sudo ./ACQPROC/acqproc ./ACQPROC/configs/pcs1.json 
+NOTICE: port 3 is bolo in non-bolo set, set nowait
+HBA0 VI:1216 VO:204
+	[0] acq2106_123 VI:320 VO:68 Offset of SPAD IN VI :260
+ System Interface Indices 0,0 WD mask: 0x80000000
+	[1] acq2106_124 VI:320 VO:68 Offset of SPAD IN VI :260
+ System Interface Indices 128,15
+	[2] acq2106_125 VI:320 VO:68 Offset of SPAD IN VI :260
+ System Interface Indices 256,30
+	[3] acq2106_555 VI:256 VO:0 Offset of SPAD IN VI :192
+ System Interface Indices 384,45
+ new sample: 0 acq2106_123
+ new sample: 0 acq2106_124
+ new sample: 0 acq2106_125
+ new sample: 0 acq2106_555
+ new sample: 1 acq2106_123
+ new sample: 1 acq2106_124
+ new sample: 1 acq2106_125
+ new sample: 1 acq2106_555
+
+
+The dummy run outputs a configuration definition: runtime.json:
+
+First, a reflection of the original config file:
+
+{
+    "AFHBA": {
+        "UUT": [
+            {
+                "VI": {
+                    "AI16": 128,
+                    "DI32": 1,
+                    "SP32": 15
+                },
+                "VO": {
+                    "AO16": 32,
+                    "DO32": 1
+                },
+                "WD_BIT": 31,
+                "name": "acq2106_123",
+                "type": "pcs"
+            },
+            {
+                "VI": {
+                    "AI16": 128,
+                    "DI32": 1,
+                    "SP32": 15
+                },
+                "VO": {
+                    "AO16": 32,
+                    "DO32": 1
+                },
+                "name": "acq2106_124",
+                "type": "pcs"
+            },
+            {
+                "VI": {
+                    "AI16": 128,
+                    "DI32": 1,
+                    "SP32": 15
+                },
+                "VO": {
+                    "AO16": 32,
+                    "DO32": 1
+                },
+                "name": "acq2106_125",
+                "type": "pcs"
+            },
+            {
+                "VI": {
+                    "AI32": 48,
+                    "SP32": 16
+                },
+                "name": "acq2106_555",
+                "type": "bolo"
+            }
+        ]
+    },
+
+
+Then, a configuration structure with GLOBAL_INDICES, indices into the type-specific SHM vectors
+
+   "SYS": {
+        "UUT": {
+            "GLOBAL_INDICES": [
+                {
+                    "VI": {
+                        "AI16": 0,
+                        "DI32": 0,
+                        "SP32": 0
+                    },
+                    "VO": {
+                        "AO16": 0,
+                        "DO32": 0
+                    }
+                },
+                {
+                    "VI": {
+                        "AI16": 128,
+                        "DI32": 1,
+                        "SP32": 15
+                    },
+                    "VO": {
+                        "AO16": 32,
+                        "DO32": 1
+                    }
+                },
+                {
+                    "VI": {
+                        "AI16": 256,
+                        "DI32": 2,
+                        "SP32": 30
+                    },
+                    "VO": {
+                        "AO16": 64,
+                        "DO32": 2
+                    }
+                },
+                {
+                    "VI": {
+                        "AI32": 0,
+                        "SP32": 45
+                    },
+                    "VO": {}
+                }
+            ],
+
+And LOCAL, byte offsets into the raw data files emitted by a PCS run:
+           "LOCAL": [
+                {
+                    "VI_OFFSETS": {
+                        "AI16": 0,
+                        "DI32": 256,
+                        "SP32": 260
+                    },
+                    "VO_OFFSETS": {
+                        "AO16": 0,
+                        "DO32": 64
+                    },
+                    "VX_LEN": {
+                        "VI": 320,
+                        "VO": 68
+                    }
+                },
+                {
+                    "VI_OFFSETS": {
+                        "AI16": 0,
+                        "DI32": 256,
+                        "SP32": 260
+                    },
+                    "VO_OFFSETS": {
+                        "AO16": 0,
+                        "DO32": 64
+                    },
+                    "VX_LEN": {
+                        "VI": 320,
+                        "VO": 68
+                    }
+                },
+                {
+                    "VI_OFFSETS": {
+                        "AI16": 0,
+                        "DI32": 256,
+                        "SP32": 260
+                    },
+                    "VO_OFFSETS": {
+                        "AO16": 0,
+                        "DO32": 64
+                    },
+                    "VX_LEN": {
+                        "VI": 320,
+                        "VO": 68
+                    }
+                },
+                {
+                    "VI_OFFSETS": {
+                        "AI32": 0,
+                        "SP32": 192
+                    },
+                    "VO_OFFSETS": {},
+                    "VX_LEN": {
+                        "VI": 256,
+                        "VO": 0
+                    }
+                }
+            ]
+        }
+
+
 
 
 
