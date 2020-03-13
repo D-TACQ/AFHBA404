@@ -79,7 +79,8 @@ HBA0 VI:1216 VO:204
 
 ## runtime.json : computed system configuration
 
-### First, a reflection of the original config file:
+### AFHBA
+First, a reflection of the original config file:
 ```json
 {
     "AFHBA": {
@@ -135,7 +136,8 @@ HBA0 VI:1216 VO:204
         ]
     },
 ```
-### Then, a configuration structure with GLOBAL_INDICES, indices into the type-specific SHM vectors
+### GLOBAL_INDICES
+Then, a configuration structure with GLOBAL_INDICES, indices into the type-specific SHM vectors
 ```json
    "SYS": {
         "UUT": {
@@ -182,6 +184,7 @@ HBA0 VI:1216 VO:204
                 }
             ],
 ```
+### LOCAL
 And LOCAL, byte offsets into the raw data files emitted by a PCS run:
 ```json
            "LOCAL": [
@@ -245,7 +248,7 @@ And LOCAL, byte offsets into the raw data files emitted by a PCS run:
         }
 ```
 
-
+# More to come.. comments please to peter.milne@d-tacq.com
 
 
 
