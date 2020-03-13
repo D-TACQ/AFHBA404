@@ -30,7 +30,7 @@ Glossary:
 - CP32 : Calc Value, 32 bit, an intermediate calc result from the PCS. This is NOT sent to the UUT, but is stored in the raw output.
 
 Typical Dummy Run:
-
+```
 [pgm@hoy5 AFHBA404]$ sudo ./ACQPROC/acqproc ./ACQPROC/configs/pcs1.json 
 NOTICE: port 3 is bolo in non-bolo set, set nowait
 HBA0 VI:1216 VO:204
@@ -50,7 +50,7 @@ HBA0 VI:1216 VO:204
  new sample: 1 acq2106_124
  new sample: 1 acq2106_125
  new sample: 1 acq2106_555
-
+```
 
 The dummy run outputs a configuration definition: runtime.json:
 
