@@ -39,7 +39,7 @@ done
 POST=${POST:-400000} 	# Number of samples to capture
 CLK=${CLK:-20000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-1}
-SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-serial} # serial: default, parallel, none
+SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -102,23 +102,10 @@ analysis() {
     echo ""
     echo "Running analysis now."
     echo "--------------------"
-    # Takes the LLC data and runs various analysis scripts.
     cd $HAPI_DIR
-    
-    NCHAN=130
-    SPADLONGS=15
-    # echo $DEVNUM
-
-    DEVNUM=0
-    for uut in $UUTS; do
-        filename=uut${DEVNUM}_data.dat
-        cd $HAPI_DIR
-        $PYTHON test_apps/t_latch_histogram.py --src=$AFHBA404_DIR/$filename --ones=1 --nchan=$NCHAN --spad_len=$SPADLONGS
-
-        cd $AFHBA404_DIR
-        $PYTHON ./scripts/latency_on_diff_histo.py --file="./$filename" $UUT1
-        DEVNUM=$((DEVNUM+1))
-    done
+    # Change the json_src path here if the json file is not located in 
+    # ~/PROJECTS/AFHBA404/runtime.json
+    $PYTHON test_apps/t_latch_histogram.py --ones=1 --json=1 --json_src="default" 
 }
 
 
@@ -126,19 +113,21 @@ control_program() {
     # Run the control program here
     cd $AFHBA404_DIR
 
-    export TASKSET="taskset --cpu-list 1"
-    [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+    #export TASKSET="taskset --cpu-list 1"
+    #[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
     export DEVMAX=$DEVMAX
     export VERBOSE=$VERBOSE
    
     export HW=1
-    $TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
-    $TASKSET ./ACQPROC/acqproc ./ACQPROC/configs/swip.json $POST 
+    export RTPRIO=10
+    #$TASKSET ./LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX $POST 
+    #$TASKSET ./ACQPROC/acqproc ./ACQPROC/configs/swip.json $POST 
+    ./ACQPROC/acqproc ./ACQPROC/configs/swip1.json $POST 
 
-    wait
-    echo "Splitting data now."
-    ./scripts/split_multi_uut_data.py --nuuts=$DEVMAX
-    echo "Starting MDSplus put now."
+    #wait
+    #echo "Splitting data now."
+    #./scripts/split_multi_uut_data.py --nuuts=$DEVMAX
+    #echo "Starting MDSplus put now."
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
