@@ -6,6 +6,7 @@ ACQPROC:
 - we're using a SHM to gather all IO data from the UUT's in a single AI,DI,AO,DO vectors,
  it's assumed that the PCS is another process on other cores that interacts with the SHM.
 - acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
+- logic to handle special cases - eg BOLO8 (data not in phase), WATCHDOG (a pulse output before trigger).
 
 - For a NEW PCS:
 -- Define the config file
@@ -16,6 +17,7 @@ eg the Subclass could be a SIMULINK wrapper.
 
 Glossary:
 - PCS: Plasma Control System
+- SHM: Shared Memory
 - UUT: Unit Under Test, in our case, an ACQ2106 DAQ Appliance with variable module payload.
 - AFHBA404: Host Bus Adapter with 4 fiber link ports, supporting up to 4UUT's.
 - acqproc: compile once, configuration driven data handling engine supporting 4UUT's as the IO processor for a PCS.
