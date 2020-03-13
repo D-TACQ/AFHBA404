@@ -248,7 +248,8 @@ And LOCAL, byte offsets into the raw data files emitted by a PCS run:
         }
 ```
 
-# More to come.. comments please to peter.milne@d-tacq.com
+# More to come.. 
+comments please to peter.milne@d-tacq.com
 
 
 
