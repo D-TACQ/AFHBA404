@@ -56,6 +56,7 @@ The dummy run outputs a configuration definition: runtime.json:
 
 First, a reflection of the original config file:
 
+```json
 {
     "AFHBA": {
         "UUT": [
@@ -109,10 +110,10 @@ First, a reflection of the original config file:
             }
         ]
     },
-
+```
 
 Then, a configuration structure with GLOBAL_INDICES, indices into the type-specific SHM vectors
-
+```json
    "SYS": {
         "UUT": {
             "GLOBAL_INDICES": [
@@ -157,8 +158,9 @@ Then, a configuration structure with GLOBAL_INDICES, indices into the type-speci
                     "VO": {}
                 }
             ],
-
+```
 And LOCAL, byte offsets into the raw data files emitted by a PCS run:
+```json
            "LOCAL": [
                 {
                     "VI_OFFSETS": {
@@ -218,6 +220,9 @@ And LOCAL, byte offsets into the raw data files emitted by a PCS run:
                 }
             ]
         }
+```
+
+
 
 
 
