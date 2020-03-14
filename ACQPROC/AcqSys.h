@@ -14,27 +14,27 @@
 using namespace std;
 
 
-/** VI : models Vector Input.
+/** Models Vector Input.
  * Vector Input is a single sample input data set, pushed to DRAM by single DMA from ACQ
  */
 struct VI {
 	int len(void) const;
 	VI& operator+= (const VI& right);
 	VI offsets(void) const;
-	int AI16;
-	int AI32;
-	int DI32;
-	int SP32;
+	int AI16;		/**< #AI16 values from the HW. */
+	int AI32;		/**< #AI32 values from the HW. */
+	int DI32;		/**< #DI32 values from the HW. */
+	int SP32;		/**< #SP32 values from the HW. */
 	VI();
 };
 
 /** SPIX: defined fields in SP32 array */
 enum SPIX {
-	TLATCH = 0,			/** Sample Number */
-	USECS = 1,			/** microseconds since trigger */
-	POLLCOUNT = 2,			/** pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
+	TLATCH = 0,			/**< Sample Number */
+	USECS = 1,			/**< microseconds since trigger */
+	POLLCOUNT = 2,			/**< pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
 };
-/** VO : Models Vector Output.
+/** Models Vector Output.
  * Vector Output is a single sample output data set, fetched by single DMA from ACQ
  */
 struct VO {
@@ -42,30 +42,33 @@ struct VO {
 	int hwlen(void) const;
 	VO& operator+= (const VO& right);
 	VO offsets(void) const;
-	int AO16;
-	int DO32;
-	int CC32;		/* CALC values from the algorithm. NOT OUTPUT to HW */
+	int AO16;		/**< #AO16 values from the algorithm. OUTPUT to HW */
+	int DO32;		/**< #DO32 values from the algorithm. OUTPUT to HW */
+	int CC32;		/**< #CALC values from the algorithm. NOT OUTPUT to HW */
 	VO();
 };
 
-/** SystemInterface : Models interface with external PCS. A subclass will implement shared mem. */
+/** Models interface with external PCS.
+ * Users can create a custom subclass to implement shared memory, comms
+ */
 struct SystemInterface {
+	/** ONE vector each type, all VI from all UUTS are split into types and
+	 *   aggregated in the appropriate vectors.
+	 */
 	struct Inputs {
 		short *AI16;
 		int *AI32;
 		unsigned *DI32;
 		unsigned *SP32;
 	} IN;
-	/**< ONE vector each type, all VI from all UUTS are split into types and
-	 *   aggregated in the appropriate vectors.
+	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
 	 */
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
 		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
 	} OUT;
-	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
-	 */
+
 	SystemInterface();
 	virtual ~SystemInterface() {}
 	virtual void ringDoorbell(int sample)
@@ -76,7 +79,7 @@ struct SystemInterface {
 	static SystemInterface& factory(const char* key);
 };
 
-/** IO Base Class */
+/** Base Class */
 class IO {
 
 	string name;
@@ -94,7 +97,7 @@ public:
 };
 
 
-/** class ACQ abstract model of an ACQ2106 box. */
+/** abstract model of an ACQ2106 box. */
 class ACQ: public IO
 {
 	ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -123,10 +126,10 @@ friend class HBA;
 friend class ACQ_HW;
 };
 
-/** struct Dev : interface to AFHBA404 device driver. */
+/** interface to AFHBA404 device driver. */
 struct Dev;
 
-/** class ACQ_HW : concrete model of ACQ2106 box. */
+/** concrete model of ACQ2106 box. */
 class ACQ_HW: public ACQ
 {
 	Dev* dev;
@@ -154,7 +157,7 @@ public:
 friend class HBA;
 };
 
-/** models a Host Bus Adapter like AFHBA404. */
+/** Models a Host Bus Adapter like AFHBA404. */
 class HBA: public IO
 {
 	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
@@ -162,10 +165,10 @@ class HBA: public IO
 public:
 	virtual ~HBA();
 	int devnum;
-	vector<ACQ*> uuts;	/**< vector if ACQ. */
+	vector<ACQ*> uuts;	/**< vector of ACQ UUT's */
 	const VI vi;		/**< total system size each Input type. */
 	const VO vo;		/**< total system size each Output type. */
-	static int maxsam;
+	static int maxsam;	/**< max samples in shot (for raw memory alloc) */
 
 	static HBA& create(const char* json_def, int _maxsam);
 	static HBA& instance() { return *the_hba; }

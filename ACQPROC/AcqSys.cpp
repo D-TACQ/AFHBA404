@@ -270,6 +270,7 @@ int HBA::maxsam;
 
 HBA* HBA::the_hba;
 
+/** HBA::Create() factory function. */
 HBA& HBA::create(const char* json_def, int _maxsam)
 {
 	json j;
