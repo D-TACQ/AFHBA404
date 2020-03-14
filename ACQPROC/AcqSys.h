@@ -158,7 +158,7 @@ friend class HBA;
 class HBA: public IO
 {
 	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
-
+	static HBA* the_hba;	/**< singleton, ugly interface. */
 public:
 	virtual ~HBA();
 	int devnum;
@@ -166,7 +166,9 @@ public:
 	const VI vi;		/**< total system size each Input type. */
 	const VO vo;		/**< total system size each Output type. */
 	static int maxsam;
+
 	static HBA& create(const char* json_def, int _maxsam);
+	static HBA& instance() { return *the_hba; }
 
 	virtual void start_shot();
 	virtual void processSample(SystemInterface& systemInterface, int sample);

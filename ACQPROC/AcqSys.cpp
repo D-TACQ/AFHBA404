@@ -270,7 +270,7 @@ int devnum;
 
 int HBA::maxsam;
 
-HBA* the_hba;
+HBA* HBA::the_hba;
 
 HBA& HBA::create(const char* json_def, int _maxsam)
 {
@@ -333,44 +333,5 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	return *the_hba;
 }
 
-
-SystemInterface::SystemInterface()
-/* make a gash SI to allow simulated operation. The real shm is customer specific */
-{
-	IN.AI16 = (short*)calloc(4*192, sizeof(short));
-	IN.AI32 = (int*)calloc(4*192, sizeof(int));
-	IN.DI32 = (unsigned*)calloc(4*6, sizeof(unsigned));    // needs to be bigger for PWM
-	IN.SP32 = (unsigned*)calloc(4*16, sizeof(unsigned));
-
-	OUT.AO16 = (short*)calloc(4*192, sizeof(short));
-	OUT.DO32 = (unsigned*)calloc(4*4, sizeof(unsigned));
-	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
-}
-
-class DummySingleThreadControlSystemInterface: public SystemInterface {
-public:
-	virtual void ringDoorbell(int sample){
-		int imax = the_hba->vo.AO16;
-		short xx = IN.AI16[0];
-		for (int ii = 0; ii < imax; ++ii){
-			OUT.AO16[ii] = xx;
-		}
-		unsigned tl = the_hba->uuts[0]->tlatch();
-		for (int ii = 0; ii < the_hba->vo.DO32; ++ii){
-			OUT.DO32[ii] = tl;
-		}
-	}
-};
-
-SystemInterface& SystemInterface::factory(const char* key)
-{
-	if (key){
-		if (strcmp(key, "control_dup1")){
-			return * new DummySingleThreadControlSystemInterface();
-		}
-	}
-
-	return * new SystemInterface();
-}
 
 
