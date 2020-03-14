@@ -131,7 +131,7 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(AI16, sizeof(short));
 	VITOSI(AI32, sizeof(unsigned));
 	VITOSI(DI32, sizeof(unsigned));
-	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[2] = pollcount;
+	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
 	pollcount = 0;
 	VITOSI(SP32, sizeof(unsigned));
 	dev->lbuf_vi.cursor += vi.len();
@@ -168,6 +168,7 @@ ACQ_HW::~ACQ_HW() {
 bool ACQ_HW::newSample(int sample)
 {
         unsigned tl1;
+        ++pollcount;
 
 	if (nowait || (tl1 = TLATCH) != tl0){
 		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());

@@ -1,5 +1,7 @@
 {
     "AFHBA": {
+	    "//" : "pcs1.json system in use at blah blah",
+	    "//" : "pcs1.json system in use at blah also",
         "UUT": [
             	{ 	"name" : "acq2106_123",  
 			"type": "pcs",

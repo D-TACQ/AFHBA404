@@ -28,6 +28,12 @@ struct VI {
 	VI();
 };
 
+/** SPIX: defined fields in SP32 array */
+enum SPIX {
+	TLATCH = 0,			/** Sample Number */
+	USECS = 1,			/** microseconds since trigger */
+	POLLCOUNT = 2,			/** pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
+};
 /** VO : Models Vector Output.
  * Vector Output is a single sample output data set, fetched by single DMA from ACQ
  */

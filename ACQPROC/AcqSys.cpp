@@ -189,48 +189,79 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 }
 
 
+typedef pair<std::string, int> KVP;		/** Key Value Pair */
+typedef std::map <std::string, int> KVM;	/** Key Value Map  */
+
+typedef pair<std::string, string> KVPS; /** Key Value Pair, COMMENT */
+typedef std::map <std::string, string> KVMS;	/** Key Value Map  */
+
+//#define COM(comment) KVPS("__comment__", comment)
+
+#define COM(i) "__comment" #i "__"
+
 #define INSERT_IF(map, vx, vxo, field) \
 	if (uut->vx.field){	\
-		map.insert(pair<std::string, int>(#field, uut->vxo.field)); \
+		map.insert(KVP(#field, uut->vxo.field)); \
 	}
+
+void add_comments(json& jsys, string& fname)
+{
+	jsys[COM(1)] = "created from " + fname;
+	jsys[COM(2)] = "LOCAL VI_OFFSETS: field offset VI in bytes";
+	jsys[COM(3)] = "LOCAL VO_OFFSETS: field offset VO in bytes";
+	jsys[COM(4)] = "LOCAL VX_LEN: length of VI|VO in bytes";
+	jsys[COM(4)] = "GLOBAL_INDICES: index of field in type-specific array in SI";
+	jsys[COM(5)] = "SPIX: Scratch Pad Index, index of field in SP32";
+
+
+	KVM spix_map;
+	spix_map.insert(KVP("TLATCH", 	 SPIX::TLATCH));
+	spix_map.insert(KVP("USECS", 	 SPIX::USECS));
+	spix_map.insert(KVP("POLLCOUNT", SPIX::POLLCOUNT));
+	jsys["SPIX"] = spix_map;
+}
 
 void store_config(json j, string fname, HBA& hba)
 {
+	json &jsys = j["SYS"];
+	add_comments(jsys, fname);
+
 	int ii = 0;
 	for (auto uut : hba.uuts){
+		json &jlo = jsys["UUT"]["LOCAL"][ii];
 
-		json &jlo = j["SYS"]["UUT"]["LOCAL"][ii];
-		std::map <std::string, int> vi_offsets_map;
+		jlo["VX_LEN"] = { {  "VI", uut->vi.len() }, { "VO", uut->vo.len() } };
+
+		KVM vi_offsets_map;
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI16);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, AI32);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, DI32);
 		INSERT_IF(vi_offsets_map, vi, vi_offsets, SP32);
-		jlo.push_back(json::object_t::value_type("VI_OFFSETS", vi_offsets_map));
-		std::map<std::string, int> vo_offsets_map;
+		jlo["VI_OFFSETS"] = vi_offsets_map;
+
+		KVM vo_offsets_map;
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, CC32);
-		jlo.push_back(json::object_t::value_type("VO_OFFSETS", vo_offsets_map));
+		jlo["VO_OFFSETS"] = vo_offsets_map;
 
-		std::map <std::string, int> len_map;
-		len_map.insert(pair<std::string, int>("VI", uut->vi.len()));
-		len_map.insert(pair<std::string, int>("VO", uut->vo.len()));
-		jlo.push_back(json::object_t::value_type("VX_LEN", len_map));
 
-		json &jix = j["SYS"]["UUT"]["GLOBAL_INDICES"][ii++];
-		std::map<std::string, int> vi_map;
+		json &jix = jsys["UUT"]["GLOBAL_INDICES"][ii++];
+		KVM vi_map;
 		INSERT_IF(vi_map, vi, vi_cursor, AI16);
 		INSERT_IF(vi_map, vi, vi_cursor, AI32);
 		INSERT_IF(vi_map, vi, vi_cursor, DI32);
 		INSERT_IF(vi_map, vi, vi_cursor, SP32);
-		jix.push_back(json::object_t::value_type("VI", vi_map));
+		jix["VI"] = vi_map;
 
-		std::map<std::string, int> vo_map;
+		KVM vo_map;
 		INSERT_IF(vo_map, vo, vo_cursor, AO16);
 		INSERT_IF(vo_map, vo, vo_cursor, DO32);
 		INSERT_IF(vo_map, vo, vo_cursor, CC32);
-		jix.push_back(json::object_t::value_type("VO", vo_map));
+		jix["VO"] = vo_map;
 	}
+
+
 	std::ofstream o("runtime.json");
 	o << std::setw(4) << j << std::endl;
 }
@@ -298,7 +329,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		++port;
 	}
 	the_hba = new HBA(::devnum, uuts, VI_sys, VO_sys);
-	store_config(j, "runtime.json", *the_hba);
+	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }
 
