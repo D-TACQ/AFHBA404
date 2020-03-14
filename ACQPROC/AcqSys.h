@@ -183,6 +183,12 @@ public:
 	/**< output raw data for each ACQ */
 };
 
+namespace G {
+	extern int nsamples;
+	extern int verbose;
+	extern int dummy_first_loop;
+	extern int samples_buffer;
+};
 
 
 

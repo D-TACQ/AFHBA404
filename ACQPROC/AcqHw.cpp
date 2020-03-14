@@ -43,8 +43,6 @@ struct Dev {
 	}
 };
 
-int samples_buffer = 1;
-
 #define AO_OFFSET 0x1000
 
 #define XO_HOST	(dev->host_buffer+AO_OFFSET)
@@ -72,7 +70,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 	dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
-	dev->xllc_def.len = samples_buffer*vi.len();
+	dev->xllc_def.len = G::samples_buffer*vi.len();
 	memset(dev->host_buffer, 0, vi.len());
 	dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
 	dev->lbuf_vi.cursor = dev->lbuf_vi.base;

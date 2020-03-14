@@ -24,10 +24,8 @@ namespace G {
 	int nsamples = 2;
 	int verbose;
 	int dummy_first_loop;
+	int samples_buffer;
 };
-
-extern int samples_buffer;	// AcqHw.cpp, should be in namespace G
-
 
 
 const char* ui(int argc, char* argv[])
@@ -59,7 +57,7 @@ const char* ui(int argc, char* argv[])
 		fprintf(stderr, "nsamples set %d\n", G::nsamples);
 	}
 	if (argc > 3){
-		samples_buffer = atoi(argv[3]);
+		G::samples_buffer = atoi(argv[3]);
 	}
 	return config_file;
 }
