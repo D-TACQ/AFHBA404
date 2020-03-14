@@ -56,7 +56,8 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 /* TLATCH now uses the dynamic set value */
 #undef TLATCH
-#define TLATCH	(*(unsigned*)(dev->host_buffer + vi_offsets.SP32))
+/** find sample count in VI. */
+#define TLATCH	((unsigned*)(dev->host_buffer + vi_offsets.SP32))[SPIX::TLATCH]
 
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
@@ -90,6 +91,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	if (vo.DO32){
 		int ll = xo_xllc_def.len/64;
 		xo_xllc_def.len = ++ll*64;
+		dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
 	}
 	if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC");
@@ -98,11 +100,12 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	printf("AO buf pa: 0x%08x len %d\n", xo_xllc_def.pa, xo_xllc_def.len);
 
 	if (vo.DO32){
-		/* marker pattern for the PAD area for hardware trace */
-		dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
-		int ii;
-		for (ii = 0; ii <= 0xf; ++ii){
-		        dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+		const char* hw_trace = getenv("DO32_HW_TRACE");
+		if (hw_trace && atoi(hw_trace)){
+			/* marker pattern for the PAD area for hardware trace */
+			for (int ii = 0; ii <= 0xf; ++ii){
+				dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+			}
 		}
 	}
 	TLATCH = 0xdeadbeef;
@@ -114,9 +117,11 @@ void HBA::start_shot()
 	goRealTime();
 }
 
+/** copy VI.field to SI.field */
 #define VITOSI(field, sz) \
 	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf_vi.cursor+vi_offsets.field, vi.field*sz))
 
+/** copy SI.field to VO */
 #define SITOVO(field, sz) \
 	(vo.field && memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
 
@@ -130,18 +135,21 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(AI32, sizeof(unsigned));
 	VITOSI(DI32, sizeof(unsigned));
 	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
-	pollcount = 0;
 	VITOSI(SP32, sizeof(unsigned));
 	dev->lbuf_vi.cursor += vi.len();
+	pollcount = 0;
 }
 
+/** copy SI.field to XO archive. */
 #define SITOVO2(field, sz) \
 	(vo.field && memcpy(dev->lbuf_vo.cursor+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
 
+/** in slack time, copy SI.OUT to VO archive cursor.
+ * @@todo make it optional in case it takes too long */
 void ACQ_HW::action2(SystemInterface& systemInterface) {
-	SITOVO(AO16, sizeof(short));
-	SITOVO(DO32, sizeof(unsigned));
-	SITOVO(CC32, sizeof(unsigned));
+	SITOVO2(AO16, sizeof(short));
+	SITOVO2(DO32, sizeof(unsigned));
+	SITOVO2(CC32, sizeof(unsigned));
 }
 
 void raw_store(const char* fname, const char* base, int len)
