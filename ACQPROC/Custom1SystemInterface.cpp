@@ -6,14 +6,9 @@
  */
 
 #include "AcqSys.h"
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
+
 #include <string.h>
-
 #include <stdio.h>		// because sprintf()
-
 #include <assert.h>
 
 
