@@ -37,8 +37,9 @@ struct Dev {
 
 	struct XLLC_DEF xllc_def;
 
-	Dev() {
+	Dev(int _devnum) {
 		memset(this, 0, sizeof(Dev));
+		devnum = _devnum;
 	}
 };
 
@@ -54,21 +55,20 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 }
 
-extern int devnum;
 
 /* TLATCH now uses the dynamic set value */
 #undef TLATCH
 #define TLATCH	(*(unsigned*)(dev->host_buffer + vi_offsets.SP32))
 
-ACQ_HW::ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
+ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
-				ACQ(_name, _vi, _vo, _vi_offsets,
+				ACQ(devnum, _name, _vi, _vo, _vi_offsets,
 							_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-				tl0(0xdeadbeef), dev(new Dev)
+				tl0(0xdeadbeef), dev(new Dev(devnum))
 {
 	// @@todo init dev.
 	struct XLLC_DEF xo_xllc_def;
-	dev->devnum = ::devnum++;
+
 
 	dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;

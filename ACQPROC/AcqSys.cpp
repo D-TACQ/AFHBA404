@@ -107,7 +107,7 @@ void HBA::dump_data(const char* basename)
 }
 
 
-ACQ::ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
+ACQ::ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		IO(_name, _vi, _vo),
 		vi_offsets(_vi_offsets), vo_offsets(_vo_offsets),
 		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor),
@@ -266,8 +266,6 @@ void store_config(json j, string fname, HBA& hba)
 	o << std::setw(4) << j << std::endl;
 }
 
-int devnum;
-
 int HBA::maxsam;
 
 HBA* HBA::the_hba;
@@ -285,9 +283,12 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	int port = 0;
 	string port0_type;
 
+	int hba_devnum = get_int(j["AFHBA"]["DEVNUM"]);
+
 	bool HW = getenv("HW") != 0 && atoi(getenv("HW"));
 
 	for (auto uut : j["AFHBA"]["UUT"]) {
+
 		VI vi;
 
 		vi.AI16 = get_int(uut["VI"]["AI16"]);
@@ -301,8 +302,8 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
 
 		ACQ *acq = HW?
-				new ACQ_HW(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
-				new    ACQ(uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
+				new ACQ_HW(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
+				new    ACQ(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
 		try {
 			int wd_bit = uut["WD_BIT"].get<int>();
@@ -328,7 +329,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		uuts.push_back(acq);
 		++port;
 	}
-	the_hba = new HBA(::devnum, uuts, VI_sys, VO_sys);
+	the_hba = new HBA(hba_devnum, uuts, VI_sys, VO_sys);
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }

@@ -134,15 +134,19 @@ int sched_fifo_priority;
 
 void goRealTime(void)
 {
-	struct sched_param p = {};
-	p.sched_priority = sched_fifo_priority;
+	if (sched_fifo_priority < 1){
+		return;
+	}else{
+		struct sched_param p = {};
+		p.sched_priority = sched_fifo_priority;
 
 
 
-	int rc = sched_setscheduler(0, SCHED_FIFO, &p);
+		int rc = sched_setscheduler(0, SCHED_FIFO, &p);
 
-	if (rc){
-		perror("failed to set RT priority");
+		if (rc){
+			perror("failed to set RT priority");
+		}
 	}
 }
 

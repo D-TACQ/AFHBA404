@@ -97,7 +97,7 @@ public:
 /** class ACQ abstract model of an ACQ2106 box. */
 class ACQ: public IO
 {
-	ACQ(string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
+	ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
         virtual ~ACQ();
 protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
@@ -134,7 +134,7 @@ class ACQ_HW: public ACQ
 
 	unsigned *dox;
 
-	ACQ_HW(string _name, VI _vi, VO _vo, VI _vi_offsets,
+	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 	virtual ~ACQ_HW();
 
