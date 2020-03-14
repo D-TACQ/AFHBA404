@@ -42,8 +42,9 @@ public:
 	}
 };
 
-SystemInterface& SystemInterface::factory(const char* key)
+SystemInterface& SystemInterface::factory()
 {
+	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (strcmp(key, "control_dup1")){
 			return * new DummySingleThreadControlSystemInterface();

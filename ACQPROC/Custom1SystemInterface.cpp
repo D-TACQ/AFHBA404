@@ -43,9 +43,10 @@ public:
 	}
 };
 
-SystemInterface& SystemInterface::factory(const char* key)
+SystemInterface& SystemInterface::factory()
 {
 	fprintf(stderr, "SystemInterface::factory  CUSTOM INTERFACE\n");
+	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (strcmp(key, "control_dup1")){
 			return * new DummySingleThreadControlSystemInterface();

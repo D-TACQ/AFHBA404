@@ -76,7 +76,7 @@ struct SystemInterface {
 	 */
 	{}
 
-	static SystemInterface& factory(const char* key);
+	static SystemInterface& factory();
 };
 
 /** Base Class */

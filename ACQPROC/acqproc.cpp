@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	hba.dump_config();
 
-	SystemInterface si(SystemInterface::factory(getenv("SINGLE_THREAD_CONTROL")));
+	SystemInterface si(SystemInterface::factory());
 
 	hba.start_shot();
 	run_shot(hba, si);
