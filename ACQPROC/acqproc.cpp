@@ -18,13 +18,11 @@ extern int sched_fifo_priority;
 
 #include "AcqSys.h"
 
-#define NSAM	2		// typ: 200000
-
 namespace G {
-	int nsamples = 2;
+	int nsamples = 2;		/**< samples to capture (default:2, typ 200000) */
 	int verbose;
-	int dummy_first_loop;
-	int samples_buffer;
+	int dummy_first_loop;		/**< possible speed up by filling cache first loop */
+	int samples_buffer = 1;		/**< number of samples in each VI buffer (default:1) */
 };
 
 
@@ -38,11 +36,9 @@ const char* ui(int argc, char* argv[])
         if (getenv("AFFINITY")){
                 setAffinity(strtol(getenv("AFFINITY"), 0, 0));
         }
-
 	if (getenv("VERBOSE")){
 		G::verbose = atoi(getenv("VERBOSE"));
 	}
-
 	if (getenv("DUMMY_FIRST_LOOP")){
 		G::dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
 	}
@@ -62,13 +58,14 @@ const char* ui(int argc, char* argv[])
 	return config_file;
 }
 
-
+/** top level shot control */
 void run_shot(HBA& hba, SystemInterface& systemInterface)
 {
 	for (int sample = 0; sample < G::nsamples; ++sample){
 		hba.processSample(systemInterface, sample);
 	}
 }
+
 int main(int argc, char* argv[])
 {
 	const char* config_file = ui(argc, argv);
