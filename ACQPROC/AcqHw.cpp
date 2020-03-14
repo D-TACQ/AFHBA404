@@ -168,7 +168,6 @@ ACQ_HW::~ACQ_HW() {
 bool ACQ_HW::newSample(int sample)
 {
         unsigned tl1;
-        ++pollcount;
 
 	if (nowait || (tl1 = TLATCH) != tl0){
 		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
