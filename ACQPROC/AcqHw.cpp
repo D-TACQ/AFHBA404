@@ -152,6 +152,7 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 	SITOVO2(CC32, sizeof(unsigned));
 }
 
+/** store raw data to file. */
 void raw_store(const char* fname, const char* base, int len)
 {
 	FILE *fp = fopen(fname, "w");
@@ -161,6 +162,7 @@ void raw_store(const char* fname, const char* base, int len)
 	fwrite(base, len, HBA::maxsam, fp);
 	fclose(fp);
 }
+
 ACQ_HW::~ACQ_HW() {
 	raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
 	raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
