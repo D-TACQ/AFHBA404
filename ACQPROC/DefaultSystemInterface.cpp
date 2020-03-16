@@ -27,11 +27,14 @@ SystemInterface::SystemInterface()
 }
 
 class DummySingleThreadControlSystemInterface: public SystemInterface {
+
 public:
+	static int DUP1;
+
 	virtual void ringDoorbell(int sample){
 		HBA& the_hba(HBA::instance());
 		int imax = the_hba.vo.AO16;
-		short xx = IN.AI16[0];
+		short xx = IN.AI16[DUP1];
 		for (int ii = 0; ii < imax; ++ii){
 			OUT.AO16[ii] = xx;
 		}
@@ -42,11 +45,14 @@ public:
 	}
 };
 
+int DummySingleThreadControlSystemInterface::DUP1;
+
 SystemInterface& SystemInterface::factory()
 {
 	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
-		if (strcmp(key, "control_dup1")){
+		if (sscanf(key, "control_dup1=%d", &DummySingleThreadControlSystemInterface::DUP1) == 1 ||
+		    strcmp(key, "control_dup1") == 0){
 			return * new DummySingleThreadControlSystemInterface();
 		}
 	}
