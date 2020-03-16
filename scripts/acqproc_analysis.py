@@ -67,7 +67,7 @@ def collect_tlatch(args):
         home = expanduser("~")
         data = np.fromfile(home + "/" + "PROJECTS/AFHBA404/" + args.name + "_VI.dat", dtype=np.int32)
     else:
-        data = np.fromfile(args.src, dtype=np.int32)
+        data = np.fromfile(args.src + "/" + args.name + "_VI.dat", dtype=np.int32)
 
     t_latch = data[int(args.nchan/2)::int(args.nchan/2+args.spad_len)]
     print("Finished collecting data")
@@ -198,7 +198,7 @@ def run_main():
                                                             "where the calculated t_latch difference is equal to one. "
                                                             "This is the default case and so this will dwarf the other "
                                                             "numbers in the histogram.")
-    parser.add_argument('--src', default="default", type=str, help="Location to pull data from for analysis.")
+    parser.add_argument('--src', default="default", type=str, help="Location to pull data from for analysis. Note that this is just the path to AFHBA404.")
     parser.add_argument('--nchan', default=128, type=int, help="How many physical channels are contained in the data EXCLUDING SCRATCHPAD.")
     parser.add_argument('--spad_len', default=16, type=int, help="How long the scratchpad is. Default is 16 long words")
     parser.add_argument('--verbose', default=0, type=int, help='Prints status messages as the stream is running')
