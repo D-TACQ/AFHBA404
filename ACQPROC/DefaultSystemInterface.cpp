@@ -32,6 +32,7 @@ public:
 	static int DUP1;
 
 	virtual void ringDoorbell(int sample){
+		G::verbose && printf("DummySingleThreadControlSystemInterface::ringDoorbell(%d)\n", sample);
 		HBA& the_hba(HBA::instance());
 		int imax = the_hba.vo.AO16;
 		short xx = IN.AI16[DUP1];
