@@ -118,7 +118,7 @@ control_program() {
    
     export HW=1
     export RTPRIO=10
-    sudo bash -c 'export HW=1; export RTPRIO=10; ./ACQPROC/acqproc ./ACQPROC/configs/swip1.json '$POST''
+    sudo bash -c 'export SINGLE_THREAD_CONTROL=control_dup1; export HW=1; export RTPRIO=10; ./ACQPROC/acqproc ./ACQPROC/configs/swip1.json '$POST''
 
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
