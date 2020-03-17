@@ -56,6 +56,12 @@ xiloader:
 llc_support:
 	cd LLCONTROL && $(MAKE)
 
+acqproc:
+	cd ACQPROC && $(MAKE)
+
+acqproc_clean:
+	cd ACQPROC && $(MAKE) clean
+
 stream:
 	cd STREAM && $(MAKE)
 
@@ -85,7 +91,7 @@ stream_clean:
 functional_tests_clean:
 	cd FUNCTIONAL_TESTS && $(MAKE) clean
 	
-clean: llc_clean stream_clean functional_tests_clean
+clean: llc_clean stream_clean functional_tests_clean acqproc_clean
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
