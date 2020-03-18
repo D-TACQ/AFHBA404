@@ -136,8 +136,6 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(DI32, sizeof(unsigned));
 	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
 	VITOSI(SP32, sizeof(unsigned));
-	dev->lbuf_vi.cursor += vi.len();
-	pollcount = 0;
 }
 
 /** copy SI.field to XO archive. */
@@ -150,6 +148,8 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 	SITOVO2(AO16, sizeof(short));
 	SITOVO2(DO32, sizeof(unsigned));
 	SITOVO2(CC32, sizeof(unsigned));
+	dev->lbuf_vi.cursor += vi.len();
+	pollcount = 0;
 }
 
 /** store raw data to file. */
