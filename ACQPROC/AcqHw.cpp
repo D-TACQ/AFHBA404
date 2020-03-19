@@ -192,7 +192,7 @@ bool ACQ_HW::newSample(int sample)
 /** returns latest tlatch from lbuf */
 unsigned ACQ_HW::tlatch(void)
 {
-	return dev->lbuf_vi.cursor[vi_offsets.SP32];
+	return *(unsigned*)(dev->lbuf_vi.cursor+vi_offsets.SP32);
 }
 /** prepare to run a shot nsamples long, arm the UUT. */
 void ACQ_HW:: arm(int nsamples)
