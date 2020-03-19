@@ -16,14 +16,14 @@
 SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 /* make a gash SI to allow simulated operation. The real shm is customer specific */
 {
-	IN.AI16 = (short*)calloc(4*192, sizeof(short));
-	IN.AI32 = (int*)calloc(4*192, sizeof(int));
-	IN.DI32 = (unsigned*)calloc(4*6, sizeof(unsigned));    // needs to be bigger for PWM
-	IN.SP32 = (unsigned*)calloc(4*16, sizeof(unsigned));
+	IN.AI16 = new short[AI16_count()];
+	IN.AI32 = new int[AI32_count()];
+	IN.DI32 = new unsigned[DI32_count()];    // needs to be bigger for PWM
+	IN.SP32 = new unsigned[SP32_count()];
 
-	OUT.AO16 = (short*)calloc(4*192, sizeof(short));
-	OUT.DO32 = (unsigned*)calloc(4*4, sizeof(unsigned));
-	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
+	OUT.AO16 = new short[AO16_count()];
+	OUT.DO32 = new unsigned [DO32_count()];
+	OUT.CC32 = new unsigned [CC32_count()];
 }
 
 class DummySingleThreadControlSystemInterface: public SystemInterface {
