@@ -39,7 +39,7 @@ public:
 		for (int ii = 0; ii < imax; ++ii){
 			OUT.AO16[ii] = xx;
 		}
-		unsigned tl = the_hba.uuts[0]->tlatch();
+		unsigned tl = tlatch();
 		for (int ii = 0; ii < the_hba.vo.DO32; ++ii){
 			OUT.DO32[ii] = tl;
 		}

@@ -77,6 +77,10 @@ struct SystemInterface {
 	{}
 
 	static SystemInterface& factory();
+
+	unsigned tlatch() {
+		return IN.SP32[0];
+	}
 };
 
 /** Base Class */
