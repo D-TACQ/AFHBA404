@@ -48,10 +48,12 @@ struct VO {
 	VO();
 };
 
+class HBA;
 /** Models interface with external PCS.
  * Users can create a custom subclass to implement shared memory, comms
  */
 struct SystemInterface {
+	const HBA& hba;
 	/** ONE vector each type, all VI from all UUTS are split into types and
 	 *   aggregated in the appropriate vectors.
 	 */
@@ -69,14 +71,14 @@ struct SystemInterface {
 		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
 	} OUT;
 
-	SystemInterface();
+	SystemInterface(const HBA& _hba);
 	virtual ~SystemInterface() {}
 	virtual void ringDoorbell(int sample)
 	/**< alert PCS that there is new data .. implement by subclass.
 	 */
 	{}
 
-	static SystemInterface& factory();
+	static SystemInterface& factory(const HBA&);
 
 	unsigned tlatch() {
 		return IN.SP32[0];

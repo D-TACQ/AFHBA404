@@ -14,7 +14,7 @@
 
 
 
-SystemInterface::SystemInterface()
+SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 /* make a gash SI to allow simulated operation. The real shm is customer specific */
 {
 	IN.AI16 = (short*)calloc(4*192, sizeof(short));
@@ -27,8 +27,11 @@ SystemInterface::SystemInterface()
 	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
 }
 
-class DummySingleThreadControlSystemInterface: public SystemInterface {
+class Custom1SingleThreadControlSystemInterface: public SystemInterface {
 public:
+	Custom1SingleThreadControlSystemInterface(const HBA& hba) :
+		SystemInterface(hba)
+	{}
 	virtual void ringDoorbell(int sample){
 		HBA& the_hba(HBA::instance());
 		int imax = the_hba.vo.AO16;
@@ -43,16 +46,16 @@ public:
 	}
 };
 
-SystemInterface& SystemInterface::factory()
+SystemInterface& SystemInterface::factory(const HBA& hba)
 {
 	fprintf(stderr, "SystemInterface::factory  CUSTOM INTERFACE\n");
 	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (strcmp(key, "control_dup1")){
-			return * new DummySingleThreadControlSystemInterface();
+			return * new Custom1SingleThreadControlSystemInterface(hba);
 		}
 	}
 
-	return * new SystemInterface();
+	return * new SystemInterface(hba);
 }
 

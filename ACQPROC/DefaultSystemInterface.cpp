@@ -7,13 +7,13 @@
 
 #include "AcqSys.h"
 #include <string.h>
-#include <stdio.h>		// because sprintf()
+//#include <stdio.h>		// because sprintf()
 #include <assert.h>
 
 
 
 
-SystemInterface::SystemInterface()
+SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 /* make a gash SI to allow simulated operation. The real shm is customer specific */
 {
 	IN.AI16 = (short*)calloc(4*192, sizeof(short));
@@ -29,6 +29,9 @@ SystemInterface::SystemInterface()
 class DummySingleThreadControlSystemInterface: public SystemInterface {
 
 public:
+	DummySingleThreadControlSystemInterface(const HBA& hba) :
+		SystemInterface(hba)
+	{}
 	static int DUP1;
 
 	virtual void ringDoorbell(int sample){
@@ -48,16 +51,16 @@ public:
 
 int DummySingleThreadControlSystemInterface::DUP1;
 
-SystemInterface& SystemInterface::factory()
+SystemInterface& SystemInterface::factory(const HBA& hba)
 {
 	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (sscanf(key, "control_dup1=%d", &DummySingleThreadControlSystemInterface::DUP1) == 1 ||
 		    strcmp(key, "control_dup1") == 0){
-			return * new DummySingleThreadControlSystemInterface();
+			return * new DummySingleThreadControlSystemInterface(hba);
 		}
 	}
 
-	return * new SystemInterface();
+	return * new SystemInterface(hba);
 }
 
