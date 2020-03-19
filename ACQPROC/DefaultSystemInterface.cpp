@@ -7,8 +7,6 @@
 
 #include "AcqSys.h"
 #include <string.h>
-//#include <stdio.h>		// because sprintf()
-#include <assert.h>
 
 
 
@@ -24,6 +22,16 @@ SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 	OUT.AO16 = new short[AO16_count()];
 	OUT.DO32 = new unsigned [DO32_count()];
 	OUT.CC32 = new unsigned [CC32_count()];
+}
+SystemInterface::~SystemInterface()
+{
+	delete [] IN.AI16;
+	delete [] IN.AI32;
+	delete [] IN.DI32;
+	delete [] IN.SP32;
+	delete [] OUT.AO16;
+	delete [] OUT.DO32;
+	delete [] OUT.CC32;
 }
 
 class DummySingleThreadControlSystemInterface: public SystemInterface {
