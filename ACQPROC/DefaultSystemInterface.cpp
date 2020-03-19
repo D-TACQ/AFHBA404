@@ -36,10 +36,9 @@ public:
 
 	virtual void ringDoorbell(int sample){
 		G::verbose && printf("DummySingleThreadControlSystemInterface::ringDoorbell(%d)\n", sample);
-		HBA& the_hba(HBA::instance());
-		int imax = the_hba.vo.AO16;
+
 		short xx = IN.AI16[DUP1];
-		for (int ii = 0; ii < imax; ++ii){
+		for (int ii = 0; ii < AO16_count(); ++ii){
 			OUT.AO16[ii] = xx;
 		}
 		unsigned tl = tlatch();
