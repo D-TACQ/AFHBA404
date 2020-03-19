@@ -48,42 +48,8 @@ struct VO {
 	VO();
 };
 
-class HBA;
-/** Models interface with external PCS.
- * Users can create a custom subclass to implement shared memory, comms
- */
-struct SystemInterface {
-	const HBA& hba;
-	/** ONE vector each type, all VI from all UUTS are split into types and
-	 *   aggregated in the appropriate vectors.
-	 */
-	struct Inputs {
-		short *AI16;
-		int *AI32;
-		unsigned *DI32;
-		unsigned *SP32;
-	} IN;
-	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
-	 */
-	struct Outputs {
-		short* AO16;
-		unsigned *DO32;
-		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
-	} OUT;
 
-	SystemInterface(const HBA& _hba);
-	virtual ~SystemInterface() {}
-	virtual void ringDoorbell(int sample)
-	/**< alert PCS that there is new data .. implement by subclass.
-	 */
-	{}
-
-	static SystemInterface& factory(const HBA&);
-
-	unsigned tlatch() {
-		return IN.SP32[0];
-	}
-};
+struct SystemInterface;
 
 /** Base Class */
 class IO {
@@ -196,6 +162,65 @@ namespace G {
 	extern int samples_buffer;
 };
 
+/** Models interface with external PCS.
+ * Users can create a custom subclass to implement shared memory, comms
+ */
+struct SystemInterface {
+private:
+	const HBA& hba;
+
+public:
+	/** ONE vector each type, all VI from all UUTS are split into types and
+	 *   aggregated in the appropriate vectors.
+	 */
+	struct Inputs {
+		short *AI16;
+		int *AI32;
+		unsigned *DI32;
+		unsigned *SP32;
+	} IN;
+	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
+	 */
+	struct Outputs {
+		short* AO16;
+		unsigned *DO32;
+		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
+	} OUT;
+
+	SystemInterface(const HBA& _hba);
+	virtual ~SystemInterface() {}
+	virtual void ringDoorbell(int sample)
+	/**< alert PCS that there is new data .. implement by subclass.
+	 */
+	{}
+
+	static SystemInterface& factory(const HBA&);
+
+	unsigned tlatch() {
+		return IN.SP32[0];
+	}
+	unsigned AI16_count() const {
+		return hba.vi.AI16;
+	}
+	unsigned AI32_count() const {
+		return hba.vi.AI32;
+	}
+	unsigned DI32_count() const {
+		return hba.vi.DI32;
+	}
+	unsigned SP32_count() const {
+		return hba.vi.SP32;
+	}
+	unsigned AO16_count() const {
+		return hba.vo.AO16;
+	}
+	unsigned DO32_count() const {
+		return hba.vo.DO32;
+	}
+	unsigned CC32_count() const {
+		return hba.vo.CC32;
+	}
+};
 
 
 #endif /* ACQPROC_ACQSYS_H_ */

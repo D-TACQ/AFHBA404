@@ -43,7 +43,7 @@ public:
 			OUT.AO16[ii] = xx;
 		}
 		unsigned tl = tlatch();
-		for (int ii = 0; ii < the_hba.vo.DO32; ++ii){
+		for (int ii = 0; ii < DO32_count(); ++ii){
 			OUT.DO32[ii] = tl;
 		}
 	}
