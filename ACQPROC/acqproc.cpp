@@ -29,18 +29,19 @@ namespace G {
 const char* ui(int argc, char* argv[])
 {
 	const char* config_file;
+	const char* key;
 
-        if (getenv("RTPRIO")){
-		sched_fifo_priority = atoi(getenv("RTPRIO"));
+        if ((key = getenv("RTPRIO"))){
+		sched_fifo_priority = atoi(key);
         }
-        if (getenv("AFFINITY")){
-                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+        if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
+                setAffinity(strtol(key, 0, 0));
         }
-	if (getenv("VERBOSE")){
-		G::verbose = atoi(getenv("VERBOSE"));
+	if ((key = getenv("VERBOSE"))){
+		G::verbose = atoi(key);
 	}
-	if (getenv("DUMMY_FIRST_LOOP")){
-		G::dummy_first_loop = atoi(getenv("DUMMY_FIRST_LOOP"));
+	if ((key = getenv("DUMMY_FIRST_LOOP"))){
+		G::dummy_first_loop = atoi(key);
 	}
 	if (argc > 1){
 		config_file = argv[1];
