@@ -25,18 +25,16 @@
 # - The script does not have to be run as root if taskset is not to be used.
 
 ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/swip1.json}
-# work to do .. auto extract UUT1, UUT2 [UUT3 .. ?] from ACQPROC_CONFIG
-UUT1=acq2106_183
-UUT2=acq2106_184
-#UUT3=acq2106_176
-
-# If you are using more than one UUT fill in the UUTs:
-UUTS="${UUTS:-$UUT1 $UUT2}"
-
-DEVMAX=0
-for u in $UUTS; do
-	DEVMAX=$(($DEVMAX+1))
-done
+cat - >acqproc_multi.env <<EOF
+$(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
+EOF
+source acqproc_multi.env
+echo UUT1 $UUT1
+echo UUT2 $UUT2
+echo UUTS $UUTS
+echo DEVMAX $DEVMAX
+echo "Going down like a DC10"
+exit 1
 
 POST=${POST:-400000} 	# Number of samples to capture
 CLK=${CLK:-20000} 		# Set desired clock speed here.
