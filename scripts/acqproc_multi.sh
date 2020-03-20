@@ -24,6 +24,8 @@
 # - This script should be run as root if the user wishes to use tasket.
 # - The script does not have to be run as root if taskset is not to be used.
 
+ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/swip1.json}
+# work to do .. auto extract UUT1, UUT2 [UUT3 .. ?] from ACQPROC_CONFIG
 UUT1=acq2106_183
 UUT2=acq2106_184
 #UUT3=acq2106_176
@@ -118,7 +120,7 @@ control_program() {
    
     export HW=1
     export RTPRIO=10
-    sudo bash -c 'export SINGLE_THREAD_CONTROL=control_dup1; export HW=1; export RTPRIO=10; ./ACQPROC/acqproc ./ACQPROC/configs/swip1.json '$POST''
+    sudo bash -c 'export SINGLE_THREAD_CONTROL=control_dup1; export HW=1; export RTPRIO=10; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
 
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
