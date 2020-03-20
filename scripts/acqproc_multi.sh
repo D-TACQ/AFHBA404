@@ -59,7 +59,7 @@ PYTHON="python3"
 # comment out if NOT using MDSplus
 USE_MDSPLUS=0
 
-export PYTHONPATH=/home/dt100/PROJECTS/acq400_hapi
+export PYTHONPATH=/home/$USER/PROJECTS/acq400_hapi
 
 if [ "$USE_MDSPLUS" = "1" ]; then
 # Below is the UUT_path for MDSplus. The server is set to andros as this
