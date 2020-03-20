@@ -142,7 +142,6 @@ def run_spad_analysis(args, data):
 def get_json(path):
     with open(path) as f:
         jdata = json.load(f)
-        f.close()
     return jdata
 
 
@@ -193,7 +192,7 @@ def run_analysis(args):
 
 
 def run_main():
-    parser = argparse.ArgumentParser(description='acq400 stream')
+    parser = argparse.ArgumentParser(description='acqproc_analysis')
     parser.add_argument('--ones', default=0, type=int, help="The ones argument allows the user to plot the instances "
                                                             "where the calculated t_latch difference is equal to one. "
                                                             "This is the default case and so this will dwarf the other "
