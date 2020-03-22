@@ -210,8 +210,9 @@ void add_comments(json& jsys, string& fname)
 	jsys[COM(2)] = "LOCAL VI_OFFSETS: field offset VI in bytes";
 	jsys[COM(3)] = "LOCAL VO_OFFSETS: field offset VO in bytes";
 	jsys[COM(4)] = "LOCAL VX_LEN: length of VI|VO in bytes";
-	jsys[COM(4)] = "GLOBAL_INDICES: index of field in type-specific array in SI";
-	jsys[COM(5)] = "SPIX: Scratch Pad Index, index of field in SP32";
+	jsys[COM(5)] = "GLOBAL_LEN: total length of each type in SystemInterface";
+	jsys[COM(6)] = "GLOBAL_INDICES: index of field in type-specific array in SI";
+	jsys[COM(7)] = "SPIX: Scratch Pad Index, index of field in SP32";
 
 
 	KVM spix_map;
@@ -220,11 +221,28 @@ void add_comments(json& jsys, string& fname)
 	spix_map.insert(KVP("POLLCOUNT", SPIX::POLLCOUNT));
 	jsys["SPIX"] = spix_map;
 }
+void add_si_lengths(json& jsys, HBA& hba)
+{
+	SystemInterface si(hba);
+	json &jgl = jsys["GLOBAL_LEN"];
+	json &jlen_vi = jgl["VI"];
+	jlen_vi = { { "AI16", si.AI16_count() }, 
+		    { "AI32", si.AI32_count() },
+		    { "DI32", si.DI32_count() },
+		    { "SP32", si.SP32_count() }
+		  };
+	json &jlen_vo = jgl["VO"];
+	jlen_vo = { { "AO16", si.AO16_count() },
+		    { "DO32", si.DO32_count() },
+		    { "CC32", si.CC32_count() }
+		  };
 
+}
 void store_config(json j, string fname, HBA& hba)
 {
 	json &jsys = j["SYS"];
 	add_comments(jsys, fname);
+	add_si_lengths(jsys, hba);
 
 	int ii = 0;
 	for (auto uut : hba.uuts){
@@ -244,7 +262,6 @@ void store_config(json j, string fname, HBA& hba)
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, CC32);
 		jlo["VO_OFFSETS"] = vo_offsets_map;
-
 
 		json &jix = jsys["UUT"]["GLOBAL_INDICES"][ii++];
 		KVM vi_map;

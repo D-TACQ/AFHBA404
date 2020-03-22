@@ -1,7 +1,8 @@
 
 CXXFLAGS+=-I. -std=c++11
 
-all: acqproc acqproc_custom
+all: acqproc 
+#	acqproc_custom
 
 clean:
 	rm -f *.o acqproc acqproc_custom
