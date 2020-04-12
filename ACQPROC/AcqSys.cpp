@@ -107,8 +107,9 @@ void HBA::dump_data(const char* basename)
 }
 
 
-ACQ::ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
+ACQ::ACQ(int _devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		IO(_name, _vi, _vo),
+		devnum(_devnum),
 		vi_offsets(_vi_offsets), vo_offsets(_vo_offsets),
 		vi_cursor(sys_vi_cursor), vo_cursor(sys_vo_cursor),
 		nowait(false), wd_mask(0), pollcount(0)
@@ -126,7 +127,7 @@ string ACQ::toString() {
 	if (wd_mask){
 		sprintf(wd, " WD mask: 0x%08x", wd_mask);
 	}
-	return IO::toString() + " Offset of SPAD IN VI :" + to_string(vi_offsets.SP32) + "\n"
+	return "dev:" + to_string(devnum) + " " + IO::toString() +  " Offset of SPAD IN VI :" + to_string(vi_offsets.SP32) + "\n"
 			" System Interface Indices " + to_string(vi_cursor.AI16)+ "," + to_string(vi_cursor.SP32) + wd;
 }
 bool ACQ::newSample(int sample)
@@ -145,20 +146,24 @@ void ACQ::arm(int nsamples)
 	cerr << "placeholder: ARM unit " << getName() << " now" <<endl;
 }
 
-int get_int(json j)
+int get_int(json j, int default_value = 0)
 {
 	try {
 		return	j.get<int>();
 	} catch (std::exception& e){
-		return 0;
+		return default_value;
 	}
 }
 
-HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
-		IO("HBA"+to_string(_devnum), _vi, _vo),
+int hba_number = 0;
+
+HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo):
+		IO("HBA"+to_string(hba_number++), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
 {
-
+	for (auto uut: uuts){
+		devs.push_back(uut->devnum);
+	}
 }
 
 HBA::~HBA() {
@@ -188,6 +193,18 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 	}
 }
 
+string HBA::toString()
+{
+	string dev_str = "devs=";
+	int idev = 0;
+	for (auto dev: devs){
+		if (idev++ != 0){
+			dev_str += ",";
+		}
+		dev_str += to_string(dev);
+	}
+	return IO::toString() + " " + dev_str;
+}
 
 typedef pair<std::string, int> KVP;		/** Key Value Pair */
 typedef std::map <std::string, int> KVM;	/** Key Value Map  */
@@ -299,13 +316,19 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	struct VO VO_sys;
 	vector <ACQ*> uuts;
 	int port = 0;
-	string port0_type;
+	int iuut = 0;
+	string first_type;
 
 	int hba_devnum = get_int(j["AFHBA"]["DEVNUM"]);
 
 	bool HW = getenv("HW") != 0 && atoi(getenv("HW"));
 
 	for (auto uut : j["AFHBA"]["UUT"]) {
+
+		if (get_int(uut["DEVNUM"], -1) != -1){
+			hba_devnum = get_int(uut["DEVNUM"]);
+			port = 0;
+		}
 
 		VI vi;
 
@@ -334,20 +357,21 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 			;
 		}
 		// check unit compatibility
-		if (port == 0){
-			port0_type = uut["type"];
+		if (iuut == 0){
+			first_type = uut["type"];
 		}else{
-			if (port0_type == "pcs" && uut["type"] == "bolo"){
+			if (first_type == "pcs" && uut["type"] == "bolo"){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
-			}else if (port0_type == "bolo" && uut["type"] != "bolo"){
+			}else if (first_type == "bolo" && uut["type"] != "bolo"){
 				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
 			}
 		}
 		uuts.push_back(acq);
 		++port;
+		++iuut;
 	}
-	the_hba = new HBA(hba_devnum, uuts, VI_sys, VO_sys);
+	the_hba = new HBA(uuts, VI_sys, VO_sys);
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }

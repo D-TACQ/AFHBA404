@@ -78,6 +78,7 @@ protected:
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
 	int pollcount;
+	int devnum;
 public:
 	const VI vi_offsets; 	/**< byte offset for each Input type in Local Vector In */
 	const VO vo_offsets; 	/**< byte offset for each Output type in Local Vector Out */
@@ -132,12 +133,13 @@ friend class HBA;
 /** Models a Host Bus Adapter like AFHBA404. */
 class HBA: public IO
 {
-	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
+	HBA(vector <ACQ*> _uuts, VI _vi, VO _vo);
 	static HBA* the_hba;	/**< singleton, ugly interface. */
 public:
 	virtual ~HBA();
 	int devnum;
 	vector<ACQ*> uuts;	/**< vector of ACQ UUT's */
+	vector<int> devs;	/**< AFHBA devnum. NB: "HBA" ... works with >4 ports, so multiple HBA's supported */
 	const VI vi;		/**< total system size each Input type. */
 	const VO vo;		/**< total system size each Output type. */
 	static int maxsam;	/**< max samples in shot (for raw memory alloc) */
@@ -153,6 +155,8 @@ public:
 	/**< output complete configuration with calculated offsets */
 	void dump_data(const char* basename);
 	/**< output raw data for each ACQ */
+
+	virtual string toString();
 };
 
 namespace G {
