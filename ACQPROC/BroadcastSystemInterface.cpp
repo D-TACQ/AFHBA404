@@ -6,6 +6,7 @@
  */
 
 #include "AcqSys.h"
+#include <assert.h>
 #include <string.h>
 
 
@@ -61,6 +62,7 @@ public:
 
 	virtual void trigger() {
 		FILE* fp = fopen(trgfile, "w");
+		assert(fp);
 		fprintf(fp, "1\n");
 		fclose(fp);
 	}

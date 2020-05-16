@@ -155,10 +155,9 @@ int get_int(json j, int default_value = 0)
 	}
 }
 
-int hba_number = 0;
-
 HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo):
-		IO("HBA"+to_string(hba_number++), _vi, _vo),
+		devnum(_uuts[0]->devnum&~0x3),
+		IO("HBA"+to_string(devnum), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
 {
 	for (auto uut: uuts){
