@@ -7,7 +7,7 @@
 
 # Example Operation with single box:
 
-## First, run a control
+## First, run a control script to configure the box - we like 49999Hz because that's the highest setting for HR_512 mode : lowest latency with highest SNR
 ```
 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_130
 
@@ -32,13 +32,13 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
  * Assume 4 x free running boxes, all samples collected at the same time: skew = +/-1 sample (20usec)
  * Worst case latency: 810+20 = 830usec.
 
-![Github](DOC.RESULT.png)
+![Github](DOC/RESULT.png)
 
  * Measuring the broadcast trigger overhead ... scope shows NTRIGGERS=3 group of 3 at 10usec spacing..
 ```
 VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc_broadcast_trigger configs/n32.json 1000000
 ```
-![Github](TRIGGEROVERHEAD.png)
+![Github](DOC/TRIGGEROVERHEAD.png)
 
 # Operation with 4 boxes
 
@@ -49,6 +49,7 @@ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 10000
 ```
 ## Run with hardware
 ```
+./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 north east west south
 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
 ``` 
 
