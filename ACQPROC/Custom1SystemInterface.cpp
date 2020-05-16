@@ -27,6 +27,17 @@ SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 	OUT.CC32 = (unsigned*)calloc(4*32, sizeof(unsigned));
 }
 
+SystemInterface::~SystemInterface()
+{
+	delete [] IN.AI16;
+	delete [] IN.AI32;
+	delete [] IN.DI32;
+	delete [] IN.SP32;
+	delete [] OUT.AO16;
+	delete [] OUT.DO32;
+	delete [] OUT.CC32;
+}
+
 class Custom1SingleThreadControlSystemInterface: public SystemInterface {
 public:
 	Custom1SingleThreadControlSystemInterface(const HBA& hba) :

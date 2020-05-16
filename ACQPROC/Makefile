@@ -1,11 +1,13 @@
 
 CXXFLAGS+=-I. -std=c++11
 
-all: acqproc acqproc_broadcast_trigger
+APPS=acqproc acqproc_custom acqproc_broadcast_trigger
+
+all: $(APPS)
 #	acqproc_custom
 
 clean:
-	rm -f *.o acqproc acqproc_custom
+	rm -f *.o $(APPS)
 
 
 acqproc: acqproc.o AcqSys.o AcqHw.o DefaultSystemInterface.o afhba-llcontrol.o
