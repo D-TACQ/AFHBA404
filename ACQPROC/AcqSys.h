@@ -193,6 +193,8 @@ public:
 
 	SystemInterface(const HBA& _hba);
 	virtual ~SystemInterface();
+	virtual void trigger()
+	{}
 	virtual void ringDoorbell(int sample)
 	/**< alert PCS that there is new data .. implement by subclass.
 	 */
