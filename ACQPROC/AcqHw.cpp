@@ -53,6 +53,81 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 }
 
+void HBA::start_shot()
+{
+	mlockall(MCL_CURRENT);
+	goRealTime();
+}
+
+
+/** concrete model of ACQ2106 box. */
+class ACQ_HW_BASE: public ACQ
+{
+	/** store raw data to file. */
+	static void raw_store(const char* fname, const char* base, int len)
+	{
+		FILE *fp = fopen(fname, "w");
+		if (fp == 0){
+			perror(fname);
+		}
+		fwrite(base, len, HBA::maxsam, fp);
+		fclose(fp);
+	}
+
+protected:
+	Dev* dev;
+	unsigned tl0;
+
+	ACQ_HW_BASE(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
+		ACQ(devnum, _name, _vi, _vo, _vi_offsets,
+				_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+				tl0(0xdeadbeef), dev(new Dev(devnum))
+	{
+		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
+		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
+		dev->xllc_def.len = G::samples_buffer*vi.len();
+		memset(dev->host_buffer, 0, vi.len());
+		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
+		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
+		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
+		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+	}
+	virtual ~ACQ_HW_BASE() {
+		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
+		raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
+
+		clear_mapping(dev->fd, dev->host_buffer);
+	}
+
+
+};
+
+class ACQ_HW: public ACQ_HW_BASE
+{
+
+	unsigned *dox;
+
+	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
+	virtual ~ACQ_HW()
+	{}
+
+protected:
+
+public:
+	virtual bool newSample(int sample);
+	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual void action(SystemInterface& systemInterface);
+	/**< on newSample, copy VO from SI, copy VI to SI */
+	virtual void action2(SystemInterface& systemInterface);
+	/**< late action(), cleanup */
+	virtual unsigned tlatch(void);
+	/**< returns latest tlatch from lbuf */
+	virtual void arm(int nsamples);
+	/**< prepare to run a shot nsamples long, arm the UUT. */
+friend class ACQ;
+};
 
 /* TLATCH now uses the dynamic set value */
 #undef TLATCH
@@ -61,22 +136,13 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
-				ACQ(devnum, _name, _vi, _vo, _vi_offsets,
-							_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-				tl0(0xdeadbeef), dev(new Dev(devnum))
+		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
 	// @@todo init dev.
 	struct XLLC_DEF xo_xllc_def;
 
 
-	dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
-	dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
-	dev->xllc_def.len = G::samples_buffer*vi.len();
-	memset(dev->host_buffer, 0, vi.len());
-	dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
-	dev->lbuf_vi.cursor = dev->lbuf_vi.base;
-	dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
-	dev->lbuf_vo.cursor = dev->lbuf_vo.base;
 
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
@@ -111,11 +177,6 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	TLATCH = 0xdeadbeef;
 }
 
-void HBA::start_shot()
-{
-	mlockall(MCL_CURRENT);
-	goRealTime();
-}
 
 /** copy VI.field to SI.field */
 #define VITOSI(field, sz) \
@@ -152,24 +213,6 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 	pollcount = 0;
 }
 
-/** store raw data to file. */
-void raw_store(const char* fname, const char* base, int len)
-{
-	FILE *fp = fopen(fname, "w");
-	if (fp == 0){
-		perror(fname);
-	}
-	fwrite(base, len, HBA::maxsam, fp);
-	fclose(fp);
-}
-
-ACQ_HW::~ACQ_HW() {
-	raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
-	raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
-
-	clear_mapping(dev->fd, dev->host_buffer);
-}
-
 
 
 /** checks host buffer for new sample, if so copies to lbuf and reports true */
@@ -199,3 +242,20 @@ void ACQ_HW:: arm(int nsamples)
 {
 	cerr << "ACQ_HW::arm: TODO" <<endl;
 }
+
+
+
+
+ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
+{
+	static bool HW = getenv("HW") != 0 ? atoi(getenv("HW")) : 0;
+
+	switch(HW){
+	case 1:
+		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
+	default:
+		return new ACQ(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
+	}
+}
+

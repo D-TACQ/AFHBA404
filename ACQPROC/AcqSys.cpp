@@ -320,8 +320,6 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 
 	int hba_devnum = get_int(j["AFHBA"]["DEVNUM"]);
 
-	bool HW = getenv("HW") != 0 && atoi(getenv("HW"));
-
 	for (auto uut : j["AFHBA"]["UUT"]) {
 
 		if (get_int(uut["DEVNUM"], -1) != -1){
@@ -341,9 +339,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		vo.DO32 = get_int(uut["VO"]["DO32"]);
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
 
-		ACQ *acq = HW?
-				new ACQ_HW(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys) :
-				new    ACQ(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
+		ACQ *acq = ACQ::factory(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
 		try {
 			int wd_bit = uut["WD_BIT"].get<int>();
@@ -374,6 +370,8 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }
+
+
 
 
 

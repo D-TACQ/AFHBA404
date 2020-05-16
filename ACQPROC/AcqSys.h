@@ -72,9 +72,10 @@ public:
 /** abstract model of an ACQ2106 box. */
 class ACQ: public IO
 {
+protected:
 	ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
         virtual ~ACQ();
-protected:
+
 	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
 	unsigned wd_mask;
 	int pollcount;
@@ -95,40 +96,16 @@ public:
 	/**< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
 	/**< prepare to run a shot nsamples long, arm the UUT. */
-friend class HBA;
-friend class ACQ_HW;
+    static ACQ* factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+    		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
+
+    friend class HBA;
 };
 
 /** interface to AFHBA404 device driver. */
 struct Dev;
 
-/** concrete model of ACQ2106 box. */
-class ACQ_HW: public ACQ
-{
-	Dev* dev;
-	unsigned tl0;
 
-	unsigned *dox;
-
-	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
-			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
-	virtual ~ACQ_HW();
-
-protected:
-
-public:
-	virtual bool newSample(int sample);
-	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
-	virtual void action(SystemInterface& systemInterface);
-	/**< on newSample, copy VO from SI, copy VI to SI */
-	virtual void action2(SystemInterface& systemInterface);
-	/**< late action(), cleanup */
-	virtual unsigned tlatch(void);
-	/**< returns latest tlatch from lbuf */
-	virtual void arm(int nsamples);
-	/**< prepare to run a shot nsamples long, arm the UUT. */
-friend class HBA;
-};
 
 /** Models a Host Bus Adapter like AFHBA404. */
 class HBA: public IO
