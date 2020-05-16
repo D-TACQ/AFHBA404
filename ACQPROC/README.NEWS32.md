@@ -38,7 +38,7 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 
 ![Github](DOC/RESULT.png)
 
- * Measuring the broadcast trigger overhead ... scope shows NTRIGGERS=3 group of 3 at 10usec spacing..
+ * Measuring the broadcast trigger overhead ... scope shows NTRIGGERS=3 group of 3 at 20usec spacing..
 ```
 VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc_broadcast_trigger configs/n32.json 1000000
 ```
