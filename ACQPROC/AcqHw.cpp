@@ -179,36 +179,42 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 
 /** copy VI.field to SI.field */
-#define VITOSI(field, sz) \
-	(vi.field && memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf_vi.cursor+vi_offsets.field, vi.field*sz))
+#define VITOSI(field) \
+	(vi.field && \
+	 memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf_vi.cursor+vi_offsets.field, \
+			vi.field*sizeof(systemInterface.IN.field[0])))
 
 /** copy SI.field to VO */
-#define SITOVO(field, sz) \
-	(vo.field && memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
+#define SITOVO(field) \
+	(vo.field && \
+	 memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, \
+			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
 void ACQ_HW::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
-	SITOVO(AO16, sizeof(short));
-	SITOVO(DO32, sizeof(unsigned));
+	SITOVO(AO16);
+	SITOVO(DO32);
 
-	VITOSI(AI16, sizeof(short));
-	VITOSI(AI32, sizeof(unsigned));
-	VITOSI(DI32, sizeof(unsigned));
+	VITOSI(AI16);
+	VITOSI(AI32);
+	VITOSI(DI32);
 	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
-	VITOSI(SP32, sizeof(unsigned));
+	VITOSI(SP32);
 }
 
 /** copy SI.field to XO archive. */
-#define SITOVO2(field, sz) \
-	(vo.field && memcpy(dev->lbuf_vo.cursor+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, vo.field*sz))
+#define SITOVO2(field) \
+	(vo.field && \
+	 memcpy(dev->lbuf_vo.cursor+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, \
+			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
 /** in slack time, copy SI.OUT to VO archive cursor.
  * @@todo make it optional in case it takes too long */
 void ACQ_HW::action2(SystemInterface& systemInterface) {
-	SITOVO2(AO16, sizeof(short));
-	SITOVO2(DO32, sizeof(unsigned));
-	SITOVO2(CC32, sizeof(unsigned));
+	SITOVO2(AO16);
+	SITOVO2(DO32);
+	SITOVO2(CC32);
 	dev->lbuf_vi.cursor += vi.len();
 	pollcount = 0;
 }
