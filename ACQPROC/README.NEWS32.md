@@ -27,10 +27,10 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 
  * View Live result in scope: C3 is the output trigger. C2 is the actual signal, zero crossing detected at -820 us
  * GD=39 * 20us = 780 us
- * Overhead of teeing up and broadcasting the marker is O(10us)
- * => overhead of the HOST SW < 30usec
+ * Overhead of teeing up and broadcasting the marker is O(20us)
+ * => overhead of the HOST SW < 20usec, latency of the input : 800us
  * Assume 4 x free running boxes, all samples collected at the same time: skew = +/-1 sample (20usec)
- * Worst case latency: 810+20 = 830usec.
+ * Worst case latency: 800+20 = 830usec.
 
 ![Github](DOC/RESULT.png)
 
