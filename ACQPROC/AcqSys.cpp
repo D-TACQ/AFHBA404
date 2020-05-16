@@ -177,8 +177,6 @@ extern "C" {
 
 void HBA::processSample(SystemInterface& systemInterface, int sample)
 {
-	systemInterface.trigger();
-
 	for (auto uut : uuts){
 		while(!uut->newSample(sample)){
 			sched_fifo_priority>1 || sched_yield();

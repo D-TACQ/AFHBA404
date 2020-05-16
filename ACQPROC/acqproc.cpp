@@ -62,6 +62,8 @@ const char* ui(int argc, char* argv[])
 /** top level shot control */
 void run_shot(HBA& hba, SystemInterface& systemInterface)
 {
+	systemInterface.trigger();
+
 	for (int sample = 0; sample < G::nsamples; ++sample){
 		hba.processSample(systemInterface, sample);
 	}
