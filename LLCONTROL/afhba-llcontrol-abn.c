@@ -184,6 +184,7 @@ void setup()
 			abn.buffers[ib].pa = xllc_def.pa + ib*PAGE_SIZE;
 		}
 		abn.buffers[ib].len = VI_LEN;
+		bufferABN[ib] = (char*)host_buffer + ib*PAGE_SIZE;
 	}
 
 

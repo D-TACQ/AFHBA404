@@ -25,6 +25,10 @@ extern "C" {
 
 #include <sys/mman.h>
 
+
+#define PAGE_SIZE	0x1000
+
+
 /** struct Dev : interface to AFHBA404 device driver. */
 struct Dev {
 	int devnum;
@@ -78,6 +82,8 @@ protected:
 	Dev* dev;
 	unsigned tl0;
 
+	unsigned *dox;
+
 	ACQ_HW_BASE(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ(devnum, _name, _vi, _vo, _vi_offsets,
@@ -92,6 +98,37 @@ protected:
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
 		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+
+		// @@todo init dev.
+		if (vo.len()){
+			struct XLLC_DEF xo_xllc_def;
+			if (vo.len()){
+				xo_xllc_def = dev->xllc_def;
+				xo_xllc_def.pa += AO_OFFSET;
+				xo_xllc_def.len = vo.hwlen();
+
+				if (vo.DO32){
+					int ll = xo_xllc_def.len/64;
+					xo_xllc_def.len = ++ll*64;
+					dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
+				}
+				if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
+					perror("ioctl AFHBA_START_AO_LLC");
+					exit(1);
+				}
+				printf("AO buf pa: 0x%08x len %d\n", xo_xllc_def.pa, xo_xllc_def.len);
+
+				if (vo.DO32){
+					const char* hw_trace = getenv("DO32_HW_TRACE");
+					if (hw_trace && atoi(hw_trace)){
+					/* marker pattern for the PAD area for hardware trace */
+						for (int ii = 0; ii <= 0xf; ++ii){
+							dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+						}
+					}
+				}
+			}
+		}
 	}
 	virtual ~ACQ_HW_BASE() {
 		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
@@ -100,33 +137,26 @@ protected:
 		clear_mapping(dev->fd, dev->host_buffer);
 	}
 
-
+	virtual void arm(int nsamples);
+	/**< prepare to run a shot nsamples long, arm the UUT. */
+	virtual unsigned tlatch(void);
+	/**< returns latest tlatch from lbuf */
 };
 
 class ACQ_HW: public ACQ_HW_BASE
 {
 
-	unsigned *dox;
-
+public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 	virtual ~ACQ_HW()
 	{}
-
-protected:
-
-public:
 	virtual bool newSample(int sample);
 	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual void action(SystemInterface& systemInterface);
 	/**< on newSample, copy VO from SI, copy VI to SI */
 	virtual void action2(SystemInterface& systemInterface);
 	/**< late action(), cleanup */
-	virtual unsigned tlatch(void);
-	/**< returns latest tlatch from lbuf */
-	virtual void arm(int nsamples);
-	/**< prepare to run a shot nsamples long, arm the UUT. */
-friend class ACQ;
 };
 
 /* TLATCH now uses the dynamic set value */
@@ -139,9 +169,6 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
 						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
-	// @@todo init dev.
-	struct XLLC_DEF xo_xllc_def;
-
 
 
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
@@ -150,30 +177,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	}
 	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
 
-	xo_xllc_def = dev->xllc_def;
-	xo_xllc_def.pa += AO_OFFSET;
-	xo_xllc_def.len = vo.hwlen();
 
-	if (vo.DO32){
-		int ll = xo_xllc_def.len/64;
-		xo_xllc_def.len = ++ll*64;
-		dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
-	}
-	if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
-		perror("ioctl AFHBA_START_AO_LLC");
-		exit(1);
-	}
-	printf("AO buf pa: 0x%08x len %d\n", xo_xllc_def.pa, xo_xllc_def.len);
-
-	if (vo.DO32){
-		const char* hw_trace = getenv("DO32_HW_TRACE");
-		if (hw_trace && atoi(hw_trace)){
-			/* marker pattern for the PAD area for hardware trace */
-			for (int ii = 0; ii <= 0xf; ++ii){
-				dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
-			}
-		}
-	}
 	TLATCH = 0xdeadbeef;
 }
 
@@ -224,7 +228,7 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 /** checks host buffer for new sample, if so copies to lbuf and reports true */
 bool ACQ_HW::newSample(int sample)
 {
-        unsigned tl1;
+    unsigned tl1;
 
 	if (nowait || (tl1 = TLATCH) != tl0){
 		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
@@ -239,28 +243,113 @@ bool ACQ_HW::newSample(int sample)
 }
 
 /** returns latest tlatch from lbuf */
-unsigned ACQ_HW::tlatch(void)
+unsigned ACQ_HW_BASE::tlatch(void)
 {
 	return *(unsigned*)(dev->lbuf_vi.cursor+vi_offsets.SP32);
 }
 /** prepare to run a shot nsamples long, arm the UUT. */
-void ACQ_HW:: arm(int nsamples)
+void ACQ_HW_BASE::arm(int nsamples)
 {
-	cerr << "ACQ_HW::arm: TODO" <<endl;
+	cerr << "ACQ_HW_BASE::arm: TODO" <<endl;
 }
 
+
+class ACQ_HW_MEAN: public ACQ_HW_BASE
+{
+	const int nmean;
+	unsigned *dox;
+	int **raw;
+
+public:
+	ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nmean);
+	virtual ~ACQ_HW_MEAN()
+	{}
+	virtual bool newSample(int sample);
+	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual void action(SystemInterface& systemInterface);
+	/**< on newSample, copy VO from SI, copy VI to SI */
+	virtual void action2(SystemInterface& systemInterface);
+	/**< late action(), cleanup */
+};
+
+ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nmean) :
+		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor), nmean(_nmean)
+{
+	struct ABN abn;
+	int ib;
+
+	raw = new int* [nmean];
+	abn.ndesc = nmean;
+	abn.buffers[0].pa = dev->xllc_def.pa;
+
+	for (ib = 0; ib < nmean; ++ib){
+		if (dev->xllc_def.pa != RTM_T_USE_HOSTBUF){
+			assert(0);			// this path not valid.
+			abn.buffers[ib].pa = dev->xllc_def.pa + ib*PAGE_SIZE;
+		}
+		abn.buffers[ib].len = dev->xllc_def.len;
+		raw[ib] = (int*)(dev->host_buffer + ib*PAGE_SIZE);
+	}
+
+	if (ioctl(dev->fd, AFHBA_START_AI_ABN, &abn)){
+		perror("ioctl AFHBA_START_AI_ABN");
+		exit(1);
+	}
+	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+
+	TLATCH = 0xdeadbeef;
+}
+
+
+bool ACQ_HW_MEAN::newSample(int sample)
+/**< checks host buffer for new sample, if so copies to lbuf and reports true */
+{
+    unsigned tl1;
+
+	if (nowait || (tl1 = TLATCH) != tl0){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
+/**< on newSample, copy VO from SI, copy VI to SI */
+{
+/** SIMPLIFY: supports AI32 ONLY! */
+
+	for (int ic = 0; ic < vi.AI32; ++ic){
+		int total = 0;
+		for (int sam = 0; sam < nmean; ++sam){
+			total += raw[sam][ic] >> 8;
+		}
+		systemInterface.IN.AI32[ic] = total/nmean;
+	}
+}
+void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
+/**< late action(), cleanup */
+{
+
+}
 
 
 
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
 {
-	static bool HW = getenv("HW") != 0 ? atoi(getenv("HW")) : 0;
+	static int HW = getenv("HW") != 0 ? atoi(getenv("HW")) : 0;
 
 	switch(HW){
 	case 1:
 		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	default:
+		if (HW > 1){
+			return new ACQ_HW_MEAN(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, HW);
+		} // else fall thru
+	case 0:
 		return new ACQ(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	}
 }
