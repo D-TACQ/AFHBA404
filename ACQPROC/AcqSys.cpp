@@ -358,6 +358,9 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 			if (first_type == "pcs" && uut["type"] == "bolo"){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
+			}else if (first_type == "pcs" && uut["type"] == "pcs,nowait"){
+				cerr << "NOTICE: port " << port << " set nowait" << endl;
+				acq->nowait = true;
 			}else if (first_type == "bolo" && uut["type"] != "bolo"){
 				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
 			}
