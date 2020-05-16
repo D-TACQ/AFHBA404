@@ -25,6 +25,10 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 
 ![Github](DOC/RUN.png)
 
+ * MGT page tracks data on the fiber, matching the stream data showing data to local DRAM
+
+![Github](DOC/MGT.png)
+
  * View Live result in scope: C3 is the output trigger. C2 is the actual signal, zero crossing detected at -820 us
  * GD=39 * 20us = 780 us
  * Overhead of teeing up and broadcasting the marker is O(20us)
@@ -52,6 +56,13 @@ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 10000
 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 north east west south
 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
 ``` 
-
-
 Please try it. Send questions to peter dot milne@d-tacq.com
+
+## Experimental. Take the mean of NSAMPLES and output that.
+ * Capture runs with N separate DMA descriptors
+ * The software blocks on the first buffer changing, then computes and outputs mean of N buffers, representing the last N samples.
+ * Example Usage: N=8: average Latency (39+4) * Fs
+```
+RTPRIO=10 NTRIGGERS=1 HW=8 ./acqproc_broadcast_trigger configs/n32.json 10000000 1
+```
+
