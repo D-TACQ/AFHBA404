@@ -59,16 +59,6 @@ const char* ui(int argc, char* argv[])
 	return config_file;
 }
 
-/** top level shot control */
-void run_shot(HBA& hba, SystemInterface& systemInterface)
-{
-	systemInterface.trigger();
-
-	for (int sample = 0; sample < G::nsamples; ++sample){
-		hba.processSample(systemInterface, sample);
-	}
-}
-
 int main(int argc, char* argv[])
 {
 	const char* config_file = ui(argc, argv);
@@ -80,6 +70,12 @@ int main(int argc, char* argv[])
 	SystemInterface& si(SystemInterface::factory(hba));
 
 	hba.start_shot();
-	run_shot(hba, si);
+	si.trigger();
+
+	for (int sample = 0; sample < G::nsamples; ++sample){
+		hba.processSample(si, sample);
+	}
 }
+
+
 
