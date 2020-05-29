@@ -65,12 +65,17 @@ afhba-llcontrol-multiuut
 afhba-llcontrol-testharness
 afhba-llcontrol-two-fiber
 afhba-llcontrol-zcopy
-#	LLCONTROL/afhba.0.simulate.lot
-#	LLCONTROL/afhba.0.thursdaypersonality.log
-#	LLCONTROL/check-tlatch
-#	LLCONTROL/llc-run-full-auto-thomson.txt
 pwm_control
 pwm_set_channel
 pwm_set_duty
 Module.symvers
 
+.acq-fiber-hba.o.d
+ACQPROC/acqproc
+ACQPROC/acqproc_broadcast_trigger
+ACQPROC/acqproc_custom
+LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX
+LLCONTROL/check-tlatch
+STREAM/rtm-t-stream-disk
+mmap
+xiloader
