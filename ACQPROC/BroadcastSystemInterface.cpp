@@ -45,6 +45,7 @@ int getenv(const char* key, int def)
 		return def;
 	}
 }
+
 class BroadcastSystemInterface: public SystemInterface {
 	const int ntriggers;			/* opt: repeat trigger to instrument trigger overhead */
 	int over;
@@ -54,7 +55,7 @@ class BroadcastSystemInterface: public SystemInterface {
 
 public:
 	BroadcastSystemInterface(const HBA& hba) :
-		SystemInterface(hba), over(0), ntriggers(::getenv("NTRIGGERS", 1))
+		SystemInterface(hba), over(0), ntriggers(::getenv("NTRIGGERS", 1)), thix(0)
 	{
 		char* _trgfile = new char[80];
 		snprintf(_trgfile, 80, "/dev/rtm-t.0.ctrl/com_trg");
