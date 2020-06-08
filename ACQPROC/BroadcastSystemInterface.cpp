@@ -35,26 +35,32 @@ SystemInterface::~SystemInterface()
 	delete [] OUT.CC32;
 }
 
+
+int getenv(const char* key, int def)
+{
+	const char* val = getenv(key);
+	if (val != 0){
+		return atoi(val);
+	}else{
+		return def;
+	}
+}
 class BroadcastSystemInterface: public SystemInterface {
 	const int ntriggers;			/* opt: repeat trigger to instrument trigger overhead */
 	int over;
 	const char* trgfile;
+	int th_chan[2];					/* channel index to threshold    */
+	int thix;						/* threshold channel index 0|1	 */
 
-	static int get_ntriggers() {
-		const char* val = getenv("NTRIGGERS");
-		if (val != 0){
-			return atoi(val);
-		}else{
-			return 1;
-		}
-	}
 public:
 	BroadcastSystemInterface(const HBA& hba) :
-		SystemInterface(hba), over(0), ntriggers(get_ntriggers())
+		SystemInterface(hba), over(0), ntriggers(::getenv("NTRIGGERS", 1))
 	{
 		char* _trgfile = new char[80];
-		snprintf(_trgfile, 80, "/dev/rtm-t.%d.ctrl/com_trg", hba.devnum);
+		snprintf(_trgfile, 80, "/dev/rtm-t.0.ctrl/com_trg");
 		trgfile = _trgfile;
+		th_chan[0] = ::getenv("THCHAN0", 0);
+		th_chan[1] = ::getenv("THCHAN1", 0);
 	}
 	virtual ~BroadcastSystemInterface() {
 		delete [] trgfile;
@@ -68,9 +74,11 @@ public:
 	}
 
 	virtual void ringDoorbell(int sample){
-		if (over && IN.AI32[0] < -2000){
+		int ai = IN.AI32[th_chan[thix]];
+
+		if (over && ai < -2000){
 			over = false;
-		}else if (!over && IN.AI32[0] > 2000) {
+		}else if (!over && ai > 2000) {
 			for (int it = 0; it < ntriggers; ++it){
 				trigger();
 			}
@@ -79,6 +87,7 @@ public:
 		}
 
 		G::verbose > 1 && printf("%s[%d] %08x\n", PFN, sample, IN.AI32[0]);
+		thix = !thix;
 	}
 };
 
