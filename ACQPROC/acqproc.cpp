@@ -18,12 +18,25 @@ extern int sched_fifo_priority;
 
 #include "AcqSys.h"
 
+
+int getenv(const char* key, int def, int (*cvt)(const char* key))
+{
+	const char* value = getenv(key);
+	if (value){
+		return cvt(value);
+	}else{
+		return def;
+	}
+}
+
 namespace G {
-	int nsamples = 2;		/**< samples to capture (default:2, typ 200000) */
-	int verbose;
-	int dummy_first_loop;		/**< possible speed up by filling cache first loop */
-	int samples_buffer = 1;		/**< number of samples in each VI buffer (default:1) */
+	int verbose = ::getenv("VERBOSE", 0);
+	int dummy_first_loop= ::getenv("DUMMY_FIRST_LOOP", 0);		/**< possible speed up by filling cache first loop */
+	int MAXLOG = ::getenv("MAXLOG", 1000000); 					/**< avoid oom */
+	int samples_buffer = 1;										/**< number of samples in each VI buffer (default:1) */
+	int nsamples = 2;											/**< samples to capture (default:2, typ 200000) */
 };
+
 
 
 const char* ui(int argc, char* argv[])
@@ -31,18 +44,13 @@ const char* ui(int argc, char* argv[])
 	const char* config_file;
 	const char* key;
 
-        if ((key = getenv("RTPRIO"))){
+    if ((key = getenv("RTPRIO"))){
 		sched_fifo_priority = atoi(key);
-        }
-        if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
+    }
+    if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
                 setAffinity(strtol(key, 0, 0));
-        }
-	if ((key = getenv("VERBOSE"))){
-		G::verbose = atoi(key);
-	}
-	if ((key = getenv("DUMMY_FIRST_LOOP"))){
-		G::dummy_first_loop = atoi(key);
-	}
+    }
+
 	if (argc > 1){
 		config_file = argv[1];
 	}else{
@@ -63,7 +71,8 @@ int main(int argc, char* argv[])
 {
 	const char* config_file = ui(argc, argv);
 
-	HBA hba = HBA::create(config_file, G::nsamples);
+	HBA hba = HBA::create(config_file, G::nsamples==0? 100: G::nsamples>G::MAXLOG? G::MAXLOG: G::nsamples);
+
 
 	hba.dump_config();
 
@@ -72,7 +81,7 @@ int main(int argc, char* argv[])
 	hba.start_shot();
 	si.trigger();
 
-	for (int sample = 0; sample < G::nsamples; ++sample){
+	for (int sample = 0; G::nsamples == 0 || sample < G::nsamples; ++sample){
 		hba.processSample(si, sample);
 	}
 }

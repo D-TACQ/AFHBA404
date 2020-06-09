@@ -13,6 +13,8 @@
 
 using namespace std;
 
+int getenv(const char* key, int def, int (*cvt)(const char* key) = atoi);
+
 
 /** Models Vector Input.
  * Vector Input is a single sample input data set, pushed to DRAM by single DMA from ACQ

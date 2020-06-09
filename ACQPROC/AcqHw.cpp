@@ -145,7 +145,7 @@ protected:
 
 class ACQ_HW: public ACQ_HW_BASE
 {
-
+	int sample;
 public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -167,7 +167,7 @@ public:
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor), sample(0)
 {
 
 
@@ -227,7 +227,9 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 	SITOVO2(AO16);
 	SITOVO2(DO32);
 	SITOVO2(CC32);
-	dev->lbuf_vi.cursor += vi.len();
+	if (++sample < HBA::maxsam){
+		dev->lbuf_vi.cursor += vi.len();
+	}
 	pollcount = 0;
 }
 

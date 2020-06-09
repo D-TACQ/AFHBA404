@@ -10,6 +10,7 @@
 #include <string.h>
 
 
+
 #define PFN __PRETTY_FUNCTION__
 
 SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
@@ -36,15 +37,7 @@ SystemInterface::~SystemInterface()
 }
 
 
-int getenv(const char* key, int def)
-{
-	const char* val = getenv(key);
-	if (val != 0){
-		return atoi(val);
-	}else{
-		return def;
-	}
-}
+
 
 class BroadcastSystemInterface: public SystemInterface {
 	const int ntriggers;			/* opt: repeat trigger to instrument trigger overhead */
