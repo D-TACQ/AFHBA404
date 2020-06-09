@@ -52,19 +52,26 @@ class BroadcastSystemInterface: public SystemInterface {
 	const char* trgfile;
 	int th_chan[2];					/* channel index to threshold    */
 	int thix;						/* threshold channel index 0|1	 */
+	FILE* fp_log;
 
 public:
 	BroadcastSystemInterface(const HBA& hba) :
-		SystemInterface(hba), over(0), ntriggers(::getenv("NTRIGGERS", 1)), thix(0)
+		SystemInterface(hba), over(0), ntriggers(::getenv("NTRIGGERS", 1)), thix(0), fp_log(0)
 	{
 		char* _trgfile = new char[80];
 		snprintf(_trgfile, 80, "/dev/rtm-t.0.ctrl/com_trg");
 		trgfile = _trgfile;
 		th_chan[0] = ::getenv("THCHAN0", 0);
 		th_chan[1] = ::getenv("THCHAN1", 0);
+		if (getenv("SILOG")){
+			fp_log = fopen(getenv("SILOG"), "w");
+		}
 	}
 	virtual ~BroadcastSystemInterface() {
 		delete [] trgfile;
+		if (fp_log){
+			fclose(fp_log);
+		}
 	}
 
 	virtual void trigger() {
@@ -89,6 +96,10 @@ public:
 
 		G::verbose > 1 && printf("%s[%d] %08x\n", PFN, sample, IN.AI32[0]);
 		thix = !thix;
+
+		if (fp_log){
+			fwrite(IN.AI32, sizeof(int), AI32_count(), fp_log);
+		}
 	}
 };
 
