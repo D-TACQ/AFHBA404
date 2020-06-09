@@ -56,13 +56,26 @@ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 10000
 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 north east west south
 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
 ``` 
+
+## Run with two hosts and check skew
+ * connect analog signal to scope #1
+ * connect analog signal to CH01 on each of two boxes, n, s
+ * connect GPIO output from each of the two boxes to scope channels #2 and #3, trigger on one of them
+``` 
+SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_130
+SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_176
+THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/ns32.json 0
+```
+ * result as shown ![Github](DOC/TWOUUTS.png)
+ * ![Github](DOC/twouuts-2020-06-09_17.45.54.mkv)]
+ * THCHAN0=0 THCHAN1=32 :: On alternate cycles, use AI[0] then AI[32] as the source of data eg uutN.CH01, uutS.CH01
+ * Cursor (a) shows the zero crossing detected by software, with output pulse at (b), +800usec
+ * SR=50kHz, 20usec, and with 40 sample group delay, it's 800usec as expected.
+ * The previous output pulse is on the far left of the screen, and is subject to about 20usec wander, this is the "skew" between uutN and uutS, which are running on the same clock.
+ * If they were to run on the same clock, eg with White Rabbit, there'd be no wander.
+ 
+ 
 Please try it. Send questions to peter dot milne@d-tacq.com
 
-## Experimental. Take the mean of NSAMPLES and output that.
- * Capture runs with N separate DMA descriptors
- * The software blocks on the first buffer changing, then computes and outputs mean of N buffers, representing the last N samples.
- * Example Usage: N=8: average Latency (39+4) * Fs
-```
-RTPRIO=10 NTRIGGERS=1 HW=8 ./acqproc_broadcast_trigger configs/n32.json 10000000 1
-```
+
 
