@@ -66,8 +66,6 @@ SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 
 SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_176
 THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/ns32.json 0
 ```
- * result as shown ![Github](DOC/TWOUUTS.png)
- * movie: download and display with VLC: ![Github](DOC/twouuts-2020-06-09_17.45.54.mkv)]
  * [![two uut movie](DOC/TWOUUTS.png)](DOC/twouuts-2020-06-09_17.45.54.mkv "Two Box movie")
  * THCHAN0=0 THCHAN1=32 :: On alternate cycles, use AI[0] then AI[32] as the source of data eg uutN.CH01, uutS.CH01
  * Cursor (a) shows the zero crossing detected by software, with output pulse at (b), +800usec
