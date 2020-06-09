@@ -185,13 +185,13 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 /** copy VI.field to SI.field */
 #define VITOSI(field) \
 	(vi.field && \
-	 memcpy((char*)systemInterface.IN.field+vi_cursor.field, dev->lbuf_vi.cursor+vi_offsets.field, \
+	 memcpy(reinterpret_cast<char*>(systemInterface.IN.field+vi_cursor.field), dev->lbuf_vi.cursor+vi_offsets.field, \
 			vi.field*sizeof(systemInterface.IN.field[0])))
 
 /** copy SI.field to VO */
 #define SITOVO(field) \
 	(vo.field && \
-	 memcpy(XO_HOST+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, \
+	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
 			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
 void ACQ_HW::action(SystemInterface& systemInterface)
@@ -201,6 +201,14 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	SITOVO(DO32);
 
 	VITOSI(AI16);
+
+	if (G::verbose > 1){
+		fprintf(stderr, "VITOSI(AI32) \"%s\" memcpy(%p, %p, %d)\n", toString().c_str(),
+				systemInterface.IN.AI32+vi_cursor.AI32,
+				dev->lbuf_vi.cursor+vi_offsets.AI32,
+				vi.AI32*sizeof(systemInterface.IN.AI32[0])
+		);
+	}
 	VITOSI(AI32);
 	VITOSI(DI32);
 	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
