@@ -35,10 +35,8 @@ def verify_data(json, composite_file):
     composite = composite.reshape((-1, 64))
 
     # Use col stack to zip together the VI.dat files without the SPAD.
-    # test_composite = np.column_stack(([ subarray for array in data ]))
     test_composite = [ array[:,0:uut['VI']['AI32']] for array in data ]
     test_composite = np.column_stack(test_composite)
-    # print(test_composite)
 
     if not np.array_equal(composite, test_composite):
         print("Error found. Composite array does not contain the same data as VI files.")
