@@ -31,8 +31,8 @@ def config(args):
 
 def run_main():
     parser = argparse.ArgumentParser(description='acqproc config freerunning acq435')
+    acq400_hapi.Acq400UI.add_args(parser, transient=False, uuts=True)
     parser.add_argument('--acq435SR', default=49999, type=int, help='set acq435 SR')
-    parser.add_argument('uuts', nargs='+', help='uuts')
     config(parser.parse_args())
 
 if __name__ == '__main__':
