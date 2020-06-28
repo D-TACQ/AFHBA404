@@ -122,7 +122,7 @@ static int write_meta(int fd, int ibuf, int nbuf)
 	snprintf(buf, 128, 
 		"IBUF=%d\n" "NBUF=%d\n" "NSAMPLES=%llu\n" "HTIME=%.3f\n",
 		 ibuf, nbuf, nsamples, htime());
-	int nw = write(fd, buf, strlen(buf));
+	return write(fd, buf, strlen(buf));
 }
 
 void fail_if_exists(char *buf)
