@@ -309,8 +309,6 @@ static void process(int ibuf, int nbuf, struct StreamBufferDef *sbd){
 				}
 			}
 			strcpy(old_fname, data_fname);
-		}else{
-			puts(buf);
 		}
 		icat = 0;
 	}
