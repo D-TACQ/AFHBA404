@@ -33,6 +33,7 @@
 #define EXPORT_SYMTAB
 #include <linux/module.h>
 #endif
+#include <linux/poll.h>
 
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
@@ -466,7 +467,7 @@ static void afs_load_dram_descriptors_ll(
 			u32 dma_desc;
 			int cnt;
 			int residue = bd->len - idb*LL_MAX_LEN;
-			
+
 			residue = min(residue, LL_MAX_LEN);
 			cnt = residue/LL_BLOCK;
 
@@ -1507,7 +1508,6 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	return afhba_release(inode, file);
 }
 
-
 ssize_t afs_dma_read(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 /* returns when buffer[s] available
@@ -1594,17 +1594,20 @@ read99:
 	return rc;
 }
 
-static unsigned int afs_dma_poll(struct file* file, struct poll_table_struct *poll_table)
+static unsigned int afs_dma_poll(struct file* file, poll_table *poll_table)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-
+	unsigned int mask = POLLOUT | POLLWRNORM;
 	if (!list_empty(&sdev->bp_full.list)){
-		return POLLIN;
+		mask |= POLLIN | POLLRDNORM; /* readable */
 	}else{
 		poll_wait(file, &sdev->return_waitq, poll_table);
-		return list_empty(&sdev->bp_full.list)? POLLIN: 0;
+		if (!list_empty(&sdev->bp_full.list)){
+			mask |= POLLIN | POLLRDNORM;
+		}
 	}
+	return mask;
 }
 
 ssize_t afs_dma_read_poll(
@@ -1937,6 +1940,7 @@ static struct file_operations afs_fops_dma_poll = {
 	.open = afs_dma_open,
 	.release = afs_dma_release,
 	.read = afs_dma_read_poll,
+	.poll = afs_dma_poll,
 	.write = afs_dma_write,
 	.unlocked_ioctl = afs_dma_ioctl,
 	.mmap = afs_mmap_host
