@@ -77,5 +77,6 @@ ACQPROC/acqproc_custom
 LLCONTROL/afhba-llcontrol-multiuut-4AI1AO1DX
 LLCONTROL/check-tlatch
 STREAM/rtm-t-stream-disk
+STREAM/librtm-t-stream.so
 mmap
 xiloader

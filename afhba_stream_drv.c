@@ -33,7 +33,6 @@
 #define EXPORT_SYMTAB
 #include <linux/module.h>
 #endif
-#include <linux/poll.h>
 
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
@@ -1600,7 +1599,7 @@ static unsigned int afs_dma_poll(struct file* file, poll_table *poll_table)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	unsigned int mask = POLLOUT | POLLWRNORM;
 	if (!list_empty(&sdev->bp_full.list)){
-		mask |= POLLIN | POLLRDNORM; /* readable */
+		mask |= POLLIN | POLLRDNORM;
 	}else{
 		poll_wait(file, &sdev->return_waitq, poll_table);
 		if (!list_empty(&sdev->bp_full.list)){
