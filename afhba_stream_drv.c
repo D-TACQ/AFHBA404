@@ -37,7 +37,9 @@
 #include "acq-fiber-hba.h"
 #include "afhba_stream_drv.h"
 
+#include <linux/poll.h>
 #include <linux/version.h>
+
 
 #define REVID	"R1070"
 
@@ -1592,6 +1594,19 @@ read99:
 	return rc;
 }
 
+static unsigned int afs_dma_poll(struct file* file, struct poll_table_struct *poll_table)
+{
+	struct AFHBA_DEV *adev = PD(file)->dev;
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
+	if (!list_empty(&sdev->bp_full.list)){
+		return POLLIN;
+	}else{
+		poll_wait(file, &sdev->return_waitq, poll_table);
+		return list_empty(&sdev->bp_full.list)? POLLIN: 0;
+	}
+}
+
 ssize_t afs_dma_read_poll(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 /* returns when buffer[s] available
@@ -1653,6 +1668,8 @@ ssize_t afs_dma_read_poll(
 read99:
 	return rc;
 }
+
+
 
 
 ssize_t afs_dma_write(
@@ -1910,6 +1927,7 @@ static struct file_operations afs_fops_dma = {
 	.open = afs_dma_open,
 	.release = afs_dma_release,
 	.read = afs_dma_read,
+	.poll = afs_dma_poll,
 	.write = afs_dma_write,
 	.unlocked_ioctl = afs_dma_ioctl,
 	.mmap = afs_mmap_host
