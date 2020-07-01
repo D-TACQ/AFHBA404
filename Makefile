@@ -14,10 +14,10 @@ EXTRA_CFLAGS += -DCONFIG_SPI
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-all: modules apps 
+all: modules apps
 #llc_support
 
-flash: spi_support 
+flash: spi_support
 
 flash_clean: spi_clean llc_clean
 
@@ -29,15 +29,21 @@ KHEADERS := /lib/modules/$(KRNL)/build
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
 	afhba_core.o  \
-	afs_procfs.o 
+	afs_procfs.o
 
 afhbaspi-objs = afhba_spi.o afhba_core.o
 
 afhbasfp-objs =  afhba_i2c_bus.o afhba_core.o
-	
-modules: 
+
+modules:
 	make -C $(KHEADERS) M=$(SRC)  modules
 
+modules-dbg:
+	make -C $(KHEADERS) M=$(SRC)  modules EXTRA_CFLAGS="-g"
+
+.PHONY: gdb-cmd
+gdb-cmd:
+	@echo "add-symbol-file afhba.ko $$(sudo cat /sys/module/afhba/sections/.text)"
 
 APPS := mmap xiloader
 apps: $(APPS) stream functional_tests llc_support acqproc
@@ -55,9 +61,6 @@ xiloader:
 
 llc_support:
 	cd LLCONTROL && $(MAKE)
-	
-acqproc:
-	cd ACQPROC && $(MAKE)
 
 acqproc:
 	cd ACQPROC && $(MAKE)
@@ -93,7 +96,7 @@ stream_clean:
 
 functional_tests_clean:
 	cd FUNCTIONAL_TESTS && $(MAKE) clean
-	
+
 clean: llc_clean stream_clean functional_tests_clean acqproc_clean
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
@@ -102,4 +105,4 @@ package: clean spi_clean
 	git tag $(DC)
 	(cd ..;tar cvzf AFHBA/release/afhba-$(DC).tgz \
 		--exclude=release --exclude=SAFE AFHBA/* )
-	
+

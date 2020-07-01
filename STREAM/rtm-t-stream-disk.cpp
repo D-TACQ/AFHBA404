@@ -3,16 +3,16 @@
 /* ------------------------------------------------------------------------- */
 /*   Copyright (C) 2010 Peter Milne, D-TACQ Solutions Ltd
  *                      <Peter dot Milne at D hyphen TACQ dot com>
-                                                                               
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of Version 2 of the GNU General Public License
     as published by the Free Software Foundation;
-                                                                               
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-                                                                               
+
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
@@ -102,7 +102,7 @@ static double htime(void){
 	}
 
 	gettimeofday(&t1, 0);
-	
+
 	if (t1.tv_usec < t0.tv_usec){
 		carry.tv_usec = 1000000;
 		carry.tv_sec = 1;
@@ -119,7 +119,7 @@ static int write_meta(int fd, int ibuf, int nbuf)
 	unsigned long long nsamples = (unsigned long long)nbuf * dev->maxlen / SSIZE;
 
 	char buf[128];
-	snprintf(buf, 128, 
+	snprintf(buf, 128,
 		"IBUF=%d\n" "NBUF=%d\n" "NSAMPLES=%llu\n" "HTIME=%.3f\n",
 		 ibuf, nbuf, nsamples, htime());
 	return write(fd, buf, strlen(buf));
@@ -263,8 +263,8 @@ static void process(int ibuf, int nbuf, struct StreamBufferDef *sbd){
 	if (icat == 0){
 		sprintf(buf, OUTROOTFMT, OUTROOT, CYCLE);
 		mkdir(buf, 0777);
-		
-		sprintf(data_fname, outfmt, OUTROOT, CYCLE, 
+
+		sprintf(data_fname, outfmt, OUTROOT, CYCLE,
 				dev->getDevnum(), ibuf);
 
 		outfp = open(data_fname, O_MODE, PERM);
@@ -369,7 +369,7 @@ static int stream()
 				}
 				DIAG("CALLING process\n");
 				process(bufno, ++nbuf, sbd+ibuf);
-			
+
 				dbg(2, "write [%d] %d\n", ibuf, bufno);
 
 				DIAG("CALLING write\n");
@@ -441,10 +441,10 @@ static void init_defaults(int argc, char* argv[])
 		devnum = atol(getenv("RTM_DEVNUM"));
 	}
 	dev = new RTM_T_Device(devnum);
-	
+
 	outfmt = dev->nbuffers > 99? OUTFMT3: OUTFMT2;
 
-	
+
 	if (getenv("RTM_MAXITER")){
 		MAXITER = atol(getenv("RTM_MAXITER"));
 		info("MAXITER set %d\n", MAXITER);

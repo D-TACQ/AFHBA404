@@ -65,6 +65,11 @@ RTM_T_Device::RTM_T_Device(int _devnum) :
 static int getKnob(const char* knob, unsigned* value)
 {
         FILE *fp = fopen(knob, "r");
+	if (!fp)
+	{
+		perror(knob);
+		return -1;
+	}
         int rc = fscanf(fp, "%u", value);
         fclose(fp);
         return rc;
