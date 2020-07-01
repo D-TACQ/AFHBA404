@@ -1,52 +1,52 @@
 {
     "AFHBA": {
-	    "//" : "pcs1.json system in use at blah blah",
-	    "//" : "pcs1.json system in use at blah also",
+        "//" : "pcs1.json system in use at blah blah",
+        "//" : "pcs1.json system in use at blah also",
         "UUT": [
-            	{ 	"name" : "acq2106_123",  
-			"type": "pcs",
-              		"VI" : {
-                  		"AI16" : 128,  
-				"DI32" : 1,  
-				"SP32" : 15
+                {   "name" : "acq2106_123",  
+            "type": "pcs",
+                    "VI" : {
+                        "AI16" : 128,  
+                "DI32" : 1,  
+                "SP32" : 15
                          },
-             		 "VO" : {
-                		"DO32" : 1, 
-				"AO16" : 32
-              		},
-			"WD_BIT" : 31
-            	},
-           	{ 	"name" : "acq2106_124",  
-			"type": "pcs",
-              		"VI" : {
-                  		"AI16" : 128,  
-				"DI32" : 1,  
-				"SP32" : 15
+                     "VO" : {
+                        "DO32" : 1, 
+                "AO16" : 32
+                    },
+            "WD_BIT" : 31
+                },
+            {   "name" : "acq2106_124",  
+            "type": "pcs",
+                    "VI" : {
+                        "AI16" : 128,  
+                "DI32" : 1,  
+                "SP32" : 15
                          },
-             		 "VO" : {
-                		"DO32" : 1, 
-				"AO16" : 32
-              		}
-            	},
-          	{ 	"name" : "acq2106_125",
-			"type": "pcs",
-              		"VI" : {
-                  		"AI16" : 128,  
-				"DI32" : 1,  
-				"SP32" : 15
+                     "VO" : {
+                        "DO32" : 1, 
+                "AO16" : 32
+                    }
+                },
+            {   "name" : "acq2106_125",
+            "type": "pcs",
+                    "VI" : {
+                        "AI16" : 128,  
+                "DI32" : 1,  
+                "SP32" : 15
                          },
-             		 "VO" : {
-                		"DO32" : 1, 
-				"AO16" : 32
-              		 }
-            	},
-           	{ 	"name" : "acq2106_555",  
-			"type": "bolo",
-              		"VI" : {
-                  		"AI32" : 48,  
-				"SP32" : 16
+                     "VO" : {
+                        "DO32" : 1, 
+                "AO16" : 32
+                     }
+                },
+            {   "name" : "acq2106_555",  
+            "type": "bolo",
+                    "VI" : {
+                        "AI32" : 48,  
+                "SP32" : 16
                          }
-            	}
+                }
         ]
     }
 }
