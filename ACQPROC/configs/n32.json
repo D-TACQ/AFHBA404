@@ -2,14 +2,14 @@
     "AFHBA": {
         "UUT": [
             {   
-            "DEVNUM": 0,
-            "name" : "acq2106_176",  
-            "type": "pcs",
+                "DEVNUM": 0,
+                "name" : "acq2106_176",  
+                "type": "pcs",
                 "VI" : {
-                        "AI32" : 32,  
-                "SP32" : 16
+                    "AI32" : 32,  
+                    "SP32" : 16
                 }
-                }
+            }
         ]
     }
 }
