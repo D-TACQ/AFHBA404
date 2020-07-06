@@ -157,6 +157,8 @@ def run_analysis(args):
 
         for uut in jdata['AFHBA']['UUT']:
             args.name = uut['name']
+            if "VI" not in uut.keys():
+                continue
             print("Running analysis for UUT: {}".format(args.name))
             try:
                 args.dix_len = uut['VI']['DI32']
