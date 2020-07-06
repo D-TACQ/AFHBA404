@@ -21,22 +21,22 @@ def parse_config(path):
         jdata = json.load(f)
 
     uuts=''
-    sync_uuts=''
+    sync_roles=''
     ii = 1
 
     for uut in jdata['AFHBA']['UUT']:
         name = uut['name']
 
         if 'sync_role' in uut:
-            sync_uuts += uut['sync_role'] + " "
+            sync_roles += uut['sync_role'] + " "
         else:
-            sync_uuts += "master " if ii==1 else "slave "
+            sync_roles += "master " if ii==1 else "slave "
 
         print("UUT{}={}".format(ii, uut['name']))
         uuts = '{}{} '.format(uuts, uut['name'])
         ii += 1
 
-    print('SYNC_UUTS="{}"'.format(sync_uuts))
+    print('SYNC_ROLES="{}"'.format(sync_roles))
     print('UUTS="{}"'.format(uuts))
     print('DEVMAX={}'.format(ii))
 

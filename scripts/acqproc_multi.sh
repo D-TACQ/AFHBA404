@@ -148,9 +148,10 @@ configure_uut() {
     p*)
         INDEX=0
         uuts=($uuts)
-        SYNC_UUTS=($SYNC_UUTS)
+        SYNC_ROLES=($SYNC_ROLES)
         for uut in $UUTS; do
             TOPROLE=${SYNC_UUTS[INDEX]}
+            if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
             echo "$TOPROLE"
             $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
             TOPROLE=slave
