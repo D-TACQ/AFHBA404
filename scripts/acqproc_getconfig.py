@@ -30,7 +30,6 @@ def parse_config(path):
         if 'sync_role' in uut:
             sync_uuts += uut['sync_role'] + " "
         else:
-            print(uut)
             sync_uuts += "master " if ii==1 else "slave "
 
         print("UUT{}={}".format(ii, uut['name']))
