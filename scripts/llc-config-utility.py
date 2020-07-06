@@ -111,7 +111,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     for site in AOSITES:
         aom = "s{}".format(site)
         uut.svc[aom].lotide = 256
-        uut.svc[aom].clk = '1,2,1'
+        uut.svc[aom].clk = '1,2,1' if len(AISITES) > 1 else '1,1,1'
         uut.svc[aom].clkdiv = '1'
 
     for site in DIOSITES:
