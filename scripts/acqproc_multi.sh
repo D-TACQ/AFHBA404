@@ -146,9 +146,16 @@ configure_uut() {
     n*)
 	    echo "WARNING: omit sync_role";;
     p*)
+        INDEX=0
+        uuts=($uuts)
+        SYNC_ROLES=($SYNC_ROLES)
         for uut in $UUTS; do
+            TOPROLE=${SYNC_ROLES[$INDEX]}
+            if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
+            echo "$TOPROLE"
             $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
             TOPROLE=slave
+            ((INDEX++))
         done
         for uut in $UUTS; do
             wait

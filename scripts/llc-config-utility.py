@@ -111,7 +111,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     for site in AOSITES:
         aom = "s{}".format(site)
         uut.svc[aom].lotide = 256
-        uut.svc[aom].clk = '1,2,1'
+        uut.svc[aom].clk = '1,2,1' if len(AISITES) > 1 else '1,1,1'
         uut.svc[aom].clkdiv = '1'
 
     for site in DIOSITES:
@@ -163,16 +163,15 @@ def config_auto(args, uut):
 
     if len(AISITES) != 0:
         config_aggregator(args, uut, AISITES, DIOSITES)
+        if args.us == 1:
+            trg = uut.s1.trg.split(" ")[0].split("=")[1]
+            uut.s0.spad1_us = trg # set the usec counter to the same as trg.
     # if len(AOSITES) != 0:
         # config_distributor(args, uut, AOSITES, DIO)
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
 
     config_sync_clk(uut)
-
-    if args.us == 1:
-        trg = uut.s1.trg.split(" ")[0].split("=")[1]
-        uut.s0.spad1_us = trg # set the usec counter to the same as trg.
 
     if args.lat == 1:
         uut.s0.LLC_instrument_latency = 1
