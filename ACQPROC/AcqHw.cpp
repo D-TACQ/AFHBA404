@@ -196,9 +196,6 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 void ACQ_HW::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
-	SITOVO(AO16);
-	SITOVO(DO32);
-
 	VITOSI(AI16);
 
 	if (G::verbose > 1){
@@ -223,6 +220,9 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 /** in slack time, copy SI.OUT to VO archive cursor.
  * @@todo make it optional in case it takes too long */
 void ACQ_HW::action2(SystemInterface& systemInterface) {
+	SITOVO(AO16);
+	SITOVO(DO32);
+
 	SITOVO2(AO16);
 	SITOVO2(DO32);
 	SITOVO2(CC32);
