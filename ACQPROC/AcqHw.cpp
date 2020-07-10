@@ -94,7 +94,6 @@ protected:
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 		dev->xllc_def.len = G::samples_buffer*vi.len();
-		memset(dev->host_buffer, 0, vi.len());
 		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
 		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
@@ -203,7 +202,7 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(AI16);
 
 	if (G::verbose > 1){
-		fprintf(stderr, "VITOSI(AI32) \"%s\" memcpy(%p, %p, %d)\n", toString().c_str(),
+		fprintf(stderr, "VITOSI(AI32) \"%s\" memcpy(%p, %p, %ld)\n", toString().c_str(),
 				systemInterface.IN.AI32+vi_cursor.AI32,
 				dev->lbuf_vi.cursor+vi_offsets.AI32,
 				vi.AI32*sizeof(systemInterface.IN.AI32[0])

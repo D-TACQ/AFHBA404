@@ -98,6 +98,7 @@ void* get_mapping(dev_t devnum, int *pfd) {
 		perror( "mmap" );
 	        exit(errno);
 	}
+	memset(host_buffer, 0, HB_LEN);
 	if(pfd) *pfd = fd;
 	return host_buffer;
 }

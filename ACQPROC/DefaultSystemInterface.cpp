@@ -8,20 +8,26 @@
 #include "AcqSys.h"
 #include <string.h>
 
-
+template <class T>
+T* new_zarray(int nelems)
+{
+	T* nz_array = new T[nelems];
+	memset(nz_array, 0, nelems*sizeof(T));
+	return nz_array;
+}
 
 
 SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 /* make a gash SI to allow simulated operation. The real shm is customer specific */
 {
-	IN.AI16 = new short[AI16_count()];
-	IN.AI32 = new int[AI32_count()];
-	IN.DI32 = new unsigned[DI32_count()];    // needs to be bigger for PWM
-	IN.SP32 = new unsigned[SP32_count()];
+	IN.AI16 = new_zarray<short>(AI16_count());
+	IN.AI32 = new_zarray<int>(AI32_count());
+	IN.DI32 = new_zarray<unsigned>(DI32_count());    // needs to be bigger for PWM
+	IN.SP32 = new_zarray<unsigned>(SP32_count());
 
-	OUT.AO16 = new short[AO16_count()];
-	OUT.DO32 = new unsigned [DO32_count()];
-	OUT.CC32 = new unsigned [CC32_count()];
+	OUT.AO16 = new_zarray<short>(AO16_count());
+	OUT.DO32 = new_zarray<unsigned>(DO32_count());
+	OUT.CC32 = new_zarray<unsigned>(CC32_count());
 }
 SystemInterface::~SystemInterface()
 {
