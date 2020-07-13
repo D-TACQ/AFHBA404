@@ -181,6 +181,10 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 		while(!uut->newSample(sample)){
 			sched_fifo_priority>1 || sched_yield();
 			++uut->pollcount;
+			if (G::maxpoll && sample && uut->pollcount > G::maxpoll){
+				fprintf(stderr, "ERROR: poll timeout on uut %s at sample %d\n", uut->getName().c_str(), sample);
+				throw -22;
+			}
 		}
 	}
 	for (auto uut : uuts){

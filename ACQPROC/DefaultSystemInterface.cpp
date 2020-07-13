@@ -18,7 +18,7 @@ public:
 	static int DUP1;
 
 	virtual void ringDoorbell(int sample){
-		G::verbose && printf("DummySingleThreadControlSystemInterface::ringDoorbell(%d)\n", sample);
+		G::verbose && printf("%s(%d)\n", PFN, sample);
 
 		short xx = IN.AI16[DUP1];
 		for (int ii = 0; ii < AO16_count(); ++ii){

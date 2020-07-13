@@ -145,6 +145,7 @@ namespace G {
 	extern int verbose;
 	extern int dummy_first_loop;
 	extern int samples_buffer;
+	extern int maxpoll;
 };
 
 /** Models interface with external PCS.
