@@ -48,7 +48,7 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 
 ## Check config with no hardware
 ```
-RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
+RTPRIO=10 NTRIGGERS=1 HW=0 ./acqproc_broadcast_trigger configs/news32.json 1000000
 
 ```
 ## Run with hardware
