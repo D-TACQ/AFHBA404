@@ -2,21 +2,23 @@
     "AFHBA": {
         "DEVNUM": 0,
         "UUT": [
-                {   "name" : "acq2106_141",  
+                {   "name" : "acq2106_141",
                     "type": "pcs",
+                    "sync_role": "fpmaster",
                     "VI" : {
-                        "AI16" : 128,  
-                        "DI32" : 1,  
+                        "AI16" : 128,
+                        "DI32" : 1,
                         "SP32" : 15
                      },
                      "VO" : {
-                        "DO32" : 1, 
+                        "DO32" : 1,
                         "AO16" : 32
                     },
                     "WD_BIT" : 31
                 },
-                {   "name" : "acq2106_156",  
+                {   "name" : "acq2106_156",
                     "type": "pcs,nowait",
+                    "sync_role": "slave",
                     "VI" : {
 
                      },
