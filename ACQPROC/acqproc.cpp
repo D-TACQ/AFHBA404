@@ -35,6 +35,7 @@ namespace G {
 	int MAXLOG = ::getenv("MAXLOG", 1000000); 					/**< avoid oom */
 	int samples_buffer = 1;										/**< number of samples in each VI buffer (default:1) */
 	int nsamples = 2;											/**< samples to capture (default:2, typ 200000) */
+	int maxpoll = 0;
 };
 
 
@@ -49,6 +50,9 @@ const char* ui(int argc, char* argv[])
     }
     if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
                 setAffinity(strtol(key, 0, 0));
+    }
+    if ((key = getenv("MAXPOLL")) && strtol(key, 0, 0) != 0){
+                G::maxpoll = strtol(key, 0, 0);
     }
 
 	if (argc > 1){
@@ -81,8 +85,12 @@ int main(int argc, char* argv[])
 	hba.start_shot();
 	si.trigger();
 
-	for (int sample = 0; G::nsamples == 0 || sample < G::nsamples; ++sample){
-		hba.processSample(si, sample);
+	try {
+		for (int sample = 0; G::nsamples == 0 || sample < G::nsamples; ++sample){
+			hba.processSample(si, sample);
+		}
+	} catch (int error) {
+		fprintf(stderr, "ERROR:%d\n", error);
 	}
 }
 

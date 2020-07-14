@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 
+#include <string.h>
+
 using namespace std;
 
 int getenv(const char* key, int def, int (*cvt)(const char* key) = atoi);
@@ -143,6 +145,7 @@ namespace G {
 	extern int verbose;
 	extern int dummy_first_loop;
 	extern int samples_buffer;
+	extern int maxpoll;
 };
 
 /** Models interface with external PCS.
@@ -206,6 +209,16 @@ public:
 		return hba.vo.CC32;
 	}
 };
+
+template <class T>
+T* new_zarray(int nelems)
+{
+	T* nz_array = new T[nelems];
+	memset(nz_array, 0, nelems*sizeof(T));
+	return nz_array;
+}
+
+#define PFN __PRETTY_FUNCTION__
 
 
 #endif /* ACQPROC_ACQSYS_H_ */

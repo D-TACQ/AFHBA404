@@ -48,7 +48,7 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 
 ## Check config with no hardware
 ```
-RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
+RTPRIO=10 NTRIGGERS=1 HW=0 ./acqproc_broadcast_trigger configs/news32.json 1000000
 
 ```
 ## Run with hardware
@@ -62,9 +62,8 @@ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 10000
  * connect analog signal to CH01 on each of two boxes, n, s
  * connect GPIO output from each of the two boxes to scope channels #2 and #3, trigger on one of them
 ``` 
-SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_130
-SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 acq2106_176
-THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/ns32.json 0
+SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 @ACQPROC/configs/ns32.json
+THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc_broadcast_trigger ACQPROC/configs/ns32.json 0
 ```
  * [![two uut movie](DOC/TWOUUTS.png)](DOC/twouuts-2020-06-09_17.45.54.mkv "Two Box movie")
  * THCHAN0=0 THCHAN1=32 :: On alternate cycles, use AI[0] then AI[32] as the source of data eg uutN.CH01, uutS.CH01
