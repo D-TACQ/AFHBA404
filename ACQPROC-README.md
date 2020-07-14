@@ -13,8 +13,55 @@
 - For a NEW PCS:
   - Define the config file
   - Subclass the shared memory interface SystemInterface to connect to your system.
+```C++
+struct SystemInterface {
 
-eg the Subclass could be a SIMULINK wrapper.
+public:
+	/** ONE vector each type, all VI from all UUTS are split into types and
+	 *   aggregated in the appropriate vectors.
+	 */
+	struct Inputs {
+		short *AI16;
+		int *AI32;
+		unsigned *DI32;
+		unsigned *SP32;
+	} IN;
+	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
+	 */
+	struct Outputs {
+		short* AO16;
+		unsigned *DO32;
+		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
+	} OUT;
+
+	SystemInterface(const HBA& _hba);
+	virtual ~SystemInterface();
+	virtual void trigger()
+	{}
+	virtual void ringDoorbell(int sample)
+	/**< alert PCS that there is new data .. implement by subclass.
+	 */
+	{}
+```
+  - In a Single Thread implementation:
+   - Inputs, Outputs are created from simple heap allocations
+   - method ringDoorbell() is called when there is new data.
+   - Single Thread implementations can perform IO processing inside ringDoorbell(), leaving updated Outputs for the system to handle.
+   - examples https://github.com/D-TACQ/AFHBA404/blob/master/ACQPROC/DefaultSystemInterface.cpp
+   - a "real" case will be more complex, and it may be an interface to another framework
+    - eg the Subclass could be a SIMULINK wrapper.
+
+  - In a Multi Thread implementation:
+   - a subclass of SystemInterface could place Inputs Outputs in Shared Memory SHM
+   - method ringDoorbell() is called when there is new data.
+   - in a Multi Thread implementation, ringDoorBell() implements an IPC signal to the main task running in another thread of control, probably on other core[s]
+   - so far, we didn't provide a Multi Thread example.
+ - Late Binding: 
+  -  different implementations of SystemInterface are combined at link time. 
+  - See Makefile for explicit examples
+  - New implementations should probably extend the Makefile. Or, we could provide acqproc as a solib.
+
+
 
 
 ## Glossary:
