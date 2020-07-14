@@ -1,0 +1,31 @@
+{
+    "AFHBA": {
+        "DEVNUM": 0,
+        "UUT": [
+            {
+                "name": "acq2106_244",
+                "type": "pcs",
+                "sync_role": "fpmaster",
+                "VI": {
+                    "AI16": 128,
+                    "DI32": 1,
+                    "SP32": 15
+                },
+                "VO": {
+                    "DO32": 1,
+                    "AO16": 32
+                },
+                "WD_BIT": 31
+            },
+            {
+                "name": "acq2106_085",
+                "type": "pcs,nowait",
+                "sync_role": "notouch",
+                "VI": {},
+                "VO": {
+                    "AO16": 4
+                }
+            }
+        ]
+    }
+}

@@ -3,16 +3,30 @@
         "DEVNUM": 0,
         "UUT": [
             {
-                "name": "acq2106_241",
+                "name": "acq2106_239",
                 "type": "pcs",
                 "sync_role": "fpmaster",
                 "VI": {
-                    "AI16": 32,
+                    "AI16": 64,
                     "SP32": 16
                 }
             },
             {
-                "name": "acq2106_243",
+                "name": "acq2106_244",
+                "type": "pcs",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 128,
+                    "SP32": 15,
+                    "DI32": 1
+                },
+                "VO": {
+                    "AO16": 32,
+                    "DO32": 1
+                }
+            },
+            {
+                "name": "acq2106_241",
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
@@ -30,7 +44,16 @@
                 }
             },
             {
-                "name": "acq2106_246",
+                "name": "acq2106_240",
+                "type": "pcs",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 64,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_243",
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
@@ -39,20 +62,11 @@
                 }
             },
             {
-                "name": "acq2106_239",
+                "name": "acq2106_246",
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
-                    "AI16": 64,
-                    "SP32": 16
-                }
-            },
-            {
-                "name": "acq2106_240",
-                "type": "pcs",
-                "sync_role": "slave",
-                "VI": {
-                    "AI16": 64,
+                    "AI16": 32,
                     "SP32": 16
                 }
             }
