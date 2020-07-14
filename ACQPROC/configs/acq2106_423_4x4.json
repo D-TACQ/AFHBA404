@@ -7,7 +7,7 @@
                 "type": "pcs",
                 "sync_role": "fpmaster",
                 "VI": {
-                    "AI16": 32,
+                    "AI16": 128,
                     "SP32": 16
                 }
             },
@@ -16,7 +16,7 @@
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
-                    "AI16": 32,
+                    "AI16": 128,
                     "SP32": 16
                 }
             },
@@ -25,7 +25,7 @@
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
-                    "AI16": 64,
+                    "AI16": 128,
                     "SP32": 16
                 }
             },
@@ -34,25 +34,7 @@
                 "type": "pcs",
                 "sync_role": "slave",
                 "VI": {
-                    "AI16": 32,
-                    "SP32": 16
-                }
-            },
-            {
-                "name": "acq2106_239",
-                "type": "pcs",
-                "sync_role": "slave",
-                "VI": {
-                    "AI16": 64,
-                    "SP32": 16
-                }
-            },
-            {
-                "name": "acq2106_240",
-                "type": "pcs",
-                "sync_role": "slave",
-                "VI": {
-                    "AI16": 64,
+                    "AI16": 128,
                     "SP32": 16
                 }
             }
