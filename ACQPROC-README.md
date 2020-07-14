@@ -18,7 +18,7 @@ struct SystemInterface {
 
 public:
 	/** ONE vector each type, all VI from all UUTS are split into types and
-	 *   aggregated in the appropriate vectors.
+	 *   aggregated in the appropriate vectors. 
 	 */
 	struct Inputs {
 		short *AI16;
@@ -26,8 +26,7 @@ public:
 		unsigned *DI32;
 		unsigned *SP32;
 	} IN;
-	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
-	 */
+	/**< ONE vector each type, scatter each type to appropriate VO all UUTS	 */
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
@@ -37,9 +36,7 @@ public:
 	SystemInterface(const HBA& _hba);
 
 	virtual void ringDoorbell(int sample)
-	/**< alert PCS that there is new data .. implement by subclass.
-	 */
-	{}
+	/**< alert PCS that there is new data .. implement by subclass. */
 ```
   - In a Single Thread implementation:
      - Inputs, Outputs are created from simple heap allocations
