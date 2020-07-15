@@ -18,7 +18,7 @@
                 },
                 {   "name" : "acq2106_156",
                     "type": "pcs,nowait",
-                    "sync_role": "slave",
+                    "sync_role": "master",
                     "VI" : {
 
                      },
