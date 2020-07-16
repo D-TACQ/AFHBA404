@@ -47,6 +47,7 @@ struct Dev {
 	}
 };
 
+/* XO uses SAME kbuffer as AI, but 4K up */
 #define AO_OFFSET 0x1000
 
 #define XO_HOST	(dev->host_buffer+AO_OFFSET)
@@ -93,42 +94,10 @@ protected:
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 		dev->xllc_def.len = G::samples_buffer*vi.len();
-		memset(dev->host_buffer, 0, vi.len());
 		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
 		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
-
-		// @@todo init dev.
-		if (vo.len()){
-			struct XLLC_DEF xo_xllc_def;
-			if (vo.len()){
-				xo_xllc_def = dev->xllc_def;
-				xo_xllc_def.pa += AO_OFFSET;
-				xo_xllc_def.len = vo.hwlen();
-
-				if (vo.DO32){
-					int ll = xo_xllc_def.len/64;
-					xo_xllc_def.len = ++ll*64;
-					dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
-				}
-				if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
-					perror("ioctl AFHBA_START_AO_LLC");
-					exit(1);
-				}
-				printf("AO buf pa: 0x%08x len %d\n", xo_xllc_def.pa, xo_xllc_def.len);
-
-				if (vo.DO32){
-					const char* hw_trace = getenv("DO32_HW_TRACE");
-					if (hw_trace && atoi(hw_trace)){
-					/* marker pattern for the PAD area for hardware trace */
-						for (int ii = 0; ii <= 0xf; ++ii){
-							dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
-						}
-					}
-				}
-			}
-		}
 	}
 	virtual ~ACQ_HW_BASE() {
 		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
@@ -169,15 +138,45 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
 						_vo_offsets, sys_vi_cursor, sys_vo_cursor), sample(0)
 {
-
-
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
 	}
-	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+	if (G::verbose){
+		printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+	}
 
+	if (vo.len()){
+		struct XLLC_DEF xo_xllc_def;
+		if (vo.len()){
+			xo_xllc_def = dev->xllc_def;
+			xo_xllc_def.pa += AO_OFFSET;
+			xo_xllc_def.len = vo.hwlen();
 
+			if (vo.DO32){
+				int ll = xo_xllc_def.len/64;
+				xo_xllc_def.len = ++ll*64;
+				dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
+			}
+			if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
+				perror("ioctl AFHBA_START_AO_LLC");
+				exit(1);
+			}
+			if (G::verbose){
+				printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
+			}
+
+			if (vo.DO32){
+				const char* hw_trace = getenv("DO32_HW_TRACE");
+				if (hw_trace && atoi(hw_trace)){
+				/* marker pattern for the PAD area for hardware trace */
+					for (int ii = 0; ii <= 0xf; ++ii){
+						dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
+					}
+				}
+			}
+		}
+	}
 	TLATCH = 0xdeadbeef;
 }
 
@@ -197,13 +196,10 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 void ACQ_HW::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
-	SITOVO(AO16);
-	SITOVO(DO32);
-
 	VITOSI(AI16);
 
 	if (G::verbose > 1){
-		fprintf(stderr, "VITOSI(AI32) \"%s\" memcpy(%p, %p, %d)\n", toString().c_str(),
+		fprintf(stderr, "VITOSI(AI32) \"%s\" memcpy(%p, %p, %ld)\n", toString().c_str(),
 				systemInterface.IN.AI32+vi_cursor.AI32,
 				dev->lbuf_vi.cursor+vi_offsets.AI32,
 				vi.AI32*sizeof(systemInterface.IN.AI32[0])
@@ -224,6 +220,9 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 /** in slack time, copy SI.OUT to VO archive cursor.
  * @@todo make it optional in case it takes too long */
 void ACQ_HW::action2(SystemInterface& systemInterface) {
+	SITOVO(AO16);
+	SITOVO(DO32);
+
 	SITOVO2(AO16);
 	SITOVO2(DO32);
 	SITOVO2(CC32);

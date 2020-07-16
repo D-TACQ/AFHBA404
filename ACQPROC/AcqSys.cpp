@@ -181,6 +181,10 @@ void HBA::processSample(SystemInterface& systemInterface, int sample)
 		while(!uut->newSample(sample)){
 			sched_fifo_priority>1 || sched_yield();
 			++uut->pollcount;
+			if (G::maxpoll && sample && uut->pollcount > G::maxpoll){
+				fprintf(stderr, "ERROR: poll timeout on uut %s at sample %d\n", uut->getName().c_str(), sample);
+				throw -22;
+			}
 		}
 	}
 	for (auto uut : uuts){
@@ -372,6 +376,29 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	the_hba = new HBA(uuts, VI_sys, VO_sys);
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
+}
+
+SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
+/* make a gash SI to allow simulated operation. The real shm is customer specific */
+{
+	IN.AI16 = new_zarray<short>(AI16_count());
+	IN.AI32 = new_zarray<int>(AI32_count());
+	IN.DI32 = new_zarray<unsigned>(DI32_count());    // needs to be bigger for PWM
+	IN.SP32 = new_zarray<unsigned>(SP32_count());
+
+	OUT.AO16 = new_zarray<short>(AO16_count());
+	OUT.DO32 = new_zarray<unsigned>(DO32_count());
+	OUT.CC32 = new_zarray<unsigned>(CC32_count());
+}
+SystemInterface::~SystemInterface()
+{
+	delete [] IN.AI16;
+	delete [] IN.AI32;
+	delete [] IN.DI32;
+	delete [] IN.SP32;
+	delete [] OUT.AO16;
+	delete [] OUT.DO32;
+	delete [] OUT.CC32;
 }
 
 

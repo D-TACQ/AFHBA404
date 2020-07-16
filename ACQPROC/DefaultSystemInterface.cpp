@@ -9,31 +9,6 @@
 #include <string.h>
 
 
-
-
-SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
-/* make a gash SI to allow simulated operation. The real shm is customer specific */
-{
-	IN.AI16 = new short[AI16_count()];
-	IN.AI32 = new int[AI32_count()];
-	IN.DI32 = new unsigned[DI32_count()];    // needs to be bigger for PWM
-	IN.SP32 = new unsigned[SP32_count()];
-
-	OUT.AO16 = new short[AO16_count()];
-	OUT.DO32 = new unsigned [DO32_count()];
-	OUT.CC32 = new unsigned [CC32_count()];
-}
-SystemInterface::~SystemInterface()
-{
-	delete [] IN.AI16;
-	delete [] IN.AI32;
-	delete [] IN.DI32;
-	delete [] IN.SP32;
-	delete [] OUT.AO16;
-	delete [] OUT.DO32;
-	delete [] OUT.CC32;
-}
-
 class DummySingleThreadControlSystemInterface: public SystemInterface {
 
 public:
@@ -43,7 +18,7 @@ public:
 	static int DUP1;
 
 	virtual void ringDoorbell(int sample){
-		G::verbose && printf("DummySingleThreadControlSystemInterface::ringDoorbell(%d)\n", sample);
+		G::verbose && printf("%s(%d)\n", PFN, sample);
 
 		short xx = IN.AI16[DUP1];
 		for (int ii = 0; ii < AO16_count(); ++ii){
