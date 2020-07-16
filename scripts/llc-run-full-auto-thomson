@@ -7,9 +7,11 @@ DELAY=${DELAY:-10}
 let TLEN="$POST*120/100"
 
 UUTS="acq2106_145 acq2106_147 acq2106_148 acq2106_149"
+CTRL_PROG=${CTRL_PROG:-"original"}
 HAPIDIR=/home/dt100/PROJECTS/acq400_hapi
 AFHBA404DIR=/home/dt100/PROJECTS/AFHBA404
 LLCDIR=${AFHBA404DIR}/LLCONTROL
+ACQPROC_CONFIG=${ACQPROC_CONFIG:-"ACQPROC/configs/thomson.json"}
 
 export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
 acq2106_076_path=andros::/home/dt100/TREES/acq2106_076
@@ -19,6 +21,13 @@ export EXTCLKDIV=${EXTCLKDIV:-10}
 set_clocks() {
 	echo "set_clocks stub"
 }
+
+
+acqproc() {
+	cd $AFHBA404DIR
+	POST=1200 VERBOSE=1 ACQPROC_CONFIG=$ACQPROC_CONFIG ./scripts/acqproc_multi.sh control_program
+}
+
 
 control_program() {
 	cd $LLCDIR
@@ -70,7 +79,12 @@ xcontrol_script)
 	set_clocks
 #	new_shot --verbose 1 $UUT1
 	echo sudo $0 control_program $POST
-	sudo $0 control_program $POST &
+
+	if [ "$CTRL_PROG" = "original" ]; then
+		sudo $0 control_program $POST &
+	else
+		acqproc &
+	fi
 
 	control_script
 	wait
