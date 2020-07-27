@@ -28,8 +28,6 @@
 int devnum = 0;
 int ibuf = 1;
 
-unsigned *pbufferXO;
-
 #define GP_DEFAULT 800		/* 125M/800 = 150k, run at 2x78 kHz */
 
 int* get_feedback()

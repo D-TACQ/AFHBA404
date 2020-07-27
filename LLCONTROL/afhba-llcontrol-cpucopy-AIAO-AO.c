@@ -95,7 +95,7 @@ struct XLLC_DEF ao_only_xllc_def = {
 #define DEF_AO_ONLY_CHAN 4
 int ao_chan = DEF_AO_CHAN;
 int ao_only_chan = DEF_AO_ONLY_CHAN;
-#define VO_LEN  (aochan*sizeof(short) + (has_do32?sizeof(unsigned):0))
+#define VO_LEN  (ao_chan*sizeof(short) + (has_do32?sizeof(unsigned):0))
 #define VO_ONLY_LEN  (ao_only_chan*sizeof(short))
 #define DO_IX	(16)		/* longwords */
 
@@ -154,7 +154,7 @@ void ui(int argc, char* argv[])
                 if (getenv("AO_IDENT")){
                         ao_ident = atoi(getenv("AO_IDENT"));
                 }
-                AO_IDENT = make_ao_ident(ao_ident);
+                AO_IDENT = make_ao_ident(DEF_AO_CHAN, ao_ident);
         }
 
 	if (getenv("SPADLONGS")){

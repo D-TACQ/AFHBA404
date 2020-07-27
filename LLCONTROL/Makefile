@@ -30,6 +30,7 @@ APPS := afhba-llcontrol-example afhba-llcontrol-zcopy \
 	afhba-llcontrol-multiuut \
 	afhba-bufferAB-480-pwm pwm_set_channel pwm_set_duty pwm_control \
 	afhba-llcontrol-abn \
+	afhba-llcontrol-cpucopy-AIAO-AO \
 	afhba-llcontrol-multiuut-4AI1AO1DX
 	
 apps: $(APPS)
