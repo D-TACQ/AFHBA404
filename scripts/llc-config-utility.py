@@ -165,15 +165,18 @@ def config_VI(args, uut, AISITES, DIOSITES):
 def config_VO(args, uut, DIOSITES, AOSITES, AISITES):
     if len(AISITES):
         signal = acq400_hapi.sigsel(site=AISITES[0])
+        signal2 = signal
     elif len(AOSITES):
-        signal = acq400_hapi.sigsel(site=AOSITES[0])
-    else:
         signal = acq400_hapi.sigsel()
+        signal2 = acq400_hapi.sigsel(site=AOSITES[0])
+    else:
+        signal2 = signal = acq400_hapi.sigsel()
     
     for site in AOSITES:
         uut.modules[site].lotide = 256
         uut.modules[site].clk = signal
         uut.modules[site].clkdiv = '1'
+        signal = signal2
     
     for site in DIOSITES:
         uut.modules[site].mode = '0'
@@ -182,6 +185,7 @@ def config_VO(args, uut, DIOSITES, AOSITES, AISITES):
         uut.modules[site].clk = signal
         uut.modules[site].trg = signal
         uut.modules[site].mode = '1'
+        signal = signal2
         
     config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
 
