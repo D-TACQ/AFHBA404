@@ -38,9 +38,20 @@
      run the control algorithm on the new AI, store new AO
  }
 
+
+ REMOTE AO ONLY=1
+
+ Example shows single remote system with AO only. Since there is NO incoming data, there's NO TLATCH
+ so the host system has to make its own time. We simulate that with usleep().
 */
 
 
+/* for REMOTE AO ONLY, uncomment the next line */
+#define REMOTE_AO_ONLY 1
+
+#ifndef REMOTE_AO_ONLY
+#define REMOTE_AO_ONLY 0
+#endif
 
 #include "afhba-llcontrol-common.h"
 
@@ -91,6 +102,10 @@ struct XLLC_DEF ao_only_xllc_def = {
 
 };
 
+
+int FFNLUT;
+void control_feedforward(short *ao, short *ai);
+
 #define DEF_AO_CHAN	32
 #define DEF_AO_ONLY_CHAN 4
 int ao_chan = DEF_AO_CHAN;
@@ -100,19 +115,25 @@ int ao_only_chan = DEF_AO_ONLY_CHAN;
 #define DO_IX	(16)		/* longwords */
 
 
+#if REMOTE_AO_ONLY == 1
+#define DEFCON 	control_feedforward
+#warning REMOTE_AO_ONLY DEFCON set control_feedforward
+#else
+#define DEFCON	control_dup1
+#endif
 
 void control_dup1(short *ao, short *ai);
-void (*G_control)(short *ao, short *ai) = control_dup1;
+void (*G_control)(short *ao, short *ai) = DEFCON;
 
 
-int FFNLUT;
-void control_feedforward(short *ao, short *ai);
+
+
 
 void ui(int argc, char* argv[])
 {
-        if (getenv("RTPRIO")){
+    if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
-        }
+    }
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
@@ -181,11 +202,14 @@ void ui(int argc, char* argv[])
 void setup()
 {
 	setup_logging(devnum);
+#if REMOTE_AO_ONLY == 0
 	host_buffer = get_mapping(devnum, &fd);
+#endif
 	// Get the ao_buffer from the get_mapping function.
 	ao_only_buffer = get_mapping(ao_devnum, &ao_fd);
 	goRealTime();
 
+#if REMOTE_AO_ONLY == 0
 	xllc_def.len = samples_buffer*VI_LEN;
 	if (xllc_def.len > 16*64){
 		xllc_def.len = 16*64;
@@ -213,14 +237,19 @@ void setup()
 	}
 	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
 
-	xllc_def.len = VO_ONLY_LEN;
-	// Use ioctl to communicate AO LLC to AHBA404
-	if (ioctl(ao_fd, AFHBA_START_AO_LLC, &xllc_def)){
+	ao_only_xllc_def.pa = xllc_def.pa;
+#else
+	;		/* ao_only_xllc_def.pa = RTM_T_USE_HOSTBUF */
+#endif
+	ao_only_xllc_def.len = VO_ONLY_LEN;
+	// Use ioctl to communicate AO LLC to AHBA404. We re-use the original dev0 buffer
+	if (ioctl(ao_fd, AFHBA_START_AO_LLC, &ao_only_xllc_def)){
 		perror("ioctl AFHBA_START_AO_LLC for AO only system.");
 		exit(1);
 	}
-	printf("AO buf pa: 0x%08x len %d\n", xllc_def.pa, xllc_def.len);
+	printf("AO buf pa: 0x%08x len %d\n", ao_only_xllc_def.pa, ao_only_xllc_def.len);
 
+#if REMOTE_AO_ONLY == 0
 	ao_buffer = (short*)((void*)host_buffer+AO_OFFSET);
 
 	if (has_do32){
@@ -231,6 +260,9 @@ void setup()
 		        dox[DO_IX+ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
 		}
 	}
+#else
+	ao_buffer = (short*)((void*)ao_only_buffer);
+#endif
 }
 
 void print_sample(unsigned sample, unsigned tl)
@@ -321,6 +353,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	}
 
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
+#if REMOTE_AO_ONLY == 0
 		memcpy(ai_buffer, host_buffer, VI_LEN);
 		while((tl1 = TLATCH(ai_buffer)[0]) == tl0){
 			sched_yield();
@@ -334,6 +367,10 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		if (verbose){
 			print_sample(sample, tl1);
 		}
+#else
+		control(ao_buffer, 0);
+		usleep(1000);
+#endif
 	}
 }
 
