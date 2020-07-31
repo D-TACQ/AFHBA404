@@ -103,7 +103,7 @@ struct XLLC_DEF ao_only_xllc_def = {
 };
 
 
-int FFNLUT;
+int FFNLUT = 32;
 void control_feedforward(short *ao, short *ai);
 
 #define DEF_AO_CHAN	32
