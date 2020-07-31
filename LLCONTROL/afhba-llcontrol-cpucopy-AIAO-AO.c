@@ -47,7 +47,7 @@
 
 
 /* for REMOTE AO ONLY, uncomment the next line */
-#define REMOTE_AO_ONLY 1
+#define REMOTE_AO_ONLY 0
 
 #ifndef REMOTE_AO_ONLY
 #define REMOTE_AO_ONLY 0
