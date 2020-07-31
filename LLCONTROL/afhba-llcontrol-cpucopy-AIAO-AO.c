@@ -47,7 +47,7 @@
 
 
 /* for REMOTE AO ONLY, uncomment the next line */
-#define REMOTE_AO_ONLY 0
+#define REMOTE_AO_ONLY 1
 
 #ifndef REMOTE_AO_ONLY
 #define REMOTE_AO_ONLY 0
@@ -347,11 +347,12 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	int pollcat = 0;
 
 	mlockall(MCL_CURRENT);
+#if REMOTE_AO_ONLY == 0
 	memset(host_buffer, 0, VI_LEN);
 	if (!dummy_first_loop){
 		TLATCH(ai_buffer)[0] = tl0;
 	}
-
+#endif
 	for (sample = 0; sample <= nsamples; ++sample, tl0 = tl1, pollcat = 0){
 #if REMOTE_AO_ONLY == 0
 		memcpy(ai_buffer, host_buffer, VI_LEN);
