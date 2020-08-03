@@ -76,7 +76,7 @@ public:
 	{
 		dev = new RTM_T_Device(ao_dev);
 
-		if (ioctl(dev->getDevnum(), RTM_T_START_STREAM_AO, &abn)){
+		if (ioctl(dev->getDeviceHandle(), RTM_T_START_STREAM_AO, &abn)){
 			perror("ioctl RTM_T_START_STREAM_AO");
 			exit(1);
 		}

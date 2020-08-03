@@ -71,8 +71,8 @@ public:
 		abn.buffers[0].pa = RTM_T_USE_HOSTBUF;
 		abn.ndesc = MAXABN;
 
-		if (ioctl(dev->getDevnum(), AFHBA_START_AO_ABN, &abn)){
-			perror("ioctl AFHBA_START_AI_ABN");
+		if (ioctl(dev->getDeviceHandle(), AFHBA_START_AO_ABN, &abn)){
+			perror("ioctl AFHBA_START_AO_ABN");
 			exit(1);
 		}
 
