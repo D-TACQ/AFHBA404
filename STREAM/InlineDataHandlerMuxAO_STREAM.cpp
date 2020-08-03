@@ -57,8 +57,6 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 	int ai_stride;
 	int wavelen;
 	RTM_T_Device *dev;
-	struct ABN abn;
-	short** ao_va;
 
 	int twizzle(int ibuf)
 	{
@@ -74,24 +72,15 @@ public:
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
 	{
 		dev = new RTM_T_Device(ao_dev);
-		abn.buffers[0].pa = RTM_T_USE_HOSTBUF;
-		abn.ndesc = MAXABN;
 
 		if (ioctl(dev->getDevnum(), RTM_T_START_STREAM_AO, &abn)){
 			perror("ioctl RTM_T_START_STREAM_AO");
 			exit(1);
 		}
-
-		ao_va = new short* [MAXABN];
-		ao_va[0] = (short*)dev->getHostBufferMappingW();
-		for (int ib = 1; ib < MAXABN; ++ib){
-			ao_va[ib] = ao_va[0] + (abn.buffers[ib].pa - abn.buffers[0].pa)/sizeof(short);
-		}
-
 	}
 
 	virtual void handleBuffer(int ibuf, const void *src, int len)
-	/* take a slice ao_count out of AI buffer and distribute one per descriptor for LLC AO */
+	/* take a slice ao_count out of AI buffer and drop the slice into  */
 	{
 		const short* ai = (const short*)src + ai_start;
 		short* ao = (short*)dev->getHostBufferMappingW(twizzle(ibuf));
