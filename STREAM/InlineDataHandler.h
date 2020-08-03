@@ -14,7 +14,7 @@ protected:
 	virtual ~InlineDataHandler();
 
 public:
-	virtual void handleBuffer(const void *ibuf, int len) {}
+	virtual void handleBuffer(int ibuf, const void *src, int len) {}
 
 	static InlineDataHandler* factory();
 };

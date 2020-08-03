@@ -95,7 +95,7 @@ struct ABN {
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
 /** ioctl AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
 
-
+#define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
 
 struct StreamBufferDef {
 	u32 ibuf;

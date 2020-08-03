@@ -72,6 +72,9 @@ public:
 	int getDevnum(void) const {
 		return devnum;
 	}
+	int next(int ibuf){
+		return ++ibuf == nbuffers? 0: ibuf;
+	}
 
 	enum {
 		MAXBUF = 32		 // maximum buffers per read

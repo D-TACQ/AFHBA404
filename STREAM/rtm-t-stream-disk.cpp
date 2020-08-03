@@ -374,7 +374,7 @@ static int stream()
 					}
 				}
 
-				handler->handleBuffer(dev->getHostBufferMapping(ibuf), dev->maxlen);
+				handler->handleBuffer(ibuf, dev->getHostBufferMapping(ibuf), dev->maxlen);
 
 				DIAG("CALLING process\n");
 				process(bufno, ++nbuf, sbd+ibuf);
