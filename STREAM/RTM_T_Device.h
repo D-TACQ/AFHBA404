@@ -62,6 +62,9 @@ public:
 	const void *getHostBufferMapping(int ibuf = 0) {
 		return host_buffers[ibuf];
 	}
+	void *getHostBufferMappingW(int ibuf = 0) {
+		return host_buffers[ibuf];
+	}
 
 	const char *getControlRoot(void) {
 		return names[CTRL_ROOT].c_str();

@@ -46,10 +46,11 @@
 #include "local.h"
 #include "popt.h"
 
+#include "rtm-t_ioctl.h"
 /* default implementation is NULL */
 #include "InlineDataHandler.h"
 
-#include "rtm-t_ioctl.h"
+
 
 #define DIAG(args...)
 //#define DIAG(args...)	fprintf(stderr, args)
