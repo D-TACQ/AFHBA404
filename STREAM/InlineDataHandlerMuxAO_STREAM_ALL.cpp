@@ -102,8 +102,9 @@ public:
 		short* ao = (short*)dev->getHostBufferMappingW(twizzle(ibuf));
 		const int instep = ai_count*ai_stride;
 		std::vector<AI_AO_MAPPING> * src_chans = getSrcChans(ai_dev);	// assume this gets updated from SHM one per src dev per process
+
 		for (int sample = 0; sample < wavelen; ++sample, ai += instep, ao += ao_count){
-			for (AI_AO_MAPPING &ch: *src_chans){
+			for (auto ch: *src_chans){
 				ao[ch.iao] = ai[ch.iai];
 			}
 		}
