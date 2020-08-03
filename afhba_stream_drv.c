@@ -345,6 +345,18 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 	}
 }
 
+static void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
+{
+	if (dma_descriptor_ram){
+		if  (!adev->stream_dev->job.dma_started){
+			write_ram_descr(adev, DMA_PULL_DESC_RAM, idesc);
+		}
+		/* else .. NO ACTION, descriptor already loaded in RAM */
+	}else{
+		write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
+	}
+}
+
 static void afs_init_dma_clr(struct AFHBA_DEV *adev)
 {
 	DMA_CTRL_RD(adev);
@@ -1811,7 +1823,7 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 }
 
 
-long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
+long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
@@ -1820,7 +1832,13 @@ long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
 	spin_unlock(&sdev->job_lock);
-	sdev->onStopPush = afs_stop_llc_push;
+	if(dma_sel&DMA_PUSH_SEL){
+		sdev->onStopPush = afs_stop_llc_push;
+	}
+	if (dma_sel&DMA_PULL_SEL){
+		sdev->onStopPull = afs_stop_llc_pull;
+	}
+
 
 	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
 		abn->buffers[0].pa = sdev->hbx[0].pa;
@@ -1835,11 +1853,17 @@ long afs_start_AI_ABN(struct AFHBA_DEV *adev, struct ABN *abn)
 				__FUNCTION__, ib, abn->buffers[ib].pa, abn->buffers[ib].len);
 	}
 
-	afs_load_dram_descriptors_ll(adev, DMA_PUSH_SEL, abn->buffers, abn->ndesc);
+	afs_load_dram_descriptors_ll(adev, dma_sel, abn->buffers, abn->ndesc);
 
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
-	job->on_push_dma_timeout = 0;
+
+	if(dma_sel&DMA_PUSH_SEL){
+		job->on_push_dma_timeout = 0;
+	}
+	if (dma_sel&DMA_PULL_SEL){
+		job->on_pull_dma_timeout = 0;
+	}
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
@@ -1882,11 +1906,17 @@ long afs_dma_ioctl(struct file *file,
 		COPY_TO_USER(varg, &ab, sizeof(struct AB));
 		return rc;
 	}
-	case AFHBA_START_AI_ABN: {
+	case AFHBA_START_AI_ABN:
+	case AFHBA_START_AO_ABN:
+	{
 		struct ABN *abn = kmalloc(sizeof(struct ABN), GFP_KERNEL);
 		long rc;
 		COPY_FROM_USER(abn, varg, sizeof(struct ABN));
-		rc = afs_start_AI_ABN(adev, abn);
+		if (cmd == AFHBA_START_AI_ABN){
+			rc = afs_start_ABN(adev, abn, DMA_PUSH_SEL);
+		}else{
+			rc = afs_start_ABN(adev, abn, DMA_PULL_SEL);
+		}
 		COPY_TO_USER(varg, abn, sizeof(struct ABN));
 		return rc;
 	}
