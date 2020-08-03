@@ -98,7 +98,7 @@ InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
 	if (const char* value = getenv("MUXAO")){
 		int pr[5];
-		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 5){
+		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 6){
 			return new InlineDataHanderMuxAO_STREAM(ai_dev, pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
 	}

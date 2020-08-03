@@ -65,11 +65,13 @@ public:
 		ao_dev(_ao_dev),
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
 	{
+		printf("InlineDataHanderMuxAO_LLC ao_dev=%d ao_count=%d ai_count=%d ai_start=%d ai_stride=%d\n",
+				ao_dev, ao_count, ai_count, ai_start, ai_stride);
 		dev = new RTM_T_Device(ao_dev);
 		abn.buffers[0].pa = RTM_T_USE_HOSTBUF;
 		abn.ndesc = MAXABN;
 
-		if (ioctl(dev->getDevnum(), AFHBA_START_AI_ABN, &abn)){
+		if (ioctl(dev->getDevnum(), AFHBA_START_AO_ABN, &abn)){
 			perror("ioctl AFHBA_START_AI_ABN");
 			exit(1);
 		}
@@ -98,7 +100,7 @@ InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
 	if (const char* value = getenv("MUXAO")){
 		int pr[5];
-		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 5){
+		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 6){
 			return new InlineDataHanderMuxAO_LLC(pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
 	}
