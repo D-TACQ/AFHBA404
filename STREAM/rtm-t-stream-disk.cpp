@@ -340,7 +340,7 @@ static int stream()
 	int ifirst = MAXINT;
 	int nbuf = 0;
 	Histo backlog(16);
-	InlineDataHandler* handler = InlineDataHandler::factory();
+	InlineDataHandler* handler = InlineDataHandler::factory(dev);
 
 
 	int rc = ioctl(fp, RTM_T_START_STREAM_MAX, &transfer_buffers);

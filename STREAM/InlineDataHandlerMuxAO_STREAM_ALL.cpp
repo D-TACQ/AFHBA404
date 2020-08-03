@@ -35,6 +35,8 @@
 
 #include "InlineDataHandler.h"
 
+#include <vector>
+
 InlineDataHandler::InlineDataHandler() {
 	// TODO Auto-generated constructor stub
 
@@ -49,7 +51,19 @@ struct ABN abn;
 int ib;
 
 
-class InlineDataHanderMuxAO_LLC : public InlineDataHandler {
+
+struct AI_AO_MAPPING {
+	int iai;
+	int iao;
+};
+
+
+std::vector<AI_AO_MAPPING> * getSrcChans(RTM_T_Device* ai_dev) {
+	return 0;
+}
+
+class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
+	RTM_T_Device* ai_dev;
 	int ao_dev;
 	int ao_count;
 	int ai_count;
@@ -57,39 +71,41 @@ class InlineDataHanderMuxAO_LLC : public InlineDataHandler {
 	int ai_stride;
 	int wavelen;
 	RTM_T_Device *dev;
-	struct ABN abn;
-	short** ao_va;
 
+	int twizzle(int ibuf)
+	{
+		/* we probably don't want to be writing this AO buffer, we want to write the NEXT one?.
+		 * maybe 2 ahead?.
+		 *
+		 */
+		return dev->next(ibuf);
+	}
 public:
-	InlineDataHanderMuxAO_LLC(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
+	InlineDataHanderMuxAO_STREAM(RTM_T_Device* _ai_dev,
+			int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
+		ai_dev(_ai_dev),
 		ao_dev(_ao_dev),
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
 	{
 		dev = new RTM_T_Device(ao_dev);
-		abn.buffers[0].pa = RTM_T_USE_HOSTBUF;
-		abn.ndesc = MAXABN;
 
-		if (ioctl(dev->getDevnum(), AFHBA_START_AI_ABN, &abn)){
-			perror("ioctl AFHBA_START_AI_ABN");
+		if (ioctl(dev->getDevnum(), RTM_T_START_STREAM_AO, &abn)){
+			perror("ioctl RTM_T_START_STREAM_AO");
 			exit(1);
 		}
-
-		ao_va = new short* [MAXABN];
-		ao_va[0] = (short*)dev->getHostBufferMappingW();
-		for (int ib = 1; ib < MAXABN; ++ib){
-			ao_va[ib] = ao_va[0] + (abn.buffers[ib].pa - abn.buffers[0].pa)/sizeof(short);
-		}
-
 	}
 
 	virtual void handleBuffer(int ibuf, const void *src, int len)
-	/* take a slice ao_count out of AI buffer and distribute one per descriptor for LLC AO */
+	/* take a slice ao_count out of AI buffer and drop the slice into  */
 	{
+		const short* ai = (const short*)src;
+		short* ao = (short*)dev->getHostBufferMappingW(twizzle(ibuf));
 		const int instep = ai_count*ai_stride;
-		short* ai = (short*)src + ai_start;
-		for (int ib = 0; ib < MAXABN; ++ib){
-			memcpy(ao_va, ai, ai_count*sizeof(short));
-			ai += instep;
+		std::vector<AI_AO_MAPPING> * src_chans = getSrcChans(ai_dev);	// assume this gets updated from SHM one per src dev per process
+		for (int sample = 0; sample < wavelen; ++sample, ai += instep, ao += ao_count){
+			for (auto ch: *src_chans){
+				ao[ch.iao] = ai[ch.iai];
+			}
 		}
 	}
 };
@@ -99,7 +115,7 @@ InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 	if (const char* value = getenv("MUXAO")){
 		int pr[5];
 		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 5){
-			return new InlineDataHanderMuxAO_LLC(pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
+			return new InlineDataHanderMuxAO_STREAM(ai_dev, pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
 	}
 	return new InlineDataHandler;

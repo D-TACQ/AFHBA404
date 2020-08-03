@@ -17,7 +17,7 @@ InlineDataHandler::~InlineDataHandler() {
 }
 
 
-InlineDataHandler* InlineDataHandler::factory()
+InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
 	return new InlineDataHandler;
 }

@@ -50,6 +50,7 @@ int ib;
 
 
 class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
+	RTM_T_Device* ai_dev;
 	int ao_dev;
 	int ao_count;
 	int ai_count;
@@ -67,7 +68,9 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 		return dev->next(ibuf);
 	}
 public:
-	InlineDataHanderMuxAO_STREAM(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
+	InlineDataHanderMuxAO_STREAM(RTM_T_Device* _ai_dev,
+			int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
+		ai_dev(_ai_dev),
 		ao_dev(_ao_dev),
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
 	{
@@ -91,12 +94,12 @@ public:
 	}
 };
 
-InlineDataHandler* InlineDataHandler::factory()
+InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
 	if (const char* value = getenv("MUXAO")){
 		int pr[5];
 		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 5){
-			return new InlineDataHanderMuxAO_STREAM(pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
+			return new InlineDataHanderMuxAO_STREAM(ai_dev, pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
 	}
 	return new InlineDataHandler;

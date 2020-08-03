@@ -8,6 +8,8 @@
 #ifndef STREAM_INLINEDATAHANDLER_H_
 #define STREAM_INLINEDATAHANDLER_H_
 
+class RTM_T_Device;
+
 class InlineDataHandler {
 protected:
 	InlineDataHandler();
@@ -16,7 +18,7 @@ protected:
 public:
 	virtual void handleBuffer(int ibuf, const void *src, int len) {}
 
-	static InlineDataHandler* factory();
+	static InlineDataHandler* factory(RTM_T_Device* ai_dev);
 };
 
 #endif /* STREAM_INLINEDATAHANDLER_H_ */
