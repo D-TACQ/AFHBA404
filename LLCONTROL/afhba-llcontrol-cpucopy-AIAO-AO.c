@@ -79,7 +79,7 @@ int ao_devnum = 1; // devnum for ao system.
 int dummy_first_loop;
 /** potentially good for cache fill, but sets initial value zero */
 int G_POLARITY = 1;
-/** env POLARITY=-1 negates feedback this is usefult to know that the
+/** env POLARITY=-1 negates feedback this is useful to know that the
  *  software is in fact doing something 					 */
 
 
