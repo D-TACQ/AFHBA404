@@ -268,7 +268,7 @@ void afhba_map(struct AFHBA_DEV *adev)
 				mp->len = pci_resource_len(dev, bar);
 				mp->region = request_mem_region(
 					mp->pa, mp->len, mp->name);
-				mp->va = ioremap_nocache(mp->pa, mp->len);
+				mp->va = ioremap(mp->pa, mp->len);
 
 				dev_dbg(pdev(adev), "BAR %d va:%p", bar, mp->va);
 			}
