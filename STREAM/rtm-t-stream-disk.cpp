@@ -27,7 +27,7 @@
 
 
 #include <stdio.h>
-#include <unistd.h>
+
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <fcntl.h>
+
 
 
 #include <sched.h>
@@ -45,6 +45,9 @@
 #include "RTM_T_Device.h"
 #include "local.h"
 #include "popt.h"
+
+/* default implementation is NULL */
+#include "InlineDataHandler.h"
 
 #include "rtm-t_ioctl.h"
 
@@ -336,6 +339,8 @@ static int stream()
 	int ifirst = MAXINT;
 	int nbuf = 0;
 	Histo backlog(16);
+	InlineDataHandler* handler = InlineDataHandler::factory();
+
 
 	int rc = ioctl(fp, RTM_T_START_STREAM_MAX, &transfer_buffers);
 	if (rc != 0){
@@ -367,6 +372,9 @@ static int stream()
 						}
 					}
 				}
+
+				handler->handleBuffer(dev->getHostBufferMapping(ibuf), dev->maxlen);
+
 				DIAG("CALLING process\n");
 				process(bufno, ++nbuf, sbd+ibuf);
 
@@ -472,7 +480,6 @@ static void init_defaults(int argc, char* argv[])
 		SSIZE = atoi(getenv("SSIZE"));
 		info("SSIZE set %d\n", SSIZE);
 	}
-
 	if (getenv("RTPRIO")){
 		setRtPrio(atoi(getenv("RTPRIO")));
 	}

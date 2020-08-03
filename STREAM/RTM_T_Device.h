@@ -11,6 +11,9 @@
 #include <map>
 #include <string>
 
+#include <fcntl.h>
+#include <unistd.h>
+
 class RTM_T_Device {
 	enum { CTRL_ROOT=-1, MINOR_REGREAD=253, MINOR_DMAREAD=254 };
 
