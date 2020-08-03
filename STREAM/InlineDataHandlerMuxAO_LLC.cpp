@@ -98,8 +98,9 @@ public:
 
 InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
+	printf("InlineDataHandler::factory() option InlineDataHanderMuxAO_LLC\n");
 	if (const char* value = getenv("MUXAO")){
-		int pr[5];
+		int pr[6];
 		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 6){
 			return new InlineDataHanderMuxAO_LLC(pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
