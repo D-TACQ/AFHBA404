@@ -345,7 +345,7 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 	}
 }
 
-static void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
+void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
 	if (dma_descriptor_ram){
 		if  (!adev->stream_dev->job.dma_started){
