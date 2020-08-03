@@ -171,7 +171,7 @@ HBA::~HBA() {
     }
 }
 extern "C" {
-	int sched_fifo_priority;
+	extern int sched_fifo_priority;
 }
 
 
