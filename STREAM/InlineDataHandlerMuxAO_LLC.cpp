@@ -61,6 +61,19 @@ class InlineDataHanderMuxAO_LLC : public InlineDataHandler {
 	struct ABN abn;
 	short** ao_va;
 
+	void getStartStride() {
+		FILE *fp = fopen("/dev/shm/amx_llc_start_stride", "r");
+		if (fp){
+			int _start, _stride;
+			if (fscanf(fp, "%d,%d", &_start, &_stride) == 2 &&
+					_start >= 0 && _start<(ai_count-ao_count) &&
+					_stride >= 1 && _stride <= 100){
+				ai_start = _start;
+				ai_stride = _stride;
+			}
+			fclose(fp);
+		}
+	}
 public:
 	InlineDataHanderMuxAO_LLC(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
 		ao_dev(_ao_dev),
@@ -97,12 +110,12 @@ public:
 				printf("%s [%d] va:%p pa:%08x\n", __FUNCTION__, ib, ao_va[ib], abn.buffers[ib].pa);
 			}
 		}
-
 	}
 
 	virtual void handleBuffer(int ibuf, const void *src, int len)
 	/* take a slice ao_count out of AI buffer and distribute one per descriptor for LLC AO */
 	{
+		getStartStride();
 		const int instep = ai_count*ai_stride;
 		short* ai = (short*)src + ai_start;
 		for (int ib = 0; ib < wavelen; ++ib){
