@@ -478,6 +478,7 @@ static void afs_load_dram_descriptors_ll(
 			u32 dma_desc;
 			int cnt;
 			int residue = bd->len - idb*LL_MAX_LEN;
+			unsigned reg_off = DMA_DIR_DESC_RAM(dma_sel) + cursor*4;
 
 			residue = min(residue, LL_MAX_LEN);
 			cnt = 1 + residue/LL_BLOCK;
@@ -485,9 +486,11 @@ static void afs_load_dram_descriptors_ll(
 			dma_desc = (bd->pa + idb*LL_MAX_LEN)
 					| LL_NB(cnt)<< AFDMAC_DESC_LEN_SHL
 					| (idb&0x0f);
-			dev_dbg(pdev(adev),"%s() [%d] 0x%08x",
-				"afs_load_dram_descriptors_ll", idb, dma_desc);
-			writel(dma_desc, adev->remote+DMA_DIR_DESC_RAM(dma_sel) + cursor*4);
+
+			dev_dbg(pdev(adev), "%s() [%d] [%04x] %p := 0x%08x",
+				__FUNCTION__, idb, reg_off, adev->remote+reg_off, dma_desc);
+
+			writel(dma_desc, adev->remote+reg_off);
 		}
 	}
 
@@ -495,7 +498,6 @@ static void afs_load_dram_descriptors_ll(
 
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RAM);
-	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_EN);
 
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
@@ -552,9 +554,12 @@ void __afs_stop_dma(struct AFHBA_DEV *adev, u32 dma_sel)
 void __afs_start_dma(struct AFHBA_DEV *adev, u32 dma_sel)
 {
 	if (afs_comms_ready(adev)){
+		u32 dmacr;
 		DMA_CTRL_SET(adev, dma_pp(dma_sel, DMA_CTRL_EN));
-		if ((DMA_CTRL_RD(adev)&DMA_CTRL_EN) == 0){
-			dev_err(pdev(adev), "DMA_CTRL_EN NOT SET");
+		dmacr = DMA_CTRL_RD(adev);
+		if ((dmacr&dma_pp(dma_sel, DMA_CTRL_EN)) == 0){
+			dev_err(pdev(adev), "DMA_CTRL_EN NOT SET wanted:%08x got:%08x",
+					dma_pp(dma_sel, DMA_CTRL_EN), dmacr);
 		}
 	}
 }
