@@ -106,7 +106,7 @@ public:
 		const int instep = ai_count*ai_stride;
 		short* ai = (short*)src + ai_start;
 		for (int ib = 0; ib < wavelen; ++ib){
-			memcpy(ao_va, ai, ai_count*sizeof(short));
+			memcpy(ao_va[ib], ai, ao_count*sizeof(short));
 			ai += instep;
 		}
 	}
