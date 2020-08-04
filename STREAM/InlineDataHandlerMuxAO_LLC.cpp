@@ -48,6 +48,7 @@ InlineDataHandler::~InlineDataHandler() {
 struct ABN abn;
 int ib;
 
+int verbose;
 
 class InlineDataHanderMuxAO_LLC : public InlineDataHandler {
 	int ao_dev;
@@ -82,10 +83,19 @@ public:
 			exit(1);
 		}
 
+
 		ao_va = new short* [wavelen];
 		ao_va[0] = (short*)dev->getHostBufferMappingW();
+
+		if (verbose){
+			printf("%s [%d] va:%p pa:%08x\n", __FUNCTION__, 0, ao_va[0], abn.buffers[0].pa);
+		}
 		for (int ib = 1; ib < wavelen; ++ib){
 			ao_va[ib] = ao_va[0] + (abn.buffers[ib].pa - abn.buffers[0].pa)/sizeof(short);
+
+			if (verbose > 1){
+				printf("%s [%d] va:%p pa:%08x\n", __FUNCTION__, ib, ao_va[ib], abn.buffers[ib].pa);
+			}
 		}
 
 	}
@@ -105,6 +115,9 @@ public:
 InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 {
 	printf("InlineDataHandler::factory() option InlineDataHanderMuxAO_LLC\n");
+	if (getenv("MUXAO_VERBOSE")){
+		verbose = atoi(getenv("MUXAO_VERBOSE"));
+	}
 	if (const char* value = getenv("MUXAO")){
 		int pr[6];
 		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 6){
