@@ -491,9 +491,12 @@ static void afs_load_dram_descriptors_ll(
 		}
 	}
 
+	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), cursor-1);
+
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_RECYCLE);
 	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RAM);
-	_afs_write_dmareg(adev, DMA_DIR_DESC_LEN(dma_sel), cursor-1);
+	dma_ctrl |= dma_pp(dma_sel, DMA_CTRL_EN);
+
 	DMA_CTRL_WR(adev, dma_ctrl);
 	afs_start_dma(adev, dma_sel);
 }
