@@ -480,7 +480,7 @@ static void afs_load_dram_descriptors_ll(
 			int residue = bd->len - idb*LL_MAX_LEN;
 
 			residue = min(residue, LL_MAX_LEN);
-			cnt = residue/LL_BLOCK;
+			cnt = 1 + residue/LL_BLOCK;
 
 			dma_desc = (bd->pa + idb*LL_MAX_LEN)
 					| LL_NB(cnt)<< AFDMAC_DESC_LEN_SHL
@@ -1839,6 +1839,8 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 		sdev->onStopPull = afs_stop_llc_pull;
 	}
 
+	dev_dbg(pdev(adev), "%s descriptors:%d %s", __FUNCTION__, abn->ndesc,
+			abn->buffers[0].pa == RTM_T_USE_HOSTBUF? "RTM_T_USE_HOSTBUF": "USER_ADDR");
 
 	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
 		abn->buffers[0].pa = sdev->hbx[0].pa;

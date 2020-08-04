@@ -63,22 +63,28 @@ class InlineDataHanderMuxAO_LLC : public InlineDataHandler {
 public:
 	InlineDataHanderMuxAO_LLC(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
 		ao_dev(_ao_dev),
-		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
+		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride),
+		wavelen(_wavelen>=MAXABN? MAXABN: _wavelen)
 	{
 		printf("InlineDataHanderMuxAO_LLC ao_dev=%d ao_count=%d ai_count=%d ai_start=%d ai_stride=%d\n",
 				ao_dev, ao_count, ai_count, ai_start, ai_stride);
+
 		dev = new RTM_T_Device(ao_dev);
-		abn.buffers[0].pa = RTM_T_USE_HOSTBUF;
-		abn.ndesc = MAXABN;
+
+		for (int ib = 0; ib < wavelen; ++ib){
+			abn.buffers[ib].pa = RTM_T_USE_HOSTBUF;
+			abn.buffers[ib].len = _ao_count * sizeof(short);
+		}
+		abn.ndesc = wavelen;
 
 		if (ioctl(dev->getDeviceHandle(), AFHBA_START_AO_ABN, &abn)){
 			perror("ioctl AFHBA_START_AO_ABN");
 			exit(1);
 		}
 
-		ao_va = new short* [MAXABN];
+		ao_va = new short* [wavelen];
 		ao_va[0] = (short*)dev->getHostBufferMappingW();
-		for (int ib = 1; ib < MAXABN; ++ib){
+		for (int ib = 1; ib < wavelen; ++ib){
 			ao_va[ib] = ao_va[0] + (abn.buffers[ib].pa - abn.buffers[0].pa)/sizeof(short);
 		}
 
@@ -89,7 +95,7 @@ public:
 	{
 		const int instep = ai_count*ai_stride;
 		short* ai = (short*)src + ai_start;
-		for (int ib = 0; ib < MAXABN; ++ib){
+		for (int ib = 0; ib < wavelen; ++ib){
 			memcpy(ao_va, ai, ai_count*sizeof(short));
 			ai += instep;
 		}
