@@ -12,7 +12,15 @@
  *  ai_stride: subsample AI, eg for 2MSPS AI, 1SMSP AI, set 2
  *  wavelen  : max 256 for LLC output. Streaming typical 20000
  *
+ *
  * export MUXAO=3,4,16,0,1,256
+ *
+ * ie the AO is a window of 4xAI channels, slides over 16 AI channels..
+ *
+ * Support scripts:
+ * ./scripts/test_mux : changes mux setting on the fly (see getStartStride())
+ * ./scripts/test_mux : sets environment above
+ * ./scripts/monitor_hb00 : monitor the AO data in host buffers.
  */
 
 
