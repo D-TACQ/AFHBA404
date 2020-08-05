@@ -1,0 +1,9 @@
+#!/bin/bash
+M1=0
+M2=3
+while [ 1 ]; do
+	echo > /dev/shm/amx_llc_start_stride $M1,10
+	usleep 10000
+	echo > /dev/shm/amx_llc_start_stride $M2,10
+	usleep 10000
+done

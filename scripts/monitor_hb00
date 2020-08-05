@@ -1,0 +1,1 @@
+./mmap -f /dev/rtm-t.4.data/hb00 | hexdump

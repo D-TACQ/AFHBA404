@@ -1,0 +1,6 @@
+./scripts/mount-ramdisk
+export RECYCLE=1 RTM_DEVNUM=0 OUTROOT=/mnt/afhba.0
+mkdir -p /mnt/afhba.0/000000/
+#export MUXAO=ao_dev,ao_count,ai_count,ai_start,ai_stride,wavelen
+export MUXAO=4,4,16,0,10,256
+
