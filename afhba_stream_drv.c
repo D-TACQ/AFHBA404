@@ -481,11 +481,17 @@ static void afs_load_dram_descriptors_ll(
 			unsigned reg_off = DMA_DIR_DESC_RAM(dma_sel) + cursor*4;
 
 			residue = min(residue, LL_MAX_LEN);
-			cnt = 1 + residue/LL_BLOCK;
+			if (residue != max(residue, LL_BLOCK)){
+				dev_warn(pdev(adev), "%s() [%d] [%04x] expect data discontinuity want:%d getting:%d\n",
+						__FUNCTION__, idb, reg_off, residue, LL_BLOCK);
+				residue = LL_BLOCK;
+			}
+
+			cnt = residue/LL_BLOCK;
 
 			dma_desc = (bd->pa + idb*LL_MAX_LEN)
 					| LL_NB(cnt)<< AFDMAC_DESC_LEN_SHL
-					| (idb&0x0f);
+					| ((reg_off>>2)&0x0f);
 
 			dev_dbg(pdev(adev), "%s() [%d] [%04x] %p := 0x%08x",
 				__FUNCTION__, idb, reg_off, adev->remote+reg_off, dma_desc);
