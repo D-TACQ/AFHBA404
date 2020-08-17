@@ -1,1 +1,4 @@
-./mmap -f /dev/rtm-t.4.data/hb00 | hexdump
+DN=${1:-0}
+NC=${2:-48}
+./mmap -f /dev/rtm-t.$DN.data/hb00 | hexdump -e "\"%08_ax: \" $NC/4 \"%08x,\" \"\n\""
+
