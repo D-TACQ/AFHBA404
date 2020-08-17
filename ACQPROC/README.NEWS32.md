@@ -17,9 +17,11 @@
 
 ## Now run the embedded control program
 ```
-cd ACQPROC
-VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/n32.json 1000000
+VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc_broadcast_trigger ./ACQPROC/configs/n32.json 1000000
 ```
+
+
+
 
  * View result in cs-studio ... now the system is capturing data.
 
@@ -44,16 +46,18 @@ VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc_broadcast_trigger configs/n32.jso
 ```
 ![Github](DOC/TRIGGEROVERHEAD.png)
 
+
+
 # Operation with 4 boxes
 
 ## Check config with no hardware
 ```
-RTPRIO=10 NTRIGGERS=1 HW=0 ./acqproc_broadcast_trigger configs/news32.json 1000000
+RTPRIO=10 NTRIGGERS=1 HW=0 ./ACQPROC/acqproc_broadcast_trigger configs/news32.json 1000000
 
 ```
 ## Run with hardware
 ```
-./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 north east west south
+./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 @ACQPROC/configs/news32.json
 RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
 ``` 
 
@@ -65,13 +69,42 @@ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 10000
 SITECLIENT_TRACE=1 ./scripts/acqproc_config_freerunning_acq435 --acq435SR 49999 @ACQPROC/configs/ns32.json
 THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc_broadcast_trigger ACQPROC/configs/ns32.json 0
 ```
+
+
+
  * [![two uut movie](DOC/TWOUUTS.png)](DOC/twouuts-2020-06-09_17.45.54.mkv "Two Box movie")
  * THCHAN0=0 THCHAN1=32 :: On alternate cycles, use AI[0] then AI[32] as the source of data eg uutN.CH01, uutS.CH01
  * Cursor (a) shows the zero crossing detected by software, with output pulse at (b), +800usec
  * SR=50kHz, 20usec, and with 40 sample group delay, it's 800usec as expected.
  * The previous output pulse is on the far left of the screen, and is subject to about 20usec wander, this is the "skew" between uutN and uutS, which are running on the same clock.
  * If they were to run on the same clock, eg with White Rabbit, there'd be no wander.
+
+## Stopping
+ * Simply abort the Control Program
+ * Stop all the UUTS
+ ```
+ ./scripts/acqproc_config_freerunning_acq435 --stop=1 @ACQPROC/configs/news32.json
+ ```
  
+# Operation with 4 boxes and MEAN of last N
+ 
+## Run with hardware
+ ```
+ ./scripts/acqproc_config_freerunning_acq435 --acq435SR 100000 @ACQPROC/configs/news32.json
+ RTPRIO=10 NTRIGGERS=1 HW=N ./acqproc_broadcast_trigger configs/news32.json 1000000
+
+ ```
+### Example: SR=100kHz, HW=1, signal=5kHz
+![SR=100kHz, HW=1, signal=5kHz](https://user-images.githubusercontent.com/3041171/90416002-cf493e00-e0a9-11ea-95b4-557c90b43938.png) 
+### Example: SR=100kHz, HW=10, signal=5kHz
+![SR=100kHz,Signal=5kHz,HW=10](https://user-images.githubusercontent.com/3041171/90416391-4ed70d00-e0aa-11ea-9382-ab5401758603.png)
+### Example: SR=100kHz, HW=20, signal=5kHz
+In this case, we're averaging over a full cycle, so no threshold crossing, ***NO OUTPUT*** 
+![SR=100kHz,Signal=5kHz,HW=20](https://user-images.githubusercontent.com/3041171/90416497-71692600-e0aa-11ea-8dde-7748e7fb602a.png)
+### Example: SR=100kHz, HW=20, signal=2kHz
+*** OUTPUT restored ***
+![SR=100kHz,Signal=2kHz,HW=20](https://user-images.githubusercontent.com/3041171/90416651-a8d7d280-e0aa-11ea-8459-7c3318fc4b75.png) 
+  
  
 Please try it. Send questions to peter dot milne@d-tacq.com
 
