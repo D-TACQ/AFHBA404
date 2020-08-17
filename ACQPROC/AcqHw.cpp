@@ -328,14 +328,18 @@ bool ACQ_HW_MEAN::newSample(int sample)
 void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
 /**< on newSample, copy VO from SI, copy VI to SI */
 {
-/** SIMPLIFY: supports AI32 ONLY! */
+/** SIMPLIFY: supports AI32 ONLY!
+ * COMPLEXIFY : re-scale as LJ 24 bit number so that HW=1 threshold is still valid, then OR the channel ID back in.
+ * */
 
 	for (int ic = 0; ic < vi.AI32; ++ic){
 		int total = 0;
-		for (int sam = 0; sam < nmean; ++sam){
+
+		for (int sam = 1; sam < nmean; ++sam){
 			total += raw[sam][ic] >> 8;
 		}
-		systemInterface.IN.AI32[ic] = total/nmean;
+		total += raw[0][ic] >> 8;
+		systemInterface.IN.AI32[vi_cursor.AI32+ic] = ((total/nmean) << 8) | (raw[0][ic]&0x00ff);
 	}
 }
 void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
