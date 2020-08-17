@@ -102,7 +102,7 @@ THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc_broa
 In this case, we're averaging over a full cycle, so no threshold crossing, ***NO OUTPUT*** 
 ![SR=100kHz,Signal=5kHz,HW=20](https://user-images.githubusercontent.com/3041171/90416497-71692600-e0aa-11ea-8dde-7748e7fb602a.png)
 ### Example: SR=100kHz, HW=20, signal=2kHz
-*** OUTPUT restored ***
+***OUTPUT restored***
 ![SR=100kHz,Signal=2kHz,HW=20](https://user-images.githubusercontent.com/3041171/90416651-a8d7d280-e0aa-11ea-8459-7c3318fc4b75.png) 
   
  
