@@ -265,6 +265,7 @@ void ACQ_HW_BASE::arm(int nsamples)
 
 class ACQ_HW_MEAN: public ACQ_HW_BASE
 {
+protected:
 	const int nmean;
 	const int spix;
 	unsigned *dox;
@@ -323,7 +324,7 @@ ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offset
 		verbose = atoi(getenv("ACQ_HW_MEAN_VERBOSE"));
 	}
 	if (verbose){
-		fprintf(stderr, "%s spix:%d\n", __FUNCTION__, spix);
+		fprintf(stderr, "%s nmean:%d spix:%d\n", __FUNCTION__, nmean, spix);
 	}
 	for (ib = 0; ib < nmean; ++ib){
 		tl0_array[ib] = 0xdeadbeef;
@@ -379,21 +380,58 @@ void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
 
 }
 
+/* takes mean of N samples, newSample returns true after <skip> samples */
+class ACQ_HW_MEAN_SKIPPER: public ACQ_HW_MEAN {
+	const int nskip;
+public:
+	ACQ_HW_MEAN_SKIPPER(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& _sys_vi_cursor, VO& _sys_vo_cursor, int _nmean, int _nskip) :
+		ACQ_HW_MEAN(devnum, _name, _vi, _vo, _vi_offsets,
+			_vo_offsets, _sys_vi_cursor, _sys_vo_cursor, _nmean),
+		nskip(_nskip)
+	{
+		fprintf(stderr, "%s skip:%d\n", __FUNCTION__, nskip);
+		tl0 = 0;
+	}
+
+	virtual bool newSample(int sample);
+};
+
+bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
+{
+    unsigned tl1;
+
+	if (nowait || (tl1 = TLATCH0) >= tl0 + nskip){
+		tl0 = tl1;
+		if (verbose){
+			fprintf(stderr, "TLATCH:%08x\n", tl0);
+		}
+		return true;
+	}else{
+		return false;
+	}
+}
 
 
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
 {
-	static int HW = getenv("HW") != 0 ? atoi(getenv("HW")) : 0;
+	static int HW;
+	static int skip;
+	if (getenv("HW") != 0){
+		sscanf(getenv("HW"), "%d,%d", &HW, &skip);
+	}
 
-	switch(HW){
-	case 1:
+
+	if (HW == 1){
 		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
-	default:
-		if (HW > 1){
+	}else if (HW > 1){
+		if (skip > 1){
+			return new ACQ_HW_MEAN_SKIPPER(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, HW, skip);
+		}else{
 			return new ACQ_HW_MEAN(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, HW);
-		} // else fall thru
-	case 0:
+		}
+	}else{
 		return new ACQ(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	}
 }
