@@ -131,7 +131,7 @@ public:
 /* TLATCH now uses the dynamic set value */
 #undef TLATCH
 /** find sample count in VI. */
-#define TLATCH	((unsigned*)(dev->host_buffer + vi_offsets.SP32))[SPIX::TLATCH]
+#define TLATCH0	((unsigned*)(dev->host_buffer + vi_offsets.SP32))[SPIX::TLATCH]
 
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
@@ -177,7 +177,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			}
 		}
 	}
-	TLATCH = 0xdeadbeef;
+	TLATCH0 = 0xdeadbeef;
 }
 
 
@@ -239,7 +239,7 @@ bool ACQ_HW::newSample(int sample)
 {
     unsigned tl1;
 
-	if (nowait || (tl1 = TLATCH) != tl0){
+	if (nowait || (tl1 = TLATCH0) != tl0){
 		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
                 tl0 = tl1;
 		return true;
@@ -266,9 +266,14 @@ void ACQ_HW_BASE::arm(int nsamples)
 class ACQ_HW_MEAN: public ACQ_HW_BASE
 {
 	const int nmean;
+	const int spix;
 	unsigned *dox;
 	int **raw;
+	unsigned *tl0_array;
 
+	int verbose;
+
+	bool _newSample(int sample);
 public:
 	ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nmean);
@@ -282,10 +287,15 @@ public:
 	/**< late action(), cleanup */
 };
 
+
 ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nmean) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor), nmean(_nmean)
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+		nmean(_nmean),
+		spix(vi_offsets.SP32/sizeof(unsigned)+SPIX::TLATCH),
+		tl0_array(new unsigned[_nmean]),
+		verbose(0)
 {
 	struct ABN abn;
 	int ib;
@@ -309,16 +319,37 @@ ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offset
 	}
 	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
 
-	TLATCH = 0xdeadbeef;
+	if (getenv("ACQ_HW_MEAN_VERBOSE")){
+		verbose = atoi(getenv("ACQ_HW_MEAN_VERBOSE"));
+	}
+	if (verbose){
+		fprintf(stderr, "%s spix:%d\n", __FUNCTION__, spix);
+	}
+	for (ib = 0; ib < nmean; ++ib){
+		tl0_array[ib] = 0xdeadbeef;
+	}
 }
 
-
+bool ACQ_HW_MEAN::_newSample(int sample)
+{
+	for (int ib = 0; ib < nmean; ++ib){
+		unsigned tl1;
+		if ((tl1 = raw[ib][spix]) != tl0_array[ib]){
+			tl0 = tl0_array[ib] = tl1;
+			return true;
+		}
+	}
+	return false;
+}
 bool ACQ_HW_MEAN::newSample(int sample)
 /**< checks host buffer for new sample, if so copies to lbuf and reports true */
 {
-    unsigned tl1;
-
-	if (nowait || (tl1 = TLATCH) != tl0){
+	if (nowait){
+		return true;
+	}else if (_newSample(sample)){
+		if (verbose){
+			fprintf(stderr, "TLATCH:%08x\n", tl0);
+		}
 		return true;
 	}else{
 		return false;
