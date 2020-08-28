@@ -1530,6 +1530,8 @@ int afs_dma_release(struct inode *inode, struct file *file)
 		sdev->onStopPush = 0;
 	}
 	sdev->pid = 0;
+	if (sdev->user) kfree(sdev->user);
+
 	return afhba_release(inode, file);
 }
 
@@ -1883,10 +1885,16 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
+
+void start_ao_burst(struct AFHBA_STREAM_DEV *sdev)
+{
+
+}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	void* varg = (void*)arg;
 
 
@@ -1935,6 +1943,36 @@ long afs_dma_ioctl(struct file *file,
 		}
 		COPY_TO_USER(varg, abn, sizeof(struct ABN));
 		return rc;
+	}
+	case AFHBA_AO_BURST_INIT:
+	{
+		if (sdev->user){
+			return -EINVAL;
+		}else{
+			struct AO_BURST *aob = kzalloc(sizeof(struct AO_BURST), GFP_KERNEL);
+			COPY_FROM_USER(aob, varg, sizeof(struct AO_BURST));
+			if (!VALID_AO_BURST(aob)){
+				return -EINVAL;
+			}
+			sdev->user = aob;
+			start_ao_burst(sdev);
+			return 0;
+		}
+	}
+	case AFHBA_AO_BURST_SETBUF:
+	{
+		if (!(sdev->user && VALID_AO_BURST(sdev->user))){
+			return -EINVAL;
+		}else{
+			struct AO_BURST* ao_burst = AO_BURST_DEV(sdev);
+			u32 srcix;
+			COPY_FROM_USER(&srcix, varg, sizeof(u32));
+			if (srcix >=0 && srcix < ao_burst->nbuf){
+				ao_burst->srcdesc = ao_burst->buffers[srcix];
+			}else{
+				return -EINVAL;
+			}
+		}
 	}
 	default:
 		return -ENOTTY;
