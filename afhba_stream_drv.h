@@ -8,6 +8,7 @@
 #ifndef AFHBA_STREAM_DRV_H_
 #define AFHBA_STREAM_DRV_H_
 
+#include "rtm-t_ioctl.h"
 
 /* idea by John: make it a multiple of 3 to handle 96ch align case */
 #define NBUFFERS	66
@@ -146,9 +147,13 @@ struct AFHBA_STREAM_DEV {
 	void *user;		// opaque user buffer, kfree on close
 };
 
-struct AO_BURST;
-
-#define AO_BURST_DEV(sdev)  ((struct AO_BURST*)sdev->user)
+struct AO_BURST_DEV {
+	struct AO_BURST ao_burst;
+	wait_queue_head_t w_waitq;
+	struct task_struct* w_task;
+	unsigned srcdesc;				// internal use only
+};
+#define AO_BURST_DEV(sdev)  ((struct AO_BURST_DEV*)sdev->user)
 
 #define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
 

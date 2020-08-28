@@ -1886,9 +1886,35 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	return 0;
 }
 
-void start_ao_burst(struct AFHBA_STREAM_DEV *sdev)
+/*
+static int ao_burst_work(void *arg)
 {
+	struct AFHBA_DEV *adev = (struct AFHBA_DEV*)arg;
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
 
+	struct sched_param param = { .sched_priority = 10 };
+	sched_setscheduler(current, SCHED_FIFO, &param);
+
+	while(!kthread_should_stop()){
+		int timeout = wait_event_interruptible_timeout(
+			sdev->work.w_waitq,
+			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do),
+			aobd) == 0;
+		afs_load_push_descriptor(adev, aobd->srcdesc);
+	}
+}
+*/
+void start_ao_burst(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
+	struct AO_BURST* aob = &aobd->ao_burst;
+
+
+	aobd->srcdesc = 0;
+
+//	sdev->work.w_task = kthread_run(ao_burst_work, adev, adev->name);
 }
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
@@ -1949,26 +1975,28 @@ long afs_dma_ioctl(struct file *file,
 		if (sdev->user){
 			return -EINVAL;
 		}else{
-			struct AO_BURST *aob = kzalloc(sizeof(struct AO_BURST), GFP_KERNEL);
-			COPY_FROM_USER(aob, varg, sizeof(struct AO_BURST));
-			if (!VALID_AO_BURST(aob)){
+			struct AO_BURST_DEV *aobd = kzalloc(sizeof(struct AO_BURST_DEV), GFP_KERNEL);
+
+			if (!VALID_AO_BURST(&aobd->ao_burst)){
 				return -EINVAL;
 			}
-			sdev->user = aob;
-			start_ao_burst(sdev);
+			COPY_FROM_USER(&aobd->ao_burst, varg, sizeof(struct AO_BURST));
+			sdev->user = aobd;
+			start_ao_burst(adev);
 			return 0;
 		}
 	}
 	case AFHBA_AO_BURST_SETBUF:
 	{
-		if (!(sdev->user && VALID_AO_BURST(sdev->user))){
+		if (!(sdev->user && VALID_AO_BURST(&AO_BURST_DEV(sdev)->ao_burst))){
 			return -EINVAL;
 		}else{
-			struct AO_BURST* ao_burst = AO_BURST_DEV(sdev);
+			struct AO_BURST_DEV *aobd = AO_BURST_DEV(sdev);
 			u32 srcix;
 			COPY_FROM_USER(&srcix, varg, sizeof(u32));
-			if (srcix >=0 && srcix < ao_burst->nbuf){
-				ao_burst->srcdesc = ao_burst->buffers[srcix];
+			if (srcix >=0 && srcix < aobd->ao_burst.nbuf){
+				afs_load_push_descriptor(adev, aobd->srcdesc);
+				aobd->srcdesc = srcix;
 			}else{
 				return -EINVAL;
 			}

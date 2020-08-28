@@ -66,11 +66,8 @@ struct ABN {
 
 struct AO_BURST {
 	unsigned id;
-	unsigned dma_len;      // DMA length in bytes 2^N * 1K
 	unsigned nbuf;
 	unsigned tickms;       // msec per tick : 0 means use interrupt
-	unsigned buffers[MAX_AO_BUF];   // SET: buffer id's eg 0,1,2
-	unsigned srcdesc;				// internal use only
 };
 
 #define VALID_AO_BURST(p) (((struct AO_BURST*)p)->id == AO_BURST_ID)
