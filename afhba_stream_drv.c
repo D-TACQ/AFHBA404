@@ -353,7 +353,7 @@ void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 		}
 		/* else .. NO ACTION, descriptor already loaded in RAM */
 	}else{
-		write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
+		write_descr(adev, DMA_PULL_DESC_FIFO, idesc);
 	}
 }
 
@@ -1973,26 +1973,36 @@ long afs_dma_ioctl(struct file *file,
 	case AFHBA_AO_BURST_INIT:
 	{
 		if (sdev->user){
-			return -EINVAL;
+			dev_err(pdev(adev), "AFHBA_AO_BURST_INIT other user data active");
+			return -EBUSY;
 		}else{
+			/*
 			struct AO_BURST_DEV *aobd = kzalloc(sizeof(struct AO_BURST_DEV), GFP_KERNEL);
 
 			if (!VALID_AO_BURST(&aobd->ao_burst)){
+				dev_err(pdev(adev), "AFHBA_AO_BURST_INIT argument not valid");
 				return -EINVAL;
 			}
 			COPY_FROM_USER(&aobd->ao_burst, varg, sizeof(struct AO_BURST));
 			sdev->user = aobd;
+
 			start_ao_burst(adev);
+			*/
 			return 0;
 		}
 	}
 	case AFHBA_AO_BURST_SETBUF:
 	{
+		/*
 		if (!(sdev->user && VALID_AO_BURST(&AO_BURST_DEV(sdev)->ao_burst))){
 			return -EINVAL;
 		}else{
+		*/
 			struct AO_BURST_DEV *aobd = AO_BURST_DEV(sdev);
-			u32 srcix;
+			u32 srcix = 0;
+
+
+			/*
 			COPY_FROM_USER(&srcix, varg, sizeof(u32));
 			if (srcix >=0 && srcix < aobd->ao_burst.nbuf){
 				afs_load_push_descriptor(adev, aobd->srcdesc);
@@ -2000,7 +2010,12 @@ long afs_dma_ioctl(struct file *file,
 			}else{
 				return -EINVAL;
 			}
+			*/
+			afs_load_pull_descriptor(adev, srcix);
+			return 0;
+			/*
 		}
+		*/
 	}
 	default:
 		return -ENOTTY;
