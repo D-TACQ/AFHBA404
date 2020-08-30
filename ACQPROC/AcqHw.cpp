@@ -28,7 +28,6 @@ extern "C" {
 
 #define PAGE_SIZE	0x1000
 
-
 /** struct Dev : interface to AFHBA404 device driver. */
 struct Dev {
 	int devnum;
@@ -399,15 +398,38 @@ public:
 
 bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
 {
-    unsigned tl1;
+	unsigned tl1;
 
-	if (nowait || (tl1 = TLATCH0) >= tl0 + nskip){
-		tl0 = tl1;
-		if (verbose){
-			fprintf(stderr, "TLATCH:%08x\n", tl0);
-		}
+	if (nowait){
 		return true;
 	}else{
+		tl1 = TLATCH0;
+
+		// Detect 32 bit rollover, every 23.8h @ 50KHz
+		bool over0 = tl0 + nskip < tl0;   // endpoint overflow
+		bool over1 = tl1 < tl0;           // current overflow
+
+		if (!(over0 || over1)){			// TRUE, almos ALL the time.
+			if (tl1 > tl0 + nskip){
+				tl0 = tl1;
+				if (verbose){
+					fprintf(stderr, "TLATCH:%08x\n", tl0);
+				}
+				return true;
+			}
+		}else{					// use 64b pointers - brute force and ignorance rules OK!
+			unsigned long long endpoint = tl0; endpoint += nskip;
+			unsigned long long current = tl1;  if (over1) current += 1ULL<<32;
+
+			if (current > endpoint){
+				tl0 = tl1;
+                                if (verbose){
+                                        fprintf(stderr, "TLATCH:%08x ROLLOVER\n", tl0);
+                                }
+                                return true;
+
+			}
+		}
 		return false;
 	}
 }
