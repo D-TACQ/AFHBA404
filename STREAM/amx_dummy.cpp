@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
 {
 	int devnum = 0;
 	int verbose = 0;
+	int sleepms = 20;
 
 	if (getenv("RTM_DEVNUM")){
 		devnum = atol(getenv("RTM_DEVNUM"));
@@ -44,6 +45,10 @@ int main(int argc, char* argv[])
 	if (getenv("VERBOSE")){
 		verbose = atol(getenv("VERBOSE"));
 	}
+	if (getenv("SLEEPMS")){
+		sleepms = atol(getenv("SLEEPMS"));
+	}
+
 	RTM_T_Device* dev = new RTM_T_Device(devnum);
 
 	int fp = dev->getDeviceHandle();
@@ -68,7 +73,7 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "hit me\n");
 			getchar();
 		}else{
-			usleep(20000);
+			usleep(sleepms*1000);
 		}
 	}
 
