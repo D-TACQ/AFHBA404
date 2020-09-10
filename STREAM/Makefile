@@ -17,10 +17,7 @@ rtm-t-stream-disk: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandler.o
 rtm-t-stream-disk-mux-AO-LLC: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandlerMuxAO_LLC.o
 	$(CXX) $(DEBUG) -o $@ $^ -lpopt
 	
-rtm-t-stream-disk-mux-AO-STREAM: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandlerMuxAO_STREAM.o
-	$(CXX) $(DEBUG) -o $@ $^ -lpopt
-
-rtm-t-stream-disk-mux-AO-STREAM_ALL: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandlerMuxAO_STREAM_ALL.o
+rtm-t-stream-disk-mux-AO-STREAM: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandlerMuxAO_STREAM_ALL.o
 	$(CXX) $(DEBUG) -o $@ $^ -lpopt
 	
 amx_dummy: amx_dummy.o RTM_T_Device.o
