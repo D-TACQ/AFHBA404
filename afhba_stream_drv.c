@@ -353,7 +353,7 @@ void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 		}
 		/* else .. NO ACTION, descriptor already loaded in RAM */
 	}else{
-		write_descr(adev, DMA_PUSH_DESC_FIFO, idesc);
+		write_descr(adev, DMA_PULL_DESC_FIFO, idesc);
 	}
 }
 
@@ -1530,6 +1530,8 @@ int afs_dma_release(struct inode *inode, struct file *file)
 		sdev->onStopPush = 0;
 	}
 	sdev->pid = 0;
+	if (sdev->user) kfree(sdev->user);
+
 	return afhba_release(inode, file);
 }
 
@@ -1883,10 +1885,42 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
+
+/*
+static int ao_burst_work(void *arg)
+{
+	struct AFHBA_DEV *adev = (struct AFHBA_DEV*)arg;
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
+
+	struct sched_param param = { .sched_priority = 10 };
+	sched_setscheduler(current, SCHED_FIFO, &param);
+
+	while(!kthread_should_stop()){
+		int timeout = wait_event_interruptible_timeout(
+			sdev->work.w_waitq,
+			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do),
+			aobd) == 0;
+		afs_load_push_descriptor(adev, aobd->srcdesc);
+	}
+}
+*/
+void start_ao_burst(struct AFHBA_DEV *adev)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
+	struct AO_BURST* aob = &aobd->ao_burst;
+
+
+	aobd->srcdesc = 0;
+
+//	sdev->work.w_task = kthread_run(ao_burst_work, adev, adev->name);
+}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	void* varg = (void*)arg;
 
 
@@ -1935,6 +1969,53 @@ long afs_dma_ioctl(struct file *file,
 		}
 		COPY_TO_USER(varg, abn, sizeof(struct ABN));
 		return rc;
+	}
+	case AFHBA_AO_BURST_INIT:
+	{
+		if (sdev->user){
+			dev_err(pdev(adev), "AFHBA_AO_BURST_INIT other user data active");
+			return -EBUSY;
+		}else{
+			/*
+			struct AO_BURST_DEV *aobd = kzalloc(sizeof(struct AO_BURST_DEV), GFP_KERNEL);
+
+			if (!VALID_AO_BURST(&aobd->ao_burst)){
+				dev_err(pdev(adev), "AFHBA_AO_BURST_INIT argument not valid");
+				return -EINVAL;
+			}
+			COPY_FROM_USER(&aobd->ao_burst, varg, sizeof(struct AO_BURST));
+			sdev->user = aobd;
+
+			start_ao_burst(adev);
+			*/
+			return 0;
+		}
+	}
+	case AFHBA_AO_BURST_SETBUF:
+	{
+		/*
+		if (!(sdev->user && VALID_AO_BURST(&AO_BURST_DEV(sdev)->ao_burst))){
+			return -EINVAL;
+		}else{
+		*/
+			struct AO_BURST_DEV *aobd = AO_BURST_DEV(sdev);
+			u32 srcix = 0;
+
+
+			/*
+			COPY_FROM_USER(&srcix, varg, sizeof(u32));
+			if (srcix >=0 && srcix < aobd->ao_burst.nbuf){
+				afs_load_push_descriptor(adev, aobd->srcdesc);
+				aobd->srcdesc = srcix;
+			}else{
+				return -EINVAL;
+			}
+			*/
+			afs_load_pull_descriptor(adev, srcix);
+			return 0;
+			/*
+		}
+		*/
 	}
 	default:
 		return -ENOTTY;

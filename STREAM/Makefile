@@ -22,6 +22,9 @@ rtm-t-stream-disk-mux-AO-STREAM: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHa
 
 rtm-t-stream-disk-mux-AO-STREAM_ALL: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHandlerMuxAO_STREAM_ALL.o
 	$(CXX) $(DEBUG) -o $@ $^ -lpopt
+	
+amx_dummy: amx_dummy.o RTM_T_Device.o
+	$(CXX) $(DEBUG) -o $@ $^ -lpopt
 
 librtm-t-stream.so: rtm-t-stream.o RTM_T_Device.o
 	$(CXX) $(DEBUG) -shared -o librtm-t-stream.so rtm-t-stream.o RTM_T_Device.o -lpopt

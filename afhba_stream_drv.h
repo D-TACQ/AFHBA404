@@ -8,6 +8,7 @@
 #ifndef AFHBA_STREAM_DRV_H_
 #define AFHBA_STREAM_DRV_H_
 
+#include "rtm-t_ioctl.h"
 
 /* idea by John: make it a multiple of 3 to handle 96ch align case */
 #define NBUFFERS	66
@@ -105,7 +106,6 @@ struct AFHBA_STREAM_DEV {
 		struct XLLC_DEF pull_llc_def;
 		int (* on_push_dma_timeout)(struct AFHBA_DEV *adev);
 		int (* on_pull_dma_timeout)(struct AFHBA_DEV *adev);
-
 	}
 		job;
 	spinlock_t job_lock;
@@ -113,9 +113,9 @@ struct AFHBA_STREAM_DEV {
 	int push_dma_timeouts;
 	int pull_dma_timeouts;
 	unsigned *data_fifo_histo;
-      	unsigned *desc_fifo_histo;
+    unsigned *desc_fifo_histo;
 
-      	void (*init_descriptors)(struct AFHBA_STREAM_DEV *sdev);
+    void (*init_descriptors)(struct AFHBA_STREAM_DEV *sdev);
 
 	struct WORK {				/* ISR BH processing */
 		wait_queue_head_t w_waitq;
@@ -144,7 +144,17 @@ struct AFHBA_STREAM_DEV {
 	enum ZI_REPORT { ZI_BAD = -1, ZI_NULL = 0, ZI_GOOD = 1 } zi_report;
 
 	int shot;
+	void *user;		// opaque user buffer, kfree on close
 };
+
+struct AO_BURST_DEV {
+	struct AO_BURST ao_burst;
+	wait_queue_head_t w_waitq;
+	struct task_struct* w_task;
+	unsigned srcdesc;				// internal use only
+};
+#define AO_BURST_DEV(sdev)  ((struct AO_BURST_DEV*)sdev->user)
+
 #define MIRROR(adev, ix) (adev->stream_dev->dma_regs[ix])
 
 void _afs_write_pcireg(struct AFHBA_DEV *adev, int regoff, u32 value);

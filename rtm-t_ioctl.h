@@ -60,6 +60,17 @@ struct ABN {
 	/* others tag on behind */
 };
 
+#define MAX_AO_BUF		4
+
+#define AO_BURST_ID		0xA0B55555
+
+struct AO_BURST {
+	unsigned id;
+	unsigned nbuf;
+	unsigned tickms;       // msec per tick : 0 means use interrupt
+};
+
+#define VALID_AO_BURST(p) (((struct AO_BURST*)p)->id == AO_BURST_ID)
 
 #define RTM_T_USE_HOSTBUF	0
 
@@ -95,6 +106,12 @@ struct ABN {
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
 /** ioctl AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
 
+/* define an AO_BURST setup */
+#define AFHBA_AO_BURST_INIT		 _IOWR(DMAGIC, 10, struct AO_BURST)
+/* define current buffer id */
+#define AFHBA_AO_BURST_SETBUF  	_IOWR(DMAGIC, 12, u32)
+
+/** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
 #define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
 
 struct StreamBufferDef {

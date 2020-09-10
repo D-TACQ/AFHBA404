@@ -28,7 +28,6 @@ extern "C" {
 
 #define PAGE_SIZE	0x1000
 
-
 /** struct Dev : interface to AFHBA404 device driver. */
 struct Dev {
 	int devnum;
@@ -131,7 +130,7 @@ public:
 /* TLATCH now uses the dynamic set value */
 #undef TLATCH
 /** find sample count in VI. */
-#define TLATCH	((unsigned*)(dev->host_buffer + vi_offsets.SP32))[SPIX::TLATCH]
+#define TLATCH0	((unsigned*)(dev->host_buffer + vi_offsets.SP32))[SPIX::TLATCH]
 
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
@@ -177,7 +176,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			}
 		}
 	}
-	TLATCH = 0xdeadbeef;
+	TLATCH0 = 0xdeadbeef;
 }
 
 
@@ -239,7 +238,7 @@ bool ACQ_HW::newSample(int sample)
 {
     unsigned tl1;
 
-	if (nowait || (tl1 = TLATCH) != tl0){
+	if (nowait || (tl1 = TLATCH0) != tl0){
 		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
                 tl0 = tl1;
 		return true;
@@ -265,10 +264,16 @@ void ACQ_HW_BASE::arm(int nsamples)
 
 class ACQ_HW_MEAN: public ACQ_HW_BASE
 {
+protected:
 	const int nmean;
+	const int spix;
 	unsigned *dox;
 	int **raw;
+	unsigned *tl0_array;
 
+	int verbose;
+
+	bool _newSample(int sample);
 public:
 	ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nmean);
@@ -282,10 +287,15 @@ public:
 	/**< late action(), cleanup */
 };
 
+
 ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nmean) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor), nmean(_nmean)
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+		nmean(_nmean),
+		spix(vi_offsets.SP32/sizeof(unsigned)+SPIX::TLATCH),
+		tl0_array(new unsigned[_nmean]),
+		verbose(0)
 {
 	struct ABN abn;
 	int ib;
@@ -309,16 +319,37 @@ ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offset
 	}
 	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
 
-	TLATCH = 0xdeadbeef;
+	if (getenv("ACQ_HW_MEAN_VERBOSE")){
+		verbose = atoi(getenv("ACQ_HW_MEAN_VERBOSE"));
+	}
+	if (verbose){
+		fprintf(stderr, "%s nmean:%d spix:%d\n", __FUNCTION__, nmean, spix);
+	}
+	for (ib = 0; ib < nmean; ++ib){
+		tl0_array[ib] = 0xdeadbeef;
+	}
 }
 
-
+bool ACQ_HW_MEAN::_newSample(int sample)
+{
+	for (int ib = 0; ib < nmean; ++ib){
+		unsigned tl1;
+		if ((tl1 = raw[ib][spix]) != tl0_array[ib]){
+			tl0 = tl0_array[ib] = tl1;
+			return true;
+		}
+	}
+	return false;
+}
 bool ACQ_HW_MEAN::newSample(int sample)
 /**< checks host buffer for new sample, if so copies to lbuf and reports true */
 {
-    unsigned tl1;
-
-	if (nowait || (tl1 = TLATCH) != tl0){
+	if (nowait){
+		return true;
+	}else if (_newSample(sample)){
+		if (verbose){
+			fprintf(stderr, "TLATCH:%08x\n", tl0);
+		}
 		return true;
 	}else{
 		return false;
@@ -328,14 +359,18 @@ bool ACQ_HW_MEAN::newSample(int sample)
 void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
 /**< on newSample, copy VO from SI, copy VI to SI */
 {
-/** SIMPLIFY: supports AI32 ONLY! */
+/** SIMPLIFY: supports AI32 ONLY!
+ * COMPLEXIFY : re-scale as LJ 24 bit number so that HW=1 threshold is still valid, then OR the channel ID back in.
+ * */
 
 	for (int ic = 0; ic < vi.AI32; ++ic){
 		int total = 0;
-		for (int sam = 0; sam < nmean; ++sam){
+
+		for (int sam = 1; sam < nmean; ++sam){
 			total += raw[sam][ic] >> 8;
 		}
-		systemInterface.IN.AI32[ic] = total/nmean;
+		total += raw[0][ic] >> 8;
+		systemInterface.IN.AI32[vi_cursor.AI32+ic] = ((total/nmean) << 8) | (raw[0][ic]&0x00ff);
 	}
 }
 void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
@@ -344,21 +379,81 @@ void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
 
 }
 
+/* takes mean of N samples, newSample returns true after <skip> samples */
+class ACQ_HW_MEAN_SKIPPER: public ACQ_HW_MEAN {
+	const int nskip;
+public:
+	ACQ_HW_MEAN_SKIPPER(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& _sys_vi_cursor, VO& _sys_vo_cursor, int _nmean, int _nskip) :
+		ACQ_HW_MEAN(devnum, _name, _vi, _vo, _vi_offsets,
+			_vo_offsets, _sys_vi_cursor, _sys_vo_cursor, _nmean),
+		nskip(_nskip)
+	{
+		fprintf(stderr, "%s skip:%d\n", __FUNCTION__, nskip);
+		tl0 = 0;
+	}
+
+	virtual bool newSample(int sample);
+};
+
+bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
+{
+	unsigned tl1;
+
+	if (nowait){
+		return true;
+	}else{
+		tl1 = TLATCH0;
+
+		// Detect 32 bit rollover, every 23.8h @ 50KHz
+		bool over0 = tl0 + nskip < tl0;   // endpoint overflow
+		bool over1 = tl1 < tl0;           // current overflow
+
+		if (!(over0 || over1)){			// TRUE, almos ALL the time.
+			if (tl1 > tl0 + nskip){
+				tl0 = tl1;
+				if (verbose){
+					fprintf(stderr, "TLATCH:%08x\n", tl0);
+				}
+				return true;
+			}
+		}else{					// use 64b pointers - brute force and ignorance rules OK!
+			unsigned long long endpoint = tl0; endpoint += nskip;
+			unsigned long long current = tl1;  if (over1) current += 1ULL<<32;
+
+			if (current > endpoint){
+				tl0 = tl1;
+                                if (verbose){
+                                        fprintf(stderr, "TLATCH:%08x ROLLOVER\n", tl0);
+                                }
+                                return true;
+
+			}
+		}
+		return false;
+	}
+}
 
 
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
 {
-	static int HW = getenv("HW") != 0 ? atoi(getenv("HW")) : 0;
+	static int HW;
+	static int skip;
+	if (getenv("HW") != 0){
+		sscanf(getenv("HW"), "%d,%d", &HW, &skip);
+	}
 
-	switch(HW){
-	case 1:
+
+	if (HW == 1){
 		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
-	default:
-		if (HW > 1){
+	}else if (HW > 1){
+		if (skip > 1){
+			return new ACQ_HW_MEAN_SKIPPER(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, HW, skip);
+		}else{
 			return new ACQ_HW_MEAN(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, HW);
-		} // else fall thru
-	case 0:
+		}
+	}else{
 		return new ACQ(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	}
 }
