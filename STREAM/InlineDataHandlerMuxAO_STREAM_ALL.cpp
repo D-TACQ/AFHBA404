@@ -12,7 +12,9 @@
  *  ai_stride: subsample AI, eg for 2MSPS AI, 1SMSP AI, set 2
  *  wavelen  : max 256 for LLC output. Streaming typical 20000
  *
- * export MUXAO=3,4,16,0,1,256
+ * export MUXAO=3,4,16,0,1,10000
+ *
+ * echo 1,1 2,16 > /dev/shm/amx_ao_map
  */
 
 
@@ -47,21 +49,15 @@ InlineDataHandler::~InlineDataHandler() {
 }
 
 
-struct ABN abn;
-int ib;
+#define AO_MAP_ZERO 0xffff
 
 
-
-struct AI_AO_MAPPING {
-	int iai;
-	int iao;
-};
-
-
-std::vector<AI_AO_MAPPING> * getSrcChans(RTM_T_Device* ai_dev) {
-	return 0;
-}
-
+/* /dev/shm/amx_ao_from ai_mapping
+ * aoch=aich                       // both index from 1 eg
+ * 1=1
+ * 2=17
+ * unmapped channels are set AO_MAP_ZERO
+ */
 class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 	RTM_T_Device* ai_dev;
 	int ao_dev;
@@ -71,26 +67,38 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 	int ai_stride;
 	int wavelen;
 	RTM_T_Device *dev;
+	unsigned * ao_ai_mapping;
 
-	int twizzle(int ibuf)
+	int ao_buf_ix;
+
+	void updateMuxSelection()
 	{
-		/* we probably don't want to be writing this AO buffer, we want to write the NEXT one?.
-		 * maybe 2 ahead?.
-		 *
-		 */
-		return dev->next(ibuf);
+		FILE *fp = fopen("/dev/shm/amx_ao_map", "r");
+		if (fp){
+			int _ao_ch, _ai_ch;
+			for (ao_ch = 0; ao_ch < ao_count; ++ao_ch){
+				ao_ai_mapping[_ao_ch] = AO_MAP_ZERO;
+			}
+			if (fscanf(fp, "%d,%d", &_ao_ch, &_ai_ch) == 2 &&
+					_ao_ch >= 1 && _ao_ch <= ao_count &&
+					_ai_ch >= 1 &&  _ai_ch <= ai_count){
+				ao_ai_mapping[_ao_ch-1] = _ai_ch-1;
+			}
+			fclose(fp);
+		}
 	}
 public:
-	InlineDataHanderMuxAO_STREAM(RTM_T_Device* _ai_dev,
-			int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
-		ai_dev(_ai_dev),
+	InlineDataHanderMuxAO_STREAM(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
 		ao_dev(_ao_dev),
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
 	{
 		dev = new RTM_T_Device(ao_dev);
-
-		if (ioctl(dev->getDeviceHandle(), RTM_T_START_STREAM_AO, &abn)){
-			perror("ioctl RTM_T_START_STREAM_AO");
+		ao_ai_mapping = new unsigned[ao_count];
+		for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
+			ao_ai_mapping[ao_ch] = ao_ch;
+		}
+		if (ioctl(dev->getDeviceHandle(), AFHBA_AO_BURST_INIT, 0)){
+			perror("ioctl AFHBA_AO_BURST_INIT");
 			exit(1);
 		}
 	}
@@ -99,14 +107,19 @@ public:
 	/* take a slice ao_count out of AI buffer and drop the slice into  */
 	{
 		const short* ai = (const short*)src;
-		short* ao = (short*)dev->getHostBufferMappingW(twizzle(ibuf));
+		short* ao = (short*)dev->getHostBufferMappingW(ao_buf_ix = !ao_buf_ix);
 		const int instep = ai_count*ai_stride;
-		std::vector<AI_AO_MAPPING> * src_chans = getSrcChans(ai_dev);	// assume this gets updated from SHM one per src dev per process
+		updateMuxSelection();
 
 		for (int sample = 0; sample < wavelen; ++sample, ai += instep, ao += ao_count){
-			for (auto ch: *src_chans){
-				ao[ch.iao] = ai[ch.iai];
+			for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
+				unsigned ai_ch = ao_ai_mapping[ao_ch];
+				ao[ao_ch] = ai_ch==AO_MAP_ZERO? 0 : ai[ai_ch];
 			}
+		}
+		if (ioctl(dev->getDeviceHandle(), AFHBA_AO_BURST_SETBUF, ao_buf_ix)){
+			perror("ioctl AFHBA_AO_BURST_SETBUF");
+			exit(1);
 		}
 	}
 };
@@ -116,7 +129,7 @@ InlineDataHandler* InlineDataHandler::factory(RTM_T_Device* ai_dev)
 	if (const char* value = getenv("MUXAO")){
 		int pr[6];
 		if (sscanf(value, "%d,%d,%d,%d,%d,%d", pr+0, pr+1, pr+2, pr+3, pr+4, pr+5) == 6){
-			return new InlineDataHanderMuxAO_STREAM(ai_dev, pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
+			return new InlineDataHanderMuxAO_STREAM(pr[0], pr[1], pr[2], pr[3], pr[4], pr[5]);
 		}
 	}
 	return new InlineDataHandler;
