@@ -75,16 +75,15 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 	{
 		FILE *fp = fopen("/dev/shm/amx_ao_map", "r");
 		if (fp){
-			for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
-				ao_ai_mapping[_ao_ch] = AO_MAP_ZERO;
+			int ai_ch, ao_ch;
+			for (ao_ch = 0; ao_ch < ao_count; ++ao_ch){
+				ao_ai_mapping[ao_ch] = AO_MAP_ZERO;
 			}
 
-			int _ao_ch, _ai_ch;
-
-			if (fscanf(fp, "%d,%d", &_ao_ch, &_ai_ch) == 2 &&
-					_ao_ch >= 1 && _ao_ch <= ao_count &&
-					_ai_ch >= 1 &&  _ai_ch <= ai_count){
-				ao_ai_mapping[_ao_ch-1] = _ai_ch-1;
+			if (fscanf(fp, "%d,%d", &ao_ch, &ai_ch) == 2 &&
+					ao_ch >= 1 && ao_ch <= ao_count &&
+					ai_ch >= 1 &&  ai_ch <= ai_count){
+				ao_ai_mapping[ao_ch-1] = ai_ch-1;
 			}
 			fclose(fp);
 		}
