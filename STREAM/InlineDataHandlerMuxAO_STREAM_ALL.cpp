@@ -91,7 +91,8 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 public:
 	InlineDataHanderMuxAO_STREAM(int _ao_dev, int _ao_count, int _ai_count, int _ai_start, int _ai_stride, int _wavelen) :
 		ao_dev(_ao_dev),
-		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen)
+		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen),
+		ao_buf_ix(0)
 	{
 		dev = new RTM_T_Device(ao_dev);
 		ao_ai_mapping = new unsigned[ao_count];
