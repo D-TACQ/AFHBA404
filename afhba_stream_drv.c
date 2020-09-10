@@ -41,7 +41,7 @@
 #include <linux/version.h>
 
 
-#define REVID	"R1070"
+#define REVID	"R1071"
 
 #define DEF_BUFFER_LEN 0x100000
 
