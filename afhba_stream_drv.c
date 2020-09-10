@@ -41,7 +41,7 @@
 #include <linux/version.h>
 
 
-#define REVID	"R1071"
+#define REVID	"R1072"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -1967,8 +1967,7 @@ long afs_dma_ioctl(struct file *file,
 	}
 	case AFHBA_AO_BURST_SETBUF:
 	{
-		u32 srcix = 0;
-		COPY_FROM_USER(&srcix, varg, sizeof(u32));
+		u32 srcix = arg;
 		afs_load_pull_descriptor(adev, srcix);
 		return 0;
 	}
