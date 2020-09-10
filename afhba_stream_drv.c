@@ -335,7 +335,8 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram){
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->push_descr_ram){
 		if  (!adev->stream_dev->job.dma_started){
 			write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
 		}
@@ -347,7 +348,8 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 
 void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram){
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->pull_descr_ram){
 		if  (!adev->stream_dev->job.dma_started){
 			write_ram_descr(adev, DMA_PULL_DESC_RAM, idesc);
 		}
@@ -366,10 +368,13 @@ static void afs_init_dma_clr(struct AFHBA_DEV *adev)
 static void afs_configure_streaming_dma(
 		struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	u32 check;
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
-	if (dma_descriptor_ram){
+	if (((dma_sel&DMA_PUSH_SEL) && sdev->push_descr_ram) ||
+		((dma_sel&DMA_PULL_SEL) && sdev->pull_descr_ram)    ){
 		dma_ctrl |= DMA_CTRL_RAM;
 	}else{
 		dma_ctrl &= ~DMA_CTRL_RAM;
@@ -1008,6 +1013,10 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	init_waitqueue_head(&sdev->return_waitq);
 
 	mutex_unlock(&sdev->list_mutex);
+
+	if (dma_descriptor_ram){
+		sdev->push_descr_ram = sdev->pull_descr_ram = 1;
+	}
 
 	init_histo_buffers(sdev);
 	dev_dbg(pdev(adev), "afs_init_buffers() 99");
