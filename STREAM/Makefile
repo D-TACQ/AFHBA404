@@ -4,7 +4,7 @@ DEBUG = -g
 CXXFLAGS += -std=c++11 -fPIC -I.. -Ofast $(DEBUG)
 
 APPS = rtm-t-stream-disk  \
-	rtm-t-stream-disk-mux-AO-LLC rtm-t-stream-disk-mux-AO-STREAM rtm-t-stream-disk-mux-AO-STREAM_ALL \
+	rtm-t-stream-disk-mux-AO-LLC rtm-t-stream-disk-mux-AO-STREAM \
 	librtm-t-stream.so
 
 apps: $(APPS)
