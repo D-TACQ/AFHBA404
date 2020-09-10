@@ -1895,36 +1895,7 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	return 0;
 }
 
-/*
-static int ao_burst_work(void *arg)
-{
-	struct AFHBA_DEV *adev = (struct AFHBA_DEV*)arg;
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
 
-	struct sched_param param = { .sched_priority = 10 };
-	sched_setscheduler(current, SCHED_FIFO, &param);
-
-	while(!kthread_should_stop()){
-		int timeout = wait_event_interruptible_timeout(
-			sdev->work.w_waitq,
-			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do),
-			aobd) == 0;
-		afs_load_push_descriptor(adev, aobd->srcdesc);
-	}
-}
-*/
-void start_ao_burst(struct AFHBA_DEV *adev)
-{
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
-	struct AO_BURST* aob = &aobd->ao_burst;
-
-
-	aobd->srcdesc = 0;
-
-//	sdev->work.w_task = kthread_run(ao_burst_work, adev, adev->name);
-}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 {
@@ -1985,46 +1956,21 @@ long afs_dma_ioctl(struct file *file,
 			dev_err(pdev(adev), "AFHBA_AO_BURST_INIT other user data active");
 			return -EBUSY;
 		}else{
-			/*
-			struct AO_BURST_DEV *aobd = kzalloc(sizeof(struct AO_BURST_DEV), GFP_KERNEL);
-
-			if (!VALID_AO_BURST(&aobd->ao_burst)){
-				dev_err(pdev(adev), "AFHBA_AO_BURST_INIT argument not valid");
-				return -EINVAL;
-			}
-			COPY_FROM_USER(&aobd->ao_burst, varg, sizeof(struct AO_BURST));
-			sdev->user = aobd;
-
-			start_ao_burst(adev);
-			*/
+			u32 dma_ctrl = DMA_CTRL_RD(adev);
+			dma_ctrl |= dma_pp(DMA_PULL_SEL, DMA_CTRL_EN);
+			sdev->pull_descr_ram = 0;
+			sdev->onStopPull = afs_stop_stream_pull;
+			afs_load_pull_descriptor(adev, 0);
+			DMA_CTRL_WR(adev, dma_ctrl);
 			return 0;
 		}
 	}
 	case AFHBA_AO_BURST_SETBUF:
 	{
-		/*
-		if (!(sdev->user && VALID_AO_BURST(&AO_BURST_DEV(sdev)->ao_burst))){
-			return -EINVAL;
-		}else{
-		*/
-			struct AO_BURST_DEV *aobd = AO_BURST_DEV(sdev);
-			u32 srcix = 0;
-
-
-			/*
-			COPY_FROM_USER(&srcix, varg, sizeof(u32));
-			if (srcix >=0 && srcix < aobd->ao_burst.nbuf){
-				afs_load_push_descriptor(adev, aobd->srcdesc);
-				aobd->srcdesc = srcix;
-			}else{
-				return -EINVAL;
-			}
-			*/
-			afs_load_pull_descriptor(adev, srcix);
-			return 0;
-			/*
-		}
-		*/
+		u32 srcix = 0;
+		COPY_FROM_USER(&srcix, varg, sizeof(u32));
+		afs_load_pull_descriptor(adev, srcix);
+		return 0;
 	}
 	default:
 		return -ENOTTY;
