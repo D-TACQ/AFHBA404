@@ -80,7 +80,7 @@ class InlineDataHanderMuxAO_STREAM : public InlineDataHandler {
 				ao_ai_mapping[ao_ch] = AO_MAP_ZERO;
 			}
 
-			if (fscanf(fp, "%d,%d", &ao_ch, &ai_ch) == 2 &&
+			while (fscanf(fp, "%d,%d", &ao_ch, &ai_ch) == 2 &&
 					ao_ch >= 1 && ao_ch <= ao_count &&
 					ai_ch >= 1 &&  ai_ch <= ai_count){
 				ao_ai_mapping[ao_ch-1] = ai_ch-1;
@@ -94,6 +94,9 @@ public:
 		ao_count(_ao_count), ai_count(_ai_count), ai_start(_ai_start), ai_stride(_ai_stride), wavelen(_wavelen),
 		ao_buf_ix(0)
 	{
+		fprintf(stderr, "%s ao_dev:%d ao:%d ai:%d ai_start:%d ai_stride:%d wavelen:%d\n", __FUNCTION__,
+				ao_dev, ao_count, ai_count, ai_start, ai_stride, wavelen);
+
 		dev = new RTM_T_Device(ao_dev);
 		ao_ai_mapping = new unsigned[ao_count];
 		for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
@@ -108,12 +111,17 @@ public:
 	virtual void handleBuffer(int ibuf, const void *src, int len)
 	/* take a slice ao_count out of AI buffer and drop the slice into  */
 	{
-		const short* ai = (const short*)src;
+		const short* ai0 = (const short*)src;
+		const short* ai = ai0;
 		short* ao = (short*)dev->getHostBufferMappingW(ao_buf_ix = !ao_buf_ix);
 		const int instep = ai_count*ai_stride;
 		updateMuxSelection();
 
 		for (int sample = 0; sample < wavelen; ++sample, ai += instep, ao += ao_count){
+			if ((const char*)(ai+ai_count) - (const char*)ai0 > dev->maxlen){
+				fprintf(stderr, "%s ai overflow at sample:%d\n", __FUNCTION__, sample);
+				exit(1);
+			}
 			for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
 				unsigned ai_ch = ao_ai_mapping[ao_ch];
 				ao[ao_ch] = ai_ch==AO_MAP_ZERO? 0 : ai[ai_ch];
