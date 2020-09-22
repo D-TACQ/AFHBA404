@@ -1,10 +1,10 @@
 #!/bin/bash
-M1=4
+M1=7
 M2=3
 
 set() {
 	echo $* > /dev/shm/amx_ao_map
-	usleep 500000
+	usleep 20000
 }
 while [ 1 ]; do
 	set $M1,1
