@@ -582,6 +582,7 @@ void __afs_start_dma(struct AFHBA_DEV *adev, u32 dma_sel)
 static int afs_aurora_errors(struct AFHBA_DEV *adev)
 {
 	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
+	int link_warning = 0;
 
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 		u32 ctrl = afhba_read_reg(adev, adev->ACR);
@@ -597,6 +598,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			adev->sfp-SFP_A + 'A',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+			link_warning = 1;
 		}
 		stat = afhba_read_reg(adev, ASR(adev->ACR));
 		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
@@ -608,7 +610,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			msleep(1000);
 			return -1;
 		}else{
-			return 1;
+			return link_warning? -1: 1;
 		}
 	}else{
 		return 0;
@@ -687,22 +689,59 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	int to = 0;
+	enum { WAIT_INIT, WAIT_LANE_UP, WAIT_LANE_STILL_UP, CHECK_READ, TXEN } state = WAIT_INIT;
+	int ticks_in_state = 0;
+#define CHANGE_STATE(s) state = (s); ticks_in_state = 0; continue
 
-	afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
+	for ( ; ; msleep(MSLEEP_TO), ++ticks_in_state){
+		dev_info(pdev(adev), "%s state:%d %s ticks:%d", __FUNCTION__, state,
+				state==WAIT_INIT? "WAIT_INIT": state==WAIT_LANE_UP? "WAIT_LANE_UP":
+				state==WAIT_LANE_STILL_UP?"WAIT_LANE_STILL_UP": state==CHECK_READ? "CHECK_READ":
+				state==TXEN? "TXEN": "???",
+				ticks_in_state);
 
-	while(!afs_aurora_lane_up(adev)){
-		msleep(to += MSLEEP_TO);
-		if (to > aurora_to_ms){
+		switch(state){
+		case WAIT_INIT:
+			afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
+			CHANGE_STATE(WAIT_LANE_UP);
+			break;
+		case WAIT_LANE_UP:
+			if (afs_aurora_lane_up(adev)){
+				CHANGE_STATE(WAIT_LANE_STILL_UP);
+			}else{
+				if (ticks_in_state > 100){
+					return 0;
+				}
+			}
+			break;
+		case WAIT_LANE_STILL_UP:
+			if (afs_aurora_lane_up(adev)){
+				if (ticks_in_state > 3){
+					dev_info(pdev(adev), "%s call mirror_init 01", __FUNCTION__);
+					afs_init_dma_clr(adev);
+					_afs_pcie_mirror_init(adev);
+					CHANGE_STATE(CHECK_READ);
+				}
+			}else{
+				CHANGE_STATE(WAIT_LANE_UP);
+			}
+			break;
+		case CHECK_READ:
+			sdev->comms_init_done = _afs_check_read(adev) == 0;
+			if (afs_aurora_errors(adev) == -1 ){
+				afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_TXDIS);
+				CHANGE_STATE(TXEN);
+			}else{
+				return sdev->comms_init_done;
+			}
+		case TXEN:
+			afhba_write_reg(adev, adev->ACR, 0);
+			CHANGE_STATE(WAIT_INIT);
+		default:
+			dev_err(pdev(adev), "%s illegal state %d", __FUNCTION__, state);
 			return 0;
 		}
 	}
-	/* ... now make _sure_ it's up .. */
-	msleep(MSLEEP_TO);
-	afs_init_dma_clr(adev);
-	_afs_pcie_mirror_init(adev);
-
-	return sdev->comms_init_done = _afs_check_read(adev) == 0;
 }
 
 int afs_comms_init(struct AFHBA_DEV *adev)
@@ -717,7 +756,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 		if (!sdev->comms_init_done){
 			sdev->comms_init_done = _afs_comms_init(adev);
 		}
-		afs_aurora_errors(adev);
+
 		return sdev->comms_init_done;
 	}else{
 		if (adev->link_up){
