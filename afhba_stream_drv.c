@@ -729,6 +729,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 		case CHECK_READ:
 			sdev->comms_init_done = _afs_check_read(adev) == 0;
 			if (afs_aurora_errors(adev) == -1 ){
+				dev_warn(pdev(adev), "%s bad aurora, TXDIS", __FUNCTION__);
 				afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_TXDIS);
 				CHANGE_STATE(TXEN);
 			}else{
