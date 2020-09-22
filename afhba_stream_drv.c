@@ -98,6 +98,10 @@ int eot_interrupt = 0;
 module_param(eot_interrupt, int, 0644);
 MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: interrupt interval");
 
+int cos_interrupt_ok = 0;
+module_param(cos_interrupt_ok, int, 0644);
+MODULE_PARM_DESC(cos_interrupt_ok, "1: interrupt every, 0: interrupt none, N: interrupt interval");
+
 int aurora_status_read_count = 0;
 module_param(aurora_status_read_count, int, 0644);
 MODULE_PARM_DESC(aurora_status_read_count, "number of amon polls");
@@ -2234,7 +2238,8 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
-	if (adev->peer == 0){
+
+	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
 	}
 	startWork(adev);
