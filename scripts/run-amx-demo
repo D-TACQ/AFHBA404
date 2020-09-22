@@ -1,4 +1,4 @@
-export MUXAO=4,4,8,0,1,65536 ; #  DEV4 AO=8 AI=16 START=0 decimate:1, 65K points
+export MUXAO=2,4,8,0,1,20000 ; #  DEV2 AO=4 AI=8 START=0 decimate:5, 65K points
 # AI set for RTM_TRANSLEN=20000 (largest that works)
 RECYCLE=1 RTM_DEVNUM=1 OUTROOT=/mnt/afhba.1 \
 ./STREAM/rtm-t-stream-disk-mux-AO-STREAM
