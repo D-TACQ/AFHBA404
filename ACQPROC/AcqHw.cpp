@@ -186,11 +186,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	 memcpy(reinterpret_cast<char*>(systemInterface.IN.field+vi_cursor.field), dev->lbuf_vi.cursor+vi_offsets.field, \
 			vi.field*sizeof(systemInterface.IN.field[0])))
 
-/** copy SI.field to VO */
-#define SITOVO(field) \
-	(vo.field && \
-	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
-			 vo.field*sizeof(systemInterface.OUT.field[0])))
+
 
 void ACQ_HW::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
@@ -210,6 +206,12 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(SP32);
 }
 
+/** copy SI.field to VO */
+#define SITOVO(field) \
+	(vo.field && \
+	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
+			 vo.field*sizeof(systemInterface.OUT.field[0])))
+
 /** copy SI.field to XO archive. */
 #define SITOVO2(field) \
 	(vo.field && \
@@ -227,6 +229,7 @@ void ACQ_HW::action2(SystemInterface& systemInterface) {
 	SITOVO2(CC32);
 	if (++sample < HBA::maxsam){
 		dev->lbuf_vi.cursor += vi.len();
+		dev->lbuf_vo.cursor += vo.len();
 	}
 	pollcount = 0;
 }
