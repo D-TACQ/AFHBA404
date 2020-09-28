@@ -16,5 +16,6 @@ echo CONTINUOUS=1 | nc acq2106_171 4220
 
 wait
 
+stop
 
 
