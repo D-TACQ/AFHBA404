@@ -1,0 +1,22 @@
+#!/bin/bash
+
+BL=${1:-0x100000}
+BL=${1:-0x80000}
+BN=${2:-33}
+NPORTS=${3:-4}
+
+AMON=${AMON:-1}
+
+DDB=/sys/kernel/debug/dynamic_debug
+[ -d $DDB ] || mount -t debugfs debug /sys/kernel/debug/
+echo 9 > /proc/sys/kernel/printk
+
+/sbin/insmod afhba.ko ll_mode_only=0 reg_access_verbose=0 \
+	afhba4_stream=1 \
+	afhba_nports=${NPORTS} \
+	aurora_monitor=$AMON nbuffers=$BN buffer_len=$BL \
+	eot_interrupt=0 WORK_TO=1 \
+        dma_descriptor_ram=1 assume_stuck_buffers_are_ok=1
+
+./scripts/mount-ramdisk
+mkdir -p /mnt/afhba.1/000000/
