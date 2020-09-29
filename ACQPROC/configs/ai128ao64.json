@@ -1,0 +1,19 @@
+{
+    "AFHBA": {
+        "//" : "Example AI128 AO64 system",
+        "UUT": [
+                {
+                "name" : "acq2106_276",
+                "type": "pcs",
+                "VI" : {
+                    "AI16" : 128,
+                    "SP32" : 16
+                    },
+                "VO": {
+					"AO16": 64
+                }
+            ]
+        }
+}
+
+
