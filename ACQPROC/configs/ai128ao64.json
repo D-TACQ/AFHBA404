@@ -2,7 +2,7 @@
     "AFHBA": {
         "//" : "Example AI128 AO64 system",
         "UUT": [
-                {
+             {
                 "name" : "acq2106_276",
                 "type": "pcs",
                 "VI" : {
@@ -12,8 +12,9 @@
                 "VO": {
 					"AO16": 64
                 }
-            ]
-        }
+             }
+         ]
+     }
 }
 
 
