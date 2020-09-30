@@ -24,6 +24,16 @@ set_clocks() {
 	$UUT1 $UUT2
 	)
 }
+
+
+set_uut() {
+    (cd PROJECTS/AFHBA404/HAPI;
+    SITECLIENT_TRACE=1
+    DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
+    )
+}
+
+
 control_program() {
 	cd PROJECTS/AFHBA404/LLCONTROL
 	#echo CONTROL PROGRAM 01
@@ -61,12 +71,7 @@ control_program() {
 }
 
 control_script() {
-       (cd PROJECTS/AFHBA404/HAPI;
-       echo CONTROL SCRIPT 01
-       SITECLIENT_TRACE=1
-       DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
-       echo CONTROL SCRIPT 99
-       )
+
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
         STATUSMONITOR_TRACE=0 ./acq400_capture.py \
 		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
@@ -100,7 +105,8 @@ xcontrol_script)
 	control_script;;
 *)
 	set_clocks
-        pwm_control
+    pwm_control
+    set_uut
 	new_shot --verbose 1 $UUT1
 	sudo $0 control_program &
 
