@@ -36,7 +36,7 @@ echo UUTS $UUTS
 echo DEVMAX $DEVMAX
 
 CAPTURE_UUTS=${CAPTURE_UUTS:-$UUTS}
-echo "CU $CAPTURE_UUTS"
+PWM_CONTROL=${PWM_CONTROL:-false}
 POST=${POST:-40000} 	# Number of samples to capture
 CLK=${CLK:-100000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-1}
@@ -178,8 +178,24 @@ configure_uut() {
         exit 1
     fi
 
-    # cd $AFHBA404_DIR
 }
+
+
+pwm_control() {
+    cd ~/PROJECTS/AFHBA404/LLCONTROL/
+    # Inserts PWM control data into the host buffer.
+    # Set all channels to 0.
+    #PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel 0 0
+    # Set first channel for test.
+    export CH_NUM=0 # 0 is all channels.
+    export INITIAL_STATE=1
+    export GROUP_PERIOD=1000
+    export ICOUNT=250
+    export OCOUNT=750
+    PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel $CH_NUM $INITIAL_STATE $GROUP_PERIOD $ICOUNT $OCOUNT
+    cd ~
+}
+
 
 
 case "x$1" in
@@ -193,6 +209,10 @@ xcontrol_script)
     # Execution starts here.
     check_uut
     configure_uut
+    if $PWM_CONTROL; then
+        pwm_control
+    fi
+
     control_program &
     control_script
 
