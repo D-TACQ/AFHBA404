@@ -24,7 +24,7 @@
 # - The script does not have to be run as root if taskset is not to be used.
 # - run ./ACQPROC/acqproc $ACQPROC_CONFIG directly to review configuration
 
-ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/swip1.json}
+ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
 
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
@@ -35,23 +35,25 @@ echo UUT2 $UUT2
 echo UUTS $UUTS
 echo DEVMAX $DEVMAX
 
-POST=${POST:-400000} 	# Number of samples to capture
-CLK=${CLK:-20000} 		# Set desired clock speed here.
+CAPTURE_UUTS=${CAPTURE_UUTS:-$UUTS}
+PWM_CONTROL=${PWM_CONTROL:-false}
+POST=${POST:-40000} 	# Number of samples to capture
+CLK=${CLK:-100000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-1}
 SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
-TOPROLE=${TOPROLE:-fpmaster}		# alt: fpmaster for front panel clk/trg.
+TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
 
 TOP=${TOP:-/home/dt100/PROJECTS/}
 HAPI_DIR=$TOP/acq400_hapi/
 AFHBA404_DIR=$TOP/AFHBA404/
 MDS_DIR=$TOP/ACQ400_MDSplus/
 
-ANALYSIS=true # Whether or not to run the analysis scripts.
-TRANSIENT=false # Take a transient capture if true, else stream
+ANALYSIS=false # Whether or not to run the analysis scripts.
+TRANSIENT=true # Take a transient capture if true, else stream
 
 PYTHON="python3"
 # comment out if NOT using MDSplus
@@ -121,7 +123,7 @@ control_program() {
     export SINGLE_THREAD_CONTROL=control_dup1
 EOF
     sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
-
+    echo "Finished"
     [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
@@ -130,9 +132,9 @@ control_script() {
 
     cd $HAPI_DIR
     if $TRANSIENT; then
-        $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $UUTS
+        $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
     else
-        $PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $UUTS
+        $PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
     fi
 
 }
@@ -165,7 +167,7 @@ configure_uut() {
     esac 
 
     cd $AFHBA404_DIR
-    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 $UUTS)"
+    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS)"
     success=$?
     info=$(echo "$cmd" | tail -n6 | sed '$d')
     printf "$info"
@@ -176,8 +178,24 @@ configure_uut() {
         exit 1
     fi
 
-    # cd $AFHBA404_DIR
 }
+
+
+pwm_control() {
+    cd ~/PROJECTS/AFHBA404/LLCONTROL/
+    # Inserts PWM control data into the host buffer.
+    # Set all channels to 0.
+    #PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel 0 0
+    # Set first channel for test.
+    export CH_NUM=0 # 0 is all channels.
+    export INITIAL_STATE=1
+    export GROUP_PERIOD=1000
+    export ICOUNT=250
+    export OCOUNT=750
+    PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel $CH_NUM $INITIAL_STATE $GROUP_PERIOD $ICOUNT $OCOUNT
+    cd ~
+}
+
 
 
 case "x$1" in
@@ -191,6 +209,10 @@ xcontrol_script)
     # Execution starts here.
     check_uut
     configure_uut
+    if $PWM_CONTROL; then
+        pwm_control
+    fi
+
     control_program &
     control_script
 
