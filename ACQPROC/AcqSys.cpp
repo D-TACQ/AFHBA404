@@ -342,6 +342,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["DO32"]);
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
+                //printf("UUT: %s, AO: %d, DO, %d \n", uut["name"].c_str(), vo.AO16, vo.DO32);
 
 		ACQ *acq = ACQ::factory(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
@@ -362,7 +363,8 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 			if (first_type == "pcs" && uut["type"] == "bolo"){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "pcs" && uut["type"] == "pcs,nowait"){
+			}else if (first_type == "pcs" &&
+                                    (uut["type"] == "pcs,nowait" || uut["type"] == "pcs,nowait,pwm")){
 				cerr << "NOTICE: port " << port << " set nowait" << endl;
 				acq->nowait = true;
 			}else if (first_type == "bolo" && uut["type"] != "bolo"){
