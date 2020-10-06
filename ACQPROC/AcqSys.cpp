@@ -342,7 +342,6 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["DO32"]);
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
-                //printf("UUT: %s, AO: %d, DO, %d \n", uut["name"].c_str(), vo.AO16, vo.DO32);
 
 		ACQ *acq = ACQ::factory(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
