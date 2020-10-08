@@ -26,11 +26,14 @@ public:
 		}
 		unsigned tl = tlatch();
 		for (int ii = 0; ii < DO32_count(); ++ii){
-                        if (ii > 0){
+			if (ii > 0 && DO32_count() > 2){
+				/* HACK ALERT: assumed to be PWM, give it a PWM setpoint.
+				 * a "real" PWM controller would calculate new setpoints here
+				 */
 				OUT.DO32[ii] = 0xbe8bb8fa;
-                        }else{
+            }else{
 				OUT.DO32[ii] = tl;
-                        }
+            }
 		}
 	}
 };
