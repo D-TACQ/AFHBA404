@@ -26,7 +26,11 @@ public:
 		}
 		unsigned tl = tlatch();
 		for (int ii = 0; ii < DO32_count(); ++ii){
-			OUT.DO32[ii] = tl;
+                        if (ii > 0){
+				OUT.DO32[ii] = 0xbe8bb8fa;
+                        }else{
+				OUT.DO32[ii] = tl;
+                        }
 		}
 	}
 };
