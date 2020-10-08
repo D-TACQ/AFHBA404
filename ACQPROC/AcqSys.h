@@ -38,6 +38,9 @@ enum SPIX {
 	USECS = 1,			/**< microseconds since trigger */
 	POLLCOUNT = 2,			/**< pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
 };
+
+typedef unsigned PW32V[32];
+
 /** Models Vector Output.
  * Vector Output is a single sample output data set, fetched by single DMA from ACQ
  */
@@ -48,6 +51,7 @@ struct VO {
 	VO offsets(void) const;
 	int AO16;		/**< #AO16 values from the algorithm. OUTPUT to HW */
 	int DO32;		/**< #DO32 values from the algorithm. OUTPUT to HW */
+	int PW32;		/**< #PW32 values from the algorithm. OUTPUT to HW */
 	int CC32;		/**< #CALC values from the algorithm. NOT OUTPUT to HW */
 	VO();
 };
@@ -170,6 +174,7 @@ public:
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
+		PW32V *PW32;			/* 32 demand values packed into shorts */
 		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
 	} OUT;
 
@@ -204,6 +209,9 @@ public:
 	}
 	unsigned DO32_count() const {
 		return hba.vo.DO32;
+	}
+	unsigned PW32_count() const {
+		return hba.vo.PW32;
 	}
 	unsigned CC32_count() const {
 		return hba.vo.CC32;

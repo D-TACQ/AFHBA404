@@ -9,6 +9,9 @@
 #include <string.h>
 
 
+
+#define PWM_MAGIC	0xbe8bb8fa			// makes for a good display
+
 class DummySingleThreadControlSystemInterface: public SystemInterface {
 
 public:
@@ -26,14 +29,12 @@ public:
 		}
 		unsigned tl = tlatch();
 		for (int ii = 0; ii < DO32_count(); ++ii){
-			if (ii > 0 && DO32_count() > 2){
-				/* HACK ALERT: assumed to be PWM, give it a PWM setpoint.
-				 * a "real" PWM controller would calculate new setpoints here
-				 */
-				OUT.DO32[ii] = 0xbe8bb8fa;
-            }else{
-				OUT.DO32[ii] = tl;
-            }
+			OUT.DO32[ii] = tl;
+		}
+		for (int ii = 0; ii < PW32_count(); ++ii){
+			for (int cc = 0; cc < sizeof(PW32V); ++cc){
+				OUT.PW32[ii][cc] = PWM_MAGIC;
+			}
 		}
 	}
 };

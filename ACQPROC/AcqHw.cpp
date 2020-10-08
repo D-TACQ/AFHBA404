@@ -114,6 +114,7 @@ protected:
 class ACQ_HW: public ACQ_HW_BASE
 {
 	int sample;
+	int pw32_double_buffer;   // for back-compatibility with old PWM code
 public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -135,7 +136,9 @@ public:
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor), sample(0)
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+		sample(0),
+		pw32_double_buffer(::getenv("PW32_DOUBLE_BUFFER", 1))
 {
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
@@ -223,9 +226,11 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 void ACQ_HW::action2(SystemInterface& systemInterface) {
 	SITOVO(AO16);
 	SITOVO(DO32);
+	if (pw32_double_buffer) SITOVO(PW32);
 
 	SITOVO2(AO16);
 	SITOVO2(DO32);
+	SITOVO2(PW32);
 	SITOVO2(CC32);
 	if (++sample < HBA::maxsam){
 		dev->lbuf_vi.cursor += vi.len();
