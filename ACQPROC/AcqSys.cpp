@@ -64,7 +64,7 @@ VO VO::offsets(void) const
 	VO voff;
 	voff.AO16 = 0;
 	voff.DO32 = AO16*sizeof(short);
-	voff.PW32 = DO32*sizeof(unsigned);
+	voff.PW32 = voff.DO32 + DO32*sizeof(unsigned);
 	voff.CC32 = voff.PW32 + PW32*sizeof(PW32V);
 	return voff;
 }
