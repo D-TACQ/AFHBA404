@@ -79,7 +79,7 @@ def calculate_tcan(xo_vector_length):
     return _calculate_padding(xo_vector_length)
 
 
-def calculate_vector_length(uut, SITES, DIOSITES):
+def calculate_vector_length(uut, SITES, DIOSITES, PWMSITES):
     vector_length = 0
     for site in SITES:
         nchan = int(uut.modules[site].get_knob('NCHAN'))
@@ -93,6 +93,11 @@ def calculate_vector_length(uut, SITES, DIOSITES):
         for site in DIOSITES:
             vector_length += 4
 
+    if PWMSITES:
+        for site in DIOSITES:
+            vector_length += 64
+
+
     return vector_length
 
 
@@ -105,7 +110,7 @@ def config_sync_clk(uut):
     return None
 
 
-def config_aggregator(args, uut, AISITES, DIOSITES):
+def config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES):
     # This function calculates the ai vector size from the number of channels
     # and word size of the AISITES argument provided to it and then sets the
     # spad, aggregator and NCHAN parameters accordingly.
@@ -119,7 +124,7 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
     print(TOTAL_SITES)
 
-    ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES)
+    ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES, PWMSITES)
 
     # now check if we need a spad
     spad = calculate_spad(ai_vector_length)
@@ -136,9 +141,9 @@ def config_aggregator(args, uut, AISITES, DIOSITES):
     return None
 
 
-def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
-    TOTAL_SITES = (AOSITES + DIOSITES)
-    ao_vector = calculate_vector_length(uut, AOSITES, DIOSITES)
+def config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
+    TOTAL_SITES = (AOSITES + DIOSITES + PWMSITES)
+    ao_vector = calculate_vector_length(uut, AOSITES, DIOSITES, PWMSITES)
     TCAN = calculate_tcan(ao_vector)
     if TCAN == 16:
         # If the TCAN is 16 then we're just taking up space for no reason, so
@@ -158,7 +163,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES):
     return None
 
 
-def config_VI(args, uut, AISITES, DIOSITES):
+def config_VI(args, uut, AISITES, DIOSITES, PWMSITES):
     uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
     if args.us == 1:
         trg = uut.s1.trg.split(" ")[0].split("=")[1]
@@ -167,7 +172,7 @@ def config_VI(args, uut, AISITES, DIOSITES):
         uut.s0.LLC_instrument_latency = 1
     if args.fp_sync_clk == 1:
         config_sync_clk(uut)
-    config_aggregator(args, uut, AISITES, DIOSITES)
+    config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES)
 
 
 def config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
@@ -182,23 +187,19 @@ def config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
 
     for site in AOSITES:
         uut.modules[site].lotide = 256
-        uut.modules[site].clk = signal
-        uut.modules[site].clkdiv = '1'
         signal = signal2
 
     for site in DIOSITES:
         uut.modules[site].mode = '0'
         uut.modules[site].lotide = '256'
         uut.modules[site].byte_is_output = '1,1,0,0'
-        uut.modules[site].clk = signal
-        uut.modules[site].trg = signal
         uut.modules[site].mode = '1'
         signal = signal2
 
     for site in PWMSITES:
         uut.modules[site].pwm_clkdiv = '%x' % 1000
 
-    config_distributor(args, uut, DIOSITES, AOSITES, AISITES)
+    config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES)
 
 
 def load_json(json_file):
@@ -207,43 +208,11 @@ def load_json(json_file):
     return json_data
 
 
-def generate_command(args, uut, AISITES, AOSITES, DIOSITES):
-    # Create and print a representitive cpucopy command.
-    # We need to iterate over the sites as s0 NCHAN now includes the spad.
-    TOTAL_SITES = AISITES + DIOSITES if args.include_dio_in_aggregator else AISITES
-    print("DEBUG = ", TOTAL_SITES)
-    aichan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN"))
-                  for site in AISITES])
-    aochan = sum([int(getattr(getattr(uut, "s{}".format(site)), "NCHAN"))
-                  for site in AOSITES])
-    nshorts = (aichan) + (2 * len(DIOSITES))
-    DO32 = 1 if DIOSITES else 0
-    spad_longs = uut.s0.spad.split(",")[1]
-    tcan_longs = uut.s0.distributor.split(" ")[3].split("=")[1]
-    devnum = get_devnum(args, uut)
-
-    print("HOST Input Vector VI composition:\n"
-          "{} short words of AI, {} longword(s) of DI, and {} longwords of SPAD.".
-          format(aichan, DO32, spad_longs))
-    print("The scratchpad will start at position {} in the vector. \n".format(
-        int(nshorts/2)))
-
-    print("HOST Output Vector VO composition:\n"
-          "{} short words of AO, {} longword(s) of DO, and {} longwords of TCAN.".
-          format(aochan, DO32, tcan_longs))
-
-    # print("\n", command, sep="")
-    command = "DUP1=0 NCHAN={} AOCHAN={} DO32={} SPADLONGS={} DEVNUM={} LLCONTROL/afhba-llcontrol-cpucopy".\
-        format(nshorts, aochan, DO32, spad_longs, devnum)
-    print("Example control program command:\n", command)
-
-
 def enum_sites(uut, uut_json=None):
     AISITES = []
     AOSITES = []
     DIOSITES = []
     PWMSITES = []
-
     for site in uut.modules:
         try:
             module_name = uut.modules[site].get_knob('module_name')
@@ -252,23 +221,25 @@ def enum_sites(uut, uut_json=None):
             elif module_name.startswith('ao'):
                 AOSITES.append(site)
             elif module_name.startswith('dio'):
-                DIOSITES.append(site)
 
-                if uut.modules[site].get_knob('module_type') == '6B' and module_has_attr(uut, "module_variant"):
+                if uut.modules[site].get_knob('module_type') == '61':
+                    DIOSITES.append(site)
+                if uut.modules[site].get_knob('module_type') == '6B':
                     module_variant = int(
                         uut.modules[site].get_knob('module_variant'))
                     if module_variant in [1, 2]:
                         PWMSITES.append(site)
 
                         if uut_json != None:
-                            if 'pwm' not in uut_json['type']:
+                            if not "PW32" in uut_json['VO'].keys():
                                 print(
                                     "Warning: PWM site found, but no PWM specified in json.")
                     elif uut_json != None:
-                        if 'pwm' in uut_json['type']:
+                        if "PW32" in uut_json['VO'].keys():
                             print(
                                 "Warning: PWM included in json configuration but site is NOT a PWM.")
-        except Exception:
+        except Exception as err:
+            print("ERROR: ", err)
             continue
     return AISITES, AOSITES, DIOSITES, PWMSITES
 
@@ -280,13 +251,10 @@ def config_auto(args, uut, uut_json=None):
     AISITES, AOSITES, DIOSITES, PWMSITES = enum_sites(uut, uut_json)
 
     if len(AISITES) != 0:
-        config_VI(args, uut, AISITES, DIOSITES)
+        config_VI(args, uut, AISITES, DIOSITES, PWMSITES)
 
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES)
-
-    if args.cmd == 1:
-        generate_command(args, uut, AISITES, AOSITES, DIOSITES)
 
     return None
 
@@ -300,10 +268,6 @@ def run_main():
 
     parser.add_argument('--auto', type=int, default=1,
                         help='Whether or not to automatically configure the UUTs.')
-
-    parser.add_argument('--cmd', type=int, default=1,
-                        help='Whether or not to include an example cpucopy command for the system'
-                        ' being configured')
 
     parser.add_argument('--us', type=int, default=1,
                         help='Whether or not to set the microsecond counter.')

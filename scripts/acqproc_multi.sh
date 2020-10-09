@@ -167,16 +167,7 @@ configure_uut() {
     esac 
 
     cd $AFHBA404_DIR
-    cmd="$($PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS)"
-    success=$?
-    info=$(echo "$cmd" | tail -n6 | sed '$d')
-    printf "$info"
-    echo -e "\n"
-    cmd="$(echo "$cmd" | tail -n1)"
-    if ! [ $success -eq 0 ]; then
-        echo "Host did not find $UUT1 connected the AFHBA404 card. Please check connections."
-        exit 1
-    fi
+    $PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS
 
 }
 
