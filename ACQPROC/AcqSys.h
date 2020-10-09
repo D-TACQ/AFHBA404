@@ -39,7 +39,8 @@ enum SPIX {
 	POLLCOUNT = 2,			/**< pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
 };
 
-typedef unsigned PW32V[32];
+#define PW32LEN  32
+typedef unsigned PW32V[PW32LEN];
 
 /** Models Vector Output.
  * Vector Output is a single sample output data set, fetched by single DMA from ACQ

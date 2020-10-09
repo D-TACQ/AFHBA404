@@ -32,7 +32,7 @@ public:
 			OUT.DO32[ii] = tl;
 		}
 		for (int ii = 0; ii < PW32_count(); ++ii){
-			for (int cc = 0; cc < sizeof(PW32V); ++cc){
+			for (int cc = 0; cc < PW32LEN; ++cc){
 				OUT.PW32[ii][cc] = PWM_MAGIC;
 			}
 		}
@@ -43,6 +43,8 @@ int DummySingleThreadControlSystemInterface::DUP1;
 
 SystemInterface& SystemInterface::factory(const HBA& hba)
 {
+	if (G::verbose) printf("%s::%s\n", __FILE__, PFN);
+
 	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (sscanf(key, "control_dup1=%d", &DummySingleThreadControlSystemInterface::DUP1) == 1 ||
