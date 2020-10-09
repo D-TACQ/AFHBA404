@@ -365,18 +365,18 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		} catch (exception& e) {
 			;
 		}
+		string uut_type = uut["type"];
 		// check unit compatibility
 		if (iuut == 0){
-			first_type = uut["type"];
+			first_type = uut_type;
 		}else{
-			if (first_type == "pcs" && uut["type"] == "bolo"){
+			if (first_type == "pcs" && uut_type == "bolo"){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "pcs" &&
-                                    (uut["type"] == "pcs,nowait" || uut["type"] == "pcs,nowait,pwm")){
+			}else if (first_type == "pcs" && uut_type.find("nowait") != string::npos){
 				cerr << "NOTICE: port " << port << " set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "bolo" && uut["type"] != "bolo"){
+			}else if (first_type == "bolo" && uut_type != "bolo"){
 				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
 			}
 		}
