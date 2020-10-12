@@ -24,7 +24,14 @@
 # - The script does not have to be run as root if taskset is not to be used.
 # - run ./ACQPROC/acqproc $ACQPROC_CONFIG directly to review configuration
 
-ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
+ACQPROC_CONFIG=$1 #{ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
+if [ -z "$ACQPROC_CONFIG" ]; then
+    echo "Script argument should be a configuration file (json)."
+    echo "This argument is required. Example files are included in:"
+    echo "ACQPROC/configs/"
+    echo "ls ACQPROC/configs/*.json"
+    exit
+fi
 
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
