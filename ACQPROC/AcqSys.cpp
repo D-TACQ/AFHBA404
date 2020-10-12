@@ -316,6 +316,13 @@ int HBA::maxsam;
 
 HBA* HBA::the_hba;
 
+
+bool strstr(string haystack, string needle)
+{
+	return haystack.find(needle) != string::npos;
+}
+
+
 /** HBA::Create() factory function. */
 HBA& HBA::create(const char* json_def, int _maxsam)
 {
@@ -370,13 +377,13 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		if (iuut == 0){
 			first_type = uut_type;
 		}else{
-			if (first_type == "pcs" && uut_type == "bolo"){
+			if (::strstr(first_type, "pcs") && ::strstr(uut_type, "bolo")){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "pcs" && uut_type.find("nowait") != string::npos){
+			}else if (::strstr(first_type, "pcs") && ::strstr(uut_type, "nowait")){
 				cerr << "NOTICE: port " << port << " set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "bolo" && uut_type != "bolo"){
+			}else if (::strstr(first_type, "bolo") && !::strstr(uut_type, "bolo")){
 				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
 			}
 		}
