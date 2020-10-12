@@ -35,11 +35,11 @@ echo UUT2 $UUT2
 echo UUTS $UUTS
 echo DEVMAX $DEVMAX
 
-CAPTURE_UUTS=${CAPTURE_UUTS:-$UUTS}
-PWM_CONTROL=${PWM_CONTROL:-false}
+#CAPTURE_UUTS=${CAPTURE_UUTS:-$UUTS}
+CAPTURE_UUTS=$(python3 scripts/list_capture_uuts.py --json_file=${ACQPROC_CONFIG})
 POST=${POST:-40000} 	# Number of samples to capture
 CLK=${CLK:-100000} 		# Set desired clock speed here.
-VERBOSE=${VERBOSE:-1}
+VERBOSE=${VERBOSE:-0}
 SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 
@@ -172,23 +172,6 @@ configure_uut() {
 }
 
 
-pwm_control() {
-    cd ~/PROJECTS/AFHBA404/LLCONTROL/
-    # Inserts PWM control data into the host buffer.
-    # Set all channels to 0.
-    #PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel 0 0
-    # Set first channel for test.
-    export CH_NUM=0 # 0 is all channels.
-    export INITIAL_STATE=1
-    export GROUP_PERIOD=1000
-    export ICOUNT=250
-    export OCOUNT=750
-    PWM_OFFSET=132 DEVNUM=1 IBUF=0 ./pwm_set_channel $CH_NUM $INITIAL_STATE $GROUP_PERIOD $ICOUNT $OCOUNT
-    cd ~
-}
-
-
-
 case "x$1" in
 xconfigure_uut)
     configure_uut;;
@@ -200,9 +183,6 @@ xcontrol_script)
     # Execution starts here.
     check_uut
     configure_uut
-    if $PWM_CONTROL; then
-        pwm_control
-    fi
 
     control_program &
     control_script
