@@ -330,6 +330,10 @@ ACQ_HW_MULTI::ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offs
 		perror("ioctl AFHBA_START_AI_ABN");
 		exit(1);
 	}
+
+	if (verbose) for (ib = 0; ib < nb; ++ib){
+		printf("[%d] [%d] AI buf pa: 0x%08x len %d\n", dev->devnum, ib, dev->xllc_def.pa, dev->xllc_def.len);
+	}
 	printf("[%d] AI buf pa: 0x%08x len %d nb:%d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len, nb);
 
 	for (ib = 0; ib < nb; ++ib){
