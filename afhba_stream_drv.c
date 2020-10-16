@@ -506,6 +506,7 @@ static void afs_load_dram_descriptors_ll(
 				__FUNCTION__, idb, reg_off, adev->remote+reg_off, dma_desc);
 
 			writel(dma_desc, adev->remote+reg_off);
+			msleep(5);
 		}
 	}
 
