@@ -83,12 +83,17 @@ protected:
 	unsigned tl0;
 
 	unsigned *dox;
+	int sample;
+	int pw32_double_buffer;   // for back-compatibility with old PWM code
 
 	ACQ_HW_BASE(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ(devnum, _name, _vi, _vo, _vi_offsets,
 				_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-				tl0(0xdeadbeef), dev(new Dev(devnum))
+				dev(new Dev(devnum)),
+				tl0(0xdeadbeef),
+				sample(0),
+				pw32_double_buffer(::getenv("PW32_DOUBLE_BUFFER", 1))
 	{
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
@@ -109,12 +114,15 @@ protected:
 	/**< prepare to run a shot nsamples long, arm the UUT. */
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
+	virtual void action(SystemInterface& systemInterface);
+	/**< on newSample, copy VO from SI, copy VI to SI */
+	virtual void action2(SystemInterface& systemInterface);
+	/**< late action(), cleanup */
 };
 
 class ACQ_HW: public ACQ_HW_BASE
 {
-	int sample;
-	int pw32_double_buffer;   // for back-compatibility with old PWM code
+
 public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -122,10 +130,7 @@ public:
 	{}
 	virtual bool newSample(int sample);
 	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
-	virtual void action(SystemInterface& systemInterface);
-	/**< on newSample, copy VO from SI, copy VI to SI */
-	virtual void action2(SystemInterface& systemInterface);
-	/**< late action(), cleanup */
+
 };
 
 /* TLATCH now uses the dynamic set value */
@@ -136,9 +141,7 @@ public:
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-		sample(0),
-		pw32_double_buffer(::getenv("PW32_DOUBLE_BUFFER", 1))
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
@@ -191,7 +194,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 
 
-void ACQ_HW::action(SystemInterface& systemInterface)
+void ACQ_HW_BASE::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
 	VITOSI(AI16);
@@ -223,7 +226,7 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 
 /** in slack time, copy SI.OUT to VO archive cursor.
  * @@todo make it optional in case it takes too long */
-void ACQ_HW::action2(SystemInterface& systemInterface) {
+void ACQ_HW_BASE::action2(SystemInterface& systemInterface) {
 	SITOVO(AO16);
 	SITOVO(DO32);
 	if (pw32_double_buffer) SITOVO(PW32);
@@ -267,6 +270,53 @@ unsigned ACQ_HW_BASE::tlatch(void)
 void ACQ_HW_BASE::arm(int nsamples)
 {
 	cerr << "ACQ_HW_BASE::arm: TODO" <<endl;
+}
+
+
+
+class ACQ_HW_MULTI: public ACQ_HW_BASE
+/**< ACQ_HW_MULTI: as per ACQ_HW, but with <multi> dma buffers
+ * use for applications like THOMSON where <multi> back to back bursts occur
+ * by using <multi> buffers, there's no pileup
+ * the system will still output a single sample per buffer, the tempo of the output will be bursty
+ */
+{
+
+	int pw32_double_buffer;   // for back-compatibility with old PWM code
+	int nbuffers;
+public:
+	ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nbuffers);
+	virtual ~ACQ_HW_MULTI()
+	{}
+	virtual bool newSample(int sample);
+	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
+};
+
+ACQ_HW_MULTI::ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nbuffers):
+		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
+								_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+		nbuffers(_nbuffers)
+{
+	// @@todo HANDLE MULTIPLE BUFFERS
+}
+
+/** checks host buffer for new sample, if so copies to lbuf and reports true */
+bool ACQ_HW_MULTI::newSample(int sample)
+{
+    unsigned tl1;
+	// @@todo HANDLE MULTIPLE BUFFERS
+	if (nowait || (tl1 = TLATCH0) != tl0){
+		memcpy(dev->lbuf_vi.cursor, dev->host_buffer, vi.len());
+                tl0 = tl1;
+		return true;
+	}else if (sample == 0 && wd_mask){
+		dox[0] ^= wd_mask;
+		return false;
+	}else{
+		return false;
+	}
 }
 
 
@@ -454,6 +504,13 @@ ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 
 	if (HW == 1){
+		int multi = 0;
+		if (getenv("HW_MULTI")){
+			multi = atoi(getenv("HW_MULTI"));
+			if (multi){
+				return new ACQ_HW_MULTI(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, multi);
+			}
+		}
 		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	}else if (HW > 1){
 		if (skip > 1){
