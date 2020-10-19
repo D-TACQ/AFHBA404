@@ -95,7 +95,9 @@ def init_ai(uut):
     uut.s1.sod = '1'
     uut.s1.trg = '0,0,0'
     uut.s1.clk = '1,0,1'
-    ssb = int(uut.s0.NCHAN)*2
+    uut.s0.run0
+    ssb = int(uut.s0.ssb)
+    #ssb = int(uut.s0.NCHAN)*2
     uut.s0.bufferlen = lcm(ssb, 4096)
 
 

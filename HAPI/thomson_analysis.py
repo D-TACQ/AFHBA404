@@ -16,7 +16,7 @@ import sys
 
 
 def check_column(data, col, total_cols, total_systems):
-    sample_count = [[],[],[],[]]
+    sample_count = [[] for i in range(total_systems)]#[[]*total_systems]
     for system in range(0,total_systems):
         for count in data[col + (system * total_cols)::total_cols * total_systems]:
             sample_count[system].append(count)
