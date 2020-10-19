@@ -3,25 +3,6 @@ import argparse
 import json
 
 
-#uuts = 7
-#data = []
-#total_data = np.array([]).reshape((-1, 192))
-#uuts = ["acq2106_238", "acq2106_261", "acq2106_262", "acq2106_263", "acq2106_264", "acq2106_265", "acq2106_266"]
-#nchan= 192
-
-
-# for uut in uuts:
-#	dat = np.fromfile("{}_VI.dat".format(uut), dtype=np.int32).reshape((-1, 112))
-#	data.append(dat)
-#	print(dat.shape)
-#
-
-#total_data = np.concatenate(data, axis=1).flatten()
-
-
-# total_data.tofile("LLCONTROL/afhba.0.log")
-
-
 def get_args():
     parser = argparse.ArgumentParser(description='THOMSON data mux tool.')
     parser.add_argument('--json_file', type=str,
