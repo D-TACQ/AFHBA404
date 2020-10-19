@@ -1,4 +1,5 @@
-/*
+/** @file acqproc.cpp
+ * @brief main program with UI, instantiates system.
  * acqproc_th.cpp  : test harness
  *
  *  Created on: 27 Feb 2020

@@ -1,5 +1,7 @@
-/*
- * DefaultSystemInterface.cpp
+/** @file DefaultSystemInterface.cpp
+ *  @brief SystemInterface implementation example
+ *  overloads ringDoorbell() to actually "do work".
+ *  a real implementation should perform a shared memory interface with another process.
  *
  *  Created on: 14 Mar 2020
  *      Author: pgm

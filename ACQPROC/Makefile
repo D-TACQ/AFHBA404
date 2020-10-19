@@ -9,6 +9,8 @@ all: $(APPS)
 clean:
 	rm -f *.o $(APPS)
 
+doxygen:
+	doxygen
 
 acqproc: acqproc.o AcqSys.o AcqHw.o DefaultSystemInterface.o afhba-llcontrol.o Env.o
 	$(CXX) -O3 -o $@ $^	

@@ -1,4 +1,6 @@
-/*
+/** @file AcqSys.cpp
+ * @brief creates system configuration from config.
+ *
  * AcqSys.cpp
  *
  *  Created on: 27 Feb 2020

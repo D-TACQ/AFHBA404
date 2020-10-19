@@ -1,4 +1,6 @@
-/*
+/** @file AcqHw.cpp
+ *  @brief hardware implementation layer
+ *
  * AcqHw.cpp  :ACQ device with hardware hooks
  *
  *  Created on: 1 Mar 2020
@@ -34,6 +36,7 @@ struct Dev {
 	int devnum;
 	int fd;
 	char* host_buffer;
+	/** local buffer interface .. for archive. */
 	struct LBUF {
 		char* base;
 		char* cursor;
@@ -123,6 +126,7 @@ protected:
 	/**< late action(), cleanup */
 };
 
+/** concrete base class. */
 class ACQ_HW: public ACQ_HW_BASE
 {
 
@@ -275,13 +279,12 @@ void ACQ_HW_BASE::arm(int nsamples)
 }
 
 
-
-class ACQ_HW_MULTI: public ACQ_HW_BASE
-/** ACQ_HW_MULTI: as per ACQ_HW, but with *multi* dma buffers
- * use for applications like THOMSON where *multi* back to back bursts occur
- * by using *multi* buffers, there's no pileup.
+/** as per ACQ_HW, but with **multi** dma buffers
+ * use for applications like THOMSON where **multi** back to back bursts occur
+ * by using **multi** buffers, there's no pileup.
  * the system will still output a single sample per buffer, the tempo of the output will be bursty
  */
+class ACQ_HW_MULTI: public ACQ_HW_BASE
 {
 protected:
 	int pw32_double_buffer;   // for back-compatibility with old PWM code
@@ -359,7 +362,8 @@ bool ACQ_HW_MULTI::newSample(int sample)
 	}
 }
 
-
+/** output the mean of **nb** values
+ */
 class ACQ_HW_MEAN: public ACQ_HW_MULTI
 {
 protected:
@@ -445,7 +449,7 @@ void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
 
 }
 
-/* takes mean of N samples, newSample returns true after <skip> samples */
+/** takes mean of N samples, newSample returns true after **skip** samples */
 class ACQ_HW_MEAN_SKIPPER: public ACQ_HW_MEAN {
 	const int nskip;
 public:
