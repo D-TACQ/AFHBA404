@@ -360,10 +360,10 @@ bool ACQ_HW_MULTI::newSample(int sample)
 }
 
 
-class ACQ_HW_MEAN: public ACQ_HW_BASE
+class ACQ_HW_MEAN: public ACQ_HW_MULTI
 {
 protected:
-	const int nmean;
+	const int& nmean;
 
 	unsigned *dox;
 	int **raw;
@@ -388,40 +388,12 @@ public:
 
 ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nmean) :
-		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-		nmean(_nmean),
-		tl0_array(new unsigned[_nmean]),
+		ACQ_HW_MULTI(devnum, _name, _vi, _vo, _vi_offsets,
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor, _nmean),
+		nmean(nb),
 		verbose(Env::getenv("ACQ_HW_MEAN_VERBOSE", 0))
 {
-	struct ABN abn;
-	int ib;
 
-	raw = new int* [nmean];
-	abn.ndesc = nmean;
-	abn.buffers[0].pa = dev->xllc_def.pa;
-
-	for (ib = 0; ib < nmean; ++ib){
-		if (dev->xllc_def.pa != RTM_T_USE_HOSTBUF){
-			assert(0);			// this path not valid.
-			abn.buffers[ib].pa = dev->xllc_def.pa + ib*PAGE_SIZE;
-		}
-		abn.buffers[ib].len = dev->xllc_def.len;
-		raw[ib] = (int*)(dev->host_buffer + ib*PAGE_SIZE);
-	}
-
-	if (ioctl(dev->fd, AFHBA_START_AI_ABN, &abn)){
-		perror("ioctl AFHBA_START_AI_ABN");
-		exit(1);
-	}
-	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
-
-	if (verbose){
-		fprintf(stderr, "%s nmean:%d spix:%d\n", __FUNCTION__, nmean, spix);
-	}
-	for (ib = 0; ib < nmean; ++ib){
-		tl0_array[ib] = 0xdeadbeef;
-	}
 }
 
 bool ACQ_HW_MEAN::_newSample(int sample)
