@@ -277,9 +277,9 @@ void ACQ_HW_BASE::arm(int nsamples)
 
 
 class ACQ_HW_MULTI: public ACQ_HW_BASE
-/**< ACQ_HW_MULTI: as per ACQ_HW, but with <multi> dma buffers
- * use for applications like THOMSON where <multi> back to back bursts occur
- * by using <multi> buffers, there's no pileup
+/** ACQ_HW_MULTI: as per ACQ_HW, but with *multi* dma buffers
+ * use for applications like THOMSON where *multi* back to back bursts occur
+ * by using *multi* buffers, there's no pileup.
  * the system will still output a single sample per buffer, the tempo of the output will be bursty
  */
 {
@@ -451,7 +451,7 @@ bool ACQ_HW_MEAN::newSample(int sample)
 }
 
 void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
-/**< on newSample, copy VO from SI, copy VI to SI */
+/** on newSample, copy VO from SI, copy VI to SI */
 {
 /** SIMPLIFY: supports AI32 ONLY!
  * COMPLEXIFY : re-scale as LJ 24 bit number so that HW=1 threshold is still valid, then OR the channel ID back in.
@@ -468,7 +468,7 @@ void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
 	}
 }
 void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
-/**< late action(), cleanup */
+/** late action(), cleanup */
 {
 
 }
@@ -528,7 +528,12 @@ bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
 	}
 }
 
+/**
+ *  ACQ::factory is configured by environment variabls to setup the core of the acquisition
 
+- HW=Value,Skip : Value 0: Simulate (check config file) Value 1: run normal hardware. >1 take mean of N samples Skip: > 0 Skip N samples before mena
+- HW_MULTI=N    : Regular capture with N DMA buffers. Allows control program to run at Fs/N
+ */
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
 {
