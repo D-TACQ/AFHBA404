@@ -36,7 +36,7 @@ acqproc() {
 	export AFFINITY=$AFFINITY
 	export SINGLE_THREAD_CONTROL=control_dup1
 EOF
-	sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' 1000'
+        sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
 }
 
 
