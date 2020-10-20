@@ -1,0 +1,1302 @@
+\hypertarget{acq-fiber-hba_8h}{}\doxysection{acq-\/fiber-\/hba.h File Reference}
+\label{acq-fiber-hba_8h}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+
+
+A\+F\+H\+B\+A404 device driver data structs.  
+
+
+{\ttfamily \#include $<$linux/device.\+h$>$}\newline
+{\ttfamily \#include $<$linux/delay.\+h$>$}\newline
+{\ttfamily \#include $<$linux/interrupt.\+h$>$}\newline
+{\ttfamily \#include $<$linux/fs.\+h$>$}\newline
+{\ttfamily \#include $<$linux/ioctl.\+h$>$}\newline
+{\ttfamily \#include $<$linux/kernel.\+h$>$}\newline
+{\ttfamily \#include $<$linux/kthread.\+h$>$}\newline
+{\ttfamily \#include $<$linux/list.\+h$>$}\newline
+{\ttfamily \#include $<$linux/pci.\+h$>$}\newline
+{\ttfamily \#include $<$linux/time.\+h$>$}\newline
+{\ttfamily \#include $<$linux/init.\+h$>$}\newline
+{\ttfamily \#include $<$linux/timex.\+h$>$}\newline
+{\ttfamily \#include $<$linux/vmalloc.\+h$>$}\newline
+{\ttfamily \#include $<$linux/mm.\+h$>$}\newline
+{\ttfamily \#include $<$linux/moduleparam.\+h$>$}\newline
+{\ttfamily \#include $<$linux/mutex.\+h$>$}\newline
+{\ttfamily \#include $<$linux/uaccess.\+h$>$}\newline
+{\ttfamily \#include $<$linux/version.\+h$>$}\newline
+{\ttfamily \#include $<$uapi/linux/sched/types.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}afhba\+\_\+minor.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}afhba\+\_\+debugfs.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}rtm-\/t\+\_\+ioctl.\+h\char`\"{}}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structHostBuffer}{Host\+Buffer}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV_1_1PciMapping}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+Pci\+Mapping}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV__PATH}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+\_\+\+P\+A\+TH}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae62a1773f22b7a2f5635c7497269cd39}{assert}}(p)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9b30c8e32c366824be94a7408f48b027}{M\+A\+X\+D\+EV}}~8	/$\ast$ maximum expected devices .. $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}{R\+E\+G\+S\+\_\+\+B\+AR}}~0		/$\ast$ @@todo assumed $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a15803d57ce517062baf9ac442ba66727}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+\+M\+AX}}~6
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aff37baed944252e0c7fef8a07970b091}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G1}}~2
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a314b4047954621d36741d105fc530ce7}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G2}}~4
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad2fe65ecff0032e02a5d6c9d61a8b969}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G4}}~6
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac2c4143824bbd55cf46d5efbe418b2a2}{S\+Z\+M1}}(field)~(sizeof(field)-\/1)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1e31a0ac88887de6da344eebd279c92d}{P\+SZ}}~(sizeof (struct \mbox{\hyperlink{structAFHBA__DEV__PATH}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+\_\+\+P\+A\+TH}}))
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a367b8145419319e0a77bff9c5d8ff312}{PD}}(file)~((struct \mbox{\hyperlink{structAFHBA__DEV__PATH}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+\_\+\+P\+A\+TH}} $\ast$)(file)-\/$>$private\+\_\+data)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a90f40077a3c072281c8d1c741b3b27c5}{D\+EV}}(file)~(\mbox{\hyperlink{acq-fiber-hba_8h_a367b8145419319e0a77bff9c5d8ff312}{PD}}(file)-\/$>$dev)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a233704347f1fa43667ea724c40ce9d28}{pdev}}(adev)~(\&(adev)-\/$>$pci\+\_\+dev-\/$>$dev)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a43ae649886a55c0ebcd0e543b9ca904e}{L\+OC}}(adev)~((adev)-\/$>$mappings\mbox{[}0\mbox{]}.va)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aeeb2947ebccabd2ffeb408c69193d49c}{R\+EM}}(adev)~((adev)-\/$>$remote)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}{R\+E\+G\+S\+\_\+\+B\+AR}}~0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad83bafe57ca5ec2c3eeef7f6d48db726}{R\+E\+M\+O\+T\+E\+\_\+\+B\+AR}}~1
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a14a584855616f92d03d709f3efd43dd8}{R\+E\+M\+O\+T\+E\+\_\+\+B\+A\+R2}}~2
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a15a2127c69dd29928d218c850a5e0a95}{N\+O\+\_\+\+B\+AR}}~-\/1
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ade2d9ba495bdf0ebbea91e0debc2ccc1}{F\+P\+G\+A\+\_\+\+R\+E\+V\+I\+S\+I\+O\+N\+\_\+\+R\+EG}}~0x0000	/$\ast$ F\+P\+GA Revision Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_affd458155cdc841fdd6d519315fdb6c7}{H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG}}~0x0004	/$\ast$ Host P\+C\+Ie Control / Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_add3d4eb382119c70f321d8e3b7ffe4db}{H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+T\+\_\+\+R\+EG}}~0x0008	/$\ast$ Host P\+C\+Ie Interrupt Register Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0184e42ca5c4b8c9b9739df4ed2930df}{P\+C\+I\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG}}~0x000C	/$\ast$ P\+CI Control / Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab4c79d3fb2927e2cdded265ac66a2eaf}{P\+C\+I\+E\+\_\+\+D\+E\+V\+I\+C\+E\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG}}~0x0010	/$\ast$ P\+C\+Ie Control / Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a4b3a351531a516408dc33d941f57b48e}{P\+C\+I\+E\+\_\+\+L\+I\+N\+K\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG}}~0x0014	/$\ast$ P\+C\+Ie Link Control / Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1e68884704e2cb90b0bc6c46e259aab6}{P\+C\+I\+E\+\_\+\+C\+O\+N\+F\+\_\+\+R\+EG}}~0x0018	/$\ast$ Host P\+C\+Ie Configuration Reg $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_afdf0c56b29b2a7dc630a056b1a421af7}{P\+C\+I\+E\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+C\+T\+R\+L\+\_\+\+R\+EG}}~0x001C
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a5ed9f9aa0d28cb0e8584a48e434bfdac}{H\+O\+S\+T\+\_\+\+T\+E\+S\+T\+\_\+\+R\+EG}}~0x0020
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a215693bf58a9660adc3c43cbe682cf1c}{H\+O\+S\+T\+\_\+\+C\+O\+U\+N\+T\+E\+R\+\_\+\+R\+EG}}~0x0024	/$\ast$ Heart Beat Counter $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aab088c1f59845fab0f6a0b70a078f0f0}{H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+D\+E\+B\+U\+G\+\_\+\+R\+EG}}~0x0028	/$\ast$ Host P\+C\+Ie Debug Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a846a9889f319a3da4f0daf559b2cad9d}{H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+L\+A\+T\+S\+T\+A\+T\+S\+\_\+1}}~0x0030
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a3ff86c9b911c9eda4f58f0c42d9c6836}{H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+L\+A\+T\+S\+T\+A\+T\+S\+\_\+2}}~0x0034
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad7c3973800c0bd226d55a1b9c8a4b3f8}{H\+O\+S\+T\+\_\+\+S\+P\+I\+\_\+\+F\+L\+A\+S\+H\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG}}~0x0040	/$\ast$ S\+PI F\+L\+A\+SH Control Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ade1eebc96430a2d82d111588fe4ecd7a}{H\+O\+S\+T\+\_\+\+S\+P\+I\+\_\+\+F\+L\+A\+S\+H\+\_\+\+D\+A\+T\+A\+\_\+\+R\+EG}}~0x0044	/$\ast$ S\+PI F\+L\+A\+SH Data Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a2f4b68a9d375b645e60804890cc8be34}{H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+R\+EG}}~0x0048  /$\ast$ Temperature Monitor/Volts Alarms $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}~0x0010  /$\ast$ Duplicate blocks every S\+T\+EP $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad05066c92da532b81c819ecc93a372e4}{A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+E\+GA}}~0x0080	/$\ast$ Aurora Control Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a132a96a03dc12d474d95d3563ed511db}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+E\+GA}}~0x0084	/$\ast$ Aurora Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae68366c13e88e1cbd4da6c808a4a5949}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+E\+GA}}~0x0088	/$\ast$ S\+FP \mbox{\hyperlink{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}{I2C}} Control and Data Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac23be51158ab5eba0aa4f294b8d06ae6}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+E\+GA}}~0x008C
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1ee82d8254d90907c4e49a7d2446c96a}{A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG}}(sfp)~(\mbox{\hyperlink{acq-fiber-hba_8h_ad05066c92da532b81c819ecc93a372e4}{A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+E\+GA}} + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae72ed39fed561908d665b0cbc82b4163}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG}}(sfp)~(\mbox{\hyperlink{acq-fiber-hba_8h_a132a96a03dc12d474d95d3563ed511db}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+E\+GA}}  + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a17196601ed6e499546689f5809e34948}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+EG}}(sfp)~(\mbox{\hyperlink{acq-fiber-hba_8h_ac23be51158ab5eba0aa4f294b8d06ae6}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+E\+GA}} + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a8349bd40c6ebf7c4a03590d04461568c}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+EG}}(sfp)~(\mbox{\hyperlink{acq-fiber-hba_8h_ae68366c13e88e1cbd4da6c808a4a5949}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+E\+GA}}   + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9eab654828c5d21a4160dd8bbe5a69b8}{H\+O\+S\+T\+\_\+\+C\+O\+M\+M\+S\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG}}~0x00\+C0	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO Control Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab9f3bef86efd80c7d4f2a9f2c853f832}{H\+O\+S\+T\+\_\+\+C\+O\+M\+M\+S\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG}}~0x00\+C4	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO Status Register $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9ffbe56e368aeb647cbe6fadc1318071}{A\+C\+Q400\+\_\+\+C\+O\+M\+M\+S\+\_\+\+R\+E\+AD}}~0x0400	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO data $\ast$/
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae27e281f5d66adc63b82620d30515109}{A\+SR}}(acr)~((acr)+4)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}{I2C}}(acr)~((acr)+8)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae740490a17d0d021761075951f6c7797}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L1\+\_\+R}}~0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac0de3fb36df23980152d898c76702a19}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A1\+\_\+R}}~1
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9e9d0eb147e8118c3c75c6993f9d3bb7}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L1\+\_\+W}}~8
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a4be024815e210322d1f71f5c2e4dbcfa}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A1\+\_\+W}}~9
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae62cf7b7a404ff3c3a871da06d1cfc7f}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L2\+\_\+R}}~0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a70b34048cbd239ee1272a378588ed928}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A2\+\_\+R}}~1
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab47307c191dc77fa28d1c90acc4ecd71}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L2\+\_\+W}}~8
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab47518cf9a996846e48d7372ff736afd}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A2\+\_\+W}}~9
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a7b831c508ab13df7fdae2d722c5f30a9}{A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+B\+U\+SY}}~(1$<$$<$31)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac00f4f22db43c17b3b3f2869505d2ac0}{A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+C\+T\+L\+\_\+\+S\+T\+A\+RT}}~(1$<$$<$7)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a56225e478ad62bc1b394e8447daea891}{A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+CS}}~(1$<$$<$0)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab69d4a07d81441925181a209a61d0e3d}{A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+H\+O\+LD}}~(1$<$$<$1)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a68c21393d5e320e594760c41f8208f45}{A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+WP}}~(1$<$$<$2)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aab10af588f02122f3022ab8db717228f}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+E\+NA}}~(1$<$$<$31)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aa4c7b6543e9037c43233981c3803544f}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+T\+X\+D\+IS}}~(1$<$$<$16)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_acd4132ec8b6e1c23b538217233f0c9d3}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+C\+LR}}~(1$<$$<$7)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac12dcfe8f3e6c82944f50417c5b89a4e}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+W\+R\+\_\+\+D\+WN}}~(1$<$$<$4)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab55497390caa5bc31ca72362ddbd4265}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK}}~(0x7)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1f193e096b75d38223dd2154c0d8e555}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+P\+R\+E\+S\+E\+N\+Tn}}~(1$<$$<$31)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aa6b6f14790e26df0ae4c7099e05a249b}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+L\+OS}}~(1$<$$<$30)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab3aae3505d7b3c87db247b41d44b38ca}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+T\+X\+\_\+\+F\+A\+U\+LT}}~(1$<$$<$29)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a35f480c5971bd89c2a68a1b7c8b1a4e8}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+H\+A\+R\+D\+\_\+\+E\+RR}}~(1$<$$<$6)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_aaeac3e2ec93c699570e47b4a01a530fe}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+O\+F\+T\+\_\+\+E\+RR}}~(1$<$$<$5)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_abb35a102d20ae5d193fa81345ea8c126}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+F\+R\+A\+M\+E\+\_\+\+E\+RR}}~(1$<$$<$4)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a331dcc90ef58bdc0e5e33261394d98b9}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+C\+H\+A\+N\+N\+E\+L\+\_\+\+UP}}~(1$<$$<$1)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9ad381607e76e7dc1d2d54eb1810e3f6}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+L\+A\+N\+E\+\_\+\+UP}}~(1$<$$<$0)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a40cb333c576035fea3b1ec2273f0ac32}{A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+E\+RR}}
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad2f55d5857ea08b8720c5fff2f8a58e7}{H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+T\+E\+M\+P\+\_\+\+S\+HL}}~20
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_af5d6fed2c035976627c07a9518b39a10}{H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+U\+S\+R\+\_\+\+T\+E\+MP}}~(1$<$$<$5)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae8b78314040ac67457e327d2970c01d2}{H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+O\+V\+E\+R\+\_\+\+T\+E\+MP}}~(1$<$$<$4)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a84eb8cfc4b797b4b9db88c952da01af5}{H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+V\+O\+L\+T\+\_\+\+A\+L\+A\+RM}}~0x7
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a87044ec92cc2531c412942dc746b37a2}{Z\+Y\+N\+Q\+\_\+\+B\+A\+SE}}~0x0000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a323f775a7166db0a4b1de9ef6d2fc82c}{P\+C\+I\+E\+\_\+\+B\+A\+SE}}~0x1000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a27abff978b429683c64c5db0610e69e8}{P\+C\+I\+E\+\_\+\+C\+O\+N\+F\+\_\+\+A\+F\+\_\+\+P\+O\+R\+T\+\_\+\+S\+HL}}~16
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab04dd812f37907dc8bd6ed82e346b563}{D\+M\+A\+\_\+\+B\+A\+SE}}~0x2000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab52f48e5a0140157e03bcca74fb675c2}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO}}~0x2040
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1d829fe537b28733fde31f26e7db8463}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO}}~0x2080
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}}~16
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}}~0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a5917aa0b05eb7e723ec75a84ef15aed8}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+EN}}~0x0001
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0b549fbf95770ef441b0198c6df7925c}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+F\+I\+F\+O\+\_\+\+R\+ST}}~0x0010
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a10672595de615ad6047f50ac9dad2dce}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+L\+O\+W\+\_\+\+L\+AT}}~0x0020
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a43d779236164a982ee9f770cead731a7}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+C\+Y\+C\+LE}}~0x0040
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a69c7d6fb45edaf67bef0a425693a1490}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+R\+AM}}~0x8000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_abcd3a8b1145dd25458c35161723b36df}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+A\+D\+DR}}~0xfffffc00
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a71ae8df957d1deca0c1e1c0c83031803}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+I\+N\+T\+EN}}~0x00000100
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0e477c85c65aedbf57e34e79510e8b46}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+EN}}~0x000000f0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae02fbe7d5f43e316a6097cf225b02f62}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+ID}}~0x0000000f
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a4c3cdfae67a80e87db2e74950340810c}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+E\+M\+P\+TY}}~0x0001
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a73f88601b4b4ea16e4881a1580ef92b6}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+F\+U\+LL}}~0x0002
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a112fe8aa4a5fb49f03199d0a42ff80e3}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+U\+N\+D\+ER}}~0x0004
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_abe066987848b264efaf8267456f2ca90}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+O\+V\+ER}}~0x0008
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_abc84745cab6debd93c23f6058b2656db}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+U\+NT}}~0xfff0
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a8044d4e8adb04492db78b45a40e6964b}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+U\+N\+T\+\_\+\+S\+HL}}~4
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ab782c77d43b3cb08978ba687c8bf7be2}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+E\+N\+\_\+\+B\+Y\+T\+ES}}(descr)~((1$<$$<$((descr\&\mbox{\hyperlink{acq-fiber-hba_8h_a0e477c85c65aedbf57e34e79510e8b46}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+EN}})$>$$>$4))$\ast$1024)
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ae7b4ba7193f7555f3bdd73bd03f7edbd}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM}}~0x6000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a9464df43d582b7a3de7b9afbfa301c7d}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM}}~0x7000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a364cc36d95b84554fabd6f74d9542a60}{D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO}}(dma\+\_\+sel)~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+: \mbox{\hyperlink{acq-fiber-hba_8h_a1d829fe537b28733fde31f26e7db8463}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO}})
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_ad00fea236aa387ca5a20f00e14d446ce}{D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN}}(dma\+\_\+sel)~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+L\+E\+N\+: \mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad82ab26af597bd0aec971dd85a7b45ab}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN}})
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a71b6a6e2256295cbd17d1dd1821bbbdf}{D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM}}(dma\+\_\+sel)~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+R\+A\+M\+: \mbox{\hyperlink{acq-fiber-hba_8h_a9464df43d582b7a3de7b9afbfa301c7d}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM}})
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a1aa2af408abe3da18601bef3530ba345}{C\+O\+M\+M\+O\+N\+\_\+\+B\+A\+SE}}~0xf000
+\item 
+\#define \mbox{\hyperlink{acq-fiber-hba_8h_a0985a3368c8c48bc412fedce37145e3c}{C\+O\+M\+\_\+\+S\+O\+F\+T\+\_\+\+T\+R\+I\+G\+G\+E\+R\+\_\+\+EN}}~0x0001
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9}{Z\+Y\+N\+Q\+\_\+\+R\+E\+GS}} \{ \newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a3885c2b495ffb0c31eb0b09ccaf880e4}{Z\+\_\+\+M\+O\+D\+\_\+\+ID}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa8a213b682633f8b2bb767b6f928abcd}{Z\+\_\+\+D\+M\+A\+\_\+\+C\+T\+RL}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9ae94b20ed1db3c7106b0a6adc456b736b}{Z\+\_\+\+C\+O\+M\+M\+S\+\_\+\+HB}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a4dab4d972f641f3170677f82907d32fd}{Z\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+RL}}, 
+\newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a1a8edccf956aebaf7f43cf993ad40dc5}{Z\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+SR}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa2374b82d7a49e236dd1969674f3e09a}{Z\+\_\+\+I\+D\+E\+NT}}
+ \}
+\item 
+enum \mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3d}{P\+C\+I\+E\+\_\+\+R\+E\+GS}} \{ \newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da3e25ced99cad6ce3c555a3b88511290b}{P\+C\+I\+E\+\_\+\+C\+N\+T\+RL}} = 1, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da8001c5a3a71621f1052d53927b5721b6}{P\+C\+I\+E\+\_\+\+I\+N\+TR}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da877cfce5a150835e4b1b342756312c28}{P\+C\+I\+\_\+\+C\+SR}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3dae36858d07ee3f39950aa7368476e99fc}{P\+C\+I\+E\+\_\+\+D\+E\+V\+\_\+\+C\+SR}}, 
+\newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da34a26eb0aa1feb2569eaf0ef8a99c87f}{P\+C\+I\+E\+\_\+\+L\+I\+N\+K\+\_\+\+C\+SR}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da351854d3e08ceffb058a324a8a40d91e}{P\+C\+I\+E\+\_\+\+C\+O\+NF}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da480f43a64acf2e4f276f03d3b761bc27}{P\+C\+I\+E\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+C\+T\+RL}}
+ \}
+\item 
+enum \mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6}{D\+M\+A\+\_\+\+R\+E\+GS}} \{ \newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ae4ef1efaf351f7c9ed74e8ff687af4d9}{D\+M\+A\+\_\+\+T\+E\+ST}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4eaf6e7dbc232d85d7b28003c847e2e0}{D\+M\+A\+\_\+\+C\+T\+RL}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6af1613884c9372d80356cf7605b480bff}{D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+S\+TA}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f79088b8e38a0078a27e5307dd5bbe3}{D\+M\+A\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+S\+TA}}, 
+\newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ac4cf9301131fc7bd04fd2645cdb9dec4}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+S\+TA}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad1398f178113f273bad297a48372135a}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+S\+TA}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a186b0b7c07473e644317f43db845edd8}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+A\+T\+A\+C\+O\+U\+NT}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a51e198b1c8212f5adca629fcbb60bdef}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+G\+AP}}, 
+\newline
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f65c78b7cd12c859116cf870084a9de}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad82ab26af597bd0aec971dd85a7b45ab}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN}}, 
+\mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6abe1e04676aba20ba77556bc1290ee1cf}{D\+M\+A\+\_\+\+R\+E\+G\+S\+\_\+\+C\+O\+U\+NT}}
+ \}
+\item 
+enum \mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}{D\+M\+A\+\_\+\+S\+EL}} \{ \mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}} = 0x1, 
+\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba7d3f844abe5ae04de17702f90b337704}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+S\+EL}} = 0x2, 
+\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18bae7e8556bd8b2150d06d4564599257d83}{D\+M\+A\+\_\+\+B\+O\+T\+H\+\_\+\+S\+EL}} = 0x3
+ \}
+\item 
+enum \mbox{\hyperlink{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37e}{C\+O\+M\+M\+O\+N\+\_\+\+R\+E\+GS}} \{ \mbox{\hyperlink{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37ea911beda0427792e4fe4de7e9dd1e613d}{C\+O\+M\+\_\+\+S\+O\+F\+T\+\_\+\+T\+R\+I\+G\+G\+ER}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{acq-fiber-hba_8h_a0fa25e119d3fd54bbac8352365710586}{afhba\+\_\+register\+Device}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$tdev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_a04e755abcd80a2c3aa5a31245d474fd7}{afhba\+\_\+delete\+Device}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$tdev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{acq-fiber-hba_8h_ab1e0fb91205d43c4f7b0de2a0282d51f}{afhba\+\_\+lookup\+Device}} (int major)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\+\_\+lookup\+Device\+From\+Class}} (struct device $\ast$dev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{acq-fiber-hba_8h_aa52de0d0bcb92db2903c9de5771270f3}{afhba\+\_\+lookup\+Device\+Pci}} (struct pci\+\_\+dev $\ast$pci\+\_\+dev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{acq-fiber-hba_8h_a577ea595f6d04919cd7253d2e59c3970}{afhba\+\_\+lookup\+Dev}} (struct device $\ast$dev)
+\item 
+int \mbox{\hyperlink{acq-fiber-hba_8h_a81805b51e2930c797a76cd75e78fb579}{afhba\+\_\+release}} (struct inode $\ast$inode, struct file $\ast$file)
+\item 
+int \mbox{\hyperlink{acq-fiber-hba_8h_a998a8a4d91eae0f4d53ab20568a826f9}{afhba\+\_\+stream\+\_\+drv\+\_\+init}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+int \mbox{\hyperlink{acq-fiber-hba_8h_a65c82f153ec4d08ea92319ed6d3c1e71}{afhba\+\_\+stream\+\_\+drv\+\_\+del}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_a277f3932399bc90cb1d012e150194179}{afhba\+\_\+create\+\_\+sysfs\+\_\+class}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_aa567e9f66611fe5577f5febd26a600a9}{afhba\+\_\+remove\+\_\+sysfs\+\_\+class}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_adeeea9c8bcc114e9b1670d9a50b4f630}{afhba\+\_\+create\+\_\+sysfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_a6bc404feecf295923c435e95c6365ef2}{afhba\+\_\+remove\+\_\+sysfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{acq-fiber-hba_8h_ac099aa44993cdcb58900e05f2275b40c}{afhba\+\_\+write\+\_\+reg}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, int regoff, \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} value)
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{acq-fiber-hba_8h_ab4d77ca27b45587b5465e2e99f031505}{afhba\+\_\+read\+\_\+reg}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, int regoff)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct list\+\_\+head \mbox{\hyperlink{acq-fiber-hba_8h_ae8d2eb1056d08ba1a907d66aedcdf3b9}{afhba\+\_\+devices}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A\+F\+H\+B\+A404 device driver data structs. 
+
+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/--- $\ast$ Copyright (C) 2014 Peter Milne, D-\/\+T\+A\+CQ Solutions Ltd ~\newline
+ $<$peter dot milne at D hyphen T\+A\+C\+Q dot com$>$ ~\newline
+ www.\+d-\/tacq.\+com Created on\+: 10 Aug 2014 ~\newline
+ Author\+: pgm ~\newline
+
+\begin{DoxyItemize}
+\item This program is free software; you can redistribute it and/or modify $\ast$ it under the terms of Version 2 of the G\+NU General Public License $\ast$ as published by the Free Software Foundation; $\ast$
+\item This program is distributed in the hope that it will be useful, $\ast$ but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of $\ast$ M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the $\ast$ G\+NU General Public License for more details. $\ast$
+\item You should have received a copy of the G\+NU General Public License $\ast$ along with this program; if not, write to the Free Software $\ast$ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, U\+SA. ~\newline
+ 
+\end{DoxyItemize}
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9ffbe56e368aeb647cbe6fadc1318071}\label{acq-fiber-hba_8h_a9ffbe56e368aeb647cbe6fadc1318071}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!ACQ400\_COMMS\_READ@{ACQ400\_COMMS\_READ}}
+\index{ACQ400\_COMMS\_READ@{ACQ400\_COMMS\_READ}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{ACQ400\_COMMS\_READ}{ACQ400\_COMMS\_READ}}
+{\footnotesize\ttfamily \#define A\+C\+Q400\+\_\+\+C\+O\+M\+M\+S\+\_\+\+R\+E\+AD~0x0400	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO data $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_acd4132ec8b6e1c23b538217233f0c9d3}\label{acq-fiber-hba_8h_acd4132ec8b6e1c23b538217233f0c9d3}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_CTRL\_CLR@{AFHBA\_AURORA\_CTRL\_CLR}}
+\index{AFHBA\_AURORA\_CTRL\_CLR@{AFHBA\_AURORA\_CTRL\_CLR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_CTRL\_CLR}{AFHBA\_AURORA\_CTRL\_CLR}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+C\+LR~(1$<$$<$7)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aab10af588f02122f3022ab8db717228f}\label{acq-fiber-hba_8h_aab10af588f02122f3022ab8db717228f}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_CTRL\_ENA@{AFHBA\_AURORA\_CTRL\_ENA}}
+\index{AFHBA\_AURORA\_CTRL\_ENA@{AFHBA\_AURORA\_CTRL\_ENA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_CTRL\_ENA}{AFHBA\_AURORA\_CTRL\_ENA}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+E\+NA~(1$<$$<$31)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab55497390caa5bc31ca72362ddbd4265}\label{acq-fiber-hba_8h_ab55497390caa5bc31ca72362ddbd4265}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_CTRL\_LOOPBACK@{AFHBA\_AURORA\_CTRL\_LOOPBACK}}
+\index{AFHBA\_AURORA\_CTRL\_LOOPBACK@{AFHBA\_AURORA\_CTRL\_LOOPBACK}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_CTRL\_LOOPBACK}{AFHBA\_AURORA\_CTRL\_LOOPBACK}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK~(0x7)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac12dcfe8f3e6c82944f50417c5b89a4e}\label{acq-fiber-hba_8h_ac12dcfe8f3e6c82944f50417c5b89a4e}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_CTRL\_PWR\_DWN@{AFHBA\_AURORA\_CTRL\_PWR\_DWN}}
+\index{AFHBA\_AURORA\_CTRL\_PWR\_DWN@{AFHBA\_AURORA\_CTRL\_PWR\_DWN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_CTRL\_PWR\_DWN}{AFHBA\_AURORA\_CTRL\_PWR\_DWN}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+W\+R\+\_\+\+D\+WN~(1$<$$<$4)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aa4c7b6543e9037c43233981c3803544f}\label{acq-fiber-hba_8h_aa4c7b6543e9037c43233981c3803544f}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_CTRL\_TXDIS@{AFHBA\_AURORA\_CTRL\_TXDIS}}
+\index{AFHBA\_AURORA\_CTRL\_TXDIS@{AFHBA\_AURORA\_CTRL\_TXDIS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_CTRL\_TXDIS}{AFHBA\_AURORA\_CTRL\_TXDIS}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+R\+L\+\_\+\+T\+X\+D\+IS~(1$<$$<$16)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a331dcc90ef58bdc0e5e33261394d98b9}\label{acq-fiber-hba_8h_a331dcc90ef58bdc0e5e33261394d98b9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_CHANNEL\_UP@{AFHBA\_AURORA\_STAT\_CHANNEL\_UP}}
+\index{AFHBA\_AURORA\_STAT\_CHANNEL\_UP@{AFHBA\_AURORA\_STAT\_CHANNEL\_UP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_CHANNEL\_UP}{AFHBA\_AURORA\_STAT\_CHANNEL\_UP}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+C\+H\+A\+N\+N\+E\+L\+\_\+\+UP~(1$<$$<$1)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a40cb333c576035fea3b1ec2273f0ac32}\label{acq-fiber-hba_8h_a40cb333c576035fea3b1ec2273f0ac32}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_ERR@{AFHBA\_AURORA\_STAT\_ERR}}
+\index{AFHBA\_AURORA\_STAT\_ERR@{AFHBA\_AURORA\_STAT\_ERR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_ERR}{AFHBA\_AURORA\_STAT\_ERR}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+E\+RR}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    (\mbox{\hyperlink{acq-fiber-hba_8h_aa6b6f14790e26df0ae4c7099e05a249b}{AFHBA\_AURORA\_STAT\_SFP\_LOS}}|\mbox{\hyperlink{acq-fiber-hba_8h_ab3aae3505d7b3c87db247b41d44b38ca}{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT}}|\(\backslash\)}
+\DoxyCodeLine{    AFHBA\_AURORA\_STAT\_HARD\_ERR|\mbox{\hyperlink{acq-fiber-hba_8h_aaeac3e2ec93c699570e47b4a01a530fe}{AFHBA\_AURORA\_STAT\_SOFT\_ERR}}|\(\backslash\)}
+\DoxyCodeLine{    AFHBA\_AURORA\_STAT\_FRAME\_ERR)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{acq-fiber-hba_8h_abb35a102d20ae5d193fa81345ea8c126}\label{acq-fiber-hba_8h_abb35a102d20ae5d193fa81345ea8c126}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_FRAME\_ERR@{AFHBA\_AURORA\_STAT\_FRAME\_ERR}}
+\index{AFHBA\_AURORA\_STAT\_FRAME\_ERR@{AFHBA\_AURORA\_STAT\_FRAME\_ERR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_FRAME\_ERR}{AFHBA\_AURORA\_STAT\_FRAME\_ERR}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+F\+R\+A\+M\+E\+\_\+\+E\+RR~(1$<$$<$4)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a35f480c5971bd89c2a68a1b7c8b1a4e8}\label{acq-fiber-hba_8h_a35f480c5971bd89c2a68a1b7c8b1a4e8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_HARD\_ERR@{AFHBA\_AURORA\_STAT\_HARD\_ERR}}
+\index{AFHBA\_AURORA\_STAT\_HARD\_ERR@{AFHBA\_AURORA\_STAT\_HARD\_ERR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_HARD\_ERR}{AFHBA\_AURORA\_STAT\_HARD\_ERR}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+H\+A\+R\+D\+\_\+\+E\+RR~(1$<$$<$6)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9ad381607e76e7dc1d2d54eb1810e3f6}\label{acq-fiber-hba_8h_a9ad381607e76e7dc1d2d54eb1810e3f6}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_LANE\_UP@{AFHBA\_AURORA\_STAT\_LANE\_UP}}
+\index{AFHBA\_AURORA\_STAT\_LANE\_UP@{AFHBA\_AURORA\_STAT\_LANE\_UP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_LANE\_UP}{AFHBA\_AURORA\_STAT\_LANE\_UP}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+L\+A\+N\+E\+\_\+\+UP~(1$<$$<$0)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aa6b6f14790e26df0ae4c7099e05a249b}\label{acq-fiber-hba_8h_aa6b6f14790e26df0ae4c7099e05a249b}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_SFP\_LOS@{AFHBA\_AURORA\_STAT\_SFP\_LOS}}
+\index{AFHBA\_AURORA\_STAT\_SFP\_LOS@{AFHBA\_AURORA\_STAT\_SFP\_LOS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_SFP\_LOS}{AFHBA\_AURORA\_STAT\_SFP\_LOS}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+L\+OS~(1$<$$<$30)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1f193e096b75d38223dd2154c0d8e555}\label{acq-fiber-hba_8h_a1f193e096b75d38223dd2154c0d8e555}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_SFP\_PRESENTn@{AFHBA\_AURORA\_STAT\_SFP\_PRESENTn}}
+\index{AFHBA\_AURORA\_STAT\_SFP\_PRESENTn@{AFHBA\_AURORA\_STAT\_SFP\_PRESENTn}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_SFP\_PRESENTn}{AFHBA\_AURORA\_STAT\_SFP\_PRESENTn}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+P\+R\+E\+S\+E\+N\+Tn~(1$<$$<$31)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab3aae3505d7b3c87db247b41d44b38ca}\label{acq-fiber-hba_8h_ab3aae3505d7b3c87db247b41d44b38ca}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT@{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT}}
+\index{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT@{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT}{AFHBA\_AURORA\_STAT\_SFP\_TX\_FAULT}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+F\+P\+\_\+\+T\+X\+\_\+\+F\+A\+U\+LT~(1$<$$<$29)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aaeac3e2ec93c699570e47b4a01a530fe}\label{acq-fiber-hba_8h_aaeac3e2ec93c699570e47b4a01a530fe}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_AURORA\_STAT\_SOFT\_ERR@{AFHBA\_AURORA\_STAT\_SOFT\_ERR}}
+\index{AFHBA\_AURORA\_STAT\_SOFT\_ERR@{AFHBA\_AURORA\_STAT\_SOFT\_ERR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_AURORA\_STAT\_SOFT\_ERR}{AFHBA\_AURORA\_STAT\_SOFT\_ERR}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+\_\+\+S\+O\+F\+T\+\_\+\+E\+RR~(1$<$$<$5)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a7b831c508ab13df7fdae2d722c5f30a9}\label{acq-fiber-hba_8h_a7b831c508ab13df7fdae2d722c5f30a9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_SPI\_BUSY@{AFHBA\_SPI\_BUSY}}
+\index{AFHBA\_SPI\_BUSY@{AFHBA\_SPI\_BUSY}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_SPI\_BUSY}{AFHBA\_SPI\_BUSY}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+B\+U\+SY~(1$<$$<$31)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a56225e478ad62bc1b394e8447daea891}\label{acq-fiber-hba_8h_a56225e478ad62bc1b394e8447daea891}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_SPI\_CS@{AFHBA\_SPI\_CS}}
+\index{AFHBA\_SPI\_CS@{AFHBA\_SPI\_CS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_SPI\_CS}{AFHBA\_SPI\_CS}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+CS~(1$<$$<$0)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac00f4f22db43c17b3b3f2869505d2ac0}\label{acq-fiber-hba_8h_ac00f4f22db43c17b3b3f2869505d2ac0}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_SPI\_CTL\_START@{AFHBA\_SPI\_CTL\_START}}
+\index{AFHBA\_SPI\_CTL\_START@{AFHBA\_SPI\_CTL\_START}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_SPI\_CTL\_START}{AFHBA\_SPI\_CTL\_START}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+C\+T\+L\+\_\+\+S\+T\+A\+RT~(1$<$$<$7)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab69d4a07d81441925181a209a61d0e3d}\label{acq-fiber-hba_8h_ab69d4a07d81441925181a209a61d0e3d}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_SPI\_HOLD@{AFHBA\_SPI\_HOLD}}
+\index{AFHBA\_SPI\_HOLD@{AFHBA\_SPI\_HOLD}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_SPI\_HOLD}{AFHBA\_SPI\_HOLD}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+H\+O\+LD~(1$<$$<$1)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a68c21393d5e320e594760c41f8208f45}\label{acq-fiber-hba_8h_a68c21393d5e320e594760c41f8208f45}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AFHBA\_SPI\_WP@{AFHBA\_SPI\_WP}}
+\index{AFHBA\_SPI\_WP@{AFHBA\_SPI\_WP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AFHBA\_SPI\_WP}{AFHBA\_SPI\_WP}}
+{\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+S\+P\+I\+\_\+\+WP~(1$<$$<$2)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae27e281f5d66adc63b82620d30515109}\label{acq-fiber-hba_8h_ae27e281f5d66adc63b82620d30515109}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!ASR@{ASR}}
+\index{ASR@{ASR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{ASR}{ASR}}
+{\footnotesize\ttfamily \#define A\+SR(\begin{DoxyParamCaption}\item[{}]{acr }\end{DoxyParamCaption})~((acr)+4)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae62a1773f22b7a2f5635c7497269cd39}\label{acq-fiber-hba_8h_ae62a1773f22b7a2f5635c7497269cd39}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!assert@{assert}}
+\index{assert@{assert}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{assert}{assert}}
+{\footnotesize\ttfamily \#define assert(\begin{DoxyParamCaption}\item[{}]{p }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    \textcolor{keywordflow}{do} \{    \(\backslash\)}
+\DoxyCodeLine{    if (!(p)) \{ \(\backslash\)}
+\DoxyCodeLine{        printk(KERN\_CRIT \textcolor{stringliteral}{"BUG at \%s:\%d assert(\%s)\(\backslash\)n"},   \(\backslash\)}
+\DoxyCodeLine{               \_\_FILE\_\_, \_\_LINE\_\_, \#p);         \(\backslash\)}
+\DoxyCodeLine{        BUG();  \(\backslash\)}
+\DoxyCodeLine{    \}       \(\backslash\)}
+\DoxyCodeLine{\} \textcolor{keywordflow}{while} (0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1ee82d8254d90907c4e49a7d2446c96a}\label{acq-fiber-hba_8h_a1ee82d8254d90907c4e49a7d2446c96a}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_CONTROL\_REG@{AURORA\_CONTROL\_REG}}
+\index{AURORA\_CONTROL\_REG@{AURORA\_CONTROL\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_CONTROL\_REG}{AURORA\_CONTROL\_REG}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG(\begin{DoxyParamCaption}\item[{}]{sfp }\end{DoxyParamCaption})~(\mbox{\hyperlink{acq-fiber-hba_8h_ad05066c92da532b81c819ecc93a372e4}{A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+E\+GA}} + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad05066c92da532b81c819ecc93a372e4}\label{acq-fiber-hba_8h_ad05066c92da532b81c819ecc93a372e4}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_CONTROL\_REGA@{AURORA\_CONTROL\_REGA}}
+\index{AURORA\_CONTROL\_REGA@{AURORA\_CONTROL\_REGA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_CONTROL\_REGA}{AURORA\_CONTROL\_REGA}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+E\+GA~0x0080	/$\ast$ Aurora Control Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a17196601ed6e499546689f5809e34948}\label{acq-fiber-hba_8h_a17196601ed6e499546689f5809e34948}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_STATUS2\_REG@{AURORA\_STATUS2\_REG}}
+\index{AURORA\_STATUS2\_REG@{AURORA\_STATUS2\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_STATUS2\_REG}{AURORA\_STATUS2\_REG}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+EG(\begin{DoxyParamCaption}\item[{}]{sfp }\end{DoxyParamCaption})~(\mbox{\hyperlink{acq-fiber-hba_8h_ac23be51158ab5eba0aa4f294b8d06ae6}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+E\+GA}} + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac23be51158ab5eba0aa4f294b8d06ae6}\label{acq-fiber-hba_8h_ac23be51158ab5eba0aa4f294b8d06ae6}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_STATUS2\_REGA@{AURORA\_STATUS2\_REGA}}
+\index{AURORA\_STATUS2\_REGA@{AURORA\_STATUS2\_REGA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_STATUS2\_REGA}{AURORA\_STATUS2\_REGA}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S2\+\_\+\+R\+E\+GA~0x008C}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae72ed39fed561908d665b0cbc82b4163}\label{acq-fiber-hba_8h_ae72ed39fed561908d665b0cbc82b4163}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_STATUS\_REG@{AURORA\_STATUS\_REG}}
+\index{AURORA\_STATUS\_REG@{AURORA\_STATUS\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_STATUS\_REG}{AURORA\_STATUS\_REG}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG(\begin{DoxyParamCaption}\item[{}]{sfp }\end{DoxyParamCaption})~(\mbox{\hyperlink{acq-fiber-hba_8h_a132a96a03dc12d474d95d3563ed511db}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+E\+GA}}  + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a132a96a03dc12d474d95d3563ed511db}\label{acq-fiber-hba_8h_a132a96a03dc12d474d95d3563ed511db}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_STATUS\_REGA@{AURORA\_STATUS\_REGA}}
+\index{AURORA\_STATUS\_REGA@{AURORA\_STATUS\_REGA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_STATUS\_REGA}{AURORA\_STATUS\_REGA}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+E\+GA~0x0084	/$\ast$ Aurora Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}\label{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!AURORA\_STEP@{AURORA\_STEP}}
+\index{AURORA\_STEP@{AURORA\_STEP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{AURORA\_STEP}{AURORA\_STEP}}
+{\footnotesize\ttfamily \#define A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP~0x0010  /$\ast$ Duplicate blocks every S\+T\+EP $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0985a3368c8c48bc412fedce37145e3c}\label{acq-fiber-hba_8h_a0985a3368c8c48bc412fedce37145e3c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!COM\_SOFT\_TRIGGER\_EN@{COM\_SOFT\_TRIGGER\_EN}}
+\index{COM\_SOFT\_TRIGGER\_EN@{COM\_SOFT\_TRIGGER\_EN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{COM\_SOFT\_TRIGGER\_EN}{COM\_SOFT\_TRIGGER\_EN}}
+{\footnotesize\ttfamily \#define C\+O\+M\+\_\+\+S\+O\+F\+T\+\_\+\+T\+R\+I\+G\+G\+E\+R\+\_\+\+EN~0x0001}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1aa2af408abe3da18601bef3530ba345}\label{acq-fiber-hba_8h_a1aa2af408abe3da18601bef3530ba345}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!COMMON\_BASE@{COMMON\_BASE}}
+\index{COMMON\_BASE@{COMMON\_BASE}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{COMMON\_BASE}{COMMON\_BASE}}
+{\footnotesize\ttfamily \#define C\+O\+M\+M\+O\+N\+\_\+\+B\+A\+SE~0xf000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a90f40077a3c072281c8d1c741b3b27c5}\label{acq-fiber-hba_8h_a90f40077a3c072281c8d1c741b3b27c5}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DEV@{DEV}}
+\index{DEV@{DEV}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DEV}{DEV}}
+{\footnotesize\ttfamily \#define D\+EV(\begin{DoxyParamCaption}\item[{}]{file }\end{DoxyParamCaption})~(\mbox{\hyperlink{acq-fiber-hba_8h_a367b8145419319e0a77bff9c5d8ff312}{PD}}(file)-\/$>$dev)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab04dd812f37907dc8bd6ed82e346b563}\label{acq-fiber-hba_8h_ab04dd812f37907dc8bd6ed82e346b563}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_BASE@{DMA\_BASE}}
+\index{DMA\_BASE@{DMA\_BASE}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_BASE}{DMA\_BASE}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+B\+A\+SE~0x2000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a5917aa0b05eb7e723ec75a84ef15aed8}\label{acq-fiber-hba_8h_a5917aa0b05eb7e723ec75a84ef15aed8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_EN@{DMA\_CTRL\_EN}}
+\index{DMA\_CTRL\_EN@{DMA\_CTRL\_EN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_EN}{DMA\_CTRL\_EN}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+EN~0x0001}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0b549fbf95770ef441b0198c6df7925c}\label{acq-fiber-hba_8h_a0b549fbf95770ef441b0198c6df7925c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_FIFO\_RST@{DMA\_CTRL\_FIFO\_RST}}
+\index{DMA\_CTRL\_FIFO\_RST@{DMA\_CTRL\_FIFO\_RST}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_FIFO\_RST}{DMA\_CTRL\_FIFO\_RST}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+F\+I\+F\+O\+\_\+\+R\+ST~0x0010}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a10672595de615ad6047f50ac9dad2dce}\label{acq-fiber-hba_8h_a10672595de615ad6047f50ac9dad2dce}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_LOW\_LAT@{DMA\_CTRL\_LOW\_LAT}}
+\index{DMA\_CTRL\_LOW\_LAT@{DMA\_CTRL\_LOW\_LAT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_LOW\_LAT}{DMA\_CTRL\_LOW\_LAT}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+L\+O\+W\+\_\+\+L\+AT~0x0020}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}\label{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_PULL\_SHL@{DMA\_CTRL\_PULL\_SHL}}
+\index{DMA\_CTRL\_PULL\_SHL@{DMA\_CTRL\_PULL\_SHL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_PULL\_SHL}{DMA\_CTRL\_PULL\_SHL}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL~16}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}\label{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_PUSH\_SHL@{DMA\_CTRL\_PUSH\_SHL}}
+\index{DMA\_CTRL\_PUSH\_SHL@{DMA\_CTRL\_PUSH\_SHL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_PUSH\_SHL}{DMA\_CTRL\_PUSH\_SHL}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL~0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a69c7d6fb45edaf67bef0a425693a1490}\label{acq-fiber-hba_8h_a69c7d6fb45edaf67bef0a425693a1490}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_RAM@{DMA\_CTRL\_RAM}}
+\index{DMA\_CTRL\_RAM@{DMA\_CTRL\_RAM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_RAM}{DMA\_CTRL\_RAM}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+R\+AM~0x8000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a43d779236164a982ee9f770cead731a7}\label{acq-fiber-hba_8h_a43d779236164a982ee9f770cead731a7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL\_RECYCLE@{DMA\_CTRL\_RECYCLE}}
+\index{DMA\_CTRL\_RECYCLE@{DMA\_CTRL\_RECYCLE}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL\_RECYCLE}{DMA\_CTRL\_RECYCLE}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+R\+E\+C\+Y\+C\+LE~0x0040}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_abc84745cab6debd93c23f6058b2656db}\label{acq-fiber-hba_8h_abc84745cab6debd93c23f6058b2656db}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_COUNT@{DMA\_DATA\_FIFO\_COUNT}}
+\index{DMA\_DATA\_FIFO\_COUNT@{DMA\_DATA\_FIFO\_COUNT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_COUNT}{DMA\_DATA\_FIFO\_COUNT}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+U\+NT~0xfff0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a8044d4e8adb04492db78b45a40e6964b}\label{acq-fiber-hba_8h_a8044d4e8adb04492db78b45a40e6964b}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_COUNT\_SHL@{DMA\_DATA\_FIFO\_COUNT\_SHL}}
+\index{DMA\_DATA\_FIFO\_COUNT\_SHL@{DMA\_DATA\_FIFO\_COUNT\_SHL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_COUNT\_SHL}{DMA\_DATA\_FIFO\_COUNT\_SHL}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+U\+N\+T\+\_\+\+S\+HL~4}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a4c3cdfae67a80e87db2e74950340810c}\label{acq-fiber-hba_8h_a4c3cdfae67a80e87db2e74950340810c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_EMPTY@{DMA\_DATA\_FIFO\_EMPTY}}
+\index{DMA\_DATA\_FIFO\_EMPTY@{DMA\_DATA\_FIFO\_EMPTY}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_EMPTY}{DMA\_DATA\_FIFO\_EMPTY}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+E\+M\+P\+TY~0x0001}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a73f88601b4b4ea16e4881a1580ef92b6}\label{acq-fiber-hba_8h_a73f88601b4b4ea16e4881a1580ef92b6}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_FULL@{DMA\_DATA\_FIFO\_FULL}}
+\index{DMA\_DATA\_FIFO\_FULL@{DMA\_DATA\_FIFO\_FULL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_FULL}{DMA\_DATA\_FIFO\_FULL}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+F\+U\+LL~0x0002}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_abe066987848b264efaf8267456f2ca90}\label{acq-fiber-hba_8h_abe066987848b264efaf8267456f2ca90}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_OVER@{DMA\_DATA\_FIFO\_OVER}}
+\index{DMA\_DATA\_FIFO\_OVER@{DMA\_DATA\_FIFO\_OVER}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_OVER}{DMA\_DATA\_FIFO\_OVER}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+O\+V\+ER~0x0008}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a112fe8aa4a5fb49f03199d0a42ff80e3}\label{acq-fiber-hba_8h_a112fe8aa4a5fb49f03199d0a42ff80e3}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFO\_UNDER@{DMA\_DATA\_FIFO\_UNDER}}
+\index{DMA\_DATA\_FIFO\_UNDER@{DMA\_DATA\_FIFO\_UNDER}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DATA\_FIFO\_UNDER}{DMA\_DATA\_FIFO\_UNDER}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+U\+N\+D\+ER~0x0004}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_abcd3a8b1145dd25458c35161723b36df}\label{acq-fiber-hba_8h_abcd3a8b1145dd25458c35161723b36df}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESCR\_ADDR@{DMA\_DESCR\_ADDR}}
+\index{DMA\_DESCR\_ADDR@{DMA\_DESCR\_ADDR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DESCR\_ADDR}{DMA\_DESCR\_ADDR}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+A\+D\+DR~0xfffffc00}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae02fbe7d5f43e316a6097cf225b02f62}\label{acq-fiber-hba_8h_ae02fbe7d5f43e316a6097cf225b02f62}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESCR\_ID@{DMA\_DESCR\_ID}}
+\index{DMA\_DESCR\_ID@{DMA\_DESCR\_ID}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DESCR\_ID}{DMA\_DESCR\_ID}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+ID~0x0000000f}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a71ae8df957d1deca0c1e1c0c83031803}\label{acq-fiber-hba_8h_a71ae8df957d1deca0c1e1c0c83031803}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESCR\_INTEN@{DMA\_DESCR\_INTEN}}
+\index{DMA\_DESCR\_INTEN@{DMA\_DESCR\_INTEN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DESCR\_INTEN}{DMA\_DESCR\_INTEN}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+I\+N\+T\+EN~0x00000100}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0e477c85c65aedbf57e34e79510e8b46}\label{acq-fiber-hba_8h_a0e477c85c65aedbf57e34e79510e8b46}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESCR\_LEN@{DMA\_DESCR\_LEN}}
+\index{DMA\_DESCR\_LEN@{DMA\_DESCR\_LEN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DESCR\_LEN}{DMA\_DESCR\_LEN}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+EN~0x000000f0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab782c77d43b3cb08978ba687c8bf7be2}\label{acq-fiber-hba_8h_ab782c77d43b3cb08978ba687c8bf7be2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESCR\_LEN\_BYTES@{DMA\_DESCR\_LEN\_BYTES}}
+\index{DMA\_DESCR\_LEN\_BYTES@{DMA\_DESCR\_LEN\_BYTES}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DESCR\_LEN\_BYTES}{DMA\_DESCR\_LEN\_BYTES}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+E\+N\+\_\+\+B\+Y\+T\+ES(\begin{DoxyParamCaption}\item[{}]{descr }\end{DoxyParamCaption})~((1$<$$<$((descr\&\mbox{\hyperlink{acq-fiber-hba_8h_a0e477c85c65aedbf57e34e79510e8b46}{D\+M\+A\+\_\+\+D\+E\+S\+C\+R\+\_\+\+L\+EN}})$>$$>$4))$\ast$1024)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a364cc36d95b84554fabd6f74d9542a60}\label{acq-fiber-hba_8h_a364cc36d95b84554fabd6f74d9542a60}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DIR\_DESC\_FIFO@{DMA\_DIR\_DESC\_FIFO}}
+\index{DMA\_DIR\_DESC\_FIFO@{DMA\_DIR\_DESC\_FIFO}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DIR\_DESC\_FIFO}{DMA\_DIR\_DESC\_FIFO}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO(\begin{DoxyParamCaption}\item[{}]{dma\+\_\+sel }\end{DoxyParamCaption})~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+: \mbox{\hyperlink{acq-fiber-hba_8h_a1d829fe537b28733fde31f26e7db8463}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO}})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad00fea236aa387ca5a20f00e14d446ce}\label{acq-fiber-hba_8h_ad00fea236aa387ca5a20f00e14d446ce}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DIR\_DESC\_LEN@{DMA\_DIR\_DESC\_LEN}}
+\index{DMA\_DIR\_DESC\_LEN@{DMA\_DIR\_DESC\_LEN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DIR\_DESC\_LEN}{DMA\_DIR\_DESC\_LEN}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN(\begin{DoxyParamCaption}\item[{}]{dma\+\_\+sel }\end{DoxyParamCaption})~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+L\+E\+N\+: \mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad82ab26af597bd0aec971dd85a7b45ab}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN}})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a71b6a6e2256295cbd17d1dd1821bbbdf}\label{acq-fiber-hba_8h_a71b6a6e2256295cbd17d1dd1821bbbdf}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DIR\_DESC\_RAM@{DMA\_DIR\_DESC\_RAM}}
+\index{DMA\_DIR\_DESC\_RAM@{DMA\_DIR\_DESC\_RAM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_DIR\_DESC\_RAM}{DMA\_DIR\_DESC\_RAM}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+D\+I\+R\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM(\begin{DoxyParamCaption}\item[{}]{dma\+\_\+sel }\end{DoxyParamCaption})~((dma\+\_\+sel)==\mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL}}? D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+R\+A\+M\+: \mbox{\hyperlink{acq-fiber-hba_8h_a9464df43d582b7a3de7b9afbfa301c7d}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM}})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1d829fe537b28733fde31f26e7db8463}\label{acq-fiber-hba_8h_a1d829fe537b28733fde31f26e7db8463}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PULL\_DESC\_FIFO@{DMA\_PULL\_DESC\_FIFO}}
+\index{DMA\_PULL\_DESC\_FIFO@{DMA\_PULL\_DESC\_FIFO}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_PULL\_DESC\_FIFO}{DMA\_PULL\_DESC\_FIFO}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO~0x2080}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9464df43d582b7a3de7b9afbfa301c7d}\label{acq-fiber-hba_8h_a9464df43d582b7a3de7b9afbfa301c7d}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PULL\_DESC\_RAM@{DMA\_PULL\_DESC\_RAM}}
+\index{DMA\_PULL\_DESC\_RAM@{DMA\_PULL\_DESC\_RAM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_PULL\_DESC\_RAM}{DMA\_PULL\_DESC\_RAM}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM~0x7000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab52f48e5a0140157e03bcca74fb675c2}\label{acq-fiber-hba_8h_ab52f48e5a0140157e03bcca74fb675c2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_DESC\_FIFO@{DMA\_PUSH\_DESC\_FIFO}}
+\index{DMA\_PUSH\_DESC\_FIFO@{DMA\_PUSH\_DESC\_FIFO}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_PUSH\_DESC\_FIFO}{DMA\_PUSH\_DESC\_FIFO}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+FO~0x2040}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae7b4ba7193f7555f3bdd73bd03f7edbd}\label{acq-fiber-hba_8h_ae7b4ba7193f7555f3bdd73bd03f7edbd}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_DESC\_RAM@{DMA\_PUSH\_DESC\_RAM}}
+\index{DMA\_PUSH\_DESC\_RAM@{DMA\_PUSH\_DESC\_RAM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_PUSH\_DESC\_RAM}{DMA\_PUSH\_DESC\_RAM}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+R\+AM~0x6000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ade2d9ba495bdf0ebbea91e0debc2ccc1}\label{acq-fiber-hba_8h_ade2d9ba495bdf0ebbea91e0debc2ccc1}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!FPGA\_REVISION\_REG@{FPGA\_REVISION\_REG}}
+\index{FPGA\_REVISION\_REG@{FPGA\_REVISION\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{FPGA\_REVISION\_REG}{FPGA\_REVISION\_REG}}
+{\footnotesize\ttfamily \#define F\+P\+G\+A\+\_\+\+R\+E\+V\+I\+S\+I\+O\+N\+\_\+\+R\+EG~0x0000	/$\ast$ F\+P\+GA Revision Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9eab654828c5d21a4160dd8bbe5a69b8}\label{acq-fiber-hba_8h_a9eab654828c5d21a4160dd8bbe5a69b8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_COMMS\_FIFO\_CONTROL\_REG@{HOST\_COMMS\_FIFO\_CONTROL\_REG}}
+\index{HOST\_COMMS\_FIFO\_CONTROL\_REG@{HOST\_COMMS\_FIFO\_CONTROL\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_COMMS\_FIFO\_CONTROL\_REG}{HOST\_COMMS\_FIFO\_CONTROL\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+C\+O\+M\+M\+S\+\_\+\+F\+I\+F\+O\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG~0x00\+C0	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO Control Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab9f3bef86efd80c7d4f2a9f2c853f832}\label{acq-fiber-hba_8h_ab9f3bef86efd80c7d4f2a9f2c853f832}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_COMMS\_FIFO\_STATUS\_REG@{HOST\_COMMS\_FIFO\_STATUS\_REG}}
+\index{HOST\_COMMS\_FIFO\_STATUS\_REG@{HOST\_COMMS\_FIFO\_STATUS\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_COMMS\_FIFO\_STATUS\_REG}{HOST\_COMMS\_FIFO\_STATUS\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+C\+O\+M\+M\+S\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG~0x00\+C4	/$\ast$ A\+C\+Q400 Receive Communications F\+I\+FO Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a215693bf58a9660adc3c43cbe682cf1c}\label{acq-fiber-hba_8h_a215693bf58a9660adc3c43cbe682cf1c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_COUNTER\_REG@{HOST\_COUNTER\_REG}}
+\index{HOST\_COUNTER\_REG@{HOST\_COUNTER\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_COUNTER\_REG}{HOST\_COUNTER\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+C\+O\+U\+N\+T\+E\+R\+\_\+\+R\+EG~0x0024	/$\ast$ Heart Beat Counter $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae8b78314040ac67457e327d2970c01d2}\label{acq-fiber-hba_8h_ae8b78314040ac67457e327d2970c01d2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_MON\_OVER\_TEMP@{HOST\_MON\_OVER\_TEMP}}
+\index{HOST\_MON\_OVER\_TEMP@{HOST\_MON\_OVER\_TEMP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_MON\_OVER\_TEMP}{HOST\_MON\_OVER\_TEMP}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+O\+V\+E\+R\+\_\+\+T\+E\+MP~(1$<$$<$4)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a2f4b68a9d375b645e60804890cc8be34}\label{acq-fiber-hba_8h_a2f4b68a9d375b645e60804890cc8be34}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_MON\_REG@{HOST\_MON\_REG}}
+\index{HOST\_MON\_REG@{HOST\_MON\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_MON\_REG}{HOST\_MON\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+R\+EG~0x0048  /$\ast$ Temperature Monitor/Volts Alarms $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad2f55d5857ea08b8720c5fff2f8a58e7}\label{acq-fiber-hba_8h_ad2f55d5857ea08b8720c5fff2f8a58e7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_MON\_TEMP\_SHL@{HOST\_MON\_TEMP\_SHL}}
+\index{HOST\_MON\_TEMP\_SHL@{HOST\_MON\_TEMP\_SHL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_MON\_TEMP\_SHL}{HOST\_MON\_TEMP\_SHL}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+T\+E\+M\+P\+\_\+\+S\+HL~20}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_af5d6fed2c035976627c07a9518b39a10}\label{acq-fiber-hba_8h_af5d6fed2c035976627c07a9518b39a10}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_MON\_USR\_TEMP@{HOST\_MON\_USR\_TEMP}}
+\index{HOST\_MON\_USR\_TEMP@{HOST\_MON\_USR\_TEMP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_MON\_USR\_TEMP}{HOST\_MON\_USR\_TEMP}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+U\+S\+R\+\_\+\+T\+E\+MP~(1$<$$<$5)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a84eb8cfc4b797b4b9db88c952da01af5}\label{acq-fiber-hba_8h_a84eb8cfc4b797b4b9db88c952da01af5}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_MON\_VOLT\_ALARM@{HOST\_MON\_VOLT\_ALARM}}
+\index{HOST\_MON\_VOLT\_ALARM@{HOST\_MON\_VOLT\_ALARM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_MON\_VOLT\_ALARM}{HOST\_MON\_VOLT\_ALARM}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+M\+O\+N\+\_\+\+V\+O\+L\+T\+\_\+\+A\+L\+A\+RM~0x7}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_affd458155cdc841fdd6d519315fdb6c7}\label{acq-fiber-hba_8h_affd458155cdc841fdd6d519315fdb6c7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_PCIE\_CONTROL\_REG@{HOST\_PCIE\_CONTROL\_REG}}
+\index{HOST\_PCIE\_CONTROL\_REG@{HOST\_PCIE\_CONTROL\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_PCIE\_CONTROL\_REG}{HOST\_PCIE\_CONTROL\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG~0x0004	/$\ast$ Host P\+C\+Ie Control / Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aab088c1f59845fab0f6a0b70a078f0f0}\label{acq-fiber-hba_8h_aab088c1f59845fab0f6a0b70a078f0f0}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_PCIE\_DEBUG\_REG@{HOST\_PCIE\_DEBUG\_REG}}
+\index{HOST\_PCIE\_DEBUG\_REG@{HOST\_PCIE\_DEBUG\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_PCIE\_DEBUG\_REG}{HOST\_PCIE\_DEBUG\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+D\+E\+B\+U\+G\+\_\+\+R\+EG~0x0028	/$\ast$ Host P\+C\+Ie Debug Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_add3d4eb382119c70f321d8e3b7ffe4db}\label{acq-fiber-hba_8h_add3d4eb382119c70f321d8e3b7ffe4db}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_PCIE\_INTERRUPT\_REG@{HOST\_PCIE\_INTERRUPT\_REG}}
+\index{HOST\_PCIE\_INTERRUPT\_REG@{HOST\_PCIE\_INTERRUPT\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_PCIE\_INTERRUPT\_REG}{HOST\_PCIE\_INTERRUPT\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+I\+N\+T\+E\+R\+R\+U\+P\+T\+\_\+\+R\+EG~0x0008	/$\ast$ Host P\+C\+Ie Interrupt Register Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a846a9889f319a3da4f0daf559b2cad9d}\label{acq-fiber-hba_8h_a846a9889f319a3da4f0daf559b2cad9d}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_PCIE\_LATSTATS\_1@{HOST\_PCIE\_LATSTATS\_1}}
+\index{HOST\_PCIE\_LATSTATS\_1@{HOST\_PCIE\_LATSTATS\_1}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_PCIE\_LATSTATS\_1}{HOST\_PCIE\_LATSTATS\_1}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+L\+A\+T\+S\+T\+A\+T\+S\+\_\+1~0x0030}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a3ff86c9b911c9eda4f58f0c42d9c6836}\label{acq-fiber-hba_8h_a3ff86c9b911c9eda4f58f0c42d9c6836}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_PCIE\_LATSTATS\_2@{HOST\_PCIE\_LATSTATS\_2}}
+\index{HOST\_PCIE\_LATSTATS\_2@{HOST\_PCIE\_LATSTATS\_2}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_PCIE\_LATSTATS\_2}{HOST\_PCIE\_LATSTATS\_2}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+P\+C\+I\+E\+\_\+\+L\+A\+T\+S\+T\+A\+T\+S\+\_\+2~0x0034}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad7c3973800c0bd226d55a1b9c8a4b3f8}\label{acq-fiber-hba_8h_ad7c3973800c0bd226d55a1b9c8a4b3f8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_SPI\_FLASH\_CONTROL\_REG@{HOST\_SPI\_FLASH\_CONTROL\_REG}}
+\index{HOST\_SPI\_FLASH\_CONTROL\_REG@{HOST\_SPI\_FLASH\_CONTROL\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_SPI\_FLASH\_CONTROL\_REG}{HOST\_SPI\_FLASH\_CONTROL\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+S\+P\+I\+\_\+\+F\+L\+A\+S\+H\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+R\+EG~0x0040	/$\ast$ S\+PI F\+L\+A\+SH Control Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ade1eebc96430a2d82d111588fe4ecd7a}\label{acq-fiber-hba_8h_ade1eebc96430a2d82d111588fe4ecd7a}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_SPI\_FLASH\_DATA\_REG@{HOST\_SPI\_FLASH\_DATA\_REG}}
+\index{HOST\_SPI\_FLASH\_DATA\_REG@{HOST\_SPI\_FLASH\_DATA\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_SPI\_FLASH\_DATA\_REG}{HOST\_SPI\_FLASH\_DATA\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+S\+P\+I\+\_\+\+F\+L\+A\+S\+H\+\_\+\+D\+A\+T\+A\+\_\+\+R\+EG~0x0044	/$\ast$ S\+PI F\+L\+A\+SH Data Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a5ed9f9aa0d28cb0e8584a48e434bfdac}\label{acq-fiber-hba_8h_a5ed9f9aa0d28cb0e8584a48e434bfdac}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!HOST\_TEST\_REG@{HOST\_TEST\_REG}}
+\index{HOST\_TEST\_REG@{HOST\_TEST\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{HOST\_TEST\_REG}{HOST\_TEST\_REG}}
+{\footnotesize\ttfamily \#define H\+O\+S\+T\+\_\+\+T\+E\+S\+T\+\_\+\+R\+EG~0x0020}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}\label{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!I2C@{I2C}}
+\index{I2C@{I2C}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{I2C}{I2C}}
+{\footnotesize\ttfamily \#define I2C(\begin{DoxyParamCaption}\item[{}]{acr }\end{DoxyParamCaption})~((acr)+8)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a43ae649886a55c0ebcd0e543b9ca904e}\label{acq-fiber-hba_8h_a43ae649886a55c0ebcd0e543b9ca904e}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!LOC@{LOC}}
+\index{LOC@{LOC}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{LOC}{LOC}}
+{\footnotesize\ttfamily \#define L\+OC(\begin{DoxyParamCaption}\item[{}]{adev }\end{DoxyParamCaption})~((adev)-\/$>$mappings\mbox{[}0\mbox{]}.va)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aff37baed944252e0c7fef8a07970b091}\label{acq-fiber-hba_8h_aff37baed944252e0c7fef8a07970b091}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!MAP\_COUNT\_4G1@{MAP\_COUNT\_4G1}}
+\index{MAP\_COUNT\_4G1@{MAP\_COUNT\_4G1}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{MAP\_COUNT\_4G1}{MAP\_COUNT\_4G1}}
+{\footnotesize\ttfamily \#define M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G1~2}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a314b4047954621d36741d105fc530ce7}\label{acq-fiber-hba_8h_a314b4047954621d36741d105fc530ce7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!MAP\_COUNT\_4G2@{MAP\_COUNT\_4G2}}
+\index{MAP\_COUNT\_4G2@{MAP\_COUNT\_4G2}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{MAP\_COUNT\_4G2}{MAP\_COUNT\_4G2}}
+{\footnotesize\ttfamily \#define M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G2~4}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad2fe65ecff0032e02a5d6c9d61a8b969}\label{acq-fiber-hba_8h_ad2fe65ecff0032e02a5d6c9d61a8b969}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!MAP\_COUNT\_4G4@{MAP\_COUNT\_4G4}}
+\index{MAP\_COUNT\_4G4@{MAP\_COUNT\_4G4}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{MAP\_COUNT\_4G4}{MAP\_COUNT\_4G4}}
+{\footnotesize\ttfamily \#define M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+4\+G4~6}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a15803d57ce517062baf9ac442ba66727}\label{acq-fiber-hba_8h_a15803d57ce517062baf9ac442ba66727}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!MAP\_COUNT\_MAX@{MAP\_COUNT\_MAX}}
+\index{MAP\_COUNT\_MAX@{MAP\_COUNT\_MAX}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{MAP\_COUNT\_MAX}{MAP\_COUNT\_MAX}}
+{\footnotesize\ttfamily \#define M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+\+M\+AX~6}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9b30c8e32c366824be94a7408f48b027}\label{acq-fiber-hba_8h_a9b30c8e32c366824be94a7408f48b027}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!MAXDEV@{MAXDEV}}
+\index{MAXDEV@{MAXDEV}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{MAXDEV}{MAXDEV}}
+{\footnotesize\ttfamily \#define M\+A\+X\+D\+EV~8	/$\ast$ maximum expected devices .. $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a15a2127c69dd29928d218c850a5e0a95}\label{acq-fiber-hba_8h_a15a2127c69dd29928d218c850a5e0a95}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!NO\_BAR@{NO\_BAR}}
+\index{NO\_BAR@{NO\_BAR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{NO\_BAR}{NO\_BAR}}
+{\footnotesize\ttfamily \#define N\+O\+\_\+\+B\+AR~-\/1}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0184e42ca5c4b8c9b9739df4ed2930df}\label{acq-fiber-hba_8h_a0184e42ca5c4b8c9b9739df4ed2930df}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCI\_CONTROL\_STATUS\_REG@{PCI\_CONTROL\_STATUS\_REG}}
+\index{PCI\_CONTROL\_STATUS\_REG@{PCI\_CONTROL\_STATUS\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCI\_CONTROL\_STATUS\_REG}{PCI\_CONTROL\_STATUS\_REG}}
+{\footnotesize\ttfamily \#define P\+C\+I\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG~0x000C	/$\ast$ P\+CI Control / Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a323f775a7166db0a4b1de9ef6d2fc82c}\label{acq-fiber-hba_8h_a323f775a7166db0a4b1de9ef6d2fc82c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_BASE@{PCIE\_BASE}}
+\index{PCIE\_BASE@{PCIE\_BASE}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_BASE}{PCIE\_BASE}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+B\+A\+SE~0x1000}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_afdf0c56b29b2a7dc630a056b1a421af7}\label{acq-fiber-hba_8h_afdf0c56b29b2a7dc630a056b1a421af7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_BUFFER\_CTRL\_REG@{PCIE\_BUFFER\_CTRL\_REG}}
+\index{PCIE\_BUFFER\_CTRL\_REG@{PCIE\_BUFFER\_CTRL\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_BUFFER\_CTRL\_REG}{PCIE\_BUFFER\_CTRL\_REG}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+C\+T\+R\+L\+\_\+\+R\+EG~0x001C}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a27abff978b429683c64c5db0610e69e8}\label{acq-fiber-hba_8h_a27abff978b429683c64c5db0610e69e8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_CONF\_AF\_PORT\_SHL@{PCIE\_CONF\_AF\_PORT\_SHL}}
+\index{PCIE\_CONF\_AF\_PORT\_SHL@{PCIE\_CONF\_AF\_PORT\_SHL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_CONF\_AF\_PORT\_SHL}{PCIE\_CONF\_AF\_PORT\_SHL}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+C\+O\+N\+F\+\_\+\+A\+F\+\_\+\+P\+O\+R\+T\+\_\+\+S\+HL~16}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1e68884704e2cb90b0bc6c46e259aab6}\label{acq-fiber-hba_8h_a1e68884704e2cb90b0bc6c46e259aab6}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_CONF\_REG@{PCIE\_CONF\_REG}}
+\index{PCIE\_CONF\_REG@{PCIE\_CONF\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_CONF\_REG}{PCIE\_CONF\_REG}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+C\+O\+N\+F\+\_\+\+R\+EG~0x0018	/$\ast$ Host P\+C\+Ie Configuration Reg $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab4c79d3fb2927e2cdded265ac66a2eaf}\label{acq-fiber-hba_8h_ab4c79d3fb2927e2cdded265ac66a2eaf}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_DEVICE\_CONTROL\_STATUS\_REG@{PCIE\_DEVICE\_CONTROL\_STATUS\_REG}}
+\index{PCIE\_DEVICE\_CONTROL\_STATUS\_REG@{PCIE\_DEVICE\_CONTROL\_STATUS\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_DEVICE\_CONTROL\_STATUS\_REG}{PCIE\_DEVICE\_CONTROL\_STATUS\_REG}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+D\+E\+V\+I\+C\+E\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG~0x0010	/$\ast$ P\+C\+Ie Control / Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a4b3a351531a516408dc33d941f57b48e}\label{acq-fiber-hba_8h_a4b3a351531a516408dc33d941f57b48e}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_LINK\_CONTROL\_STATUS\_REG@{PCIE\_LINK\_CONTROL\_STATUS\_REG}}
+\index{PCIE\_LINK\_CONTROL\_STATUS\_REG@{PCIE\_LINK\_CONTROL\_STATUS\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_LINK\_CONTROL\_STATUS\_REG}{PCIE\_LINK\_CONTROL\_STATUS\_REG}}
+{\footnotesize\ttfamily \#define P\+C\+I\+E\+\_\+\+L\+I\+N\+K\+\_\+\+C\+O\+N\+T\+R\+O\+L\+\_\+\+S\+T\+A\+T\+U\+S\+\_\+\+R\+EG~0x0014	/$\ast$ P\+C\+Ie Link Control / Status Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a367b8145419319e0a77bff9c5d8ff312}\label{acq-fiber-hba_8h_a367b8145419319e0a77bff9c5d8ff312}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PD@{PD}}
+\index{PD@{PD}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PD}{PD}}
+{\footnotesize\ttfamily \#define PD(\begin{DoxyParamCaption}\item[{}]{file }\end{DoxyParamCaption})~((struct \mbox{\hyperlink{structAFHBA__DEV__PATH}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+\_\+\+P\+A\+TH}} $\ast$)(file)-\/$>$private\+\_\+data)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a233704347f1fa43667ea724c40ce9d28}\label{acq-fiber-hba_8h_a233704347f1fa43667ea724c40ce9d28}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!pdev@{pdev}}
+\index{pdev@{pdev}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{pdev}{pdev}}
+{\footnotesize\ttfamily \#define pdev(\begin{DoxyParamCaption}\item[{}]{adev }\end{DoxyParamCaption})~(\&(adev)-\/$>$pci\+\_\+dev-\/$>$dev)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a1e31a0ac88887de6da344eebd279c92d}\label{acq-fiber-hba_8h_a1e31a0ac88887de6da344eebd279c92d}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PSZ@{PSZ}}
+\index{PSZ@{PSZ}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PSZ}{PSZ}}
+{\footnotesize\ttfamily \#define P\+SZ~(sizeof (struct \mbox{\hyperlink{structAFHBA__DEV__PATH}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+\_\+\+P\+A\+TH}}))}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}\label{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!REGS\_BAR@{REGS\_BAR}}
+\index{REGS\_BAR@{REGS\_BAR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{REGS\_BAR}{REGS\_BAR}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \#define R\+E\+G\+S\+\_\+\+B\+AR~0		/$\ast$ @@todo assumed $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}\label{acq-fiber-hba_8h_a0f8c5528309de996df0ce80f68740dd3}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!REGS\_BAR@{REGS\_BAR}}
+\index{REGS\_BAR@{REGS\_BAR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{REGS\_BAR}{REGS\_BAR}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \#define R\+E\+G\+S\+\_\+\+B\+AR~0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aeeb2947ebccabd2ffeb408c69193d49c}\label{acq-fiber-hba_8h_aeeb2947ebccabd2ffeb408c69193d49c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!REM@{REM}}
+\index{REM@{REM}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{REM}{REM}}
+{\footnotesize\ttfamily \#define R\+EM(\begin{DoxyParamCaption}\item[{}]{adev }\end{DoxyParamCaption})~((adev)-\/$>$remote)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ad83bafe57ca5ec2c3eeef7f6d48db726}\label{acq-fiber-hba_8h_ad83bafe57ca5ec2c3eeef7f6d48db726}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!REMOTE\_BAR@{REMOTE\_BAR}}
+\index{REMOTE\_BAR@{REMOTE\_BAR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{REMOTE\_BAR}{REMOTE\_BAR}}
+{\footnotesize\ttfamily \#define R\+E\+M\+O\+T\+E\+\_\+\+B\+AR~1}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a14a584855616f92d03d709f3efd43dd8}\label{acq-fiber-hba_8h_a14a584855616f92d03d709f3efd43dd8}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!REMOTE\_BAR2@{REMOTE\_BAR2}}
+\index{REMOTE\_BAR2@{REMOTE\_BAR2}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{REMOTE\_BAR2}{REMOTE\_BAR2}}
+{\footnotesize\ttfamily \#define R\+E\+M\+O\+T\+E\+\_\+\+B\+A\+R2~2}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a8349bd40c6ebf7c4a03590d04461568c}\label{acq-fiber-hba_8h_a8349bd40c6ebf7c4a03590d04461568c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_DATA\_REG@{SFP\_I2C\_DATA\_REG}}
+\index{SFP\_I2C\_DATA\_REG@{SFP\_I2C\_DATA\_REG}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_DATA\_REG}{SFP\_I2C\_DATA\_REG}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+EG(\begin{DoxyParamCaption}\item[{}]{sfp }\end{DoxyParamCaption})~(\mbox{\hyperlink{acq-fiber-hba_8h_ae68366c13e88e1cbd4da6c808a4a5949}{S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+E\+GA}}   + \mbox{\hyperlink{acq-fiber-hba_8h_a08ec30817ef92e64a68766d63da84d53}{A\+U\+R\+O\+R\+A\+\_\+\+S\+T\+EP}}$\ast$(sfp))}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae68366c13e88e1cbd4da6c808a4a5949}\label{acq-fiber-hba_8h_ae68366c13e88e1cbd4da6c808a4a5949}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_DATA\_REGA@{SFP\_I2C\_DATA\_REGA}}
+\index{SFP\_I2C\_DATA\_REGA@{SFP\_I2C\_DATA\_REGA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_DATA\_REGA}{SFP\_I2C\_DATA\_REGA}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+D\+A\+T\+A\+\_\+\+R\+E\+GA~0x0088	/$\ast$ S\+FP \mbox{\hyperlink{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}{I2C}} Control and Data Register $\ast$/}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae740490a17d0d021761075951f6c7797}\label{acq-fiber-hba_8h_ae740490a17d0d021761075951f6c7797}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SCL1\_R@{SFP\_I2C\_SCL1\_R}}
+\index{SFP\_I2C\_SCL1\_R@{SFP\_I2C\_SCL1\_R}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SCL1\_R}{SFP\_I2C\_SCL1\_R}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L1\+\_\+R~0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a9e9d0eb147e8118c3c75c6993f9d3bb7}\label{acq-fiber-hba_8h_a9e9d0eb147e8118c3c75c6993f9d3bb7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SCL1\_W@{SFP\_I2C\_SCL1\_W}}
+\index{SFP\_I2C\_SCL1\_W@{SFP\_I2C\_SCL1\_W}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SCL1\_W}{SFP\_I2C\_SCL1\_W}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L1\+\_\+W~8}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae62cf7b7a404ff3c3a871da06d1cfc7f}\label{acq-fiber-hba_8h_ae62cf7b7a404ff3c3a871da06d1cfc7f}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SCL2\_R@{SFP\_I2C\_SCL2\_R}}
+\index{SFP\_I2C\_SCL2\_R@{SFP\_I2C\_SCL2\_R}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SCL2\_R}{SFP\_I2C\_SCL2\_R}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L2\+\_\+R~0}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab47307c191dc77fa28d1c90acc4ecd71}\label{acq-fiber-hba_8h_ab47307c191dc77fa28d1c90acc4ecd71}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SCL2\_W@{SFP\_I2C\_SCL2\_W}}
+\index{SFP\_I2C\_SCL2\_W@{SFP\_I2C\_SCL2\_W}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SCL2\_W}{SFP\_I2C\_SCL2\_W}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+C\+L2\+\_\+W~8}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac0de3fb36df23980152d898c76702a19}\label{acq-fiber-hba_8h_ac0de3fb36df23980152d898c76702a19}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SDA1\_R@{SFP\_I2C\_SDA1\_R}}
+\index{SFP\_I2C\_SDA1\_R@{SFP\_I2C\_SDA1\_R}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SDA1\_R}{SFP\_I2C\_SDA1\_R}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A1\+\_\+R~1}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a4be024815e210322d1f71f5c2e4dbcfa}\label{acq-fiber-hba_8h_a4be024815e210322d1f71f5c2e4dbcfa}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SDA1\_W@{SFP\_I2C\_SDA1\_W}}
+\index{SFP\_I2C\_SDA1\_W@{SFP\_I2C\_SDA1\_W}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SDA1\_W}{SFP\_I2C\_SDA1\_W}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A1\+\_\+W~9}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a70b34048cbd239ee1272a378588ed928}\label{acq-fiber-hba_8h_a70b34048cbd239ee1272a378588ed928}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SDA2\_R@{SFP\_I2C\_SDA2\_R}}
+\index{SFP\_I2C\_SDA2\_R@{SFP\_I2C\_SDA2\_R}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SDA2\_R}{SFP\_I2C\_SDA2\_R}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A2\+\_\+R~1}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab47518cf9a996846e48d7372ff736afd}\label{acq-fiber-hba_8h_ab47518cf9a996846e48d7372ff736afd}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SFP\_I2C\_SDA2\_W@{SFP\_I2C\_SDA2\_W}}
+\index{SFP\_I2C\_SDA2\_W@{SFP\_I2C\_SDA2\_W}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SFP\_I2C\_SDA2\_W}{SFP\_I2C\_SDA2\_W}}
+{\footnotesize\ttfamily \#define S\+F\+P\+\_\+\+I2\+C\+\_\+\+S\+D\+A2\+\_\+W~9}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac2c4143824bbd55cf46d5efbe418b2a2}\label{acq-fiber-hba_8h_ac2c4143824bbd55cf46d5efbe418b2a2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!SZM1@{SZM1}}
+\index{SZM1@{SZM1}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{SZM1}{SZM1}}
+{\footnotesize\ttfamily \#define S\+Z\+M1(\begin{DoxyParamCaption}\item[{}]{field }\end{DoxyParamCaption})~(sizeof(field)-\/1)}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a87044ec92cc2531c412942dc746b37a2}\label{acq-fiber-hba_8h_a87044ec92cc2531c412942dc746b37a2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!ZYNQ\_BASE@{ZYNQ\_BASE}}
+\index{ZYNQ\_BASE@{ZYNQ\_BASE}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{ZYNQ\_BASE}{ZYNQ\_BASE}}
+{\footnotesize\ttfamily \#define Z\+Y\+N\+Q\+\_\+\+B\+A\+SE~0x0000}
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37e}\label{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37e}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!COMMON\_REGS@{COMMON\_REGS}}
+\index{COMMON\_REGS@{COMMON\_REGS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{COMMON\_REGS}{COMMON\_REGS}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37e}{C\+O\+M\+M\+O\+N\+\_\+\+R\+E\+GS}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{COM\_SOFT\_TRIGGER@{COM\_SOFT\_TRIGGER}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!COM\_SOFT\_TRIGGER@{COM\_SOFT\_TRIGGER}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37ea911beda0427792e4fe4de7e9dd1e613d}\label{acq-fiber-hba_8h_a26da304e5a01189da6cfd2a21270a37ea911beda0427792e4fe4de7e9dd1e613d}} 
+C\+O\+M\+\_\+\+S\+O\+F\+T\+\_\+\+T\+R\+I\+G\+G\+ER&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_REGS@{DMA\_REGS}}
+\index{DMA\_REGS@{DMA\_REGS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_REGS}{DMA\_REGS}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6}{D\+M\+A\+\_\+\+R\+E\+GS}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_TEST@{DMA\_TEST}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_TEST@{DMA\_TEST}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ae4ef1efaf351f7c9ed74e8ff687af4d9}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ae4ef1efaf351f7c9ed74e8ff687af4d9}} 
+D\+M\+A\+\_\+\+T\+E\+ST&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_CTRL@{DMA\_CTRL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_CTRL@{DMA\_CTRL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4eaf6e7dbc232d85d7b28003c847e2e0}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4eaf6e7dbc232d85d7b28003c847e2e0}} 
+D\+M\+A\+\_\+\+C\+T\+RL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_DATA\_FIFSTA@{DMA\_DATA\_FIFSTA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DATA\_FIFSTA@{DMA\_DATA\_FIFSTA}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6af1613884c9372d80356cf7605b480bff}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6af1613884c9372d80356cf7605b480bff}} 
+D\+M\+A\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+S\+TA&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_DESC\_FIFSTA@{DMA\_DESC\_FIFSTA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_DESC\_FIFSTA@{DMA\_DESC\_FIFSTA}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f79088b8e38a0078a27e5307dd5bbe3}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f79088b8e38a0078a27e5307dd5bbe3}} 
+D\+M\+A\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+S\+TA&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PUSH\_DESC\_STA@{DMA\_PUSH\_DESC\_STA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_DESC\_STA@{DMA\_PUSH\_DESC\_STA}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ac4cf9301131fc7bd04fd2645cdb9dec4}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ac4cf9301131fc7bd04fd2645cdb9dec4}} 
+D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+S\+TA&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PULL\_DESC\_STA@{DMA\_PULL\_DESC\_STA}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PULL\_DESC\_STA@{DMA\_PULL\_DESC\_STA}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad1398f178113f273bad297a48372135a}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad1398f178113f273bad297a48372135a}} 
+D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+S\+TA&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PUSH\_DATACOUNT@{DMA\_PUSH\_DATACOUNT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_DATACOUNT@{DMA\_PUSH\_DATACOUNT}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a186b0b7c07473e644317f43db845edd8}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a186b0b7c07473e644317f43db845edd8}} 
+D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+A\+T\+A\+C\+O\+U\+NT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PUSH\_GAP@{DMA\_PUSH\_GAP}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_GAP@{DMA\_PUSH\_GAP}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a51e198b1c8212f5adca629fcbb60bdef}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a51e198b1c8212f5adca629fcbb60bdef}} 
+D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+G\+AP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PUSH\_DESC\_LEN@{DMA\_PUSH\_DESC\_LEN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_DESC\_LEN@{DMA\_PUSH\_DESC\_LEN}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f65c78b7cd12c859116cf870084a9de}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6a4f65c78b7cd12c859116cf870084a9de}} 
+D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PULL\_DESC\_LEN@{DMA\_PULL\_DESC\_LEN}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PULL\_DESC\_LEN@{DMA\_PULL\_DESC\_LEN}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad82ab26af597bd0aec971dd85a7b45ab}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6ad82ab26af597bd0aec971dd85a7b45ab}} 
+D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+L\+EN&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_REGS\_COUNT@{DMA\_REGS\_COUNT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_REGS\_COUNT@{DMA\_REGS\_COUNT}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6abe1e04676aba20ba77556bc1290ee1cf}\label{acq-fiber-hba_8h_a4197530ae6b3346313f06b487a5853d6abe1e04676aba20ba77556bc1290ee1cf}} 
+D\+M\+A\+\_\+\+R\+E\+G\+S\+\_\+\+C\+O\+U\+NT&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}\label{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_SEL@{DMA\_SEL}}
+\index{DMA\_SEL@{DMA\_SEL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{DMA\_SEL}{DMA\_SEL}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}{D\+M\+A\+\_\+\+S\+EL}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PUSH\_SEL@{DMA\_PUSH\_SEL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PUSH\_SEL@{DMA\_PUSH\_SEL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}\label{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba830d155f4fd6fea6b1246e92a9be1782}} 
+D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+S\+EL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_PULL\_SEL@{DMA\_PULL\_SEL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_PULL\_SEL@{DMA\_PULL\_SEL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba7d3f844abe5ae04de17702f90b337704}\label{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18ba7d3f844abe5ae04de17702f90b337704}} 
+D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+S\+EL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA\_BOTH\_SEL@{DMA\_BOTH\_SEL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!DMA\_BOTH\_SEL@{DMA\_BOTH\_SEL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18bae7e8556bd8b2150d06d4564599257d83}\label{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18bae7e8556bd8b2150d06d4564599257d83}} 
+D\+M\+A\+\_\+\+B\+O\+T\+H\+\_\+\+S\+EL&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3d}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3d}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_REGS@{PCIE\_REGS}}
+\index{PCIE\_REGS@{PCIE\_REGS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{PCIE\_REGS}{PCIE\_REGS}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3d}{P\+C\+I\+E\+\_\+\+R\+E\+GS}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_CNTRL@{PCIE\_CNTRL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_CNTRL@{PCIE\_CNTRL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da3e25ced99cad6ce3c555a3b88511290b}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da3e25ced99cad6ce3c555a3b88511290b}} 
+P\+C\+I\+E\+\_\+\+C\+N\+T\+RL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_INTR@{PCIE\_INTR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_INTR@{PCIE\_INTR}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da8001c5a3a71621f1052d53927b5721b6}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da8001c5a3a71621f1052d53927b5721b6}} 
+P\+C\+I\+E\+\_\+\+I\+N\+TR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCI\_CSR@{PCI\_CSR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCI\_CSR@{PCI\_CSR}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da877cfce5a150835e4b1b342756312c28}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da877cfce5a150835e4b1b342756312c28}} 
+P\+C\+I\+\_\+\+C\+SR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_DEV\_CSR@{PCIE\_DEV\_CSR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_DEV\_CSR@{PCIE\_DEV\_CSR}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3dae36858d07ee3f39950aa7368476e99fc}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3dae36858d07ee3f39950aa7368476e99fc}} 
+P\+C\+I\+E\+\_\+\+D\+E\+V\+\_\+\+C\+SR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_LINK\_CSR@{PCIE\_LINK\_CSR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_LINK\_CSR@{PCIE\_LINK\_CSR}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da34a26eb0aa1feb2569eaf0ef8a99c87f}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da34a26eb0aa1feb2569eaf0ef8a99c87f}} 
+P\+C\+I\+E\+\_\+\+L\+I\+N\+K\+\_\+\+C\+SR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_CONF@{PCIE\_CONF}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_CONF@{PCIE\_CONF}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da351854d3e08ceffb058a324a8a40d91e}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da351854d3e08ceffb058a324a8a40d91e}} 
+P\+C\+I\+E\+\_\+\+C\+O\+NF&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCIE\_BUFFER\_CTRL@{PCIE\_BUFFER\_CTRL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!PCIE\_BUFFER\_CTRL@{PCIE\_BUFFER\_CTRL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da480f43a64acf2e4f276f03d3b761bc27}\label{acq-fiber-hba_8h_a8409928588f999445963d1344bc6eb3da480f43a64acf2e4f276f03d3b761bc27}} 
+P\+C\+I\+E\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+C\+T\+RL&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!ZYNQ\_REGS@{ZYNQ\_REGS}}
+\index{ZYNQ\_REGS@{ZYNQ\_REGS}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{ZYNQ\_REGS}{ZYNQ\_REGS}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9}{Z\+Y\+N\+Q\+\_\+\+R\+E\+GS}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_MOD\_ID@{Z\_MOD\_ID}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_MOD\_ID@{Z\_MOD\_ID}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a3885c2b495ffb0c31eb0b09ccaf880e4}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a3885c2b495ffb0c31eb0b09ccaf880e4}} 
+Z\+\_\+\+M\+O\+D\+\_\+\+ID&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_DMA\_CTRL@{Z\_DMA\_CTRL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_DMA\_CTRL@{Z\_DMA\_CTRL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa8a213b682633f8b2bb767b6f928abcd}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa8a213b682633f8b2bb767b6f928abcd}} 
+Z\+\_\+\+D\+M\+A\+\_\+\+C\+T\+RL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_COMMS\_HB@{Z\_COMMS\_HB}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_COMMS\_HB@{Z\_COMMS\_HB}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9ae94b20ed1db3c7106b0a6adc456b736b}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9ae94b20ed1db3c7106b0a6adc456b736b}} 
+Z\+\_\+\+C\+O\+M\+M\+S\+\_\+\+HB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_AURORA\_CTRL@{Z\_AURORA\_CTRL}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_AURORA\_CTRL@{Z\_AURORA\_CTRL}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a4dab4d972f641f3170677f82907d32fd}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a4dab4d972f641f3170677f82907d32fd}} 
+Z\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+C\+T\+RL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_AURORA\_SR@{Z\_AURORA\_SR}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_AURORA\_SR@{Z\_AURORA\_SR}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a1a8edccf956aebaf7f43cf993ad40dc5}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9a1a8edccf956aebaf7f43cf993ad40dc5}} 
+Z\+\_\+\+A\+U\+R\+O\+R\+A\+\_\+\+SR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Z\_IDENT@{Z\_IDENT}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!Z\_IDENT@{Z\_IDENT}}}\mbox{\Hypertarget{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa2374b82d7a49e236dd1969674f3e09a}\label{acq-fiber-hba_8h_a7baa74c64c77143c0c978ca15ffe8cf9aa2374b82d7a49e236dd1969674f3e09a}} 
+Z\+\_\+\+I\+D\+E\+NT&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{acq-fiber-hba_8h_adeeea9c8bcc114e9b1670d9a50b4f630}\label{acq-fiber-hba_8h_adeeea9c8bcc114e9b1670d9a50b4f630}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_create\_sysfs@{afhba\_create\_sysfs}}
+\index{afhba\_create\_sysfs@{afhba\_create\_sysfs}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs()}{afhba\_create\_sysfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a277f3932399bc90cb1d012e150194179}\label{acq-fiber-hba_8h_a277f3932399bc90cb1d012e150194179}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}}
+\index{afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs\_class()}{afhba\_create\_sysfs\_class()}}
+{\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a04e755abcd80a2c3aa5a31245d474fd7}\label{acq-fiber-hba_8h_a04e755abcd80a2c3aa5a31245d474fd7}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_deleteDevice@{afhba\_deleteDevice}}
+\index{afhba\_deleteDevice@{afhba\_deleteDevice}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_deleteDevice()}{afhba\_deleteDevice()}}
+{\footnotesize\ttfamily void afhba\+\_\+delete\+Device (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{tdev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a577ea595f6d04919cd7253d2e59c3970}\label{acq-fiber-hba_8h_a577ea595f6d04919cd7253d2e59c3970}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_lookupDev@{afhba\_lookupDev}}
+\index{afhba\_lookupDev@{afhba\_lookupDev}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDev()}{afhba\_lookupDev()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Dev (\begin{DoxyParamCaption}\item[{struct device $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab1e0fb91205d43c4f7b0de2a0282d51f}\label{acq-fiber-hba_8h_ab1e0fb91205d43c4f7b0de2a0282d51f}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_lookupDevice@{afhba\_lookupDevice}}
+\index{afhba\_lookupDevice@{afhba\_lookupDevice}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDevice()}{afhba\_lookupDevice()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device (\begin{DoxyParamCaption}\item[{int}]{major }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}\label{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_lookupDeviceFromClass@{afhba\_lookupDeviceFromClass}}
+\index{afhba\_lookupDeviceFromClass@{afhba\_lookupDeviceFromClass}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDeviceFromClass()}{afhba\_lookupDeviceFromClass()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device\+From\+Class (\begin{DoxyParamCaption}\item[{struct device $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aa52de0d0bcb92db2903c9de5771270f3}\label{acq-fiber-hba_8h_aa52de0d0bcb92db2903c9de5771270f3}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_lookupDevicePci@{afhba\_lookupDevicePci}}
+\index{afhba\_lookupDevicePci@{afhba\_lookupDevicePci}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDevicePci()}{afhba\_lookupDevicePci()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device\+Pci (\begin{DoxyParamCaption}\item[{struct pci\+\_\+dev $\ast$}]{pci\+\_\+dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ab4d77ca27b45587b5465e2e99f031505}\label{acq-fiber-hba_8h_ab4d77ca27b45587b5465e2e99f031505}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_read\_reg@{afhba\_read\_reg}}
+\index{afhba\_read\_reg@{afhba\_read\_reg}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_read\_reg()}{afhba\_read\_reg()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} afhba\+\_\+read\+\_\+reg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a0fa25e119d3fd54bbac8352365710586}\label{acq-fiber-hba_8h_a0fa25e119d3fd54bbac8352365710586}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_registerDevice@{afhba\_registerDevice}}
+\index{afhba\_registerDevice@{afhba\_registerDevice}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_registerDevice()}{afhba\_registerDevice()}}
+{\footnotesize\ttfamily int afhba\+\_\+register\+Device (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{tdev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a81805b51e2930c797a76cd75e78fb579}\label{acq-fiber-hba_8h_a81805b51e2930c797a76cd75e78fb579}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_release@{afhba\_release}}
+\index{afhba\_release@{afhba\_release}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_release()}{afhba\_release()}}
+{\footnotesize\ttfamily int afhba\+\_\+release (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a6bc404feecf295923c435e95c6365ef2}\label{acq-fiber-hba_8h_a6bc404feecf295923c435e95c6365ef2}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_remove\_sysfs@{afhba\_remove\_sysfs}}
+\index{afhba\_remove\_sysfs@{afhba\_remove\_sysfs}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs()}{afhba\_remove\_sysfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_aa567e9f66611fe5577f5febd26a600a9}\label{acq-fiber-hba_8h_aa567e9f66611fe5577f5febd26a600a9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}}
+\index{afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs\_class()}{afhba\_remove\_sysfs\_class()}}
+{\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a65c82f153ec4d08ea92319ed6d3c1e71}\label{acq-fiber-hba_8h_a65c82f153ec4d08ea92319ed6d3c1e71}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_stream\_drv\_del@{afhba\_stream\_drv\_del}}
+\index{afhba\_stream\_drv\_del@{afhba\_stream\_drv\_del}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_stream\_drv\_del()}{afhba\_stream\_drv\_del()}}
+{\footnotesize\ttfamily int afhba\+\_\+stream\+\_\+drv\+\_\+del (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_a998a8a4d91eae0f4d53ab20568a826f9}\label{acq-fiber-hba_8h_a998a8a4d91eae0f4d53ab20568a826f9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_stream\_drv\_init@{afhba\_stream\_drv\_init}}
+\index{afhba\_stream\_drv\_init@{afhba\_stream\_drv\_init}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_stream\_drv\_init()}{afhba\_stream\_drv\_init()}}
+{\footnotesize\ttfamily int afhba\+\_\+stream\+\_\+drv\+\_\+init (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acq-fiber-hba_8h_ac099aa44993cdcb58900e05f2275b40c}\label{acq-fiber-hba_8h_ac099aa44993cdcb58900e05f2275b40c}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_write\_reg@{afhba\_write\_reg}}
+\index{afhba\_write\_reg@{afhba\_write\_reg}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_write\_reg()}{afhba\_write\_reg()}}
+{\footnotesize\ttfamily void afhba\+\_\+write\+\_\+reg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{value }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{acq-fiber-hba_8h_ae8d2eb1056d08ba1a907d66aedcdf3b9}\label{acq-fiber-hba_8h_ae8d2eb1056d08ba1a907d66aedcdf3b9}} 
+\index{acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}!afhba\_devices@{afhba\_devices}}
+\index{afhba\_devices@{afhba\_devices}!acq-\/fiber-\/hba.h@{acq-\/fiber-\/hba.h}}
+\doxysubsubsection{\texorpdfstring{afhba\_devices}{afhba\_devices}}
+{\footnotesize\ttfamily struct list\+\_\+head afhba\+\_\+devices}
+

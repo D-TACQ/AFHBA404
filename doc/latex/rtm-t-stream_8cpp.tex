@@ -1,0 +1,174 @@
+\hypertarget{rtm-t-stream_8cpp}{}\doxysection{S\+T\+R\+E\+A\+M/rtm-\/t-\/stream.cpp File Reference}
+\label{rtm-t-stream_8cpp}\index{STREAM/rtm-\/t-\/stream.cpp@{STREAM/rtm-\/t-\/stream.cpp}}
+
+
+D-\/\+T\+A\+CQ P\+C\+Ie R\+T\+M\+\_\+T stream access solib Continuous streaming using P\+C\+Ie and buffers.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$sys/eventfd.\+h$>$}\newline
+{\ttfamily \#include $<$sys/ioctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}local.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}rtm-\/t\+\_\+ioctl.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}R\+T\+M\+\_\+\+T\+\_\+\+Device.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}rtm-\/t-\/stream.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$poll.\+h$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structSTREAM}{S\+T\+R\+E\+AM}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_ae401be1b42d019c767262a438aba10ce}{D\+BG}}(args...)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_affde14445f49f65ff4f5b592e44ee71a}{L\+I\+K\+E\+LY}}(x)~(x)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_ab10d0a221f4d7a706701b806c8135fd7}{U\+N\+L\+I\+K\+E\+LY}}(x)~(x)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_a84d08a536fb0c914dd8c9861075450d5}{S\+B\+DN}}~\mbox{\hyperlink{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a}{R\+T\+M\+\_\+\+T\+\_\+\+Device\+::\+M\+A\+X\+B\+UF}}
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_a542f5e866b4bc331d52d399c6e8a2035}{T\+E\+S\+T\+\_\+\+N\+U\+L\+L\+P\+TR}}(ptr)~do\{if \mbox{\hyperlink{rtm-t-stream_8cpp_ab10d0a221f4d7a706701b806c8135fd7}{U\+N\+L\+I\+K\+E\+LY}}(!ptr)\{fprintf(stderr, \char`\"{}N\+U\+LL pointer error\char`\"{});return -\/1;\}\}while(0)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_a35839e00e8308696d8f91e542e146512}{E\+R\+R\+O\+R\+\_\+\+S\+T\+A\+RT}}(errorcode,  message)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}{C\+H\+E\+CK}}(i)~(pfds\mbox{[}i\mbox{]}.revents \& P\+O\+L\+L\+IN)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_a4b45cb4a8fcae1b0708efe5edb9f6df7}{C\+H\+E\+C\+K\+\_\+\+S\+T\+OP}}~\mbox{\hyperlink{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}{C\+H\+E\+CK}}(0)
+\item 
+\#define \mbox{\hyperlink{rtm-t-stream_8cpp_ac28ec35015ad3b1bb732dccb2d20a619}{C\+H\+E\+C\+K\+\_\+\+FD}}~\mbox{\hyperlink{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}{C\+H\+E\+CK}}(1)
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structSTREAM}{S\+T\+R\+E\+AM}} $\ast$ \mbox{\hyperlink{rtm-t-stream_8cpp_a71674984e8c18d923e22bd989edfd244}{S\+T\+R\+E\+A\+M\+\_\+P}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int \mbox{\hyperlink{rtm-t-stream_8cpp_a4dfca6f47bd42c162a9de3f5571f5333}{Rtm\+Stream\+Start}} (void $\ast$$\ast$handle, const int devnum, const int \mbox{\hyperlink{rtm-t-stream-disk_8cpp_ae66e1d9a72fa03b94d82955c2fa497dc}{N\+B\+U\+FS}}, int $\ast$const maxlen)
+\item 
+\mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int \mbox{\hyperlink{rtm-t-stream_8cpp_abd06231440b6bddcb9ace4a555751e0d}{Rtm\+Stream\+Stop}} (void $\ast$handle)
+\item 
+\mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int \mbox{\hyperlink{rtm-t-stream_8cpp_a4bbcdd3dca06ae1530187dcb5b145126}{Rtm\+Stream\+Close}} (void $\ast$handle)
+\item 
+\mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int \mbox{\hyperlink{rtm-t-stream_8cpp_a936584f9d5371ea40782a55da1ee727d}{Rtm\+Stream\+Get\+Buffer}} (void $\ast$handle, void $\ast$const buf, const int buflen)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+D-\/\+T\+A\+CQ P\+C\+Ie R\+T\+M\+\_\+T stream access solib Continuous streaming using P\+C\+Ie and buffers. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}\label{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!CHECK@{CHECK}}
+\index{CHECK@{CHECK}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{CHECK}{CHECK}}
+{\footnotesize\ttfamily \#define C\+H\+E\+CK(\begin{DoxyParamCaption}\item[{}]{i }\end{DoxyParamCaption})~(pfds\mbox{[}i\mbox{]}.revents \& P\+O\+L\+L\+IN)}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_ac28ec35015ad3b1bb732dccb2d20a619}\label{rtm-t-stream_8cpp_ac28ec35015ad3b1bb732dccb2d20a619}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!CHECK\_FD@{CHECK\_FD}}
+\index{CHECK\_FD@{CHECK\_FD}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_FD}{CHECK\_FD}}
+{\footnotesize\ttfamily \#define C\+H\+E\+C\+K\+\_\+\+FD~\mbox{\hyperlink{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}{C\+H\+E\+CK}}(1)}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a4b45cb4a8fcae1b0708efe5edb9f6df7}\label{rtm-t-stream_8cpp_a4b45cb4a8fcae1b0708efe5edb9f6df7}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!CHECK\_STOP@{CHECK\_STOP}}
+\index{CHECK\_STOP@{CHECK\_STOP}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_STOP}{CHECK\_STOP}}
+{\footnotesize\ttfamily \#define C\+H\+E\+C\+K\+\_\+\+S\+T\+OP~\mbox{\hyperlink{rtm-t-stream_8cpp_ac4f05cca5f08d180dd3a96f6dfd3e4e0}{C\+H\+E\+CK}}(0)}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_ae401be1b42d019c767262a438aba10ce}\label{rtm-t-stream_8cpp_ae401be1b42d019c767262a438aba10ce}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!DBG@{DBG}}
+\index{DBG@{DBG}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{DBG}{DBG}}
+{\footnotesize\ttfamily \#define D\+BG(\begin{DoxyParamCaption}\item[{}]{args... }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a35839e00e8308696d8f91e542e146512}\label{rtm-t-stream_8cpp_a35839e00e8308696d8f91e542e146512}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!ERROR\_START@{ERROR\_START}}
+\index{ERROR\_START@{ERROR\_START}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{ERROR\_START}{ERROR\_START}}
+{\footnotesize\ttfamily \#define E\+R\+R\+O\+R\+\_\+\+S\+T\+A\+RT(\begin{DoxyParamCaption}\item[{}]{errorcode,  }\item[{}]{message }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    \textcolor{keywordflow}{do}\{\(\backslash\)}
+\DoxyCodeLine{    perror(message \textcolor{stringliteral}{" error"});\(\backslash\)}
+\DoxyCodeLine{    if (\mbox{\hyperlink{namespacertm-t-stream_aa9560f265c21198e31afe3be3e7d4d40}{stream}} \&\& \mbox{\hyperlink{namespacertm-t-stream_aa9560f265c21198e31afe3be3e7d4d40}{stream}}-\/>dev)\(\backslash\)}
+\DoxyCodeLine{        delete \mbox{\hyperlink{namespacertm-t-stream_aa9560f265c21198e31afe3be3e7d4d40}{stream}}-\/>dev;\(\backslash\)}
+\DoxyCodeLine{    if (\mbox{\hyperlink{namespacertm-t-stream_aa9560f265c21198e31afe3be3e7d4d40}{stream}})\(\backslash\)}
+\DoxyCodeLine{        free(\mbox{\hyperlink{namespacertm-t-stream_aa9560f265c21198e31afe3be3e7d4d40}{stream}});\(\backslash\)}
+\DoxyCodeLine{    return errorcode;\(\backslash\)}
+\DoxyCodeLine{\}\textcolor{keywordflow}{while}(0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{rtm-t-stream_8cpp_affde14445f49f65ff4f5b592e44ee71a}\label{rtm-t-stream_8cpp_affde14445f49f65ff4f5b592e44ee71a}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!LIKELY@{LIKELY}}
+\index{LIKELY@{LIKELY}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{LIKELY}{LIKELY}}
+{\footnotesize\ttfamily \#define L\+I\+K\+E\+LY(\begin{DoxyParamCaption}\item[{}]{x }\end{DoxyParamCaption})~(x)}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a84d08a536fb0c914dd8c9861075450d5}\label{rtm-t-stream_8cpp_a84d08a536fb0c914dd8c9861075450d5}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!SBDN@{SBDN}}
+\index{SBDN@{SBDN}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{SBDN}{SBDN}}
+{\footnotesize\ttfamily \#define S\+B\+DN~\mbox{\hyperlink{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a}{R\+T\+M\+\_\+\+T\+\_\+\+Device\+::\+M\+A\+X\+B\+UF}}}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a542f5e866b4bc331d52d399c6e8a2035}\label{rtm-t-stream_8cpp_a542f5e866b4bc331d52d399c6e8a2035}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!TEST\_NULLPTR@{TEST\_NULLPTR}}
+\index{TEST\_NULLPTR@{TEST\_NULLPTR}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_NULLPTR}{TEST\_NULLPTR}}
+{\footnotesize\ttfamily \#define T\+E\+S\+T\+\_\+\+N\+U\+L\+L\+P\+TR(\begin{DoxyParamCaption}\item[{}]{ptr }\end{DoxyParamCaption})~do\{if \mbox{\hyperlink{rtm-t-stream_8cpp_ab10d0a221f4d7a706701b806c8135fd7}{U\+N\+L\+I\+K\+E\+LY}}(!ptr)\{fprintf(stderr, \char`\"{}N\+U\+LL pointer error\char`\"{});return -\/1;\}\}while(0)}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_ab10d0a221f4d7a706701b806c8135fd7}\label{rtm-t-stream_8cpp_ab10d0a221f4d7a706701b806c8135fd7}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!UNLIKELY@{UNLIKELY}}
+\index{UNLIKELY@{UNLIKELY}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{UNLIKELY}{UNLIKELY}}
+{\footnotesize\ttfamily \#define U\+N\+L\+I\+K\+E\+LY(\begin{DoxyParamCaption}\item[{}]{x }\end{DoxyParamCaption})~(x)}
+
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a71674984e8c18d923e22bd989edfd244}\label{rtm-t-stream_8cpp_a71674984e8c18d923e22bd989edfd244}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!STREAM\_P@{STREAM\_P}}
+\index{STREAM\_P@{STREAM\_P}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{STREAM\_P}{STREAM\_P}}
+{\footnotesize\ttfamily typedef  struct \mbox{\hyperlink{structSTREAM}{S\+T\+R\+E\+AM}} $\ast$ \mbox{\hyperlink{rtm-t-stream_8cpp_a71674984e8c18d923e22bd989edfd244}{S\+T\+R\+E\+A\+M\+\_\+P}}}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a4bbcdd3dca06ae1530187dcb5b145126}\label{rtm-t-stream_8cpp_a4bbcdd3dca06ae1530187dcb5b145126}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!RtmStreamClose@{RtmStreamClose}}
+\index{RtmStreamClose@{RtmStreamClose}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{RtmStreamClose()}{RtmStreamClose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int Rtm\+Stream\+Close (\begin{DoxyParamCaption}\item[{void $\ast$}]{handle }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a936584f9d5371ea40782a55da1ee727d}\label{rtm-t-stream_8cpp_a936584f9d5371ea40782a55da1ee727d}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!RtmStreamGetBuffer@{RtmStreamGetBuffer}}
+\index{RtmStreamGetBuffer@{RtmStreamGetBuffer}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{RtmStreamGetBuffer()}{RtmStreamGetBuffer()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int Rtm\+Stream\+Get\+Buffer (\begin{DoxyParamCaption}\item[{void $\ast$}]{handle,  }\item[{void $\ast$const}]{buf,  }\item[{const int}]{buflen }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_a4dfca6f47bd42c162a9de3f5571f5333}\label{rtm-t-stream_8cpp_a4dfca6f47bd42c162a9de3f5571f5333}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!RtmStreamStart@{RtmStreamStart}}
+\index{RtmStreamStart@{RtmStreamStart}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{RtmStreamStart()}{RtmStreamStart()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int Rtm\+Stream\+Start (\begin{DoxyParamCaption}\item[{void $\ast$$\ast$}]{handle,  }\item[{const int}]{devnum,  }\item[{const int}]{N\+B\+U\+FS,  }\item[{int $\ast$const}]{maxlen }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{rtm-t-stream_8cpp_abd06231440b6bddcb9ace4a555751e0d}\label{rtm-t-stream_8cpp_abd06231440b6bddcb9ace4a555751e0d}} 
+\index{rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}!RtmStreamStop@{RtmStreamStop}}
+\index{RtmStreamStop@{RtmStreamStop}!rtm-\/t-\/stream.cpp@{rtm-\/t-\/stream.cpp}}
+\doxysubsubsection{\texorpdfstring{RtmStreamStop()}{RtmStreamStop()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{rtm-t-stream_8h_a3472d8cdbb788d5f1815b3522595bc49}{E\+X\+P\+O\+RT}} int Rtm\+Stream\+Stop (\begin{DoxyParamCaption}\item[{void $\ast$}]{handle }\end{DoxyParamCaption})}
+

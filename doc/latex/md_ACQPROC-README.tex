@@ -1,0 +1,303 @@
+\hypertarget{md_ACQPROC-README_autotoc_md1}{}\doxysection{A\+C\+Q\+P\+R\+O\+C\+:}\label{md_ACQPROC-README_autotoc_md1}
+
+\begin{DoxyItemize}
+\item a single compile-\/once executable supports any 4 U\+UT\textquotesingle{}s (A\+C\+Q2106), any payload.
+\item the system is defined by a config file (json), and the system autoconfigures itself.
+\item we\textquotesingle{}re using a S\+HM to gather all \mbox{\hyperlink{classIO}{IO}} data from the U\+UT\textquotesingle{}s in a single AI,DI,AO,DO vectors, it\textquotesingle{}s assumed that the P\+CS is another process on other cores that interacts with the S\+HM.
+\item acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the P\+CS and offsets of salient fields in the individual \mbox{\hyperlink{structVI}{VI}}, \mbox{\hyperlink{structVO}{VO}} vectors of each U\+UT, used by our post-\/shot analysis tools -\/ the goal is that post-\/shot analysis is automatic, rather than depending on large numbers of command line constants.
+\item logic to handle special cases -\/ eg
+\begin{DoxyItemize}
+\item B\+O\+L\+O8 (data not in phase),
+\item W\+A\+T\+C\+H\+D\+OG (a pulse output before trigger).
+\end{DoxyItemize}
+\item For a N\+EW P\+CS\+:
+\begin{DoxyItemize}
+\item Define the config file
+\item Subclass the shared memory interface \mbox{\hyperlink{structSystemInterface}{System\+Interface}} to connect to your system. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ \{C++\}}
+\DoxyCodeLine{struct SystemInterface \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{public:}
+\DoxyCodeLine{    /** ONE vector each type, all VI from all UUTS are split into types and}
+\DoxyCodeLine{     *   aggregated in the appropriate vectors. }
+\DoxyCodeLine{     */}
+\DoxyCodeLine{    struct Inputs \{}
+\DoxyCodeLine{        short *AI16;}
+\DoxyCodeLine{        int *AI32;}
+\DoxyCodeLine{        unsigned *DI32;}
+\DoxyCodeLine{        unsigned *SP32;}
+\DoxyCodeLine{    \} IN;}
+\DoxyCodeLine{    /**< ONE vector each type, scatter each type to appropriate VO all UUTS  */}
+\DoxyCodeLine{    struct Outputs \{}
+\DoxyCodeLine{        short* AO16;}
+\DoxyCodeLine{        unsigned *DO32;}
+\DoxyCodeLine{        unsigned *CC32;         /* calc values from PCS .. NOT outputs. */}
+\DoxyCodeLine{    \} OUT;}
+\DoxyCodeLine{}
+\DoxyCodeLine{    SystemInterface(const HBA\& \_hba);}
+\DoxyCodeLine{}
+\DoxyCodeLine{    virtual void ringDoorbell(int sample)}
+\DoxyCodeLine{    /**< alert PCS that there is new data .. implement by subclass. */}
+\end{DoxyCode}
+
+\item In a Single Thread implementation\+:
+\begin{DoxyItemize}
+\item Inputs, Outputs are created from simple heap allocations
+\item method ring\+Doorbell() is called when there is new data.
+\item Single Thread implementations can perform \mbox{\hyperlink{classIO}{IO}} processing inside ring\+Doorbell(), leaving updated Outputs for the system to handle.
+\item examples \href{https://github.com/D-TACQ/AFHBA404/blob/master/ACQPROC/DefaultSystemInterface.cpp}{\texttt{ https\+://github.\+com/\+D-\/\+T\+A\+C\+Q/\+A\+F\+H\+B\+A404/blob/master/\+A\+C\+Q\+P\+R\+O\+C/\+Default\+System\+Interface.\+cpp}}
+\item a \char`\"{}real\char`\"{} case will be more complex, and it may be an interface to another framework
+\begin{DoxyItemize}
+\item eg the Subclass could be a S\+I\+M\+U\+L\+I\+NK wrapper.
+\end{DoxyItemize}
+\end{DoxyItemize}
+\item In a Multi Thread implementation\+:
+\begin{DoxyItemize}
+\item a subclass of \mbox{\hyperlink{structSystemInterface}{System\+Interface}} could place Inputs Outputs in Shared Memory S\+HM
+\item method ring\+Doorbell() is called when there is new data.
+\item in a Multi Thread implementation, ring\+Door\+Bell() implements an I\+PC signal to the main task running in another thread of control, probably on other core\mbox{[}s\mbox{]}
+\item so far, we didn\textquotesingle{}t provide a Multi Thread example.
+\end{DoxyItemize}
+\item Late Binding\+:
+\begin{DoxyItemize}
+\item different implementations of \mbox{\hyperlink{structSystemInterface}{System\+Interface}} are combined at link time.
+\item See Makefile for explicit examples
+\item New implementations should probably extend the Makefile. Or, we could provide acqproc as a solib.
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_ACQPROC-README_autotoc_md2}{}\doxysection{Glossary\+:}\label{md_ACQPROC-README_autotoc_md2}
+
+\begin{DoxyItemize}
+\item P\+CS\+: Plasma Control System
+\item S\+HM\+: Shared Memory
+\item U\+UT\+: Unit Under Test, in our case, an A\+C\+Q2106 D\+AQ Appliance with variable module payload.
+\item A\+F\+H\+B\+A404\+: Host Bus Adapter with 4 fiber link ports, supporting up to 4U\+UT\textquotesingle{}s.
+\item acqproc\+: compile once, configuration driven data handling engine supporting 4U\+UT\textquotesingle{}s as the \mbox{\hyperlink{classIO}{IO}} processor for a P\+CS
+\end{DoxyItemize}\hypertarget{md_ACQPROC-README_autotoc_md3}{}\doxysubsection{Vectors}\label{md_ACQPROC-README_autotoc_md3}
+
+\begin{DoxyItemize}
+\item \mbox{\hyperlink{structVI}{VI}} \+: Vector Input\+: U\+UT sends a sample every clock, this is the \mbox{\hyperlink{structVI}{VI}}, comprised of A\+I16, A\+I32, D\+I32, S\+P32
+\item \mbox{\hyperlink{structVO}{VO}} \+: Vector Output\+: U\+UT fetches an output sample every clock, this is the \mbox{\hyperlink{structVO}{VO}}, comprising A\+O16, D\+O32, C\+P32
+\end{DoxyItemize}\hypertarget{md_ACQPROC-README_autotoc_md4}{}\doxysubsection{Fields in Vectors}\label{md_ACQPROC-README_autotoc_md4}
+
+\begin{DoxyItemize}
+\item A\+I16 \+: Analog Input, 16 bit.(eg A\+C\+Q424\+E\+L\+F-\/32)
+\item A\+I32 \+: Analog Input, 32 bit (eg B\+O\+L\+O8)
+\item D\+I32 \+: Digital Input, 32 bit (eg D\+I\+O432\+E\+LF)
+\item S\+P32 \+: Scratch Pad, 32 bit unsigned. S\+P\+AD\mbox{[}0\mbox{]} is the T\+L\+A\+T\+CH or sample count.
+\item A\+O16 \+: Analog Output, 16 bit, (eg A\+O424\+E\+L\+F-\/32)
+\item D\+O32 \+: Digital Output, 32 bit, (eg D\+I423\+E\+LF)
+\item C\+P32 \+: Calc Value, 32 bit, an intermediate calc result from the P\+CS. This is N\+OT sent to the U\+UT, but is stored in the raw output.
+\end{DoxyItemize}\hypertarget{md_ACQPROC-README_autotoc_md5}{}\doxysection{sample config file, pcs1.\+json}\label{md_ACQPROC-README_autotoc_md5}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    "AFHBA": \{}
+\DoxyCodeLine{        "UUT": [}
+\DoxyCodeLine{...}
+\DoxyCodeLine{            \{   "name" : "acq2106\_555",  }
+\DoxyCodeLine{            "type": "bolo",}
+\DoxyCodeLine{                    "VI" : \{}
+\DoxyCodeLine{                        "AI32" : 48,  }
+\DoxyCodeLine{                "SP32" : 16}
+\DoxyCodeLine{                         \}}
+\DoxyCodeLine{                \}}
+\DoxyCodeLine{        ]}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{\}}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC-README_autotoc_md6}{}\doxysection{Typical Dummy Run\+:}\label{md_ACQPROC-README_autotoc_md6}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{[pgm@hoy5 AFHBA404]\$ sudo ./ACQPROC/acqproc ./ACQPROC/configs/pcs1.json }
+\DoxyCodeLine{NOTICE: port 3 is bolo in non-\/bolo set, set nowait}
+\DoxyCodeLine{HBA0 VI:1216 VO:204}
+\DoxyCodeLine{    [0] acq2106\_123 VI:320 VO:68 Offset of SPAD IN VI :260}
+\DoxyCodeLine{ System Interface Indices 0,0 WD mask: 0x80000000}
+\DoxyCodeLine{    [1] acq2106\_124 VI:320 VO:68 Offset of SPAD IN VI :260}
+\DoxyCodeLine{ System Interface Indices 128,15}
+\DoxyCodeLine{    [2] acq2106\_125 VI:320 VO:68 Offset of SPAD IN VI :260}
+\DoxyCodeLine{ System Interface Indices 256,30}
+\DoxyCodeLine{    [3] acq2106\_555 VI:256 VO:0 Offset of SPAD IN VI :192}
+\DoxyCodeLine{ System Interface Indices 384,45}
+\DoxyCodeLine{ new sample: 0 acq2106\_123}
+\DoxyCodeLine{ new sample: 0 acq2106\_124}
+\DoxyCodeLine{ new sample: 0 acq2106\_125}
+\DoxyCodeLine{ new sample: 0 acq2106\_555}
+\DoxyCodeLine{ new sample: 1 acq2106\_123}
+\DoxyCodeLine{ new sample: 1 acq2106\_124}
+\DoxyCodeLine{ new sample: 1 acq2106\_125}
+\DoxyCodeLine{ new sample: 1 acq2106\_555}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC-README_autotoc_md7}{}\doxysection{runtime.\+json \+: computed system configuration}\label{md_ACQPROC-README_autotoc_md7}
+\hypertarget{md_ACQPROC-README_autotoc_md8}{}\doxysubsection{A\+F\+H\+BA}\label{md_ACQPROC-README_autotoc_md8}
+First, a reflection of the original config file\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    "AFHBA": \{}
+\DoxyCodeLine{        "UUT": [}
+\DoxyCodeLine{            \{}
+\DoxyCodeLine{                "VI": \{}
+\DoxyCodeLine{                    "AI16": 128,}
+\DoxyCodeLine{                    "DI32": 1,}
+\DoxyCodeLine{                    "SP32": 15}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "VO": \{}
+\DoxyCodeLine{                    "AO16": 32,}
+\DoxyCodeLine{                    "DO32": 1}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "WD\_BIT": 31,}
+\DoxyCodeLine{                "name": "acq2106\_123",}
+\DoxyCodeLine{                "type": "pcs"}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            \{}
+\DoxyCodeLine{                "VI": \{}
+\DoxyCodeLine{                    "AI16": 128,}
+\DoxyCodeLine{                    "DI32": 1,}
+\DoxyCodeLine{                    "SP32": 15}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "VO": \{}
+\DoxyCodeLine{                    "AO16": 32,}
+\DoxyCodeLine{                    "DO32": 1}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "name": "acq2106\_124",}
+\DoxyCodeLine{                "type": "pcs"}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            \{}
+\DoxyCodeLine{                "VI": \{}
+\DoxyCodeLine{                    "AI16": 128,}
+\DoxyCodeLine{                    "DI32": 1,}
+\DoxyCodeLine{                    "SP32": 15}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "VO": \{}
+\DoxyCodeLine{                    "AO16": 32,}
+\DoxyCodeLine{                    "DO32": 1}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "name": "acq2106\_125",}
+\DoxyCodeLine{                "type": "pcs"}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            \{}
+\DoxyCodeLine{                "VI": \{}
+\DoxyCodeLine{                    "AI32": 48,}
+\DoxyCodeLine{                    "SP32": 16}
+\DoxyCodeLine{                \},}
+\DoxyCodeLine{                "name": "acq2106\_555",}
+\DoxyCodeLine{                "type": "bolo"}
+\DoxyCodeLine{            \}}
+\DoxyCodeLine{        ]}
+\DoxyCodeLine{    \},}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC-README_autotoc_md9}{}\doxysubsection{G\+L\+O\+B\+A\+L\+\_\+\+I\+N\+D\+I\+C\+ES}\label{md_ACQPROC-README_autotoc_md9}
+Then, a configuration structure with G\+L\+O\+B\+A\+L\+\_\+\+I\+N\+D\+I\+C\+ES, indices into the type-\/specific S\+HM vectors 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{"SYS": \{}
+\DoxyCodeLine{     "UUT": \{}
+\DoxyCodeLine{         "GLOBAL\_INDICES": [}
+\DoxyCodeLine{             \{}
+\DoxyCodeLine{                 "VI": \{}
+\DoxyCodeLine{                     "AI16": 0,}
+\DoxyCodeLine{                     "DI32": 0,}
+\DoxyCodeLine{                     "SP32": 0}
+\DoxyCodeLine{                 \},}
+\DoxyCodeLine{                 "VO": \{}
+\DoxyCodeLine{                     "AO16": 0,}
+\DoxyCodeLine{                     "DO32": 0}
+\DoxyCodeLine{                 \}}
+\DoxyCodeLine{             \},}
+\DoxyCodeLine{             \{}
+\DoxyCodeLine{                 "VI": \{}
+\DoxyCodeLine{                     "AI16": 128,}
+\DoxyCodeLine{                     "DI32": 1,}
+\DoxyCodeLine{                     "SP32": 15}
+\DoxyCodeLine{                 \},}
+\DoxyCodeLine{                 "VO": \{}
+\DoxyCodeLine{                     "AO16": 32,}
+\DoxyCodeLine{                     "DO32": 1}
+\DoxyCodeLine{                 \}}
+\DoxyCodeLine{             \},}
+\DoxyCodeLine{             \{}
+\DoxyCodeLine{                 "VI": \{}
+\DoxyCodeLine{                     "AI16": 256,}
+\DoxyCodeLine{                     "DI32": 2,}
+\DoxyCodeLine{                     "SP32": 30}
+\DoxyCodeLine{                 \},}
+\DoxyCodeLine{                 "VO": \{}
+\DoxyCodeLine{                     "AO16": 64,}
+\DoxyCodeLine{                     "DO32": 2}
+\DoxyCodeLine{                 \}}
+\DoxyCodeLine{             \},}
+\DoxyCodeLine{             \{}
+\DoxyCodeLine{                 "VI": \{}
+\DoxyCodeLine{                     "AI32": 0,}
+\DoxyCodeLine{                     "SP32": 45}
+\DoxyCodeLine{                 \},}
+\DoxyCodeLine{                 "VO": \{\}}
+\DoxyCodeLine{             \}}
+\DoxyCodeLine{         ],}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC-README_autotoc_md10}{}\doxysubsection{L\+O\+C\+AL}\label{md_ACQPROC-README_autotoc_md10}
+And L\+O\+C\+AL, byte offsets into the raw data files emitted by a P\+CS run\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{   "LOCAL": [}
+\DoxyCodeLine{        \{}
+\DoxyCodeLine{            "VI\_OFFSETS": \{}
+\DoxyCodeLine{                "AI16": 0,}
+\DoxyCodeLine{                "DI32": 256,}
+\DoxyCodeLine{                "SP32": 260}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VO\_OFFSETS": \{}
+\DoxyCodeLine{                "AO16": 0,}
+\DoxyCodeLine{                "DO32": 64}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VX\_LEN": \{}
+\DoxyCodeLine{                "VI": 320,}
+\DoxyCodeLine{                "VO": 68}
+\DoxyCodeLine{            \}}
+\DoxyCodeLine{        \},}
+\DoxyCodeLine{        \{}
+\DoxyCodeLine{            "VI\_OFFSETS": \{}
+\DoxyCodeLine{                "AI16": 0,}
+\DoxyCodeLine{                "DI32": 256,}
+\DoxyCodeLine{                "SP32": 260}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VO\_OFFSETS": \{}
+\DoxyCodeLine{                "AO16": 0,}
+\DoxyCodeLine{                "DO32": 64}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VX\_LEN": \{}
+\DoxyCodeLine{                "VI": 320,}
+\DoxyCodeLine{                "VO": 68}
+\DoxyCodeLine{            \}}
+\DoxyCodeLine{        \},}
+\DoxyCodeLine{        \{}
+\DoxyCodeLine{            "VI\_OFFSETS": \{}
+\DoxyCodeLine{                "AI16": 0,}
+\DoxyCodeLine{                "DI32": 256,}
+\DoxyCodeLine{                "SP32": 260}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VO\_OFFSETS": \{}
+\DoxyCodeLine{                "AO16": 0,}
+\DoxyCodeLine{                "DO32": 64}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VX\_LEN": \{}
+\DoxyCodeLine{                "VI": 320,}
+\DoxyCodeLine{                "VO": 68}
+\DoxyCodeLine{            \}}
+\DoxyCodeLine{        \},}
+\DoxyCodeLine{        \{}
+\DoxyCodeLine{            "VI\_OFFSETS": \{}
+\DoxyCodeLine{                "AI32": 0,}
+\DoxyCodeLine{                "SP32": 192}
+\DoxyCodeLine{            \},}
+\DoxyCodeLine{            "VO\_OFFSETS": \{\},}
+\DoxyCodeLine{            "VX\_LEN": \{}
+\DoxyCodeLine{                "VI": 256,}
+\DoxyCodeLine{                "VO": 0}
+\DoxyCodeLine{            \}}
+\DoxyCodeLine{        \}}
+\DoxyCodeLine{    ]}
+\DoxyCodeLine{\}}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC-README_autotoc_md11}{}\doxysection{More to come..}\label{md_ACQPROC-README_autotoc_md11}
+comments please to \href{mailto:peter.milne@d-tacq.com}{\texttt{ peter.\+milne@d-\/tacq.\+com}} 

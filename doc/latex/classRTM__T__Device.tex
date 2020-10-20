@@ -1,0 +1,158 @@
+\hypertarget{classRTM__T__Device}{}\doxysection{R\+T\+M\+\_\+\+T\+\_\+\+Device Class Reference}
+\label{classRTM__T__Device}\index{RTM\_T\_Device@{RTM\_T\_Device}}
+
+
+{\ttfamily \#include $<$R\+T\+M\+\_\+\+T\+\_\+\+Device.\+h$>$}
+
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a}{M\+A\+X\+B\+UF}} = 32
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classRTM__T__Device_a706c700d9f7a6d5ad9c9dec24295d08c}{R\+T\+M\+\_\+\+T\+\_\+\+Device}} (int \+\_\+devnum)
+\item 
+virtual \mbox{\hyperlink{classRTM__T__Device_a26fa5c0ecfcd79d87a3d6dfcc8c1f29d}{$\sim$\+R\+T\+M\+\_\+\+T\+\_\+\+Device}} ()
+\item 
+const char $\ast$ \mbox{\hyperlink{classRTM__T__Device_af9f13aba86c51bf84c4f9ff15fce795e}{get\+Device}} (void)
+\item 
+const int \mbox{\hyperlink{classRTM__T__Device_a22c7acd623faa9ba543bf0925dc86fa1}{get\+Device\+Handle}} (void)
+\item 
+const char $\ast$ \mbox{\hyperlink{classRTM__T__Device_a869ebf80bde387d0dad9f7883e185100}{get\+Regs\+Device}} (void)
+\item 
+const void $\ast$ \mbox{\hyperlink{classRTM__T__Device_a0c4c3aca22bdf81788601d5408ffdcc1}{get\+Host\+Buffer\+Mapping}} (int ibuf=0)
+\item 
+void $\ast$ \mbox{\hyperlink{classRTM__T__Device_ab700d956a39645030fae7d432b6eaf8e}{get\+Host\+Buffer\+MappingW}} (int ibuf=0)
+\item 
+const char $\ast$ \mbox{\hyperlink{classRTM__T__Device_a87427d3f054a9b71c04eaa520b78c988}{get\+Control\+Root}} (void)
+\item 
+int \mbox{\hyperlink{classRTM__T__Device_a65e3b8c646829574ef3a34897552d6d7}{get\+Devnum}} (void) const
+\item 
+int \mbox{\hyperlink{classRTM__T__Device_aa5b0082f950eb3546fabfc309cdd86f2}{next}} (int ibuf)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const unsigned \mbox{\hyperlink{classRTM__T__Device_a09170906b89ce2c53811db4be4f3150e}{devnum}}
+\item 
+const unsigned \mbox{\hyperlink{classRTM__T__Device_a3191f2f7156f4c88af45dcef88b36abc}{nbuffers}}
+\item 
+const unsigned \mbox{\hyperlink{classRTM__T__Device_a67019d9f7242892c44b8a29d4cf44ab6}{maxlen}}
+\item 
+const unsigned \mbox{\hyperlink{classRTM__T__Device_aa727fdfd481e197e1823711196f4aaa7}{transfer\+\_\+buffers}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082}\label{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082}} 
+\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily anonymous enum}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MAXBUF@{MAXBUF}!RTM\_T\_Device@{RTM\_T\_Device}}\index{RTM\_T\_Device@{RTM\_T\_Device}!MAXBUF@{MAXBUF}}}\mbox{\Hypertarget{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a}\label{classRTM__T__Device_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a}} 
+M\+A\+X\+B\+UF&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRTM__T__Device_a706c700d9f7a6d5ad9c9dec24295d08c}\label{classRTM__T__Device_a706c700d9f7a6d5ad9c9dec24295d08c}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!RTM\_T\_Device@{RTM\_T\_Device}}
+\index{RTM\_T\_Device@{RTM\_T\_Device}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{RTM\_T\_Device()}{RTM\_T\_Device()}}
+{\footnotesize\ttfamily R\+T\+M\+\_\+\+T\+\_\+\+Device\+::\+R\+T\+M\+\_\+\+T\+\_\+\+Device (\begin{DoxyParamCaption}\item[{int}]{\+\_\+devnum }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRTM__T__Device_a26fa5c0ecfcd79d87a3d6dfcc8c1f29d}\label{classRTM__T__Device_a26fa5c0ecfcd79d87a3d6dfcc8c1f29d}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!````~RTM\_T\_Device@{$\sim$RTM\_T\_Device}}
+\index{````~RTM\_T\_Device@{$\sim$RTM\_T\_Device}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{$\sim$RTM\_T\_Device()}{~RTM\_T\_Device()}}
+{\footnotesize\ttfamily virtual R\+T\+M\+\_\+\+T\+\_\+\+Device\+::$\sim$\+R\+T\+M\+\_\+\+T\+\_\+\+Device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classRTM__T__Device_a87427d3f054a9b71c04eaa520b78c988}\label{classRTM__T__Device_a87427d3f054a9b71c04eaa520b78c988}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getControlRoot@{getControlRoot}}
+\index{getControlRoot@{getControlRoot}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getControlRoot()}{getControlRoot()}}
+{\footnotesize\ttfamily const char$\ast$ R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Control\+Root (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_af9f13aba86c51bf84c4f9ff15fce795e}\label{classRTM__T__Device_af9f13aba86c51bf84c4f9ff15fce795e}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getDevice@{getDevice}}
+\index{getDevice@{getDevice}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getDevice()}{getDevice()}}
+{\footnotesize\ttfamily const char$\ast$ R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Device (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_a22c7acd623faa9ba543bf0925dc86fa1}\label{classRTM__T__Device_a22c7acd623faa9ba543bf0925dc86fa1}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getDeviceHandle@{getDeviceHandle}}
+\index{getDeviceHandle@{getDeviceHandle}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getDeviceHandle()}{getDeviceHandle()}}
+{\footnotesize\ttfamily const int R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Device\+Handle (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_a65e3b8c646829574ef3a34897552d6d7}\label{classRTM__T__Device_a65e3b8c646829574ef3a34897552d6d7}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getDevnum@{getDevnum}}
+\index{getDevnum@{getDevnum}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getDevnum()}{getDevnum()}}
+{\footnotesize\ttfamily int R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Devnum (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_a0c4c3aca22bdf81788601d5408ffdcc1}\label{classRTM__T__Device_a0c4c3aca22bdf81788601d5408ffdcc1}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getHostBufferMapping@{getHostBufferMapping}}
+\index{getHostBufferMapping@{getHostBufferMapping}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getHostBufferMapping()}{getHostBufferMapping()}}
+{\footnotesize\ttfamily const void$\ast$ R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Host\+Buffer\+Mapping (\begin{DoxyParamCaption}\item[{int}]{ibuf = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_ab700d956a39645030fae7d432b6eaf8e}\label{classRTM__T__Device_ab700d956a39645030fae7d432b6eaf8e}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getHostBufferMappingW@{getHostBufferMappingW}}
+\index{getHostBufferMappingW@{getHostBufferMappingW}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getHostBufferMappingW()}{getHostBufferMappingW()}}
+{\footnotesize\ttfamily void$\ast$ R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Host\+Buffer\+MappingW (\begin{DoxyParamCaption}\item[{int}]{ibuf = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_a869ebf80bde387d0dad9f7883e185100}\label{classRTM__T__Device_a869ebf80bde387d0dad9f7883e185100}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!getRegsDevice@{getRegsDevice}}
+\index{getRegsDevice@{getRegsDevice}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{getRegsDevice()}{getRegsDevice()}}
+{\footnotesize\ttfamily const char$\ast$ R\+T\+M\+\_\+\+T\+\_\+\+Device\+::get\+Regs\+Device (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRTM__T__Device_aa5b0082f950eb3546fabfc309cdd86f2}\label{classRTM__T__Device_aa5b0082f950eb3546fabfc309cdd86f2}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!next@{next}}
+\index{next@{next}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily int R\+T\+M\+\_\+\+T\+\_\+\+Device\+::next (\begin{DoxyParamCaption}\item[{int}]{ibuf }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classRTM__T__Device_a09170906b89ce2c53811db4be4f3150e}\label{classRTM__T__Device_a09170906b89ce2c53811db4be4f3150e}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!devnum@{devnum}}
+\index{devnum@{devnum}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{devnum}{devnum}}
+{\footnotesize\ttfamily const unsigned R\+T\+M\+\_\+\+T\+\_\+\+Device\+::devnum}
+
+\mbox{\Hypertarget{classRTM__T__Device_a67019d9f7242892c44b8a29d4cf44ab6}\label{classRTM__T__Device_a67019d9f7242892c44b8a29d4cf44ab6}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!maxlen@{maxlen}}
+\index{maxlen@{maxlen}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{maxlen}{maxlen}}
+{\footnotesize\ttfamily const unsigned R\+T\+M\+\_\+\+T\+\_\+\+Device\+::maxlen}
+
+\mbox{\Hypertarget{classRTM__T__Device_a3191f2f7156f4c88af45dcef88b36abc}\label{classRTM__T__Device_a3191f2f7156f4c88af45dcef88b36abc}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!nbuffers@{nbuffers}}
+\index{nbuffers@{nbuffers}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{nbuffers}{nbuffers}}
+{\footnotesize\ttfamily const unsigned R\+T\+M\+\_\+\+T\+\_\+\+Device\+::nbuffers}
+
+\mbox{\Hypertarget{classRTM__T__Device_aa727fdfd481e197e1823711196f4aaa7}\label{classRTM__T__Device_aa727fdfd481e197e1823711196f4aaa7}} 
+\index{RTM\_T\_Device@{RTM\_T\_Device}!transfer\_buffers@{transfer\_buffers}}
+\index{transfer\_buffers@{transfer\_buffers}!RTM\_T\_Device@{RTM\_T\_Device}}
+\doxysubsubsection{\texorpdfstring{transfer\_buffers}{transfer\_buffers}}
+{\footnotesize\ttfamily const unsigned R\+T\+M\+\_\+\+T\+\_\+\+Device\+::transfer\+\_\+buffers}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+S\+T\+R\+E\+A\+M/\mbox{\hyperlink{RTM__T__Device_8h}{R\+T\+M\+\_\+\+T\+\_\+\+Device.\+h}}\item 
+S\+T\+R\+E\+A\+M/\mbox{\hyperlink{RTM__T__Device_8cpp}{R\+T\+M\+\_\+\+T\+\_\+\+Device.\+cpp}}\end{DoxyCompactItemize}

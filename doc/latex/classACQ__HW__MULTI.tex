@@ -1,0 +1,126 @@
+\hypertarget{classACQ__HW__MULTI}{}\doxysection{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI Class Reference}
+\label{classACQ__HW__MULTI}\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+
+
+as per \mbox{\hyperlink{classACQ__HW}{A\+C\+Q\+\_\+\+HW}}, but with {\bfseries{multi}} dma buffers use for applications like T\+H\+O\+M\+S\+ON where {\bfseries{multi}} back to back bursts occur by using {\bfseries{multi}} buffers, there\textquotesingle{}s no pileup.  
+
+
+Inheritance diagram for A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classACQ__HW__MULTI}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classACQ__HW__MULTI_a596f7301d99818f8e8db94c4384a9209}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI}} (int \mbox{\hyperlink{classACQ_a2af6cf10b6644724bfedc1fb5fa7a976}{devnum}}, string \+\_\+name, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi\+\_\+offsets, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo\+\_\+offsets, \mbox{\hyperlink{structVI}{VI}} \&sys\+\_\+vi\+\_\+cursor, \mbox{\hyperlink{structVO}{VO}} \&sys\+\_\+vo\+\_\+cursor, int \mbox{\hyperlink{afs__procfs_8c_a5e6733abb143b0f91bda273e6b0ebbbc}{nbuffers}})
+\item 
+virtual \mbox{\hyperlink{classACQ__HW__MULTI_a1579c8150d18e919648d7acd0d029803}{$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI}} ()
+\item 
+virtual bool \mbox{\hyperlink{classACQ__HW__MULTI_a3959a4858f45647c937e8d116860a505}{new\+Sample}} (int \mbox{\hyperlink{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}{sample}})
+\begin{DoxyCompactList}\small\item\em checks host buffer for new sample, if so copies to lbuf and reports true \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned \mbox{\hyperlink{classACQ__HW__MULTI_a544de41340acde7976b63d68f5e6963f}{tlatch0}} (int \mbox{\hyperlink{InlineDataHandlerMuxAO__LLC_8cpp_a264d7907938e52414f6007ea28c2d0c9}{ib}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{classACQ__HW__MULTI_a54cbb32c5ba509a24444e82fcc1225a5}{pw32\+\_\+double\+\_\+buffer}}
+\item 
+int \mbox{\hyperlink{classACQ__HW__MULTI_a023065e960482ca107000658260fbd30}{nb}}
+\item 
+int $\ast$$\ast$ \mbox{\hyperlink{classACQ__HW__MULTI_a4cf701fb0631307a9cc230b0b75a1f70}{raw}}
+\item 
+unsigned $\ast$ \mbox{\hyperlink{classACQ__HW__MULTI_a8b142efc82694746221071b8cd5e0575}{tl0\+\_\+array}}
+\item 
+int \mbox{\hyperlink{classACQ__HW__MULTI_aa5d93e213af1143873070906bfeba489}{verbose}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+as per \mbox{\hyperlink{classACQ__HW}{A\+C\+Q\+\_\+\+HW}}, but with {\bfseries{multi}} dma buffers use for applications like T\+H\+O\+M\+S\+ON where {\bfseries{multi}} back to back bursts occur by using {\bfseries{multi}} buffers, there\textquotesingle{}s no pileup. 
+
+the system will still output a single sample per buffer, the tempo of the output will be bursty 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classACQ__HW__MULTI_a596f7301d99818f8e8db94c4384a9209}\label{classACQ__HW__MULTI_a596f7301d99818f8e8db94c4384a9209}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{ACQ\_HW\_MULTI()}{ACQ\_HW\_MULTI()}}
+{\footnotesize\ttfamily A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI (\begin{DoxyParamCaption}\item[{int}]{devnum,  }\item[{string}]{\+\_\+name,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVI}{VI}} \&}]{sys\+\_\+vi\+\_\+cursor,  }\item[{\mbox{\hyperlink{structVO}{VO}} \&}]{sys\+\_\+vo\+\_\+cursor,  }\item[{int}]{nbuffers }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_a1579c8150d18e919648d7acd0d029803}\label{classACQ__HW__MULTI_a1579c8150d18e919648d7acd0d029803}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!````~ACQ\_HW\_MULTI@{$\sim$ACQ\_HW\_MULTI}}
+\index{````~ACQ\_HW\_MULTI@{$\sim$ACQ\_HW\_MULTI}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{$\sim$ACQ\_HW\_MULTI()}{~ACQ\_HW\_MULTI()}}
+{\footnotesize\ttfamily virtual A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classACQ__HW__MULTI_a3959a4858f45647c937e8d116860a505}\label{classACQ__HW__MULTI_a3959a4858f45647c937e8d116860a505}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!newSample@{newSample}}
+\index{newSample@{newSample}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{newSample()}{newSample()}}
+{\footnotesize\ttfamily bool A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::new\+Sample (\begin{DoxyParamCaption}\item[{int}]{sample }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+checks host buffer for new sample, if so copies to lbuf and reports true 
+
+
+
+Reimplemented from \mbox{\hyperlink{classACQ_a966d21e2e1616ce11949877495962662}{A\+CQ}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classACQ__HW__MEAN__SKIPPER_ab73b2470efa4617e9dbf2da7976ab278}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER}}, and \mbox{\hyperlink{classACQ__HW__MEAN_a778998401cf2320de0d33420fbaed520}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}}.
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_a544de41340acde7976b63d68f5e6963f}\label{classACQ__HW__MULTI_a544de41340acde7976b63d68f5e6963f}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!tlatch0@{tlatch0}}
+\index{tlatch0@{tlatch0}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{tlatch0()}{tlatch0()}}
+{\footnotesize\ttfamily unsigned A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::tlatch0 (\begin{DoxyParamCaption}\item[{int}]{ib }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classACQ__HW__MULTI_a023065e960482ca107000658260fbd30}\label{classACQ__HW__MULTI_a023065e960482ca107000658260fbd30}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!nb@{nb}}
+\index{nb@{nb}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{nb}{nb}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::nb\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_a54cbb32c5ba509a24444e82fcc1225a5}\label{classACQ__HW__MULTI_a54cbb32c5ba509a24444e82fcc1225a5}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!pw32\_double\_buffer@{pw32\_double\_buffer}}
+\index{pw32\_double\_buffer@{pw32\_double\_buffer}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{pw32\_double\_buffer}{pw32\_double\_buffer}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::pw32\+\_\+double\+\_\+buffer\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_a4cf701fb0631307a9cc230b0b75a1f70}\label{classACQ__HW__MULTI_a4cf701fb0631307a9cc230b0b75a1f70}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!raw@{raw}}
+\index{raw@{raw}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{raw}{raw}}
+{\footnotesize\ttfamily int$\ast$$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::raw\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_a8b142efc82694746221071b8cd5e0575}\label{classACQ__HW__MULTI_a8b142efc82694746221071b8cd5e0575}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!tl0\_array@{tl0\_array}}
+\index{tl0\_array@{tl0\_array}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{tl0\_array}{tl0\_array}}
+{\footnotesize\ttfamily unsigned$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::tl0\+\_\+array\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MULTI_aa5d93e213af1143873070906bfeba489}\label{classACQ__HW__MULTI_aa5d93e213af1143873070906bfeba489}} 
+\index{ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}!verbose@{verbose}}
+\index{verbose@{verbose}!ACQ\_HW\_MULTI@{ACQ\_HW\_MULTI}}
+\doxysubsubsection{\texorpdfstring{verbose}{verbose}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+T\+I\+::verbose\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}}\end{DoxyCompactItemize}

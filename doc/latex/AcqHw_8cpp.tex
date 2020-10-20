@@ -1,0 +1,157 @@
+\hypertarget{AcqHw_8cpp}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/\+Acq\+Hw.cpp File Reference}
+\label{AcqHw_8cpp}\index{ACQPROC/AcqHw.cpp@{ACQPROC/AcqHw.cpp}}
+
+
+hardware implementation layer  
+
+
+{\ttfamily \#include \char`\"{}../local.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../rtm-\/t\+\_\+ioctl.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}afhba-\/llcontrol.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Acq\+Sys.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Env.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structDev}{Dev}}
+\begin{DoxyCompactList}\small\item\em struct \mbox{\hyperlink{structDev}{Dev}} \+: interface to A\+F\+H\+B\+A404 device driver. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structDev_1_1LBUF}{Dev\+::\+L\+B\+UF}}
+\begin{DoxyCompactList}\small\item\em local buffer interface . \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ__HW__BASE}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE}}
+\begin{DoxyCompactList}\small\item\em concrete model of A\+C\+Q2106 box. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ__HW}{A\+C\+Q\+\_\+\+HW}}
+\begin{DoxyCompactList}\small\item\em concrete base class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ__HW__MULTI}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI}}
+\begin{DoxyCompactList}\small\item\em as per \mbox{\hyperlink{classACQ__HW}{A\+C\+Q\+\_\+\+HW}}, but with {\bfseries{multi}} dma buffers use for applications like T\+H\+O\+M\+S\+ON where {\bfseries{multi}} back to back bursts occur by using {\bfseries{multi}} buffers, there\textquotesingle{}s no pileup. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ__HW__MEAN}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}}
+\begin{DoxyCompactList}\small\item\em output the mean of {\bfseries{nb}} values \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ__HW__MEAN__SKIPPER}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER}}
+\begin{DoxyCompactList}\small\item\em takes mean of N samples, new\+Sample returns true after {\bfseries{skip}} samples \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_a7d467c1d283fdfa1f2081ba1e0d01b6e}{P\+A\+G\+E\+\_\+\+S\+I\+ZE}}~0x1000
+\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_acca97579145d756cbfd9dfe5128d39d9}{A\+O\+\_\+\+O\+F\+F\+S\+ET}}~0x1000
+\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_a6cd330b70cc614526d5a26088633f818}{X\+O\+\_\+\+H\+O\+ST}}~(dev-\/$>$host\+\_\+buffer+\mbox{\hyperlink{AcqHw_8cpp_acca97579145d756cbfd9dfe5128d39d9}{A\+O\+\_\+\+O\+F\+F\+S\+ET}})
+\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_a65dd2b5ef226d5dfd5f547ffcbf4a903}{T\+L\+A\+T\+C\+H0}}~((unsigned$\ast$)(dev-\/$>$host\+\_\+buffer + vi\+\_\+offsets.\+S\+P32))\mbox{[}\mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072a808dd1682a365fbb3eab97f139a6792c}{S\+P\+I\+X\+::\+T\+L\+A\+T\+CH}}\mbox{]}
+\begin{DoxyCompactList}\small\item\em find sample count in \mbox{\hyperlink{structVI}{VI}}. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_a158e9fca8095f6a734c10cc2c69fc054}{V\+I\+T\+O\+SI}}(field)
+\begin{DoxyCompactList}\small\item\em copy V\+I.\+field to S\+I.\+field \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_acd9a3f2f155cab06b971b718a543736d}{S\+I\+T\+O\+VO}}(field)
+\begin{DoxyCompactList}\small\item\em copy S\+I.\+field to \mbox{\hyperlink{structVO}{VO}} \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{AcqHw_8cpp_ac94daac664235af47d01033c933907b8}{S\+I\+T\+O\+V\+O2}}(field)
+\begin{DoxyCompactList}\small\item\em copy S\+I.\+field to XO archive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{AcqHw_8cpp_aa7ff93afed8ec0d3a2778e600d81f395}{\+\_\+get\+\_\+connected}} (struct \mbox{\hyperlink{structDev}{Dev}} $\ast$dev, unsigned vi\+\_\+len)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+hardware implementation layer 
+
+\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}} \+:\mbox{\hyperlink{classACQ}{A\+CQ}} device with hardware hooks
+
+Created on\+: 1 Mar 2020 Author\+: pgm 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{AcqHw_8cpp_acca97579145d756cbfd9dfe5128d39d9}\label{AcqHw_8cpp_acca97579145d756cbfd9dfe5128d39d9}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!AO\_OFFSET@{AO\_OFFSET}}
+\index{AO\_OFFSET@{AO\_OFFSET}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{AO\_OFFSET}{AO\_OFFSET}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+O\+F\+F\+S\+ET~0x1000}
+
+\mbox{\Hypertarget{AcqHw_8cpp_a7d467c1d283fdfa1f2081ba1e0d01b6e}\label{AcqHw_8cpp_a7d467c1d283fdfa1f2081ba1e0d01b6e}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!PAGE\_SIZE@{PAGE\_SIZE}}
+\index{PAGE\_SIZE@{PAGE\_SIZE}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{PAGE\_SIZE}{PAGE\_SIZE}}
+{\footnotesize\ttfamily \#define P\+A\+G\+E\+\_\+\+S\+I\+ZE~0x1000}
+
+\mbox{\Hypertarget{AcqHw_8cpp_acd9a3f2f155cab06b971b718a543736d}\label{AcqHw_8cpp_acd9a3f2f155cab06b971b718a543736d}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!SITOVO@{SITOVO}}
+\index{SITOVO@{SITOVO}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{SITOVO}{SITOVO}}
+{\footnotesize\ttfamily \#define S\+I\+T\+O\+VO(\begin{DoxyParamCaption}\item[{}]{field }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    (vo.field \&\& \(\backslash\)}
+\DoxyCodeLine{     memcpy(\mbox{\hyperlink{AcqHw_8cpp_a6cd330b70cc614526d5a26088633f818}{XO\_HOST}}+vo\_offsets.field, \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(systemInterface.OUT.field+vo\_cursor.field), \(\backslash\)}
+\DoxyCodeLine{             vo.field*\textcolor{keyword}{sizeof}(systemInterface.OUT.field[0])))}
+
+\end{DoxyCode}
+
+
+copy S\+I.\+field to \mbox{\hyperlink{structVO}{VO}} 
+
+\mbox{\Hypertarget{AcqHw_8cpp_ac94daac664235af47d01033c933907b8}\label{AcqHw_8cpp_ac94daac664235af47d01033c933907b8}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!SITOVO2@{SITOVO2}}
+\index{SITOVO2@{SITOVO2}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{SITOVO2}{SITOVO2}}
+{\footnotesize\ttfamily \#define S\+I\+T\+O\+V\+O2(\begin{DoxyParamCaption}\item[{}]{field }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    (vo.field \&\& \(\backslash\)}
+\DoxyCodeLine{     memcpy(dev-\/>lbuf\_vo.cursor+vo\_offsets.field, (\textcolor{keywordtype}{char}*)systemInterface.OUT.field+vo\_cursor.field, \(\backslash\)}
+\DoxyCodeLine{             vo.field*\textcolor{keyword}{sizeof}(systemInterface.OUT.field[0])))}
+
+\end{DoxyCode}
+
+
+copy S\+I.\+field to XO archive. 
+
+\mbox{\Hypertarget{AcqHw_8cpp_a65dd2b5ef226d5dfd5f547ffcbf4a903}\label{AcqHw_8cpp_a65dd2b5ef226d5dfd5f547ffcbf4a903}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!TLATCH0@{TLATCH0}}
+\index{TLATCH0@{TLATCH0}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{TLATCH0}{TLATCH0}}
+{\footnotesize\ttfamily \#define T\+L\+A\+T\+C\+H0~((unsigned$\ast$)(dev-\/$>$host\+\_\+buffer + vi\+\_\+offsets.\+S\+P32))\mbox{[}\mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072a808dd1682a365fbb3eab97f139a6792c}{S\+P\+I\+X\+::\+T\+L\+A\+T\+CH}}\mbox{]}}
+
+
+
+find sample count in \mbox{\hyperlink{structVI}{VI}}. 
+
+\mbox{\Hypertarget{AcqHw_8cpp_a158e9fca8095f6a734c10cc2c69fc054}\label{AcqHw_8cpp_a158e9fca8095f6a734c10cc2c69fc054}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!VITOSI@{VITOSI}}
+\index{VITOSI@{VITOSI}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{VITOSI}{VITOSI}}
+{\footnotesize\ttfamily \#define V\+I\+T\+O\+SI(\begin{DoxyParamCaption}\item[{}]{field }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    (vi.field \&\& \(\backslash\)}
+\DoxyCodeLine{     memcpy(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(systemInterface.IN.field+vi\_cursor.field), dev-\/>lbuf\_vi.cursor+vi\_offsets.field, \(\backslash\)}
+\DoxyCodeLine{            vi.field*\textcolor{keyword}{sizeof}(systemInterface.IN.field[0])))}
+
+\end{DoxyCode}
+
+
+copy V\+I.\+field to S\+I.\+field 
+
+\mbox{\Hypertarget{AcqHw_8cpp_a6cd330b70cc614526d5a26088633f818}\label{AcqHw_8cpp_a6cd330b70cc614526d5a26088633f818}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!XO\_HOST@{XO\_HOST}}
+\index{XO\_HOST@{XO\_HOST}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{XO\_HOST}{XO\_HOST}}
+{\footnotesize\ttfamily \#define X\+O\+\_\+\+H\+O\+ST~(dev-\/$>$host\+\_\+buffer+\mbox{\hyperlink{AcqHw_8cpp_acca97579145d756cbfd9dfe5128d39d9}{A\+O\+\_\+\+O\+F\+F\+S\+ET}})}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{AcqHw_8cpp_aa7ff93afed8ec0d3a2778e600d81f395}\label{AcqHw_8cpp_aa7ff93afed8ec0d3a2778e600d81f395}} 
+\index{AcqHw.cpp@{AcqHw.cpp}!\_get\_connected@{\_get\_connected}}
+\index{\_get\_connected@{\_get\_connected}!AcqHw.cpp@{AcqHw.cpp}}
+\doxysubsubsection{\texorpdfstring{\_get\_connected()}{\_get\_connected()}}
+{\footnotesize\ttfamily void \+\_\+get\+\_\+connected (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structDev}{Dev}} $\ast$}]{dev,  }\item[{unsigned}]{vi\+\_\+len }\end{DoxyParamCaption})}
+

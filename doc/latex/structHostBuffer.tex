@@ -1,0 +1,133 @@
+\hypertarget{structHostBuffer}{}\doxysection{Host\+Buffer Struct Reference}
+\label{structHostBuffer}\index{HostBuffer@{HostBuffer}}
+
+
+{\ttfamily \#include $<$acq-\/fiber-\/hba.\+h$>$}
+
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}{B\+S\+T\+A\+TE}} \{ \mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98da8fb0a3a0437a79a19d5b793443d6f460}{B\+S\+\_\+\+E\+M\+P\+TY}}, 
+\mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98da23549df2bd9e1f65e9ede6709c5c9493}{B\+S\+\_\+\+F\+I\+L\+L\+I\+NG}}, 
+\mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98daa07efca900e41153a68b7dfe899ea1d3}{B\+S\+\_\+\+F\+U\+LL}}, 
+\mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98da134d3a1bb594ea93f9b54128098390fe}{B\+S\+\_\+\+F\+U\+L\+L\+\_\+\+A\+PP}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{structHostBuffer_ab9885da0d63d99ae629e6ee655addc0c}{ibuf}}
+\item 
+void $\ast$ \mbox{\hyperlink{structHostBuffer_aa60e7fc06891f98c534641d1149643db}{va}}
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{structHostBuffer_ac9ab06c27ff7f59d5948063b6c3c258f}{pa}}
+\item 
+int \mbox{\hyperlink{structHostBuffer_a561ffba7201da80d3ab73dedd0f84312}{len}}
+\item 
+int \mbox{\hyperlink{structHostBuffer_a08c8820223e28047ae7a591b30f363a0}{req\+\_\+len}}
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{structHostBuffer_aa270640cbc5c3d8933b51a4e35cb5c50}{descr}}
+\item 
+struct list\+\_\+head \mbox{\hyperlink{structHostBuffer_a146a55e6310e97887e5d3aad3be40d30}{list}}
+\item 
+enum \mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}{Host\+Buffer\+::\+B\+S\+T\+A\+TE}} \mbox{\hyperlink{structHostBuffer_ab3fadd5daf56a5098160455de17949af}{bstate}}
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{structHostBuffer_afe321367a3de99af469896f1f37a1e79}{esta}}
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{structHostBuffer_ab22827976e5c3ab0ced46d158551b8a7}{timestamp}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}\label{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}} 
+\index{HostBuffer@{HostBuffer}!BSTATE@{BSTATE}}
+\index{BSTATE@{BSTATE}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{BSTATE}{BSTATE}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}{Host\+Buffer\+::\+B\+S\+T\+A\+TE}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BS\_EMPTY@{BS\_EMPTY}!HostBuffer@{HostBuffer}}\index{HostBuffer@{HostBuffer}!BS\_EMPTY@{BS\_EMPTY}}}\mbox{\Hypertarget{structHostBuffer_a48b039f13a4729e238197abdc2cde98da8fb0a3a0437a79a19d5b793443d6f460}\label{structHostBuffer_a48b039f13a4729e238197abdc2cde98da8fb0a3a0437a79a19d5b793443d6f460}} 
+B\+S\+\_\+\+E\+M\+P\+TY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BS\_FILLING@{BS\_FILLING}!HostBuffer@{HostBuffer}}\index{HostBuffer@{HostBuffer}!BS\_FILLING@{BS\_FILLING}}}\mbox{\Hypertarget{structHostBuffer_a48b039f13a4729e238197abdc2cde98da23549df2bd9e1f65e9ede6709c5c9493}\label{structHostBuffer_a48b039f13a4729e238197abdc2cde98da23549df2bd9e1f65e9ede6709c5c9493}} 
+B\+S\+\_\+\+F\+I\+L\+L\+I\+NG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BS\_FULL@{BS\_FULL}!HostBuffer@{HostBuffer}}\index{HostBuffer@{HostBuffer}!BS\_FULL@{BS\_FULL}}}\mbox{\Hypertarget{structHostBuffer_a48b039f13a4729e238197abdc2cde98daa07efca900e41153a68b7dfe899ea1d3}\label{structHostBuffer_a48b039f13a4729e238197abdc2cde98daa07efca900e41153a68b7dfe899ea1d3}} 
+B\+S\+\_\+\+F\+U\+LL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BS\_FULL\_APP@{BS\_FULL\_APP}!HostBuffer@{HostBuffer}}\index{HostBuffer@{HostBuffer}!BS\_FULL\_APP@{BS\_FULL\_APP}}}\mbox{\Hypertarget{structHostBuffer_a48b039f13a4729e238197abdc2cde98da134d3a1bb594ea93f9b54128098390fe}\label{structHostBuffer_a48b039f13a4729e238197abdc2cde98da134d3a1bb594ea93f9b54128098390fe}} 
+B\+S\+\_\+\+F\+U\+L\+L\+\_\+\+A\+PP&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{structHostBuffer_ab3fadd5daf56a5098160455de17949af}\label{structHostBuffer_ab3fadd5daf56a5098160455de17949af}} 
+\index{HostBuffer@{HostBuffer}!bstate@{bstate}}
+\index{bstate@{bstate}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{bstate}{bstate}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{structHostBuffer_a48b039f13a4729e238197abdc2cde98d}{Host\+Buffer\+::\+B\+S\+T\+A\+TE}} Host\+Buffer\+::bstate}
+
+\mbox{\Hypertarget{structHostBuffer_aa270640cbc5c3d8933b51a4e35cb5c50}\label{structHostBuffer_aa270640cbc5c3d8933b51a4e35cb5c50}} 
+\index{HostBuffer@{HostBuffer}!descr@{descr}}
+\index{descr@{descr}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{descr}{descr}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} Host\+Buffer\+::descr}
+
+\mbox{\Hypertarget{structHostBuffer_afe321367a3de99af469896f1f37a1e79}\label{structHostBuffer_afe321367a3de99af469896f1f37a1e79}} 
+\index{HostBuffer@{HostBuffer}!esta@{esta}}
+\index{esta@{esta}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{esta}{esta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} Host\+Buffer\+::esta}
+
+\mbox{\Hypertarget{structHostBuffer_ab9885da0d63d99ae629e6ee655addc0c}\label{structHostBuffer_ab9885da0d63d99ae629e6ee655addc0c}} 
+\index{HostBuffer@{HostBuffer}!ibuf@{ibuf}}
+\index{ibuf@{ibuf}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{ibuf}{ibuf}}
+{\footnotesize\ttfamily int Host\+Buffer\+::ibuf}
+
+\mbox{\Hypertarget{structHostBuffer_a561ffba7201da80d3ab73dedd0f84312}\label{structHostBuffer_a561ffba7201da80d3ab73dedd0f84312}} 
+\index{HostBuffer@{HostBuffer}!len@{len}}
+\index{len@{len}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{len}{len}}
+{\footnotesize\ttfamily int Host\+Buffer\+::len}
+
+\mbox{\Hypertarget{structHostBuffer_a146a55e6310e97887e5d3aad3be40d30}\label{structHostBuffer_a146a55e6310e97887e5d3aad3be40d30}} 
+\index{HostBuffer@{HostBuffer}!list@{list}}
+\index{list@{list}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{list}{list}}
+{\footnotesize\ttfamily struct list\+\_\+head Host\+Buffer\+::list}
+
+\mbox{\Hypertarget{structHostBuffer_ac9ab06c27ff7f59d5948063b6c3c258f}\label{structHostBuffer_ac9ab06c27ff7f59d5948063b6c3c258f}} 
+\index{HostBuffer@{HostBuffer}!pa@{pa}}
+\index{pa@{pa}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{pa}{pa}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} Host\+Buffer\+::pa}
+
+\mbox{\Hypertarget{structHostBuffer_a08c8820223e28047ae7a591b30f363a0}\label{structHostBuffer_a08c8820223e28047ae7a591b30f363a0}} 
+\index{HostBuffer@{HostBuffer}!req\_len@{req\_len}}
+\index{req\_len@{req\_len}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{req\_len}{req\_len}}
+{\footnotesize\ttfamily int Host\+Buffer\+::req\+\_\+len}
+
+\mbox{\Hypertarget{structHostBuffer_ab22827976e5c3ab0ced46d158551b8a7}\label{structHostBuffer_ab22827976e5c3ab0ced46d158551b8a7}} 
+\index{HostBuffer@{HostBuffer}!timestamp@{timestamp}}
+\index{timestamp@{timestamp}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{timestamp}{timestamp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} Host\+Buffer\+::timestamp}
+
+\mbox{\Hypertarget{structHostBuffer_aa60e7fc06891f98c534641d1149643db}\label{structHostBuffer_aa60e7fc06891f98c534641d1149643db}} 
+\index{HostBuffer@{HostBuffer}!va@{va}}
+\index{va@{va}!HostBuffer@{HostBuffer}}
+\doxysubsubsection{\texorpdfstring{va}{va}}
+{\footnotesize\ttfamily void$\ast$ Host\+Buffer\+::va}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{acq-fiber-hba_8h}{acq-\/fiber-\/hba.\+h}}\end{DoxyCompactItemize}

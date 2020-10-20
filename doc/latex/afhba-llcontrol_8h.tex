@@ -1,0 +1,72 @@
+\hypertarget{afhba-llcontrol_8h}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/afhba-\/llcontrol.h File Reference}
+\label{afhba-llcontrol_8h}\index{ACQPROC/afhba-\/llcontrol.h@{ACQPROC/afhba-\/llcontrol.h}}
+{\ttfamily \#include $<$sched.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/ioctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{afhba-llcontrol_8h_a369266c24eacffb87046522897a570d5}{\+\_\+\+G\+N\+U\+\_\+\+S\+O\+U\+R\+CE}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned \mbox{\hyperlink{afhba-llcontrol_8h_a2d7bfa09e3bee0f30351dde8d4f940e1}{difftime\+\_\+us}} (void)
+\item 
+void $\ast$ \mbox{\hyperlink{afhba-llcontrol_8h_a5360620f54683c9cca00e2bdbb9350f9}{get\+\_\+mapping}} (dev\+\_\+t devnum, int $\ast$pfd)
+\item 
+void \mbox{\hyperlink{afhba-llcontrol_8h_a61090d96e182bfa12227cf0819272e74}{clear\+\_\+mapping}} (int fd, void $\ast$hb)
+\item 
+void \mbox{\hyperlink{afhba-llcontrol_8h_a0e19f97ee13d3ece358463de98f28b89}{set\+Affinity}} (unsigned cpu\+\_\+mask)
+\item 
+void \mbox{\hyperlink{afhba-llcontrol_8h_a502f7a17377a31f5ee1aef6b13c8ee62}{go\+Real\+Time}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{afhba-llcontrol_8h_a369266c24eacffb87046522897a570d5}\label{afhba-llcontrol_8h_a369266c24eacffb87046522897a570d5}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!\_GNU\_SOURCE@{\_GNU\_SOURCE}}
+\index{\_GNU\_SOURCE@{\_GNU\_SOURCE}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{\_GNU\_SOURCE}{\_GNU\_SOURCE}}
+{\footnotesize\ttfamily \#define \+\_\+\+G\+N\+U\+\_\+\+S\+O\+U\+R\+CE}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba-llcontrol_8h_a61090d96e182bfa12227cf0819272e74}\label{afhba-llcontrol_8h_a61090d96e182bfa12227cf0819272e74}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!clear\_mapping@{clear\_mapping}}
+\index{clear\_mapping@{clear\_mapping}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{clear\_mapping()}{clear\_mapping()}}
+{\footnotesize\ttfamily void clear\+\_\+mapping (\begin{DoxyParamCaption}\item[{int}]{fd,  }\item[{void $\ast$}]{hb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba-llcontrol_8h_a2d7bfa09e3bee0f30351dde8d4f940e1}\label{afhba-llcontrol_8h_a2d7bfa09e3bee0f30351dde8d4f940e1}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!difftime\_us@{difftime\_us}}
+\index{difftime\_us@{difftime\_us}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{difftime\_us()}{difftime\_us()}}
+{\footnotesize\ttfamily unsigned difftime\+\_\+us (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba-llcontrol_8h_a5360620f54683c9cca00e2bdbb9350f9}\label{afhba-llcontrol_8h_a5360620f54683c9cca00e2bdbb9350f9}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!get\_mapping@{get\_mapping}}
+\index{get\_mapping@{get\_mapping}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{get\_mapping()}{get\_mapping()}}
+{\footnotesize\ttfamily void$\ast$ get\+\_\+mapping (\begin{DoxyParamCaption}\item[{dev\+\_\+t}]{devnum,  }\item[{int $\ast$}]{pfd }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba-llcontrol_8h_a502f7a17377a31f5ee1aef6b13c8ee62}\label{afhba-llcontrol_8h_a502f7a17377a31f5ee1aef6b13c8ee62}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!goRealTime@{goRealTime}}
+\index{goRealTime@{goRealTime}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{goRealTime()}{goRealTime()}}
+{\footnotesize\ttfamily void go\+Real\+Time (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba-llcontrol_8h_a0e19f97ee13d3ece358463de98f28b89}\label{afhba-llcontrol_8h_a0e19f97ee13d3ece358463de98f28b89}} 
+\index{afhba-\/llcontrol.h@{afhba-\/llcontrol.h}!setAffinity@{setAffinity}}
+\index{setAffinity@{setAffinity}!afhba-\/llcontrol.h@{afhba-\/llcontrol.h}}
+\doxysubsubsection{\texorpdfstring{setAffinity()}{setAffinity()}}
+{\footnotesize\ttfamily void set\+Affinity (\begin{DoxyParamCaption}\item[{unsigned}]{cpu\+\_\+mask }\end{DoxyParamCaption})}
+

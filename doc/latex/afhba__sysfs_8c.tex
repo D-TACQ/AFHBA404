@@ -1,0 +1,260 @@
+\hypertarget{afhba__sysfs_8c}{}\doxysection{afhba\+\_\+sysfs.\+c File Reference}
+\label{afhba__sysfs_8c}\index{afhba\_sysfs.c@{afhba\_sysfs.c}}
+
+
+sysfs interface aka \char`\"{}knobs\char`\"{}  
+
+
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}afhba\+\_\+stream\+\_\+drv.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_aab5f10d7f6c80d1616bf1161ecdb3cff}{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}}(D\+IR,  S\+HL)
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_a073e35ee410f0fdde804a2a0f05fcef1}{D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}}(D\+IR,  S\+HL)
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_aed3d2690756aec3641983096fc593f1e}{D\+M\+A\+\_\+\+C\+T\+RL}}(D\+IR,  S\+HL)
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_a7a04bfbd81e9cdaa77a1df44415598c2}{D\+M\+A\+\_\+\+L\+A\+T\+E\+ST}}(D\+IR,  RD)
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}{\+\_\+\+E\+R\+R\+L\+AT}}(yymask)~((yymask) == 0x0ffff $\vert$$\vert$ (yymask) == 0)
+\item 
+\#define \mbox{\hyperlink{afhba__sysfs_8c_a813828110f858dd171cf861933c9332d}{E\+R\+R\+L\+AT}}(yy)~(\mbox{\hyperlink{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}{\+\_\+\+E\+R\+R\+L\+AT}}((yy)\&0x0ffff))
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_a4c047ff852ed38ce7961b989a9685f8c}{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}} (pull, \mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_ab22da58077da0acecd93d1ec635f3047}{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}} (push, \mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_a6537b4efccec4867db737d9e5c36e23e}{D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}} (pull, \mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_ae88fca98e2a8c4b8dcc7f911acf07f0f}{D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT}} (push, \mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_af9f9c8cf1b3dc4633e8f838b6bdca981}{D\+M\+A\+\_\+\+C\+T\+RL}} (pull, \mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_a8be9f74cede44213baffb5f57f826728}{D\+M\+A\+\_\+\+C\+T\+RL}} (push, \mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_ae41ef49ab80a838e66df8ef6ed8b7d97}{D\+M\+A\+\_\+\+L\+A\+T\+E\+ST}} (pull, \mbox{\hyperlink{afhba__stream__drv_8h_ac871d57b7ef44a736d87f482c635e0bd}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+S\+T\+A\+\_\+\+RD}})
+\item 
+\mbox{\hyperlink{afhba__sysfs_8c_a2604f016717382d8914b443695bc61be}{D\+M\+A\+\_\+\+L\+A\+T\+E\+ST}} (push, \mbox{\hyperlink{afhba__stream__drv_8h_ac2010931b2784f1b42ab6f9b39fddabe}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+S\+T\+A\+\_\+\+RD}})
+\item 
+char $\ast$ \mbox{\hyperlink{afhba__sysfs_8c_a154237a412a6c9fa633d0e49b176284b}{get\+Flags}} (\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} stat, char buf\mbox{[}$\,$\mbox{]}, int maxbuf)
+\item 
+void \mbox{\hyperlink{afhba__sysfs_8c_adeeea9c8bcc114e9b1670d9a50b4f630}{afhba\+\_\+create\+\_\+sysfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__sysfs_8c_a6bc404feecf295923c435e95c6365ef2}{afhba\+\_\+remove\+\_\+sysfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__sysfs_8c_a277f3932399bc90cb1d012e150194179}{afhba\+\_\+create\+\_\+sysfs\+\_\+class}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__sysfs_8c_aa567e9f66611fe5577f5febd26a600a9}{afhba\+\_\+remove\+\_\+sysfs\+\_\+class}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}{buffer\+\_\+len}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+sysfs interface aka \char`\"{}knobs\char`\"{} 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}\label{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!\_ERRLAT@{\_ERRLAT}}
+\index{\_ERRLAT@{\_ERRLAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{\_ERRLAT}{\_ERRLAT}}
+{\footnotesize\ttfamily \#define \+\_\+\+E\+R\+R\+L\+AT(\begin{DoxyParamCaption}\item[{}]{yymask }\end{DoxyParamCaption})~((yymask) == 0x0ffff $\vert$$\vert$ (yymask) == 0)}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_aab5f10d7f6c80d1616bf1161ecdb3cff}\label{afhba__sysfs_8c_aab5f10d7f6c80d1616bf1161ecdb3cff}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}}
+\index{DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DATA\_FIFO\_STAT}{DATA\_FIFO\_STAT}}
+{\footnotesize\ttfamily \#define D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT(\begin{DoxyParamCaption}\item[{}]{D\+IR,  }\item[{}]{S\+HL }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static} ssize\_t show\_data\_fifo\_stat\_\#\#DIR(               \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device * dev,                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device\_attribute *attr,                  \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keywordtype}{char} * buf)                         \(\backslash\)}
+\DoxyCodeLine{\{                                   \(\backslash\)}
+\DoxyCodeLine{    char flags[80];                         \(\backslash\)}
+\DoxyCodeLine{    struct \mbox{\hyperlink{structAFHBA__DEV}{AFHBA\_DEV}} *adev = \mbox{\hyperlink{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\_lookupDeviceFromClass}}(dev);          \(\backslash\)}
+\DoxyCodeLine{    u32 stat = (\mbox{\hyperlink{afhba__stream__drv_8h_a930a7e2fe34f32fe9bfeeb119314637d}{DMA\_DATA\_FIFSTA\_RD}}(adev) >> SHL)\&0xffff;      \(\backslash\)}
+\DoxyCodeLine{    getDataFifoStat(stat, flags, 80);               \(\backslash\)}
+\DoxyCodeLine{    return sprintf(buf, \textcolor{stringliteral}{"0x\%04x \%s\(\backslash\)n"}, stat, flags);        \(\backslash\)}
+\DoxyCodeLine{\}                                   \(\backslash\)}
+\DoxyCodeLine{                                    \(\backslash\)}
+\DoxyCodeLine{static DEVICE\_ATTR(data\_fifo\_stat\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_data\_fifo\_stat\_\#\#DIR, 0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{afhba__sysfs_8c_a073e35ee410f0fdde804a2a0f05fcef1}\label{afhba__sysfs_8c_a073e35ee410f0fdde804a2a0f05fcef1}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}}
+\index{DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DESC\_FIFO\_STAT}{DESC\_FIFO\_STAT}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT(\begin{DoxyParamCaption}\item[{}]{D\+IR,  }\item[{}]{S\+HL }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static} ssize\_t show\_desc\_fifo\_stat\_\#\#DIR(               \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device * dev,                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device\_attribute *attr,                  \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keywordtype}{char} * buf)                         \(\backslash\)}
+\DoxyCodeLine{\{                                   \(\backslash\)}
+\DoxyCodeLine{    char flags[80];                         \(\backslash\)}
+\DoxyCodeLine{    struct \mbox{\hyperlink{structAFHBA__DEV}{AFHBA\_DEV}} *adev = \mbox{\hyperlink{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\_lookupDeviceFromClass}}(dev);          \(\backslash\)}
+\DoxyCodeLine{    u32 stat = (\mbox{\hyperlink{afhba__stream__drv_8h_a0592c6481f6cea5a445fa86b8063762c}{DMA\_DESC\_FIFSTA\_RD}}(adev) >> SHL)\&0xffff;      \(\backslash\)}
+\DoxyCodeLine{    getDataFifoStat(stat, flags, 80);               \(\backslash\)}
+\DoxyCodeLine{    return sprintf(buf, \textcolor{stringliteral}{"0x\%04x \%s\(\backslash\)n"}, stat, flags);        \(\backslash\)}
+\DoxyCodeLine{\}                                   \(\backslash\)}
+\DoxyCodeLine{                                    \(\backslash\)}
+\DoxyCodeLine{static DEVICE\_ATTR(desc\_fifo\_stat\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_desc\_fifo\_stat\_\#\#DIR, 0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{afhba__sysfs_8c_aed3d2690756aec3641983096fc593f1e}\label{afhba__sysfs_8c_aed3d2690756aec3641983096fc593f1e}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_CTRL@{DMA\_CTRL}}
+\index{DMA\_CTRL@{DMA\_CTRL}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL}{DMA\_CTRL}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+C\+T\+RL(\begin{DoxyParamCaption}\item[{}]{D\+IR,  }\item[{}]{S\+HL }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static} ssize\_t show\_dma\_ctrl\_\#\#DIR(                 \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device * dev,                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device\_attribute *attr,                  \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keywordtype}{char} * buf)                         \(\backslash\)}
+\DoxyCodeLine{\{                                   \(\backslash\)}
+\DoxyCodeLine{    char flags[80];                         \(\backslash\)}
+\DoxyCodeLine{    struct \mbox{\hyperlink{structAFHBA__DEV}{AFHBA\_DEV}} *adev = \mbox{\hyperlink{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\_lookupDeviceFromClass}}(dev);          \(\backslash\)}
+\DoxyCodeLine{    u32 stat = (\mbox{\hyperlink{afhba__stream__drv_8h_a187b648e9ff7b64e5d8a7f19186635cc}{DMA\_CTRL\_RD}}(adev) >> SHL)\&0xffff;            \(\backslash\)}
+\DoxyCodeLine{    getDmaCtrl(stat, flags, 80);                    \(\backslash\)}
+\DoxyCodeLine{    return sprintf(buf, \textcolor{stringliteral}{"0x\%04x \%s\(\backslash\)n"}, stat, flags);        \(\backslash\)}
+\DoxyCodeLine{\}                                   \(\backslash\)}
+\DoxyCodeLine{                                    \(\backslash\)}
+\DoxyCodeLine{static DEVICE\_ATTR(dma\_ctrl\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_dma\_ctrl\_\#\#DIR, 0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{afhba__sysfs_8c_a7a04bfbd81e9cdaa77a1df44415598c2}\label{afhba__sysfs_8c_a7a04bfbd81e9cdaa77a1df44415598c2}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_LATEST@{DMA\_LATEST}}
+\index{DMA\_LATEST@{DMA\_LATEST}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_LATEST}{DMA\_LATEST}}
+{\footnotesize\ttfamily \#define D\+M\+A\+\_\+\+L\+A\+T\+E\+ST(\begin{DoxyParamCaption}\item[{}]{D\+IR,  }\item[{}]{RD }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static} ssize\_t show\_dma\_latest\_\#\#DIR(                   \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device * dev,                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keyword}{struct} device\_attribute *attr,                  \(\backslash\)}
+\DoxyCodeLine{    \textcolor{keywordtype}{char} * buf)                         \(\backslash\)}
+\DoxyCodeLine{\{                                   \(\backslash\)}
+\DoxyCodeLine{    char flags[80];                         \(\backslash\)}
+\DoxyCodeLine{    struct \mbox{\hyperlink{structAFHBA__DEV}{AFHBA\_DEV}} *adev = \mbox{\hyperlink{acq-fiber-hba_8h_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\_lookupDeviceFromClass}}(dev);          \(\backslash\)}
+\DoxyCodeLine{    u32 descr = RD(adev);                       \(\backslash\)}
+\DoxyCodeLine{    getDesc(descr, flags, 80);                  \(\backslash\)}
+\DoxyCodeLine{    return sprintf(buf, \textcolor{stringliteral}{"0x\%08x \%s\(\backslash\)n"}, descr, flags);       \(\backslash\)}
+\DoxyCodeLine{\}                                   \(\backslash\)}
+\DoxyCodeLine{                                    \(\backslash\)}
+\DoxyCodeLine{static DEVICE\_ATTR(dma\_latest\_\#\#DIR\#\#\_desc, (S\_IRUSR|S\_IRGRP), show\_dma\_latest\_\#\#DIR, 0)}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{afhba__sysfs_8c_a813828110f858dd171cf861933c9332d}\label{afhba__sysfs_8c_a813828110f858dd171cf861933c9332d}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!ERRLAT@{ERRLAT}}
+\index{ERRLAT@{ERRLAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{ERRLAT}{ERRLAT}}
+{\footnotesize\ttfamily \#define E\+R\+R\+L\+AT(\begin{DoxyParamCaption}\item[{}]{yy }\end{DoxyParamCaption})~(\mbox{\hyperlink{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}{\+\_\+\+E\+R\+R\+L\+AT}}((yy)\&0x0ffff))}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__sysfs_8c_adeeea9c8bcc114e9b1670d9a50b4f630}\label{afhba__sysfs_8c_adeeea9c8bcc114e9b1670d9a50b4f630}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_create\_sysfs@{afhba\_create\_sysfs}}
+\index{afhba\_create\_sysfs@{afhba\_create\_sysfs}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs()}{afhba\_create\_sysfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a277f3932399bc90cb1d012e150194179}\label{afhba__sysfs_8c_a277f3932399bc90cb1d012e150194179}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}}
+\index{afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs\_class()}{afhba\_create\_sysfs\_class()}}
+{\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a6bc404feecf295923c435e95c6365ef2}\label{afhba__sysfs_8c_a6bc404feecf295923c435e95c6365ef2}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_remove\_sysfs@{afhba\_remove\_sysfs}}
+\index{afhba\_remove\_sysfs@{afhba\_remove\_sysfs}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs()}{afhba\_remove\_sysfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_aa567e9f66611fe5577f5febd26a600a9}\label{afhba__sysfs_8c_aa567e9f66611fe5577f5febd26a600a9}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}}
+\index{afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs\_class()}{afhba\_remove\_sysfs\_class()}}
+{\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a4c047ff852ed38ce7961b989a9685f8c}\label{afhba__sysfs_8c_a4c047ff852ed38ce7961b989a9685f8c}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}}
+\index{DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DATA\_FIFO\_STAT()}{DATA\_FIFO\_STAT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT (\begin{DoxyParamCaption}\item[{pull}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_ab22da58077da0acecd93d1ec635f3047}\label{afhba__sysfs_8c_ab22da58077da0acecd93d1ec635f3047}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}}
+\index{DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DATA\_FIFO\_STAT()}{DATA\_FIFO\_STAT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT (\begin{DoxyParamCaption}\item[{push}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a6537b4efccec4867db737d9e5c36e23e}\label{afhba__sysfs_8c_a6537b4efccec4867db737d9e5c36e23e}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}}
+\index{DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DESC\_FIFO\_STAT()}{DESC\_FIFO\_STAT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT (\begin{DoxyParamCaption}\item[{pull}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_ae88fca98e2a8c4b8dcc7f911acf07f0f}\label{afhba__sysfs_8c_ae88fca98e2a8c4b8dcc7f911acf07f0f}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}}
+\index{DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DESC\_FIFO\_STAT()}{DESC\_FIFO\_STAT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+AT (\begin{DoxyParamCaption}\item[{push}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_af9f9c8cf1b3dc4633e8f838b6bdca981}\label{afhba__sysfs_8c_af9f9c8cf1b3dc4633e8f838b6bdca981}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_CTRL@{DMA\_CTRL}}
+\index{DMA\_CTRL@{DMA\_CTRL}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL()}{DMA\_CTRL()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily D\+M\+A\+\_\+\+C\+T\+RL (\begin{DoxyParamCaption}\item[{pull}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_abdced2e9eba2963a9ab2c9d199a05a7f}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+L\+L\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a8be9f74cede44213baffb5f57f826728}\label{afhba__sysfs_8c_a8be9f74cede44213baffb5f57f826728}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_CTRL@{DMA\_CTRL}}
+\index{DMA\_CTRL@{DMA\_CTRL}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_CTRL()}{DMA\_CTRL()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily D\+M\+A\+\_\+\+C\+T\+RL (\begin{DoxyParamCaption}\item[{push}]{,  }\item[{\mbox{\hyperlink{acq-fiber-hba_8h_ac8559b6098e79ebe12d3428c44e10a80}{D\+M\+A\+\_\+\+C\+T\+R\+L\+\_\+\+P\+U\+S\+H\+\_\+\+S\+HL}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_ae41ef49ab80a838e66df8ef6ed8b7d97}\label{afhba__sysfs_8c_ae41ef49ab80a838e66df8ef6ed8b7d97}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_LATEST@{DMA\_LATEST}}
+\index{DMA\_LATEST@{DMA\_LATEST}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_LATEST()}{DMA\_LATEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily D\+M\+A\+\_\+\+L\+A\+T\+E\+ST (\begin{DoxyParamCaption}\item[{pull}]{,  }\item[{\mbox{\hyperlink{afhba__stream__drv_8h_ac871d57b7ef44a736d87f482c635e0bd}{D\+M\+A\+\_\+\+P\+U\+L\+L\+\_\+\+D\+E\+S\+C\+\_\+\+S\+T\+A\+\_\+\+RD}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a2604f016717382d8914b443695bc61be}\label{afhba__sysfs_8c_a2604f016717382d8914b443695bc61be}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_LATEST@{DMA\_LATEST}}
+\index{DMA\_LATEST@{DMA\_LATEST}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{DMA\_LATEST()}{DMA\_LATEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily D\+M\+A\+\_\+\+L\+A\+T\+E\+ST (\begin{DoxyParamCaption}\item[{push}]{,  }\item[{\mbox{\hyperlink{afhba__stream__drv_8h_ac2010931b2784f1b42ab6f9b39fddabe}{D\+M\+A\+\_\+\+P\+U\+S\+H\+\_\+\+D\+E\+S\+C\+\_\+\+S\+T\+A\+\_\+\+RD}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__sysfs_8c_a154237a412a6c9fa633d0e49b176284b}\label{afhba__sysfs_8c_a154237a412a6c9fa633d0e49b176284b}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!getFlags@{getFlags}}
+\index{getFlags@{getFlags}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{getFlags()}{getFlags()}}
+{\footnotesize\ttfamily char$\ast$ get\+Flags (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{stat,  }\item[{char}]{buf\mbox{[}$\,$\mbox{]},  }\item[{int}]{maxbuf }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}\label{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}} 
+\index{afhba\_sysfs.c@{afhba\_sysfs.c}!buffer\_len@{buffer\_len}}
+\index{buffer\_len@{buffer\_len}!afhba\_sysfs.c@{afhba\_sysfs.c}}
+\doxysubsubsection{\texorpdfstring{buffer\_len}{buffer\_len}}
+{\footnotesize\ttfamily int buffer\+\_\+len}
+

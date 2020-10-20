@@ -1,0 +1,107 @@
+\hypertarget{md_README_autotoc_md13}{}\doxysubsection{1. Hardware}\label{md_README_autotoc_md13}
+A\+H\+F\+B\+A404 is a P\+C\+I-\/express Gen2 4 lane card to fit standard PC enclosure On the front panel\+: 4x\+S\+FP marked A,B,C,D
+
+A\+F\+H\+B\+A404 is used to connect 1 to 4 A\+C\+Q2106 units to a H\+O\+ST PC, establishing a fiber-\/optic link that may be used in one of two ways\+:\hypertarget{md_README_autotoc_md14}{}\doxysubsubsection{1.\+1 H\+T\+S High Throughput Stream}\label{md_README_autotoc_md14}
+Data is transferred in large blocks at maximum 400M\+B/s per link. (max 4MB, min 4K), typically to disk archive.
+
+In theory it\textquotesingle{}s possible to run all 4 links at full speed, but to date D-\/\+T\+A\+CQ has not tested a PC that is capable of handling this.
+
+More typical usage\+:
+\begin{DoxyItemize}
+\item 1 x 400M\+B/s, single box, full rate to local disk (N\+V\+Me S\+SD recommended)
+\item 4 x 100M\+B/s, connect 4 x A\+C\+Q2106 to single host.
+\end{DoxyItemize}
+
+A\+F\+H\+B\+A404 may also be used to send a common trigger to multiple A\+C\+Q2106.
+
+See R\+E\+A\+D\+M\+E.\+A\+C\+Q2106.\+H\+TS and S\+T\+R\+E\+A\+M/ for details.\hypertarget{md_README_autotoc_md15}{}\doxysubsubsection{1.\+2 L\+L\+C Low Latency Control}\label{md_README_autotoc_md15}
+Classic Plasma Control System. Data is transferred in \char`\"{}small\char`\"{} blocks, one sample at a time to H\+O\+ST D\+R\+AM with minimum latency. An L\+LC system can be implemented in one or multiple A\+C\+Q2106 boxes.
+
+Typical use case\+:
+
+
+\begin{DoxyItemize}
+\item A\+C\+Q2106+4x\+A\+C\+Q424\+E\+L\+F-\/32+2x\+A\+O424\+E\+L\+F32 \+: 128AI, 64AO, run in an L\+LC loop at 100k\+S\+PS.
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md16}{}\doxysubsection{2. Device driver}\label{md_README_autotoc_md16}
+Download from git\+: 
+\begin{DoxyPre}
+mkdir PROJECTS
+cd PROJECTS
+git clone \href{https://github.com/D-TACQ/AFHBA404.git}{\texttt{ https://github.com/D-\/TACQ/AFHBA404.git}}
+cd AFHBA404
+\end{DoxyPre}
+ Now refer to I\+N\+S\+T\+A\+LL 
+\begin{DoxyPre}
+make
+sudo ./scripts/install-\/hotplug
+\end{DoxyPre}
+
+
+\#\hypertarget{md_README_autotoc_md17}{}\doxysection{3. Check A\+F\+H\+B\+A404 firmware}\label{md_README_autotoc_md17}
+
+\begin{DoxyPre}
+[dt100@brotto AFHBA404]\$ sudo ./scripts/afhba404-\/get-\/ident 
+brotto Device d1ac:4104 Device Serial Number af-\/ba-\/40-\/40-\/11-\/00-\/41-\/0b\end{DoxyPre}
+
+
+
+\begin{DoxyPre}af-\/ba-\/40-\/40-\/    : Device ID
+11          : Comms code TT
+00-\/41       : Serial Number (Decimal!)
+0b      : Firmware Revision VV (hex)\end{DoxyPre}
+
+
+
+\begin{DoxyPre}NB: for use with ACQ2106, ALL current units should show:
+VV >= 0x0b. 
+TT == 0x11.
+\end{DoxyPre}
+ The matching A\+C\+Q2106 F\+P\+GA firmware has C\+O\+M\+MS C\+O\+DE 9011, eg 
+\begin{DoxyPre}
+acq2106\_154> grep filename /tmp/fpga\_status 
+generated from filename   : ACQ2106\_TOP\_09\_09\_09\_09\_09\_09\_9011\end{DoxyPre}
+
+
+
+\begin{DoxyPre}ACQ2106\_TOP\_ : Idents ACQ2106
+09\_[09\_]..   : Matches 6 modules sites, in this case ACQ423
+9011         : COMMS MODULE, 90: SFP comms, 11: 6Gbps with error detection/correction
+\end{DoxyPre}
+ If your A\+F\+H\+B\+A404 or A\+C\+Q2106 does N\+OT meet the requirements, please contact D-\/\+T\+A\+CQ for support.\hypertarget{md_README_autotoc_md18}{}\doxysubsection{4. Check Connected Devices}\label{md_README_autotoc_md18}
+
+\begin{DoxyPre}
+[dt100@brotto AFHBA404]\$ sudo ./scripts/get-\/ident-\/all 
+brotto 0 acq2106\_110 A
+brotto 1 acq2106\_110 B
+brotto 2 acq2106\_085 A\end{DoxyPre}
+
+
+
+\begin{DoxyPre}Lists the attached UUT's.\end{DoxyPre}
+
+
+
+\begin{DoxyPre}Linux Device numbers 0,1,2,3 map to local ports A,B,C,D
+brotto 0 acq2106\_110 A\end{DoxyPre}
+
+
+
+\begin{DoxyPre}hostname: brotto    (the HOST PC)
+DEVNUM  : 0         (localport A)
+UUT     : acq2106\_110   (remote host name)
+RPORT   : A             (remote port A)\end{DoxyPre}
+
+
+
+\begin{DoxyPre}NB: the LINK is used for DATA only. Control is via Gigabit Ethernet
+\end{DoxyPre}
+
+
+Ideally, the H\+O\+S\+T\+PC has a D\+NS system (/etc/hosts if no D\+NS) that will allow network software to connect to the U\+UT by name.
+
+For further details, please refer to
+\begin{DoxyItemize}
+\item I\+N\+S\+T\+A\+LL
+\item R\+E\+A\+D\+M\+E.\+A\+C\+Q2106.\+H\+TS
+\item L\+L\+C\+O\+N\+T\+R\+O\+L/\+R\+E\+A\+D\+M\+E.\+A\+F\+H\+B\+A404 
+\end{DoxyItemize}

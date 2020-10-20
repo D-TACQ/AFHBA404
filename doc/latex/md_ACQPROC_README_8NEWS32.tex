@@ -1,0 +1,112 @@
+
+\begin{DoxyItemize}
+\item units each have a free running clock
+\item start continuous capture on A\+F\+H\+BA broadcast T\+RG
+\item instrument system by outputting T\+RG on FP G\+P\+IO at end of each cycle.
+\item ./\+A\+C\+Q\+P\+R\+O\+C/configs/news32.json defines the whole system
+\item ./\+A\+C\+Q\+P\+R\+O\+C/configs/n32.json defines a single-\/box minimal system
+\end{DoxyItemize}\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md32}{}\doxysection{Example Operation with single box\+:}\label{md_ACQPROC_README_8NEWS32_autotoc_md32}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md33}{}\doxysubsection{First, run a control script to configure the box -\/ we like 49999\+Hz because that\textquotesingle{}s the highest setting for H\+R\+\_\+512 mode \+: lowest latency with highest S\+NR}\label{md_ACQPROC_README_8NEWS32_autotoc_md33}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./scripts/acqproc\_config\_freerunning\_acq435 -\/-\/acq435SR 49999 acq2106\_130}
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item View result in cs-\/studio\+: 
+\end{DoxyItemize}\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md34}{}\doxysubsection{Now run the embedded control program}\label{md_ACQPROC_README_8NEWS32_autotoc_md34}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc\_broadcast\_trigger ./ACQPROC/configs/n32.json 1000000}
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item View result in cs-\/studio ... now the system is capturing data.
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item M\+GT page tracks data on the fiber, matching the stream data showing data to local D\+R\+AM
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item View Live result in scope\+: C3 is the output trigger. C2 is the actual signal, zero crossing detected at -\/820 us
+\item GD=39 $\ast$ 20us = 780 us
+\item Overhead of teeing up and broadcasting the marker is O(20us)
+\item =$>$ overhead of the H\+O\+ST SW $<$ 20usec, latency of the input \+: 800us
+\item Assume 4 x free running boxes, all samples collected at the same time\+: skew = +/-\/1 sample (20usec)
+\item Worst case latency\+: 800+20 = 830usec.
+\end{DoxyItemize}
+
+
+
+
+\begin{DoxyItemize}
+\item Measuring the broadcast trigger overhead ... scope shows N\+T\+R\+I\+G\+G\+E\+RS=3 group of 3 at 20usec spacing.. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{VERBOSE=0 RTPRIO=10 NTRIGGERS=3 HW=1 ./acqproc\_broadcast\_trigger configs/n32.json 1000000}
+\end{DoxyCode}
+
+\end{DoxyItemize}
+
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md35}{}\doxysection{Operation with 4 boxes}\label{md_ACQPROC_README_8NEWS32_autotoc_md35}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md36}{}\doxysubsection{Check config with no hardware}\label{md_ACQPROC_README_8NEWS32_autotoc_md36}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{RTPRIO=10 NTRIGGERS=1 HW=0 ./ACQPROC/acqproc\_broadcast\_trigger configs/news32.json 1000000}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md37}{}\doxysubsection{Run with hardware}\label{md_ACQPROC_README_8NEWS32_autotoc_md37}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./scripts/acqproc\_config\_freerunning\_acq435 -\/-\/acq435SR 49999 @ACQPROC/configs/news32.json}
+\DoxyCodeLine{RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc\_broadcast\_trigger configs/news32.json 1000000}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md38}{}\doxysubsection{Run with two hosts and check skew}\label{md_ACQPROC_README_8NEWS32_autotoc_md38}
+
+\begin{DoxyItemize}
+\item connect analog signal to scope \#1
+\item connect analog signal to C\+H01 on each of two boxes, n, s
+\item connect G\+P\+IO output from each of the two boxes to scope channels \#2 and \#3, trigger on one of them 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SITECLIENT\_TRACE=1 ./scripts/acqproc\_config\_freerunning\_acq435 -\/-\/acq435SR 49999 @ACQPROC/configs/ns32.json}
+\DoxyCodeLine{THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc\_broadcast\_trigger ACQPROC/configs/ns32.json 0}
+\end{DoxyCode}
+
+\item \href{DOC/twouuts-2020-06-09_17.45.54.mkv}{\texttt{ }}
+\item T\+H\+C\+H\+A\+N0=0 T\+H\+C\+H\+A\+N1=32 \+:: On alternate cycles, use AI\mbox{[}0\mbox{]} then AI\mbox{[}32\mbox{]} as the source of data eg uut\+N.\+C\+H01, uut\+S.\+C\+H01
+\item Cursor (a) shows the zero crossing detected by software, with output pulse at (b), +800usec
+\item SR=50k\+Hz, 20usec, and with 40 sample group delay, it\textquotesingle{}s 800usec as expected.
+\item The previous output pulse is on the far left of the screen, and is subject to about 20usec wander, this is the \char`\"{}skew\char`\"{} between uutN and uutS, which are running on the same clock.
+\item If they were to run on the same clock, eg with White Rabbit, there\textquotesingle{}d be no wander.
+\end{DoxyItemize}\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md39}{}\doxysubsection{Stopping}\label{md_ACQPROC_README_8NEWS32_autotoc_md39}
+
+\begin{DoxyItemize}
+\item Simply abort the Control Program
+\item Stop all the U\+U\+TS 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./scripts/acqproc\_config\_freerunning\_acq435 -\/-\/stop=1 @ACQPROC/configs/news32.json}
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md40}{}\doxysection{Operation with 4 boxes and M\+E\+A\+N of last N}\label{md_ACQPROC_README_8NEWS32_autotoc_md40}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md41}{}\doxysubsection{Run with hardware}\label{md_ACQPROC_README_8NEWS32_autotoc_md41}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./scripts/acqproc\_config\_freerunning\_acq435 -\/-\/acq435SR 100000 @ACQPROC/configs/news32.json}
+\DoxyCodeLine{RTPRIO=10 NTRIGGERS=1 HW=N ./acqproc\_broadcast\_trigger configs/news32.json 1000000}
+\end{DoxyCode}
+\hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md42}{}\doxysubsubsection{Example\+: S\+R=100k\+Hz, H\+W=1, signal=5k\+Hz}\label{md_ACQPROC_README_8NEWS32_autotoc_md42}
+ \hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md43}{}\doxysubsubsection{Example\+: S\+R=100k\+Hz, H\+W=10, signal=5k\+Hz}\label{md_ACQPROC_README_8NEWS32_autotoc_md43}
+ \hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md44}{}\doxysubsubsection{Example\+: S\+R=100k\+Hz, H\+W=20, signal=5k\+Hz}\label{md_ACQPROC_README_8NEWS32_autotoc_md44}
+In this case, we\textquotesingle{}re averaging over a full cycle, so no threshold crossing, {\itshape {\bfseries{NO O\+U\+T\+P\+UT}}}  \hypertarget{md_ACQPROC_README_8NEWS32_autotoc_md45}{}\doxysubsubsection{Example\+: S\+R=100k\+Hz, H\+W=20, signal=2k\+Hz}\label{md_ACQPROC_README_8NEWS32_autotoc_md45}
+{\itshape {\bfseries{O\+U\+T\+P\+UT restored}}} 
+
+Please try it. Send questions to peter dot \href{mailto:milne@d-tacq.com}{\texttt{ milne@d-\/tacq.\+com}} 

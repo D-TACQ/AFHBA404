@@ -1,0 +1,126 @@
+\hypertarget{afhba__i2c__bus_8c}{}\doxysection{afhba\+\_\+i2c\+\_\+bus.\+c File Reference}
+\label{afhba__i2c__bus_8c}\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+{\ttfamily \#include $<$linux/i2c.\+h$>$}\newline
+{\ttfamily \#include $<$linux/i2c-\/gpio.\+h$>$}\newline
+{\ttfamily \#include $<$linux/i2c-\/algo-\/bit.\+h$>$}\newline
+{\ttfamily \#include $<$linux/init.\+h$>$}\newline
+{\ttfamily \#include $<$linux/module.\+h$>$}\newline
+{\ttfamily \#include $<$linux/moduleparam.\+h$>$}\newline
+{\ttfamily \#include $<$linux/platform\+\_\+device.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{afhba__i2c__bus_8c_a99c3e621aa742a08ae8f989c65f580a5}{G\+E\+TD}}(pdata)~((struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$)(pdata+1)-\/$>$resource)
+\item 
+\#define \mbox{\hyperlink{afhba__i2c__bus_8c_af6938b27063f7d5fb55bdaa7b5556da9}{C\+H\+IX}}(ch)~((ch)==2)	/$\ast$ 2=$>$1 $\ast$=$>$0 $\ast$/
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afhba__i2c__bus_8c_a280d1ba042fbbc67ccf38c90b6e5d013}{hba\+\_\+sfp\+\_\+get\+\_\+value}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, unsigned gpio)
+\item 
+void \mbox{\hyperlink{afhba__i2c__bus_8c_a70c82838e3b328dd91dba538016bd929}{hba\+\_\+sfp\+\_\+set\+\_\+value}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, unsigned gpio, int value)
+\item 
+int \mbox{\hyperlink{afhba__i2c__bus_8c_a449d9f821379f5c991fe166b5f366988}{i2c\+\_\+hba\+\_\+sfp\+\_\+getsda}} (void $\ast$dev)
+\item 
+int \mbox{\hyperlink{afhba__i2c__bus_8c_a687242e7d3f2107e19723240e1935515}{i2c\+\_\+hba\+\_\+sfp\+\_\+getscl}} (void $\ast$dev)
+\item 
+int \mbox{\hyperlink{afhba__i2c__bus_8c_a59491e33009fecc65e763c5e9ab23352}{afhba\+\_\+sfp\+\_\+i2c\+\_\+create}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+int \mbox{\hyperlink{afhba__i2c__bus_8c_a8832b7f4e208f6efe14f84224f21c624}{afhba\+\_\+sfp\+\_\+i2c\+\_\+remove}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+\mbox{\hyperlink{afhba__i2c__bus_8c_a9d88bac58bb7d6687c82ed77b813135f}{module\+\_\+init}} (afhba\+\_\+i2c\+\_\+sfp\+\_\+init)
+\item 
+\mbox{\hyperlink{afhba__i2c__bus_8c_adf6a74612362cdee35df6be7a21970fd}{module\+\_\+exit}} (afhba\+\_\+i2c\+\_\+sfp\+\_\+exit)
+\item 
+\mbox{\hyperlink{afhba__i2c__bus_8c_a60b51613612e5f117c4994244879c370}{M\+O\+D\+U\+L\+E\+\_\+\+A\+U\+T\+H\+OR}} (\char`\"{}Peter Milne $<$peter.\+milne@d-\/tacq.\+com\char`\"{})
+\item 
+\mbox{\hyperlink{afhba__i2c__bus_8c_a31b4a30bc27ef5a0ab9745aebd4deba0}{M\+O\+D\+U\+L\+E\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+I\+ON}} (\char`\"{}A\+CQ-\/F\+I\+B\+ER-\/\mbox{\hyperlink{classHBA}{H\+BA}} \mbox{\hyperlink{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}{I2C}} driver\char`\"{})
+\item 
+\mbox{\hyperlink{afhba__i2c__bus_8c_ad94b36675e7eb067ea3ce6ff9e244a44}{M\+O\+D\+U\+L\+E\+\_\+\+L\+I\+C\+E\+N\+SE}} (\char`\"{}G\+PL\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{afhba__i2c__bus_8c_af6938b27063f7d5fb55bdaa7b5556da9}\label{afhba__i2c__bus_8c_af6938b27063f7d5fb55bdaa7b5556da9}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!CHIX@{CHIX}}
+\index{CHIX@{CHIX}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{CHIX}{CHIX}}
+{\footnotesize\ttfamily \#define C\+H\+IX(\begin{DoxyParamCaption}\item[{}]{ch }\end{DoxyParamCaption})~((ch)==2)	/$\ast$ 2=$>$1 $\ast$=$>$0 $\ast$/}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a99c3e621aa742a08ae8f989c65f580a5}\label{afhba__i2c__bus_8c_a99c3e621aa742a08ae8f989c65f580a5}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!GETD@{GETD}}
+\index{GETD@{GETD}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{GETD}{GETD}}
+{\footnotesize\ttfamily \#define G\+E\+TD(\begin{DoxyParamCaption}\item[{}]{pdata }\end{DoxyParamCaption})~((struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$)(pdata+1)-\/$>$resource)}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a59491e33009fecc65e763c5e9ab23352}\label{afhba__i2c__bus_8c_a59491e33009fecc65e763c5e9ab23352}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!afhba\_sfp\_i2c\_create@{afhba\_sfp\_i2c\_create}}
+\index{afhba\_sfp\_i2c\_create@{afhba\_sfp\_i2c\_create}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_sfp\_i2c\_create()}{afhba\_sfp\_i2c\_create()}}
+{\footnotesize\ttfamily int afhba\+\_\+sfp\+\_\+i2c\+\_\+create (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a8832b7f4e208f6efe14f84224f21c624}\label{afhba__i2c__bus_8c_a8832b7f4e208f6efe14f84224f21c624}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!afhba\_sfp\_i2c\_remove@{afhba\_sfp\_i2c\_remove}}
+\index{afhba\_sfp\_i2c\_remove@{afhba\_sfp\_i2c\_remove}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_sfp\_i2c\_remove()}{afhba\_sfp\_i2c\_remove()}}
+{\footnotesize\ttfamily int afhba\+\_\+sfp\+\_\+i2c\+\_\+remove (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a280d1ba042fbbc67ccf38c90b6e5d013}\label{afhba__i2c__bus_8c_a280d1ba042fbbc67ccf38c90b6e5d013}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!hba\_sfp\_get\_value@{hba\_sfp\_get\_value}}
+\index{hba\_sfp\_get\_value@{hba\_sfp\_get\_value}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{hba\_sfp\_get\_value()}{hba\_sfp\_get\_value()}}
+{\footnotesize\ttfamily int hba\+\_\+sfp\+\_\+get\+\_\+value (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{unsigned}]{gpio }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a70c82838e3b328dd91dba538016bd929}\label{afhba__i2c__bus_8c_a70c82838e3b328dd91dba538016bd929}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!hba\_sfp\_set\_value@{hba\_sfp\_set\_value}}
+\index{hba\_sfp\_set\_value@{hba\_sfp\_set\_value}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{hba\_sfp\_set\_value()}{hba\_sfp\_set\_value()}}
+{\footnotesize\ttfamily void hba\+\_\+sfp\+\_\+set\+\_\+value (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{unsigned}]{gpio,  }\item[{int}]{value }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a687242e7d3f2107e19723240e1935515}\label{afhba__i2c__bus_8c_a687242e7d3f2107e19723240e1935515}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!i2c\_hba\_sfp\_getscl@{i2c\_hba\_sfp\_getscl}}
+\index{i2c\_hba\_sfp\_getscl@{i2c\_hba\_sfp\_getscl}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{i2c\_hba\_sfp\_getscl()}{i2c\_hba\_sfp\_getscl()}}
+{\footnotesize\ttfamily int i2c\+\_\+hba\+\_\+sfp\+\_\+getscl (\begin{DoxyParamCaption}\item[{void $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a449d9f821379f5c991fe166b5f366988}\label{afhba__i2c__bus_8c_a449d9f821379f5c991fe166b5f366988}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!i2c\_hba\_sfp\_getsda@{i2c\_hba\_sfp\_getsda}}
+\index{i2c\_hba\_sfp\_getsda@{i2c\_hba\_sfp\_getsda}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{i2c\_hba\_sfp\_getsda()}{i2c\_hba\_sfp\_getsda()}}
+{\footnotesize\ttfamily int i2c\+\_\+hba\+\_\+sfp\+\_\+getsda (\begin{DoxyParamCaption}\item[{void $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a60b51613612e5f117c4994244879c370}\label{afhba__i2c__bus_8c_a60b51613612e5f117c4994244879c370}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!MODULE\_AUTHOR@{MODULE\_AUTHOR}}
+\index{MODULE\_AUTHOR@{MODULE\_AUTHOR}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_AUTHOR()}{MODULE\_AUTHOR()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+A\+U\+T\+H\+OR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a31b4a30bc27ef5a0ab9745aebd4deba0}\label{afhba__i2c__bus_8c_a31b4a30bc27ef5a0ab9745aebd4deba0}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!MODULE\_DESCRIPTION@{MODULE\_DESCRIPTION}}
+\index{MODULE\_DESCRIPTION@{MODULE\_DESCRIPTION}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_DESCRIPTION()}{MODULE\_DESCRIPTION()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+I\+ON (\begin{DoxyParamCaption}\item[{\char`\"{}A\+CQ-\/F\+I\+B\+ER-\/\mbox{\hyperlink{classHBA}{H\+BA}} \mbox{\hyperlink{acq-fiber-hba_8h_a57ef3faf95cd8ff7d9eca518dca3db87}{I2C}} driver\char`\"{}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_adf6a74612362cdee35df6be7a21970fd}\label{afhba__i2c__bus_8c_adf6a74612362cdee35df6be7a21970fd}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!module\_exit@{module\_exit}}
+\index{module\_exit@{module\_exit}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{module\_exit()}{module\_exit()}}
+{\footnotesize\ttfamily module\+\_\+exit (\begin{DoxyParamCaption}\item[{afhba\+\_\+i2c\+\_\+sfp\+\_\+exit}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_a9d88bac58bb7d6687c82ed77b813135f}\label{afhba__i2c__bus_8c_a9d88bac58bb7d6687c82ed77b813135f}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!module\_init@{module\_init}}
+\index{module\_init@{module\_init}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{module\_init()}{module\_init()}}
+{\footnotesize\ttfamily module\+\_\+init (\begin{DoxyParamCaption}\item[{afhba\+\_\+i2c\+\_\+sfp\+\_\+init}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__i2c__bus_8c_ad94b36675e7eb067ea3ce6ff9e244a44}\label{afhba__i2c__bus_8c_ad94b36675e7eb067ea3ce6ff9e244a44}} 
+\index{afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}!MODULE\_LICENSE@{MODULE\_LICENSE}}
+\index{MODULE\_LICENSE@{MODULE\_LICENSE}!afhba\_i2c\_bus.c@{afhba\_i2c\_bus.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_LICENSE()}{MODULE\_LICENSE()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+L\+I\+C\+E\+N\+SE (\begin{DoxyParamCaption}\item[{\char`\"{}G\+PL\char`\"{}}]{ }\end{DoxyParamCaption})}
+

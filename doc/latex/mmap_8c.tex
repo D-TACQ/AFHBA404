@@ -1,0 +1,142 @@
+\hypertarget{mmap_8c}{}\doxysection{mmap.\+c File Reference}
+\label{mmap_8c}\index{mmap.c@{mmap.c}}
+
+
+memory mapping utility  
+
+
+{\ttfamily \#include \char`\"{}local.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/ioctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$popt.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{mmap_8c_afd7feb39acd312085566c208e35c2362}{F\+N\+A\+ME}}~\char`\"{}/dev/acq32/acq32.\+1.\+raw\char`\"{}
+\item 
+\#define \mbox{\hyperlink{mmap_8c_ae8a798ec5e0449028e485688e8241b5e}{H\+E\+LP}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{mmap_8c_a53ed59058c68995076ad0342dc8327db}{do\+Regs\+Test}} (volatile unsigned $\ast$regs, unsigned $\ast$offsets, int nregs)
+\item 
+int \mbox{\hyperlink{mmap_8c_ae81a7e8362f18038a0a438bff3999e1c}{regs\+Test}} (void $\ast$pmem, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{mmap_8c_ac0f2228420376f4db7e1274f2b41667c}{main}} (int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{mmap_8c_a0a2d59880bbb20fd6d770084cb2cfa2c}{acq200\+\_\+debug}}
+\item 
+int \mbox{\hyperlink{mmap_8c_adb50a8c81aea224cc470486d3195f734}{G\+\_\+fail}}
+\item 
+int \mbox{\hyperlink{mmap_8c_ac5a2acc6f8542b700a9dbfc135889c8e}{G\+\_\+pass}}
+\item 
+int \mbox{\hyperlink{mmap_8c_ae35e933edb9849f57764536b70663f35}{please\+\_\+quit}}
+\item 
+int \mbox{\hyperlink{mmap_8c_a9c2fef3d948fbb905ca8252d94da30ef}{alarm\+\_\+set}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+memory mapping utility 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{mmap_8c_afd7feb39acd312085566c208e35c2362}\label{mmap_8c_afd7feb39acd312085566c208e35c2362}} 
+\index{mmap.c@{mmap.c}!FNAME@{FNAME}}
+\index{FNAME@{FNAME}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{FNAME}{FNAME}}
+{\footnotesize\ttfamily \#define F\+N\+A\+ME~\char`\"{}/dev/acq32/acq32.\+1.\+raw\char`\"{}}
+
+\mbox{\Hypertarget{mmap_8c_ae8a798ec5e0449028e485688e8241b5e}\label{mmap_8c_ae8a798ec5e0449028e485688e8241b5e}} 
+\index{mmap.c@{mmap.c}!HELP@{HELP}}
+\index{HELP@{HELP}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{HELP}{HELP}}
+{\footnotesize\ttfamily \#define H\+E\+LP}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    \textcolor{stringliteral}{"mmap \$Revision: 1.4 \$\(\backslash\)n"}                   \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"usage: mmap opts\(\backslash\)n"}                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/f device name\(\backslash\)n"}                      \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/r read [default]\(\backslash\)n"}                   \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/w write\(\backslash\)n"}                        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/n nop (just block, holding the mapping)\(\backslash\)n"}        \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/o offset\(\backslash\)n"}                       \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    -\/l length\(\backslash\)n"}                       \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"maps device [ram] space and either\(\backslash\)n"}              \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"    reads from ram to stdout\(\backslash\)n"}                \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"-\/or-\/writes to ram from stdin\(\backslash\)n"}                \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"   -\/b [-\/v value] = block fill [default 0xdeadbeef]\(\backslash\)n"}      \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{"   -\/T [list of test regs] registers walking bit test\(\backslash\)n"}    \(\backslash\)}
+\DoxyCodeLine{    \textcolor{stringliteral}{""}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{mmap_8c_a53ed59058c68995076ad0342dc8327db}\label{mmap_8c_a53ed59058c68995076ad0342dc8327db}} 
+\index{mmap.c@{mmap.c}!doRegsTest@{doRegsTest}}
+\index{doRegsTest@{doRegsTest}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{doRegsTest()}{doRegsTest()}}
+{\footnotesize\ttfamily int do\+Regs\+Test (\begin{DoxyParamCaption}\item[{volatile unsigned $\ast$}]{regs,  }\item[{unsigned $\ast$}]{offsets,  }\item[{int}]{nregs }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mmap_8c_ac0f2228420376f4db7e1274f2b41667c}\label{mmap_8c_ac0f2228420376f4db7e1274f2b41667c}} 
+\index{mmap.c@{mmap.c}!main@{main}}
+\index{main@{main}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mmap_8c_ae81a7e8362f18038a0a438bff3999e1c}\label{mmap_8c_ae81a7e8362f18038a0a438bff3999e1c}} 
+\index{mmap.c@{mmap.c}!regsTest@{regsTest}}
+\index{regsTest@{regsTest}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{regsTest()}{regsTest()}}
+{\footnotesize\ttfamily int regs\+Test (\begin{DoxyParamCaption}\item[{void $\ast$}]{pmem,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{mmap_8c_a0a2d59880bbb20fd6d770084cb2cfa2c}\label{mmap_8c_a0a2d59880bbb20fd6d770084cb2cfa2c}} 
+\index{mmap.c@{mmap.c}!acq200\_debug@{acq200\_debug}}
+\index{acq200\_debug@{acq200\_debug}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{acq200\_debug}{acq200\_debug}}
+{\footnotesize\ttfamily int acq200\+\_\+debug}
+
+\mbox{\Hypertarget{mmap_8c_a9c2fef3d948fbb905ca8252d94da30ef}\label{mmap_8c_a9c2fef3d948fbb905ca8252d94da30ef}} 
+\index{mmap.c@{mmap.c}!alarm\_set@{alarm\_set}}
+\index{alarm\_set@{alarm\_set}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{alarm\_set}{alarm\_set}}
+{\footnotesize\ttfamily int alarm\+\_\+set}
+
+\mbox{\Hypertarget{mmap_8c_adb50a8c81aea224cc470486d3195f734}\label{mmap_8c_adb50a8c81aea224cc470486d3195f734}} 
+\index{mmap.c@{mmap.c}!G\_fail@{G\_fail}}
+\index{G\_fail@{G\_fail}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{G\_fail}{G\_fail}}
+{\footnotesize\ttfamily int G\+\_\+fail}
+
+\mbox{\Hypertarget{mmap_8c_ac5a2acc6f8542b700a9dbfc135889c8e}\label{mmap_8c_ac5a2acc6f8542b700a9dbfc135889c8e}} 
+\index{mmap.c@{mmap.c}!G\_pass@{G\_pass}}
+\index{G\_pass@{G\_pass}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{G\_pass}{G\_pass}}
+{\footnotesize\ttfamily int G\+\_\+pass}
+
+\mbox{\Hypertarget{mmap_8c_ae35e933edb9849f57764536b70663f35}\label{mmap_8c_ae35e933edb9849f57764536b70663f35}} 
+\index{mmap.c@{mmap.c}!please\_quit@{please\_quit}}
+\index{please\_quit@{please\_quit}!mmap.c@{mmap.c}}
+\doxysubsubsection{\texorpdfstring{please\_quit}{please\_quit}}
+{\footnotesize\ttfamily int please\+\_\+quit}
+

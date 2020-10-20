@@ -1,0 +1,63 @@
+\hypertarget{afs__procfs_8c}{}\doxysection{afs\+\_\+procfs.\+c File Reference}
+\label{afs__procfs_8c}\index{afs\_procfs.c@{afs\_procfs.c}}
+
+
+procfs interface, simple diagnostics  
+
+
+{\ttfamily \#include $<$linux/seq\+\_\+file.\+h$>$}\newline
+{\ttfamily \#include $<$linux/proc\+\_\+fs.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}afhba\+\_\+stream\+\_\+drv.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afs__procfs_8c_a501cdc1ad7581bfe972a424488e9cb4e}{afs\+\_\+init\+\_\+procfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afs__procfs_8c_a5e6733abb143b0f91bda273e6b0ebbbc}{nbuffers}}
+\item 
+struct list\+\_\+head \mbox{\hyperlink{afs__procfs_8c_ae8d2eb1056d08ba1a907d66aedcdf3b9}{afhba\+\_\+devices}}
+\item 
+struct proc\+\_\+dir\+\_\+entry $\ast$ \mbox{\hyperlink{afs__procfs_8c_acd52fd151503680f39ce0a54775f1bfe}{afs\+\_\+proc\+\_\+root}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+procfs interface, simple diagnostics 
+
+
+\begin{DoxyItemize}
+\item -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/--- 
+\end{DoxyItemize}
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afs__procfs_8c_a501cdc1ad7581bfe972a424488e9cb4e}\label{afs__procfs_8c_a501cdc1ad7581bfe972a424488e9cb4e}} 
+\index{afs\_procfs.c@{afs\_procfs.c}!afs\_init\_procfs@{afs\_init\_procfs}}
+\index{afs\_init\_procfs@{afs\_init\_procfs}!afs\_procfs.c@{afs\_procfs.c}}
+\doxysubsubsection{\texorpdfstring{afs\_init\_procfs()}{afs\_init\_procfs()}}
+{\footnotesize\ttfamily int afs\+\_\+init\+\_\+procfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{afs__procfs_8c_ae8d2eb1056d08ba1a907d66aedcdf3b9}\label{afs__procfs_8c_ae8d2eb1056d08ba1a907d66aedcdf3b9}} 
+\index{afs\_procfs.c@{afs\_procfs.c}!afhba\_devices@{afhba\_devices}}
+\index{afhba\_devices@{afhba\_devices}!afs\_procfs.c@{afs\_procfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_devices}{afhba\_devices}}
+{\footnotesize\ttfamily struct list\+\_\+head afhba\+\_\+devices}
+
+\mbox{\Hypertarget{afs__procfs_8c_acd52fd151503680f39ce0a54775f1bfe}\label{afs__procfs_8c_acd52fd151503680f39ce0a54775f1bfe}} 
+\index{afs\_procfs.c@{afs\_procfs.c}!afs\_proc\_root@{afs\_proc\_root}}
+\index{afs\_proc\_root@{afs\_proc\_root}!afs\_procfs.c@{afs\_procfs.c}}
+\doxysubsubsection{\texorpdfstring{afs\_proc\_root}{afs\_proc\_root}}
+{\footnotesize\ttfamily struct proc\+\_\+dir\+\_\+entry$\ast$ afs\+\_\+proc\+\_\+root}
+
+\mbox{\Hypertarget{afs__procfs_8c_a5e6733abb143b0f91bda273e6b0ebbbc}\label{afs__procfs_8c_a5e6733abb143b0f91bda273e6b0ebbbc}} 
+\index{afs\_procfs.c@{afs\_procfs.c}!nbuffers@{nbuffers}}
+\index{nbuffers@{nbuffers}!afs\_procfs.c@{afs\_procfs.c}}
+\doxysubsubsection{\texorpdfstring{nbuffers}{nbuffers}}
+{\footnotesize\ttfamily int nbuffers}
+

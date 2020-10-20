@@ -1,0 +1,82 @@
+\hypertarget{afhba__debugfs_8c}{}\doxysection{afhba\+\_\+debugfs.\+c File Reference}
+\label{afhba__debugfs_8c}\index{afhba\_debugfs.c@{afhba\_debugfs.c}}
+
+
+debug register access  
+
+
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$linux/debugfs.\+h$>$}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{afhba__debugfs_8c_a66c28a471d758730af88340c59a39334}{N\+U\+M\+\_\+\+R\+E\+G\+\_\+\+C\+R\+E\+A\+TE}}(dir,  va,  reg)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{afhba__debugfs_8c_adde1eb218d466eb5f31a50180b874214}{afhba\+\_\+create\+Debugfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__debugfs_8c_a932f2002a926a3384fabc587da35f44f}{afhba\+\_\+remove\+Debugfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct dentry $\ast$ \mbox{\hyperlink{afhba__debugfs_8c_a90ba514d30c0267cf0879d59da835016}{afhba\+\_\+debug\+\_\+root}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+debug register access 
+
+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/--- $\ast$ Copyright (C) 2014 Peter Milne, D-\/\+T\+A\+CQ Solutions Ltd ~\newline
+ $<$peter dot milne at D hyphen T\+A\+C\+Q dot com$>$ ~\newline
+ www.\+d-\/tacq.\+com Created on\+: 11 Aug 2014 ~\newline
+ Author\+: pgm ~\newline
+
+\begin{DoxyItemize}
+\item This program is free software; you can redistribute it and/or modify $\ast$ it under the terms of Version 2 of the G\+NU General Public License $\ast$ as published by the Free Software Foundation; $\ast$
+\item This program is distributed in the hope that it will be useful, $\ast$ but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of $\ast$ M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the $\ast$ G\+NU General Public License for more details. $\ast$
+\item You should have received a copy of the G\+NU General Public License $\ast$ along with this program; if not, write to the Free Software $\ast$ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, U\+SA. ~\newline
+ 
+\end{DoxyItemize}
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{afhba__debugfs_8c_a66c28a471d758730af88340c59a39334}\label{afhba__debugfs_8c_a66c28a471d758730af88340c59a39334}} 
+\index{afhba\_debugfs.c@{afhba\_debugfs.c}!NUM\_REG\_CREATE@{NUM\_REG\_CREATE}}
+\index{NUM\_REG\_CREATE@{NUM\_REG\_CREATE}!afhba\_debugfs.c@{afhba\_debugfs.c}}
+\doxysubsubsection{\texorpdfstring{NUM\_REG\_CREATE}{NUM\_REG\_CREATE}}
+{\footnotesize\ttfamily \#define N\+U\+M\+\_\+\+R\+E\+G\+\_\+\+C\+R\+E\+A\+TE(\begin{DoxyParamCaption}\item[{}]{dir,  }\item[{}]{va,  }\item[{}]{reg }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    sprintf(pcursor, \textcolor{stringliteral}{"0x\%04lx"}, reg);               \(\backslash\)}
+\DoxyCodeLine{    debugfs\_create\_x32(pcursor, S\_IRUGO|S\_IWUGO, dir, va+(reg));    \(\backslash\)}
+\DoxyCodeLine{    pcursor += strlen(pcursor) + 1;                 \(\backslash\)}
+\DoxyCodeLine{    if (pcursor-\/pbase >= 4096) \{ WARN\_ON(\textcolor{keyword}{true}); \textcolor{keywordflow}{return}; \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__debugfs_8c_adde1eb218d466eb5f31a50180b874214}\label{afhba__debugfs_8c_adde1eb218d466eb5f31a50180b874214}} 
+\index{afhba\_debugfs.c@{afhba\_debugfs.c}!afhba\_createDebugfs@{afhba\_createDebugfs}}
+\index{afhba\_createDebugfs@{afhba\_createDebugfs}!afhba\_debugfs.c@{afhba\_debugfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_createDebugfs()}{afhba\_createDebugfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+create\+Debugfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__debugfs_8c_a932f2002a926a3384fabc587da35f44f}\label{afhba__debugfs_8c_a932f2002a926a3384fabc587da35f44f}} 
+\index{afhba\_debugfs.c@{afhba\_debugfs.c}!afhba\_removeDebugfs@{afhba\_removeDebugfs}}
+\index{afhba\_removeDebugfs@{afhba\_removeDebugfs}!afhba\_debugfs.c@{afhba\_debugfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_removeDebugfs()}{afhba\_removeDebugfs()}}
+{\footnotesize\ttfamily void afhba\+\_\+remove\+Debugfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{afhba__debugfs_8c_a90ba514d30c0267cf0879d59da835016}\label{afhba__debugfs_8c_a90ba514d30c0267cf0879d59da835016}} 
+\index{afhba\_debugfs.c@{afhba\_debugfs.c}!afhba\_debug\_root@{afhba\_debug\_root}}
+\index{afhba\_debug\_root@{afhba\_debug\_root}!afhba\_debugfs.c@{afhba\_debugfs.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_debug\_root}{afhba\_debug\_root}}
+{\footnotesize\ttfamily struct dentry$\ast$ afhba\+\_\+debug\+\_\+root}
+

@@ -1,0 +1,79 @@
+\hypertarget{acqproc_8cpp}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/acqproc.cpp File Reference}
+\label{acqproc_8cpp}\index{ACQPROC/acqproc.cpp@{ACQPROC/acqproc.cpp}}
+
+
+main program with UI, instantiates system. acqproc\+\_\+th.\+cpp \+: test harness  
+
+
+{\ttfamily \#include \char`\"{}afhba-\/llcontrol.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include \char`\"{}Acq\+Sys.\+h\char`\"{}}\newline
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceG}{G}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{acqproc_8cpp_a2abda385c203496976e3fe00bad0cef1}{getenv}} (const char $\ast$key, int def, int($\ast$cvt)(const char $\ast$key))
+\item 
+const char $\ast$ \mbox{\hyperlink{acqproc_8cpp_aef36f3c7cf544588f534c36f9d892b7f}{ui}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{acqproc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{acqproc_8cpp_a52d07f959b74576585992cde0d113c27}{sched\+\_\+fifo\+\_\+priority}}
+\item 
+int \mbox{\hyperlink{namespaceG_a35372d47075003766734f9bd25f04a03}{G\+::verbose}} = \+::\mbox{\hyperlink{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}{getenv}}(\char`\"{}V\+E\+R\+B\+O\+SE\char`\"{}, 0)
+\item 
+int \mbox{\hyperlink{namespaceG_a88eacded90dd5d15fc8e96e84974b109}{G\+::dummy\+\_\+first\+\_\+loop}} = \+::\mbox{\hyperlink{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}{getenv}}(\char`\"{}D\+U\+M\+M\+Y\+\_\+\+F\+I\+R\+S\+T\+\_\+\+L\+O\+OP\char`\"{}, 0)
+\begin{DoxyCompactList}\small\item\em possible speed up by filling cache first loop \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{namespaceG_a49632423ca0782d8fb71ebeff941f3d2}{G\+::\+M\+A\+X\+L\+OG}} = \+::\mbox{\hyperlink{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}{getenv}}(\char`\"{}M\+A\+X\+L\+OG\char`\"{}, 1000000)
+\begin{DoxyCompactList}\small\item\em avoid oom \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{namespaceG_aea21e432d73ce7514acc2fd20b25d677}{G\+::samples\+\_\+buffer}} = 1
+\begin{DoxyCompactList}\small\item\em number of samples in each \mbox{\hyperlink{structVI}{VI}} buffer (default\+:1) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{namespaceG_a905277e37deb267c650d895144633e72}{G\+::nsamples}} = 2
+\begin{DoxyCompactList}\small\item\em samples to capture (default\+:2, typ 200000) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{namespaceG_a136e633f9149f1d6ce6919ce55785f14}{G\+::maxpoll}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+main program with UI, instantiates system. acqproc\+\_\+th.\+cpp \+: test harness 
+
+Created on\+: 27 Feb 2020 Author\+: pgm 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{acqproc_8cpp_a2abda385c203496976e3fe00bad0cef1}\label{acqproc_8cpp_a2abda385c203496976e3fe00bad0cef1}} 
+\index{acqproc.cpp@{acqproc.cpp}!getenv@{getenv}}
+\index{getenv@{getenv}!acqproc.cpp@{acqproc.cpp}}
+\doxysubsubsection{\texorpdfstring{getenv()}{getenv()}}
+{\footnotesize\ttfamily int getenv (\begin{DoxyParamCaption}\item[{const char $\ast$}]{key,  }\item[{int}]{def,  }\item[{int($\ast$)(const char $\ast$key)}]{cvt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acqproc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\label{acqproc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}} 
+\index{acqproc.cpp@{acqproc.cpp}!main@{main}}
+\index{main@{main}!acqproc.cpp@{acqproc.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acqproc_8cpp_aef36f3c7cf544588f534c36f9d892b7f}\label{acqproc_8cpp_aef36f3c7cf544588f534c36f9d892b7f}} 
+\index{acqproc.cpp@{acqproc.cpp}!ui@{ui}}
+\index{ui@{ui}!acqproc.cpp@{acqproc.cpp}}
+\doxysubsubsection{\texorpdfstring{ui()}{ui()}}
+{\footnotesize\ttfamily const char$\ast$ ui (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{acqproc_8cpp_a52d07f959b74576585992cde0d113c27}\label{acqproc_8cpp_a52d07f959b74576585992cde0d113c27}} 
+\index{acqproc.cpp@{acqproc.cpp}!sched\_fifo\_priority@{sched\_fifo\_priority}}
+\index{sched\_fifo\_priority@{sched\_fifo\_priority}!acqproc.cpp@{acqproc.cpp}}
+\doxysubsubsection{\texorpdfstring{sched\_fifo\_priority}{sched\_fifo\_priority}}
+{\footnotesize\ttfamily int sched\+\_\+fifo\+\_\+priority}
+

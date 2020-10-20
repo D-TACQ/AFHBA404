@@ -1,0 +1,161 @@
+\hypertarget{classACQ__HW__MEAN}{}\doxysection{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN Class Reference}
+\label{classACQ__HW__MEAN}\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+
+
+output the mean of {\bfseries{nb}} values  
+
+
+Inheritance diagram for A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classACQ__HW__MEAN}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classACQ__HW__MEAN_aacb28d6fd6081bac47c4352077245be2}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}} (int \mbox{\hyperlink{classACQ_a2af6cf10b6644724bfedc1fb5fa7a976}{devnum}}, string \+\_\+name, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi\+\_\+offsets, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo\+\_\+offsets, \mbox{\hyperlink{structVI}{VI}} \&sys\+\_\+vi\+\_\+cursor, \mbox{\hyperlink{structVO}{VO}} \&sys\+\_\+vo\+\_\+cursor, int \mbox{\hyperlink{classACQ__HW__MEAN_a486eeaa3dea8b7960ce56b56546b2244}{nmean}})
+\item 
+virtual \mbox{\hyperlink{classACQ__HW__MEAN_a00929aab9efd493afc36dfa005497980}{$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}} ()
+\item 
+virtual bool \mbox{\hyperlink{classACQ__HW__MEAN_a778998401cf2320de0d33420fbaed520}{new\+Sample}} (int \mbox{\hyperlink{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}{sample}})
+\begin{DoxyCompactList}\small\item\em checks host buffer for new sample, if so copies to lbuf and reports true \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}{action}} (\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&system\+Interface)
+\begin{DoxyCompactList}\small\item\em on new\+Sample, copy \mbox{\hyperlink{structVO}{VO}} from SI, copy \mbox{\hyperlink{structVI}{VI}} to SI \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classACQ__HW__MEAN_a61b816cd6716f9ad0c7dcb603b2df185}{action2}} (\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&system\+Interface)
+\begin{DoxyCompactList}\small\item\em late \mbox{\hyperlink{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}{action()}}, cleanup \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classACQ__HW__MEAN_a266948ad18a097319007b37db7c5d34b}{\+\_\+new\+Sample}} (int \mbox{\hyperlink{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}{sample}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const int \& \mbox{\hyperlink{classACQ__HW__MEAN_a486eeaa3dea8b7960ce56b56546b2244}{nmean}}
+\item 
+unsigned $\ast$ \mbox{\hyperlink{classACQ__HW__MEAN_a82361ec5cf56ede0b8e8d6016fbca7b1}{dox}}
+\item 
+int $\ast$$\ast$ \mbox{\hyperlink{classACQ__HW__MEAN_aa7d8ae7f818f7a4bb28041a6f7986f64}{raw}}
+\item 
+unsigned $\ast$ \mbox{\hyperlink{classACQ__HW__MEAN_a2d998db72eda726e6a559be81a1be509}{tl0\+\_\+array}}
+\item 
+int \mbox{\hyperlink{classACQ__HW__MEAN_afa8a6ea570848157b2bf8a4a9af71bfa}{verbose}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+output the mean of {\bfseries{nb}} values 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classACQ__HW__MEAN_aacb28d6fd6081bac47c4352077245be2}\label{classACQ__HW__MEAN_aacb28d6fd6081bac47c4352077245be2}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{ACQ\_HW\_MEAN()}{ACQ\_HW\_MEAN()}}
+{\footnotesize\ttfamily A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN (\begin{DoxyParamCaption}\item[{int}]{devnum,  }\item[{string}]{\+\_\+name,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVI}{VI}} \&}]{sys\+\_\+vi\+\_\+cursor,  }\item[{\mbox{\hyperlink{structVO}{VO}} \&}]{sys\+\_\+vo\+\_\+cursor,  }\item[{int}]{nmean }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a00929aab9efd493afc36dfa005497980}\label{classACQ__HW__MEAN_a00929aab9efd493afc36dfa005497980}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!````~ACQ\_HW\_MEAN@{$\sim$ACQ\_HW\_MEAN}}
+\index{````~ACQ\_HW\_MEAN@{$\sim$ACQ\_HW\_MEAN}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{$\sim$ACQ\_HW\_MEAN()}{~ACQ\_HW\_MEAN()}}
+{\footnotesize\ttfamily virtual A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classACQ__HW__MEAN_a266948ad18a097319007b37db7c5d34b}\label{classACQ__HW__MEAN_a266948ad18a097319007b37db7c5d34b}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!\_newSample@{\_newSample}}
+\index{\_newSample@{\_newSample}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{\_newSample()}{\_newSample()}}
+{\footnotesize\ttfamily bool A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::\+\_\+new\+Sample (\begin{DoxyParamCaption}\item[{int}]{sample }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}\label{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!action@{action}}
+\index{action@{action}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{action()}{action()}}
+{\footnotesize\ttfamily void A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&}]{system\+Interface }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+on new\+Sample, copy \mbox{\hyperlink{structVO}{VO}} from SI, copy \mbox{\hyperlink{structVI}{VI}} to SI 
+
+S\+I\+M\+P\+L\+I\+FY\+: supports A\+I32 O\+N\+L\+Y! C\+O\+M\+P\+L\+E\+X\+I\+FY \+: re-\/scale as LJ 24 bit number so that HW=1 threshold is still valid, then OR the channel ID back in.
+
+Reimplemented from \mbox{\hyperlink{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE}}.
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a61b816cd6716f9ad0c7dcb603b2df185}\label{classACQ__HW__MEAN_a61b816cd6716f9ad0c7dcb603b2df185}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!action2@{action2}}
+\index{action2@{action2}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{action2()}{action2()}}
+{\footnotesize\ttfamily void A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::action2 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&}]{system\+Interface }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+late \mbox{\hyperlink{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}{action()}}, cleanup 
+
+
+
+Reimplemented from \mbox{\hyperlink{classACQ__HW__BASE_ab4dcb6b80b0468f3eafa7a48ad9f70a0}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE}}.
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a778998401cf2320de0d33420fbaed520}\label{classACQ__HW__MEAN_a778998401cf2320de0d33420fbaed520}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!newSample@{newSample}}
+\index{newSample@{newSample}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{newSample()}{newSample()}}
+{\footnotesize\ttfamily bool A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::new\+Sample (\begin{DoxyParamCaption}\item[{int}]{sample }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+checks host buffer for new sample, if so copies to lbuf and reports true 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sample} & checks host buffer for new sample, if so copies to lbuf and reports true \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classACQ__HW__MULTI_a3959a4858f45647c937e8d116860a505}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+U\+L\+TI}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classACQ__HW__MEAN__SKIPPER_ab73b2470efa4617e9dbf2da7976ab278}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classACQ__HW__MEAN_a82361ec5cf56ede0b8e8d6016fbca7b1}\label{classACQ__HW__MEAN_a82361ec5cf56ede0b8e8d6016fbca7b1}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!dox@{dox}}
+\index{dox@{dox}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{dox}{dox}}
+{\footnotesize\ttfamily unsigned$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::dox\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a486eeaa3dea8b7960ce56b56546b2244}\label{classACQ__HW__MEAN_a486eeaa3dea8b7960ce56b56546b2244}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!nmean@{nmean}}
+\index{nmean@{nmean}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{nmean}{nmean}}
+{\footnotesize\ttfamily const int\& A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::nmean\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_aa7d8ae7f818f7a4bb28041a6f7986f64}\label{classACQ__HW__MEAN_aa7d8ae7f818f7a4bb28041a6f7986f64}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!raw@{raw}}
+\index{raw@{raw}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{raw}{raw}}
+{\footnotesize\ttfamily int$\ast$$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::raw\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_a2d998db72eda726e6a559be81a1be509}\label{classACQ__HW__MEAN_a2d998db72eda726e6a559be81a1be509}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!tl0\_array@{tl0\_array}}
+\index{tl0\_array@{tl0\_array}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{tl0\_array}{tl0\_array}}
+{\footnotesize\ttfamily unsigned$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::tl0\+\_\+array\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__MEAN_afa8a6ea570848157b2bf8a4a9af71bfa}\label{classACQ__HW__MEAN_afa8a6ea570848157b2bf8a4a9af71bfa}} 
+\index{ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}!verbose@{verbose}}
+\index{verbose@{verbose}!ACQ\_HW\_MEAN@{ACQ\_HW\_MEAN}}
+\doxysubsubsection{\texorpdfstring{verbose}{verbose}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+::verbose\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}}\end{DoxyCompactItemize}

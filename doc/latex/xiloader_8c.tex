@@ -1,0 +1,217 @@
+\hypertarget{xiloader_8c}{}\doxysection{xiloader.\+c File Reference}
+\label{xiloader_8c}\index{xiloader.c@{xiloader.c}}
+
+
+decode/load xilinx .bit file  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$inttypes.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$ctype.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}popt.\+h\char`\"{}}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structOptions}{Options}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_a6418c657b08e4c44baaf696e042871ab}{V\+E\+R\+ID}}~\char`\"{}xiloader r1.\+01 (c) D-\/T\+A\+CQ Solutions\char`\"{}
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_a0b90c74e66c9d4e2786247473b5591f3}{F\+P\+G\+A\+\_\+\+P\+O\+RT}}~\char`\"{}/dev/xdevcfg\char`\"{}
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_acbe968dbd904e18df869b4e53d2b3e0b}{S\+T\+D\+O\+U\+T\+\_\+\+S\+TR}}~\char`\"{}-\/\char`\"{}
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_acb6e444884f99fd80faf38058920ceef}{S\+T\+D\+I\+N\+\_\+\+S\+TR}}~\char`\"{}-\/\char`\"{}
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_a66500afc3dbca9b5d134f0d14f34d3aa}{B\+Y\+T\+E\+S\+W\+AP}}(val)~bs(val)
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_a0a49896eb77a1c4636ef31394d88539b}{M\+A\+X\+H\+E\+A\+D\+ER}}~1024
+\item 
+\#define \mbox{\hyperlink{xiloader_8c_ad9eafae91d44d0b27f4897a699fcc038}{M\+A\+X1\+W\+R\+I\+TE}}~0x100000
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned \mbox{\hyperlink{xiloader_8c_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{xiloader_8c_a115dc3857ff745e8cc6ad741714167ea}{get\+\_\+options}} (int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{xiloader_8c_a0b6467d54529ff75c5b780a5918be940}{input\+\_\+size\+\_\+unknown}} ()
+\item 
+int \mbox{\hyperlink{xiloader_8c_acea302a2798b98017865a897a092ee82}{getdata}} (void $\ast$$\ast$buffer)
+\item 
+void $\ast$ \mbox{\hyperlink{xiloader_8c_ac787b10428c763edbc28f905ded44987}{get\+\_\+remaining\+\_\+data}} (void $\ast$buffer, int buffer\+\_\+size)
+\item 
+int \mbox{\hyperlink{xiloader_8c_a0806050a82c2acb5346157656472e83e}{triplet}} (uint8\+\_\+t $\ast$cursor, uint8\+\_\+t t1, uint8\+\_\+t t2, uint8\+\_\+t t3)
+\item 
+void \mbox{\hyperlink{xiloader_8c_aae5cd979d9267e0a7d9a5abebcaa9652}{print\+\_\+header}} (uint8\+\_\+t $\ast$header, int eoh\+\_\+location, int stream\+\_\+size)
+\item 
+void \mbox{\hyperlink{xiloader_8c_a223348a405b98f7cec1d63a16c58d07e}{load\+\_\+bitstream}} (uint32\+\_\+t $\ast$bitstream, int nbytes)
+\item 
+int \mbox{\hyperlink{xiloader_8c_ae00ef4ade27801afbbaf6e9fd9668636}{is\+\_\+bitstream\+\_\+marker}} (uint8\+\_\+t $\ast$cursor)
+\item 
+int \mbox{\hyperlink{xiloader_8c_ac0f2228420376f4db7e1274f2b41667c}{main}} (int argc, const char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structOptions}{Options}} \mbox{\hyperlink{xiloader_8c_a455f845b69eb490933e2c47fd0369c82}{O\+P\+TS}}
+\item 
+F\+I\+LE $\ast$ \mbox{\hyperlink{xiloader_8c_a648dfa11e36316ab3a5bc94679171ecf}{ifp}}
+\item 
+int \mbox{\hyperlink{xiloader_8c_af1dc6455c990040d246c28dff4702059}{icursor}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+decode/load xilinx .bit file 
+
+Refs\+: 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{xiloader_8c_a66500afc3dbca9b5d134f0d14f34d3aa}\label{xiloader_8c_a66500afc3dbca9b5d134f0d14f34d3aa}} 
+\index{xiloader.c@{xiloader.c}!BYTESWAP@{BYTESWAP}}
+\index{BYTESWAP@{BYTESWAP}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{BYTESWAP}{BYTESWAP}}
+{\footnotesize\ttfamily \#define B\+Y\+T\+E\+S\+W\+AP(\begin{DoxyParamCaption}\item[{}]{val }\end{DoxyParamCaption})~bs(val)}
+
+\mbox{\Hypertarget{xiloader_8c_a0b90c74e66c9d4e2786247473b5591f3}\label{xiloader_8c_a0b90c74e66c9d4e2786247473b5591f3}} 
+\index{xiloader.c@{xiloader.c}!FPGA\_PORT@{FPGA\_PORT}}
+\index{FPGA\_PORT@{FPGA\_PORT}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{FPGA\_PORT}{FPGA\_PORT}}
+{\footnotesize\ttfamily \#define F\+P\+G\+A\+\_\+\+P\+O\+RT~\char`\"{}/dev/xdevcfg\char`\"{}}
+
+\mbox{\Hypertarget{xiloader_8c_ad9eafae91d44d0b27f4897a699fcc038}\label{xiloader_8c_ad9eafae91d44d0b27f4897a699fcc038}} 
+\index{xiloader.c@{xiloader.c}!MAX1WRITE@{MAX1WRITE}}
+\index{MAX1WRITE@{MAX1WRITE}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{MAX1WRITE}{MAX1WRITE}}
+{\footnotesize\ttfamily \#define M\+A\+X1\+W\+R\+I\+TE~0x100000}
+
+\mbox{\Hypertarget{xiloader_8c_a0a49896eb77a1c4636ef31394d88539b}\label{xiloader_8c_a0a49896eb77a1c4636ef31394d88539b}} 
+\index{xiloader.c@{xiloader.c}!MAXHEADER@{MAXHEADER}}
+\index{MAXHEADER@{MAXHEADER}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{MAXHEADER}{MAXHEADER}}
+{\footnotesize\ttfamily \#define M\+A\+X\+H\+E\+A\+D\+ER~1024}
+
+\mbox{\Hypertarget{xiloader_8c_acb6e444884f99fd80faf38058920ceef}\label{xiloader_8c_acb6e444884f99fd80faf38058920ceef}} 
+\index{xiloader.c@{xiloader.c}!STDIN\_STR@{STDIN\_STR}}
+\index{STDIN\_STR@{STDIN\_STR}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{STDIN\_STR}{STDIN\_STR}}
+{\footnotesize\ttfamily \#define S\+T\+D\+I\+N\+\_\+\+S\+TR~\char`\"{}-\/\char`\"{}}
+
+\mbox{\Hypertarget{xiloader_8c_acbe968dbd904e18df869b4e53d2b3e0b}\label{xiloader_8c_acbe968dbd904e18df869b4e53d2b3e0b}} 
+\index{xiloader.c@{xiloader.c}!STDOUT\_STR@{STDOUT\_STR}}
+\index{STDOUT\_STR@{STDOUT\_STR}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{STDOUT\_STR}{STDOUT\_STR}}
+{\footnotesize\ttfamily \#define S\+T\+D\+O\+U\+T\+\_\+\+S\+TR~\char`\"{}-\/\char`\"{}}
+
+\mbox{\Hypertarget{xiloader_8c_a6418c657b08e4c44baaf696e042871ab}\label{xiloader_8c_a6418c657b08e4c44baaf696e042871ab}} 
+\index{xiloader.c@{xiloader.c}!VERID@{VERID}}
+\index{VERID@{VERID}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{VERID}{VERID}}
+{\footnotesize\ttfamily \#define V\+E\+R\+ID~\char`\"{}xiloader r1.\+01 (c) D-\/T\+A\+CQ Solutions\char`\"{}}
+
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{xiloader_8c_ae0a7c37f5a766b8e881b7ca59f579d01}\label{xiloader_8c_ae0a7c37f5a766b8e881b7ca59f579d01}} 
+\index{xiloader.c@{xiloader.c}!u32@{u32}}
+\index{u32@{u32}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{u32}{u32}}
+{\footnotesize\ttfamily typedef unsigned \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{xiloader_8c_a115dc3857ff745e8cc6ad741714167ea}\label{xiloader_8c_a115dc3857ff745e8cc6ad741714167ea}} 
+\index{xiloader.c@{xiloader.c}!get\_options@{get\_options}}
+\index{get\_options@{get\_options}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{get\_options()}{get\_options()}}
+{\footnotesize\ttfamily void get\+\_\+options (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_ac787b10428c763edbc28f905ded44987}\label{xiloader_8c_ac787b10428c763edbc28f905ded44987}} 
+\index{xiloader.c@{xiloader.c}!get\_remaining\_data@{get\_remaining\_data}}
+\index{get\_remaining\_data@{get\_remaining\_data}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{get\_remaining\_data()}{get\_remaining\_data()}}
+{\footnotesize\ttfamily void$\ast$ get\+\_\+remaining\+\_\+data (\begin{DoxyParamCaption}\item[{void $\ast$}]{buffer,  }\item[{int}]{buffer\+\_\+size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_acea302a2798b98017865a897a092ee82}\label{xiloader_8c_acea302a2798b98017865a897a092ee82}} 
+\index{xiloader.c@{xiloader.c}!getdata@{getdata}}
+\index{getdata@{getdata}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{getdata()}{getdata()}}
+{\footnotesize\ttfamily int getdata (\begin{DoxyParamCaption}\item[{void $\ast$$\ast$}]{buffer }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_a0b6467d54529ff75c5b780a5918be940}\label{xiloader_8c_a0b6467d54529ff75c5b780a5918be940}} 
+\index{xiloader.c@{xiloader.c}!input\_size\_unknown@{input\_size\_unknown}}
+\index{input\_size\_unknown@{input\_size\_unknown}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{input\_size\_unknown()}{input\_size\_unknown()}}
+{\footnotesize\ttfamily int input\+\_\+size\+\_\+unknown (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_ae00ef4ade27801afbbaf6e9fd9668636}\label{xiloader_8c_ae00ef4ade27801afbbaf6e9fd9668636}} 
+\index{xiloader.c@{xiloader.c}!is\_bitstream\_marker@{is\_bitstream\_marker}}
+\index{is\_bitstream\_marker@{is\_bitstream\_marker}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{is\_bitstream\_marker()}{is\_bitstream\_marker()}}
+{\footnotesize\ttfamily int is\+\_\+bitstream\+\_\+marker (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{cursor }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_a223348a405b98f7cec1d63a16c58d07e}\label{xiloader_8c_a223348a405b98f7cec1d63a16c58d07e}} 
+\index{xiloader.c@{xiloader.c}!load\_bitstream@{load\_bitstream}}
+\index{load\_bitstream@{load\_bitstream}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{load\_bitstream()}{load\_bitstream()}}
+{\footnotesize\ttfamily void load\+\_\+bitstream (\begin{DoxyParamCaption}\item[{uint32\+\_\+t $\ast$}]{bitstream,  }\item[{int}]{nbytes }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_ac0f2228420376f4db7e1274f2b41667c}\label{xiloader_8c_ac0f2228420376f4db7e1274f2b41667c}} 
+\index{xiloader.c@{xiloader.c}!main@{main}}
+\index{main@{main}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{const char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_aae5cd979d9267e0a7d9a5abebcaa9652}\label{xiloader_8c_aae5cd979d9267e0a7d9a5abebcaa9652}} 
+\index{xiloader.c@{xiloader.c}!print\_header@{print\_header}}
+\index{print\_header@{print\_header}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{print\_header()}{print\_header()}}
+{\footnotesize\ttfamily void print\+\_\+header (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{header,  }\item[{int}]{eoh\+\_\+location,  }\item[{int}]{stream\+\_\+size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{xiloader_8c_a0806050a82c2acb5346157656472e83e}\label{xiloader_8c_a0806050a82c2acb5346157656472e83e}} 
+\index{xiloader.c@{xiloader.c}!triplet@{triplet}}
+\index{triplet@{triplet}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{triplet()}{triplet()}}
+{\footnotesize\ttfamily int triplet (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{cursor,  }\item[{uint8\+\_\+t}]{t1,  }\item[{uint8\+\_\+t}]{t2,  }\item[{uint8\+\_\+t}]{t3 }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{xiloader_8c_af1dc6455c990040d246c28dff4702059}\label{xiloader_8c_af1dc6455c990040d246c28dff4702059}} 
+\index{xiloader.c@{xiloader.c}!icursor@{icursor}}
+\index{icursor@{icursor}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{icursor}{icursor}}
+{\footnotesize\ttfamily int icursor}
+
+\mbox{\Hypertarget{xiloader_8c_a648dfa11e36316ab3a5bc94679171ecf}\label{xiloader_8c_a648dfa11e36316ab3a5bc94679171ecf}} 
+\index{xiloader.c@{xiloader.c}!ifp@{ifp}}
+\index{ifp@{ifp}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{ifp}{ifp}}
+{\footnotesize\ttfamily F\+I\+LE$\ast$ ifp}
+
+\mbox{\Hypertarget{xiloader_8c_a455f845b69eb490933e2c47fd0369c82}\label{xiloader_8c_a455f845b69eb490933e2c47fd0369c82}} 
+\index{xiloader.c@{xiloader.c}!OPTS@{OPTS}}
+\index{OPTS@{OPTS}!xiloader.c@{xiloader.c}}
+\doxysubsubsection{\texorpdfstring{OPTS}{OPTS}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structOptions}{Options}} O\+P\+TS}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{        \mbox{\hyperlink{xiloader_8c_acb6e444884f99fd80faf38058920ceef}{STDIN\_STR}}, \mbox{\hyperlink{xiloader_8c_a0b90c74e66c9d4e2786247473b5591f3}{FPGA\_PORT}}, 1, 0, 0, 0}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}

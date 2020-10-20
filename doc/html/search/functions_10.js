@@ -1,0 +1,11 @@
+var searchData=
+[
+  ['regstest_1129',['regsTest',['../mmap_8c.html#ae81a7e8362f18038a0a438bff3999e1c',1,'mmap.c']]],
+  ['ringdoorbell_1130',['ringDoorbell',['../structSystemInterface.html#ac9c449e0e64330b3f143fd9bdc4f2022',1,'SystemInterface::ringDoorbell()'],['../classBroadcastSystemInterface.html#ab0958cc82fb7d77a6410af2aa7345658',1,'BroadcastSystemInterface::ringDoorbell()'],['../classCustom1SingleThreadControlSystemInterface.html#ac0f3363c649c0750d5edcc35c3bfa34f',1,'Custom1SingleThreadControlSystemInterface::ringDoorbell()'],['../classDummySingleThreadControlSystemInterface.html#ab9a7ae2b270603b8c110c3c7089c2b1d',1,'DummySingleThreadControlSystemInterface::ringDoorbell()']]],
+  ['rtm_5ft_5fdevice_1131',['RTM_T_Device',['../classRTM__T__Device.html#a706c700d9f7a6d5ad9c9dec24295d08c',1,'RTM_T_Device']]],
+  ['rtmstreamclose_1132',['RtmStreamClose',['../rtm-t-stream_8cpp.html#a4bbcdd3dca06ae1530187dcb5b145126',1,'RtmStreamClose(void *handle):&#160;rtm-t-stream.cpp'],['../rtm-t-stream_8h.html#ad76316529a0071becb46c77c767aefd3',1,'RtmStreamClose(void *const handle):&#160;rtm-t-stream.cpp']]],
+  ['rtmstreamgetbuffer_1133',['RtmStreamGetBuffer',['../rtm-t-stream_8cpp.html#a936584f9d5371ea40782a55da1ee727d',1,'RtmStreamGetBuffer(void *handle, void *const buf, const int buflen):&#160;rtm-t-stream.cpp'],['../rtm-t-stream_8h.html#a99ab27b7ccc174406c7855564f77449d',1,'RtmStreamGetBuffer(void *const handle, void *const buf, const int buflen):&#160;rtm-t-stream.cpp']]],
+  ['rtmstreamstart_1134',['RtmStreamStart',['../rtm-t-stream_8cpp.html#a4dfca6f47bd42c162a9de3f5571f5333',1,'RtmStreamStart(void **handle, const int devnum, const int NBUFS, int *const maxlen):&#160;rtm-t-stream.cpp'],['../rtm-t-stream_8h.html#abd3263fa8cce7ad1dcdc4ccb00cb771e',1,'RtmStreamStart(void **const handle, const int devnum, const int NBUFS, int *const maxlen):&#160;rtm-t-stream.cpp']]],
+  ['rtmstreamstop_1135',['RtmStreamStop',['../rtm-t-stream_8cpp.html#abd06231440b6bddcb9ace4a555751e0d',1,'RtmStreamStop(void *handle):&#160;rtm-t-stream.cpp'],['../rtm-t-stream_8h.html#aa53e91d964061b200c6ee7af845b7335',1,'RtmStreamStop(void *const handle):&#160;rtm-t-stream.cpp']]],
+  ['run_1136',['run',['../classrtm-t-stream_1_1STREAM.html#a6dad6c0ff50abaea68153b2288ef0344',1,'rtm-t-stream::STREAM']]]
+];

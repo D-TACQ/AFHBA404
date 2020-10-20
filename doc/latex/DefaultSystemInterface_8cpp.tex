@@ -1,0 +1,33 @@
+\hypertarget{DefaultSystemInterface_8cpp}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/\+Default\+System\+Interface.cpp File Reference}
+\label{DefaultSystemInterface_8cpp}\index{ACQPROC/DefaultSystemInterface.cpp@{ACQPROC/DefaultSystemInterface.cpp}}
+
+
+\mbox{\hyperlink{structSystemInterface}{System\+Interface}} implementation example overloads ring\+Doorbell() to actually \char`\"{}do work\char`\"{}. a real implementation should perform a shared memory interface with another process.  
+
+
+{\ttfamily \#include \char`\"{}Acq\+Sys.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classDummySingleThreadControlSystemInterface}{Dummy\+Single\+Thread\+Control\+System\+Interface}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{DefaultSystemInterface_8cpp_ac3f6e97d3e69536855bb4446db2cec0d}{P\+W\+M\+\_\+\+M\+A\+G\+IC}}~0xbe8bb8fa
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{structSystemInterface}{System\+Interface}} implementation example overloads ring\+Doorbell() to actually \char`\"{}do work\char`\"{}. a real implementation should perform a shared memory interface with another process. 
+
+Created on\+: 14 Mar 2020 Author\+: pgm 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{DefaultSystemInterface_8cpp_ac3f6e97d3e69536855bb4446db2cec0d}\label{DefaultSystemInterface_8cpp_ac3f6e97d3e69536855bb4446db2cec0d}} 
+\index{DefaultSystemInterface.cpp@{DefaultSystemInterface.cpp}!PWM\_MAGIC@{PWM\_MAGIC}}
+\index{PWM\_MAGIC@{PWM\_MAGIC}!DefaultSystemInterface.cpp@{DefaultSystemInterface.cpp}}
+\doxysubsubsection{\texorpdfstring{PWM\_MAGIC}{PWM\_MAGIC}}
+{\footnotesize\ttfamily \#define P\+W\+M\+\_\+\+M\+A\+G\+IC~0xbe8bb8fa}
+

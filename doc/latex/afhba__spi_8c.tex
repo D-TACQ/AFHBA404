@@ -1,0 +1,123 @@
+\hypertarget{afhba__spi_8c}{}\doxysection{afhba\+\_\+spi.\+c File Reference}
+\label{afhba__spi_8c}\index{afhba\_spi.c@{afhba\_spi.c}}
+{\ttfamily \#include $<$linux/device.\+h$>$}\newline
+{\ttfamily \#include $<$linux/delay.\+h$>$}\newline
+{\ttfamily \#include $<$linux/interrupt.\+h$>$}\newline
+{\ttfamily \#include $<$linux/kernel.\+h$>$}\newline
+{\ttfamily \#include $<$linux/pci.\+h$>$}\newline
+{\ttfamily \#include $<$linux/time.\+h$>$}\newline
+{\ttfamily \#include $<$linux/init.\+h$>$}\newline
+{\ttfamily \#include $<$linux/timex.\+h$>$}\newline
+{\ttfamily \#include $<$linux/vmalloc.\+h$>$}\newline
+{\ttfamily \#include $<$linux/mm.\+h$>$}\newline
+{\ttfamily \#include $<$linux/module.\+h$>$}\newline
+{\ttfamily \#include $<$linux/moduleparam.\+h$>$}\newline
+{\ttfamily \#include $<$linux/spi/flash.\+h$>$}\newline
+{\ttfamily \#include $<$linux/spi/spi.\+h$>$}\newline
+{\ttfamily \#include $<$linux/spi/spi\+\_\+bitbang.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structafhba__spi}{afhba\+\_\+spi}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{afhba__spi_8c_ab2ccdf62607befdbe6c0122493437b43}{module\+\_\+param}} (\mbox{\hyperlink{afhba__spi_8c_ad818b1e8a64b93bce3397648556a67d2}{afhba\+\_\+spi\+\_\+debug}}, int, 0644)
+\item 
+\mbox{\hyperlink{afhba__spi_8c_aa955674bc939efa6aa208555c8254bf8}{module\+\_\+param}} (\mbox{\hyperlink{afhba__spi_8c_aed6a5bbf8c0fbde7d2c600da47ef53ad}{spi\+\_\+write\+\_\+msleep}}, int, 0664)
+\item 
+int \mbox{\hyperlink{afhba__spi_8c_a0bbe1e35d60d214f236551670d6e1f59}{afhba\+\_\+spi\+\_\+master\+\_\+init}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__spi_8c_adb211a9cf1a2d85f7612f5e80a6481b3}{afhba\+\_\+spi\+\_\+master\+\_\+remove}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+\mbox{\hyperlink{afhba__spi_8c_af8895b3823dcf68d4ad7595c6a89a152}{module\+\_\+init}} (afhba\+\_\+spi\+\_\+init)
+\item 
+\mbox{\hyperlink{afhba__spi_8c_a1f17afb87c3bcfa58a5fc1f5e2b831fd}{module\+\_\+exit}} (afhba\+\_\+spi\+\_\+exit)
+\item 
+\mbox{\hyperlink{afhba__spi_8c_a60b51613612e5f117c4994244879c370}{M\+O\+D\+U\+L\+E\+\_\+\+A\+U\+T\+H\+OR}} (\char`\"{}Peter Milne $<$peter.\+milne@d-\/tacq.\+com\char`\"{})
+\item 
+\mbox{\hyperlink{afhba__spi_8c_a889c434ec9290c83a5ed72a220aeab5d}{M\+O\+D\+U\+L\+E\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+I\+ON}} (\char`\"{}A\+CQ-\/F\+I\+B\+ER-\/\mbox{\hyperlink{classHBA}{H\+BA}} S\+PI flash driver\char`\"{})
+\item 
+\mbox{\hyperlink{afhba__spi_8c_ad94b36675e7eb067ea3ce6ff9e244a44}{M\+O\+D\+U\+L\+E\+\_\+\+L\+I\+C\+E\+N\+SE}} (\char`\"{}G\+PL\char`\"{})
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afhba__spi_8c_ad818b1e8a64b93bce3397648556a67d2}{afhba\+\_\+spi\+\_\+debug}}
+\item 
+int \mbox{\hyperlink{afhba__spi_8c_aed6a5bbf8c0fbde7d2c600da47ef53ad}{spi\+\_\+write\+\_\+msleep}} = 1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__spi_8c_a0bbe1e35d60d214f236551670d6e1f59}\label{afhba__spi_8c_a0bbe1e35d60d214f236551670d6e1f59}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!afhba\_spi\_master\_init@{afhba\_spi\_master\_init}}
+\index{afhba\_spi\_master\_init@{afhba\_spi\_master\_init}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_spi\_master\_init()}{afhba\_spi\_master\_init()}}
+{\footnotesize\ttfamily int afhba\+\_\+spi\+\_\+master\+\_\+init (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_adb211a9cf1a2d85f7612f5e80a6481b3}\label{afhba__spi_8c_adb211a9cf1a2d85f7612f5e80a6481b3}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!afhba\_spi\_master\_remove@{afhba\_spi\_master\_remove}}
+\index{afhba\_spi\_master\_remove@{afhba\_spi\_master\_remove}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_spi\_master\_remove()}{afhba\_spi\_master\_remove()}}
+{\footnotesize\ttfamily void afhba\+\_\+spi\+\_\+master\+\_\+remove (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_a60b51613612e5f117c4994244879c370}\label{afhba__spi_8c_a60b51613612e5f117c4994244879c370}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!MODULE\_AUTHOR@{MODULE\_AUTHOR}}
+\index{MODULE\_AUTHOR@{MODULE\_AUTHOR}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_AUTHOR()}{MODULE\_AUTHOR()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+A\+U\+T\+H\+OR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_a889c434ec9290c83a5ed72a220aeab5d}\label{afhba__spi_8c_a889c434ec9290c83a5ed72a220aeab5d}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!MODULE\_DESCRIPTION@{MODULE\_DESCRIPTION}}
+\index{MODULE\_DESCRIPTION@{MODULE\_DESCRIPTION}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_DESCRIPTION()}{MODULE\_DESCRIPTION()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+I\+ON (\begin{DoxyParamCaption}\item[{\char`\"{}A\+CQ-\/F\+I\+B\+ER-\/\mbox{\hyperlink{classHBA}{H\+BA}} S\+PI flash driver\char`\"{}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_a1f17afb87c3bcfa58a5fc1f5e2b831fd}\label{afhba__spi_8c_a1f17afb87c3bcfa58a5fc1f5e2b831fd}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!module\_exit@{module\_exit}}
+\index{module\_exit@{module\_exit}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{module\_exit()}{module\_exit()}}
+{\footnotesize\ttfamily module\+\_\+exit (\begin{DoxyParamCaption}\item[{afhba\+\_\+spi\+\_\+exit}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_af8895b3823dcf68d4ad7595c6a89a152}\label{afhba__spi_8c_af8895b3823dcf68d4ad7595c6a89a152}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!module\_init@{module\_init}}
+\index{module\_init@{module\_init}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{module\_init()}{module\_init()}}
+{\footnotesize\ttfamily module\+\_\+init (\begin{DoxyParamCaption}\item[{afhba\+\_\+spi\+\_\+init}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_ad94b36675e7eb067ea3ce6ff9e244a44}\label{afhba__spi_8c_ad94b36675e7eb067ea3ce6ff9e244a44}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!MODULE\_LICENSE@{MODULE\_LICENSE}}
+\index{MODULE\_LICENSE@{MODULE\_LICENSE}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{MODULE\_LICENSE()}{MODULE\_LICENSE()}}
+{\footnotesize\ttfamily M\+O\+D\+U\+L\+E\+\_\+\+L\+I\+C\+E\+N\+SE (\begin{DoxyParamCaption}\item[{\char`\"{}G\+PL\char`\"{}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_ab2ccdf62607befdbe6c0122493437b43}\label{afhba__spi_8c_ab2ccdf62607befdbe6c0122493437b43}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!module\_param@{module\_param}}
+\index{module\_param@{module\_param}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{module\_param()}{module\_param()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily module\+\_\+param (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{afhba__spi_8c_ad818b1e8a64b93bce3397648556a67d2}{afhba\+\_\+spi\+\_\+debug}}}]{,  }\item[{int}]{,  }\item[{0644}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__spi_8c_aa955674bc939efa6aa208555c8254bf8}\label{afhba__spi_8c_aa955674bc939efa6aa208555c8254bf8}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!module\_param@{module\_param}}
+\index{module\_param@{module\_param}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{module\_param()}{module\_param()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily module\+\_\+param (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{afhba__spi_8c_aed6a5bbf8c0fbde7d2c600da47ef53ad}{spi\+\_\+write\+\_\+msleep}}}]{,  }\item[{int}]{,  }\item[{0664}]{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{afhba__spi_8c_ad818b1e8a64b93bce3397648556a67d2}\label{afhba__spi_8c_ad818b1e8a64b93bce3397648556a67d2}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!afhba\_spi\_debug@{afhba\_spi\_debug}}
+\index{afhba\_spi\_debug@{afhba\_spi\_debug}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_spi\_debug}{afhba\_spi\_debug}}
+{\footnotesize\ttfamily int afhba\+\_\+spi\+\_\+debug}
+
+\mbox{\Hypertarget{afhba__spi_8c_aed6a5bbf8c0fbde7d2c600da47ef53ad}\label{afhba__spi_8c_aed6a5bbf8c0fbde7d2c600da47ef53ad}} 
+\index{afhba\_spi.c@{afhba\_spi.c}!spi\_write\_msleep@{spi\_write\_msleep}}
+\index{spi\_write\_msleep@{spi\_write\_msleep}!afhba\_spi.c@{afhba\_spi.c}}
+\doxysubsubsection{\texorpdfstring{spi\_write\_msleep}{spi\_write\_msleep}}
+{\footnotesize\ttfamily int spi\+\_\+write\+\_\+msleep = 1}
+

@@ -1,0 +1,79 @@
+\hypertarget{afhba__core_8c}{}\doxysection{afhba\+\_\+core.\+c File Reference}
+\label{afhba__core_8c}\index{afhba\_core.c@{afhba\_core.c}}
+
+
+A\+F\+H\+B\+A404 hardware register access.  
+
+
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{afhba__core_8c_a039caa732f16226b1c3926b7c5b540c6}{V\+B\+S1}}~(\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}} $>$= 1)
+\item 
+\#define \mbox{\hyperlink{afhba__core_8c_afea48a0caac441ed78afc619c7850b46}{V\+B\+S2}}~(\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}} $>$= 2)
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{afhba__core_8c_a7d51d08d9f0bc3411bfb13935666baa7}{module\+\_\+param}} (\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}}, int, 0644)
+\item 
+void \mbox{\hyperlink{afhba__core_8c_ac099aa44993cdcb58900e05f2275b40c}{afhba\+\_\+write\+\_\+reg}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, int regoff, \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} value)
+\item 
+\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \mbox{\hyperlink{afhba__core_8c_ab4d77ca27b45587b5465e2e99f031505}{afhba\+\_\+read\+\_\+reg}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, int regoff)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A\+F\+H\+B\+A404 hardware register access. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{afhba__core_8c_a039caa732f16226b1c3926b7c5b540c6}\label{afhba__core_8c_a039caa732f16226b1c3926b7c5b540c6}} 
+\index{afhba\_core.c@{afhba\_core.c}!VBS1@{VBS1}}
+\index{VBS1@{VBS1}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{VBS1}{VBS1}}
+{\footnotesize\ttfamily \#define V\+B\+S1~(\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}} $>$= 1)}
+
+\mbox{\Hypertarget{afhba__core_8c_afea48a0caac441ed78afc619c7850b46}\label{afhba__core_8c_afea48a0caac441ed78afc619c7850b46}} 
+\index{afhba\_core.c@{afhba\_core.c}!VBS2@{VBS2}}
+\index{VBS2@{VBS2}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{VBS2}{VBS2}}
+{\footnotesize\ttfamily \#define V\+B\+S2~(\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}} $>$= 2)}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__core_8c_ab4d77ca27b45587b5465e2e99f031505}\label{afhba__core_8c_ab4d77ca27b45587b5465e2e99f031505}} 
+\index{afhba\_core.c@{afhba\_core.c}!afhba\_read\_reg@{afhba\_read\_reg}}
+\index{afhba\_read\_reg@{afhba\_read\_reg}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_read\_reg()}{afhba\_read\_reg()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} afhba\+\_\+read\+\_\+reg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__core_8c_ac099aa44993cdcb58900e05f2275b40c}\label{afhba__core_8c_ac099aa44993cdcb58900e05f2275b40c}} 
+\index{afhba\_core.c@{afhba\_core.c}!afhba\_write\_reg@{afhba\_write\_reg}}
+\index{afhba\_write\_reg@{afhba\_write\_reg}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_write\_reg()}{afhba\_write\_reg()}}
+{\footnotesize\ttfamily void afhba\+\_\+write\+\_\+reg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{value }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__core_8c_a7d51d08d9f0bc3411bfb13935666baa7}\label{afhba__core_8c_a7d51d08d9f0bc3411bfb13935666baa7}} 
+\index{afhba\_core.c@{afhba\_core.c}!module\_param@{module\_param}}
+\index{module\_param@{module\_param}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{module\_param()}{module\_param()}}
+{\footnotesize\ttfamily module\+\_\+param (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}{reg\+\_\+access\+\_\+verbose}}}]{,  }\item[{int}]{,  }\item[{0644}]{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}\label{afhba__core_8c_afed5330ab55829f6c7225a3f3709ac36}} 
+\index{afhba\_core.c@{afhba\_core.c}!reg\_access\_verbose@{reg\_access\_verbose}}
+\index{reg\_access\_verbose@{reg\_access\_verbose}!afhba\_core.c@{afhba\_core.c}}
+\doxysubsubsection{\texorpdfstring{reg\_access\_verbose}{reg\_access\_verbose}}
+{\footnotesize\ttfamily int reg\+\_\+access\+\_\+verbose}
+

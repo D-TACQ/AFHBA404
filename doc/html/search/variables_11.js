@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['sample_1352',['sample',['../classACQ__HW__BASE.html#a6b107395b9e73ab3c16bdf78e5f35bc1',1,'ACQ_HW_BASE']]],
+  ['samples_5fbuffer_1353',['samples_buffer',['../namespaceG.html#aea21e432d73ce7514acc2fd20b25d677',1,'G']]],
+  ['sbd_1354',['sbd',['../structSTREAM.html#a15043e8ba98cc5c1d7ada5b4f49bbfa0',1,'STREAM']]],
+  ['sched_5ffifo_5fpriority_1355',['sched_fifo_priority',['../acqproc_8cpp.html#a52d07f959b74576585992cde0d113c27',1,'sched_fifo_priority():&#160;afhba-llcontrol.c'],['../AcqSys_8cpp.html#a52d07f959b74576585992cde0d113c27',1,'sched_fifo_priority():&#160;afhba-llcontrol.c'],['../afhba-llcontrol_8c.html#a52d07f959b74576585992cde0d113c27',1,'sched_fifo_priority():&#160;afhba-llcontrol.c']]],
+  ['sent_5freset_1356',['sent_reset',['../structafhba__spi.html#aae9005f755b5d2b2900d5fedcfde39d3',1,'afhba_spi']]],
+  ['seq_1357',['SEQ',['../rtm-t-stream-disk_8cpp.html#a804985ef1a989863dc8691520b62dd7c',1,'rtm-t-stream-disk.cpp']]],
+  ['sfp_1358',['sfp',['../structAFHBA__DEV.html#aed419a93d97f701f91704d0751abe9ce',1,'AFHBA_DEV']]],
+  ['shot_1359',['shot',['../structAFHBA__STREAM__DEV.html#a91e4abf9b2ad70cdfdbb44fa024243a1',1,'AFHBA_STREAM_DEV']]],
+  ['slot_5fname_1360',['slot_name',['../structAFHBA__DEV.html#a91c77dca06d0604c36066c29ff3b5ecc',1,'AFHBA_DEV']]],
+  ['smoo_1361',['SMOO',['../afhba__stream__drv_8c.html#a49e6c0eaa2fb179f3ca3ea77ef98882c',1,'afhba_stream_drv.c']]],
+  ['sp32_1362',['SP32',['../structVI.html#a2f935fec5f1ba22cd856cdd5d70bf109',1,'VI::SP32()'],['../structSystemInterface_1_1Inputs.html#a9cd5d9819ed9b9ef147b7ec0c0548cfa',1,'SystemInterface::Inputs::SP32()']]],
+  ['spadlongs_1363',['spadlongs',['../afhba-llcontrol_8c.html#ad80a87ab088210eecdb985e6b14e85d6',1,'afhba-llcontrol.c']]],
+  ['spi_5fwrite_5fmsleep_1364',['spi_write_msleep',['../afhba__spi_8c.html#aed6a5bbf8c0fbde7d2c600da47ef53ad',1,'afhba_spi.c']]],
+  ['spix_1365',['spix',['../classACQ__HW__BASE.html#ac8a735c8c3d7070136cf476a0143bdf3',1,'ACQ_HW_BASE']]],
+  ['src_5fpa_1366',['src_pa',['../structAO__LLC__DEF.html#a52a03d75f53e7667309100d3b2387bf1',1,'AO_LLC_DEF']]],
+  ['srcdesc_1367',['srcdesc',['../structAO__BURST__DEV.html#af610163efc17cfce846100dff4b3b7ee',1,'AO_BURST_DEV']]],
+  ['ssize_1368',['SSIZE',['../rtm-t-stream-disk_8cpp.html#a7e7649c1f4eb3539b814bc44292556b5',1,'rtm-t-stream-disk.cpp']]],
+  ['stalls_1369',['stalls',['../afhba__stream__drv_8c.html#a87c725e30f7fbd2764f1193cb2650ec7',1,'afhba_stream_drv.c']]],
+  ['stop_1370',['stop',['../structSTREAM.html#a34703b08412df1a7b7f3fad33e0bacf4',1,'STREAM']]],
+  ['stop_5fon_5fskipped_5fbuffer_1371',['stop_on_skipped_buffer',['../afhba__stream__drv_8c.html#ae1e28c510aaec3c066bfda0da8d19051',1,'afhba_stream_drv.c']]],
+  ['stream_1372',['stream',['../namespacertm-t-stream.html#aa9560f265c21198e31afe3be3e7d4d40',1,'rtm-t-stream']]],
+  ['stream_5fdev_1373',['stream_dev',['../structAFHBA__DEV.html#a63df8625651d61d29b79c5a65d45a897',1,'AFHBA_DEV']]],
+  ['stream_5ffops_1374',['stream_fops',['../structAFHBA__DEV.html#a9e36e4b6dfda1f70fc0ac66eb6a3f5ad',1,'AFHBA_DEV']]]
+];

@@ -1,0 +1,178 @@
+\hypertarget{AcqSys_8cpp}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/\+Acq\+Sys.cpp File Reference}
+\label{AcqSys_8cpp}\index{ACQPROC/AcqSys.cpp@{ACQPROC/AcqSys.cpp}}
+
+
+creates system configuration from config.  
+
+
+{\ttfamily \#include \char`\"{}Acq\+Sys.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include \char`\"{}nlohmann/json.\+hpp\char`\"{}}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{AcqSys_8cpp_af55c53d3bdbe250ab794eea42d4f6d22}{C\+OM}}(i)~\char`\"{}\+\_\+\+\_\+comment\char`\"{} \#i \char`\"{}\+\_\+\+\_\+\char`\"{}
+\begin{DoxyCompactList}\small\item\em Key Value Map ~\newline
+ \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{AcqSys_8cpp_a526799d9edddf2694413de3fd437bef2}{I\+N\+S\+E\+R\+T\+\_\+\+IF}}(map,  vx,  vxo,  field)
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} = nlohmann\+::json
+\item 
+typedef pair$<$ std\+::string, int $>$ \mbox{\hyperlink{AcqSys_8cpp_a911e02da0d0ab859165dc719ce82b467}{K\+VP}}
+\item 
+typedef std\+::map$<$ std\+::string, int $>$ \mbox{\hyperlink{AcqSys_8cpp_a0d9f9ea27aaa2da01831528f23a54142}{K\+VM}}
+\begin{DoxyCompactList}\small\item\em Key Value Pair. \end{DoxyCompactList}\item 
+typedef pair$<$ std\+::string, string $>$ \mbox{\hyperlink{AcqSys_8cpp_a5dcba92e1d4c97118cece778a290d886}{K\+V\+PS}}
+\begin{DoxyCompactList}\small\item\em Key Value Map ~\newline
+ \end{DoxyCompactList}\item 
+typedef std\+::map$<$ std\+::string, string $>$ \mbox{\hyperlink{AcqSys_8cpp_a4522ffdad7d324a2609ac24298335ec8}{K\+V\+MS}}
+\begin{DoxyCompactList}\small\item\em Key Value Pair, C\+O\+M\+M\+E\+NT. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{AcqSys_8cpp_afcb900c52fa1066544bf18ca8d4e89b8}{get\+\_\+int}} (\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} j, int default\+\_\+value=0)
+\item 
+void \mbox{\hyperlink{AcqSys_8cpp_a4ca53d6ae1cb39566ef54dfd9c585469}{add\+\_\+comments}} (\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} \&jsys, string \&fname)
+\item 
+void \mbox{\hyperlink{AcqSys_8cpp_af2e6f043e87eca3204b8baac17d9cd39}{add\+\_\+si\+\_\+lengths}} (\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} \&jsys, \mbox{\hyperlink{classHBA}{H\+BA}} \&hba)
+\item 
+void \mbox{\hyperlink{AcqSys_8cpp_aa281eddeeb9894e0c4cd0912fc558a7e}{store\+\_\+config}} (\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} j, string fname, \mbox{\hyperlink{classHBA}{H\+BA}} \&hba)
+\item 
+bool \mbox{\hyperlink{AcqSys_8cpp_a5a6a84c1d56b46285bcaca6849469cea}{strstr}} (string haystack, string needle)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{AcqSys_8cpp_a52d07f959b74576585992cde0d113c27}{sched\+\_\+fifo\+\_\+priority}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+creates system configuration from config. 
+
+\mbox{\hyperlink{AcqSys_8cpp}{Acq\+Sys.\+cpp}}
+
+Created on\+: 27 Feb 2020 Author\+: pgm 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{AcqSys_8cpp_af55c53d3bdbe250ab794eea42d4f6d22}\label{AcqSys_8cpp_af55c53d3bdbe250ab794eea42d4f6d22}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!COM@{COM}}
+\index{COM@{COM}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{COM}{COM}}
+{\footnotesize\ttfamily \#define C\+OM(\begin{DoxyParamCaption}\item[{}]{i }\end{DoxyParamCaption})~\char`\"{}\+\_\+\+\_\+comment\char`\"{} \#i \char`\"{}\+\_\+\+\_\+\char`\"{}}
+
+
+
+Key Value Map ~\newline
+ 
+
+\mbox{\Hypertarget{AcqSys_8cpp_a526799d9edddf2694413de3fd437bef2}\label{AcqSys_8cpp_a526799d9edddf2694413de3fd437bef2}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!INSERT\_IF@{INSERT\_IF}}
+\index{INSERT\_IF@{INSERT\_IF}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{INSERT\_IF}{INSERT\_IF}}
+{\footnotesize\ttfamily \#define I\+N\+S\+E\+R\+T\+\_\+\+IF(\begin{DoxyParamCaption}\item[{}]{map,  }\item[{}]{vx,  }\item[{}]{vxo,  }\item[{}]{field }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{    \textcolor{keywordflow}{if} (uut-\/>vx.field)\{ \(\backslash\)}
+\DoxyCodeLine{        map.insert(\mbox{\hyperlink{AcqSys_8cpp_a911e02da0d0ab859165dc719ce82b467}{KVP}}(\#field, uut-\/>vxo.field)); \(\backslash\)}
+\DoxyCodeLine{    \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}\label{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!json@{json}}
+\index{json@{json}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{json}{json}}
+{\footnotesize\ttfamily using \mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} =  nlohmann\+::json}
+
+\mbox{\Hypertarget{AcqSys_8cpp_a0d9f9ea27aaa2da01831528f23a54142}\label{AcqSys_8cpp_a0d9f9ea27aaa2da01831528f23a54142}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!KVM@{KVM}}
+\index{KVM@{KVM}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{KVM}{KVM}}
+{\footnotesize\ttfamily typedef std\+::map$<$std\+::string, int$>$ \mbox{\hyperlink{AcqSys_8cpp_a0d9f9ea27aaa2da01831528f23a54142}{K\+VM}}}
+
+
+
+Key Value Pair. 
+
+\mbox{\Hypertarget{AcqSys_8cpp_a4522ffdad7d324a2609ac24298335ec8}\label{AcqSys_8cpp_a4522ffdad7d324a2609ac24298335ec8}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!KVMS@{KVMS}}
+\index{KVMS@{KVMS}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{KVMS}{KVMS}}
+{\footnotesize\ttfamily typedef std\+::map$<$std\+::string, string$>$ \mbox{\hyperlink{AcqSys_8cpp_a4522ffdad7d324a2609ac24298335ec8}{K\+V\+MS}}}
+
+
+
+Key Value Pair, C\+O\+M\+M\+E\+NT. 
+
+\mbox{\Hypertarget{AcqSys_8cpp_a911e02da0d0ab859165dc719ce82b467}\label{AcqSys_8cpp_a911e02da0d0ab859165dc719ce82b467}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!KVP@{KVP}}
+\index{KVP@{KVP}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{KVP}{KVP}}
+{\footnotesize\ttfamily typedef pair$<$std\+::string, int$>$ \mbox{\hyperlink{AcqSys_8cpp_a911e02da0d0ab859165dc719ce82b467}{K\+VP}}}
+
+\mbox{\Hypertarget{AcqSys_8cpp_a5dcba92e1d4c97118cece778a290d886}\label{AcqSys_8cpp_a5dcba92e1d4c97118cece778a290d886}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!KVPS@{KVPS}}
+\index{KVPS@{KVPS}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{KVPS}{KVPS}}
+{\footnotesize\ttfamily typedef pair$<$std\+::string, string$>$ \mbox{\hyperlink{AcqSys_8cpp_a5dcba92e1d4c97118cece778a290d886}{K\+V\+PS}}}
+
+
+
+Key Value Map ~\newline
+ 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{AcqSys_8cpp_a4ca53d6ae1cb39566ef54dfd9c585469}\label{AcqSys_8cpp_a4ca53d6ae1cb39566ef54dfd9c585469}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!add\_comments@{add\_comments}}
+\index{add\_comments@{add\_comments}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{add\_comments()}{add\_comments()}}
+{\footnotesize\ttfamily void add\+\_\+comments (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} \&}]{jsys,  }\item[{string \&}]{fname }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{AcqSys_8cpp_af2e6f043e87eca3204b8baac17d9cd39}\label{AcqSys_8cpp_af2e6f043e87eca3204b8baac17d9cd39}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!add\_si\_lengths@{add\_si\_lengths}}
+\index{add\_si\_lengths@{add\_si\_lengths}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{add\_si\_lengths()}{add\_si\_lengths()}}
+{\footnotesize\ttfamily void add\+\_\+si\+\_\+lengths (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}} \&}]{jsys,  }\item[{\mbox{\hyperlink{classHBA}{H\+BA}} \&}]{hba }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{AcqSys_8cpp_afcb900c52fa1066544bf18ca8d4e89b8}\label{AcqSys_8cpp_afcb900c52fa1066544bf18ca8d4e89b8}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!get\_int@{get\_int}}
+\index{get\_int@{get\_int}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_int()}{get\_int()}}
+{\footnotesize\ttfamily int get\+\_\+int (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}}}]{j,  }\item[{int}]{default\+\_\+value = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{AcqSys_8cpp_aa281eddeeb9894e0c4cd0912fc558a7e}\label{AcqSys_8cpp_aa281eddeeb9894e0c4cd0912fc558a7e}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!store\_config@{store\_config}}
+\index{store\_config@{store\_config}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{store\_config()}{store\_config()}}
+{\footnotesize\ttfamily void store\+\_\+config (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{AcqSys_8cpp_ab701e3ac61a85b337ec5c1abaad6742d}{json}}}]{j,  }\item[{string}]{fname,  }\item[{\mbox{\hyperlink{classHBA}{H\+BA}} \&}]{hba }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{AcqSys_8cpp_a5a6a84c1d56b46285bcaca6849469cea}\label{AcqSys_8cpp_a5a6a84c1d56b46285bcaca6849469cea}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!strstr@{strstr}}
+\index{strstr@{strstr}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{strstr()}{strstr()}}
+{\footnotesize\ttfamily bool strstr (\begin{DoxyParamCaption}\item[{string}]{haystack,  }\item[{string}]{needle }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{AcqSys_8cpp_a52d07f959b74576585992cde0d113c27}\label{AcqSys_8cpp_a52d07f959b74576585992cde0d113c27}} 
+\index{AcqSys.cpp@{AcqSys.cpp}!sched\_fifo\_priority@{sched\_fifo\_priority}}
+\index{sched\_fifo\_priority@{sched\_fifo\_priority}!AcqSys.cpp@{AcqSys.cpp}}
+\doxysubsubsection{\texorpdfstring{sched\_fifo\_priority}{sched\_fifo\_priority}}
+{\footnotesize\ttfamily int sched\+\_\+fifo\+\_\+priority}
+

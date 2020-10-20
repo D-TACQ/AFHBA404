@@ -1,0 +1,57 @@
+\hypertarget{afhba__devman_8c}{}\doxysection{afhba\+\_\+devman.\+c File Reference}
+\label{afhba__devman_8c}\index{afhba\_devman.c@{afhba\_devman.c}}
+{\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{afhba__devman_8c_a30687cac5d9659054d96d0630e686fee}{afhba\+\_\+register\+Device}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+void \mbox{\hyperlink{afhba__devman_8c_a69f65c7ede4cdea506d4179cd7a6b224}{afhba\+\_\+delete\+Device}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{afhba__devman_8c_ab1e0fb91205d43c4f7b0de2a0282d51f}{afhba\+\_\+lookup\+Device}} (int major)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{afhba__devman_8c_a615baf97a1981fa224c1a6d200ad7e0a}{afhba\+\_\+lookup\+Device\+From\+Class}} (struct device $\ast$dev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{afhba__devman_8c_aa52de0d0bcb92db2903c9de5771270f3}{afhba\+\_\+lookup\+Device\+Pci}} (struct pci\+\_\+dev $\ast$pci\+\_\+dev)
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{afhba__devman_8c_a577ea595f6d04919cd7253d2e59c3970}{afhba\+\_\+lookup\+Dev}} (struct device $\ast$dev)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{afhba__devman_8c_a69f65c7ede4cdea506d4179cd7a6b224}\label{afhba__devman_8c_a69f65c7ede4cdea506d4179cd7a6b224}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_deleteDevice@{afhba\_deleteDevice}}
+\index{afhba\_deleteDevice@{afhba\_deleteDevice}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_deleteDevice()}{afhba\_deleteDevice()}}
+{\footnotesize\ttfamily void afhba\+\_\+delete\+Device (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__devman_8c_a577ea595f6d04919cd7253d2e59c3970}\label{afhba__devman_8c_a577ea595f6d04919cd7253d2e59c3970}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_lookupDev@{afhba\_lookupDev}}
+\index{afhba\_lookupDev@{afhba\_lookupDev}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDev()}{afhba\_lookupDev()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Dev (\begin{DoxyParamCaption}\item[{struct device $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__devman_8c_ab1e0fb91205d43c4f7b0de2a0282d51f}\label{afhba__devman_8c_ab1e0fb91205d43c4f7b0de2a0282d51f}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_lookupDevice@{afhba\_lookupDevice}}
+\index{afhba\_lookupDevice@{afhba\_lookupDevice}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDevice()}{afhba\_lookupDevice()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device (\begin{DoxyParamCaption}\item[{int}]{major }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__devman_8c_a615baf97a1981fa224c1a6d200ad7e0a}\label{afhba__devman_8c_a615baf97a1981fa224c1a6d200ad7e0a}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_lookupDeviceFromClass@{afhba\_lookupDeviceFromClass}}
+\index{afhba\_lookupDeviceFromClass@{afhba\_lookupDeviceFromClass}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDeviceFromClass()}{afhba\_lookupDeviceFromClass()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device\+From\+Class (\begin{DoxyParamCaption}\item[{struct device $\ast$}]{dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__devman_8c_aa52de0d0bcb92db2903c9de5771270f3}\label{afhba__devman_8c_aa52de0d0bcb92db2903c9de5771270f3}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_lookupDevicePci@{afhba\_lookupDevicePci}}
+\index{afhba\_lookupDevicePci@{afhba\_lookupDevicePci}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_lookupDevicePci()}{afhba\_lookupDevicePci()}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ afhba\+\_\+lookup\+Device\+Pci (\begin{DoxyParamCaption}\item[{struct pci\+\_\+dev $\ast$}]{pci\+\_\+dev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{afhba__devman_8c_a30687cac5d9659054d96d0630e686fee}\label{afhba__devman_8c_a30687cac5d9659054d96d0630e686fee}} 
+\index{afhba\_devman.c@{afhba\_devman.c}!afhba\_registerDevice@{afhba\_registerDevice}}
+\index{afhba\_registerDevice@{afhba\_registerDevice}!afhba\_devman.c@{afhba\_devman.c}}
+\doxysubsubsection{\texorpdfstring{afhba\_registerDevice()}{afhba\_registerDevice()}}
+{\footnotesize\ttfamily int afhba\+\_\+register\+Device (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+

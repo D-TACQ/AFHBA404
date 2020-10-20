@@ -1,0 +1,180 @@
+\hypertarget{classACQ__HW__BASE}{}\doxysection{A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE Class Reference}
+\label{classACQ__HW__BASE}\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+
+
+concrete model of A\+C\+Q2106 box.  
+
+
+Inheritance diagram for A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classACQ__HW__BASE}
+\end{center}
+\end{figure}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classACQ__HW__BASE_a94f9b5c6b66c8883a7f28b1da8c0655e}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE}} (int \mbox{\hyperlink{classACQ_a2af6cf10b6644724bfedc1fb5fa7a976}{devnum}}, string \+\_\+name, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi\+\_\+offsets, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo\+\_\+offsets, \mbox{\hyperlink{structVI}{VI}} \&sys\+\_\+vi\+\_\+cursor, \mbox{\hyperlink{structVO}{VO}} \&sys\+\_\+vo\+\_\+cursor)
+\item 
+virtual \mbox{\hyperlink{classACQ__HW__BASE_a3cd2c684a9631b432237d8189dfb8acb}{$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE}} ()
+\item 
+virtual void \mbox{\hyperlink{classACQ__HW__BASE_a28197dc004ef393d7273930cf1e88b28}{arm}} (int nsamples)
+\begin{DoxyCompactList}\small\item\em prepare to run a shot nsamples long, arm the U\+UT. \end{DoxyCompactList}\item 
+virtual unsigned \mbox{\hyperlink{classACQ__HW__BASE_ad2c7ee1ff0589551795406ef046f5acc}{tlatch}} (void)
+\begin{DoxyCompactList}\small\item\em returns latest tlatch from lbuf \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}{action}} (\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&system\+Interface)
+\begin{DoxyCompactList}\small\item\em on new\+Sample, copy \mbox{\hyperlink{structVO}{VO}} from SI, copy \mbox{\hyperlink{structVI}{VI}} to SI \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classACQ__HW__BASE_ab4dcb6b80b0468f3eafa7a48ad9f70a0}{action2}} (\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&system\+Interface)
+\begin{DoxyCompactList}\small\item\em late \mbox{\hyperlink{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}{action()}}, cleanup \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structDev}{Dev}} $\ast$ \mbox{\hyperlink{classACQ__HW__BASE_a51a9f20b15f378c599893dffd12bdd6e}{dev}}
+\item 
+unsigned \mbox{\hyperlink{classACQ__HW__BASE_ada5f4ae273303c676026aedaaf0615c5}{tl0}}
+\item 
+unsigned $\ast$ \mbox{\hyperlink{classACQ__HW__BASE_ab0cf4af2d5db33c5b946b695b595bd56}{dox}}
+\item 
+int \mbox{\hyperlink{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}{sample}}
+\item 
+const int \mbox{\hyperlink{classACQ__HW__BASE_ac8a735c8c3d7070136cf476a0143bdf3}{spix}}
+\item 
+int \mbox{\hyperlink{classACQ__HW__BASE_ac7f80978b59f2fff4deb16908b7f4636}{pw32\+\_\+double\+\_\+buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+concrete model of A\+C\+Q2106 box. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classACQ__HW__BASE_a94f9b5c6b66c8883a7f28b1da8c0655e}\label{classACQ__HW__BASE_a94f9b5c6b66c8883a7f28b1da8c0655e}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{ACQ\_HW\_BASE()}{ACQ\_HW\_BASE()}}
+{\footnotesize\ttfamily A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE (\begin{DoxyParamCaption}\item[{int}]{devnum,  }\item[{string}]{\+\_\+name,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVI}{VI}} \&}]{sys\+\_\+vi\+\_\+cursor,  }\item[{\mbox{\hyperlink{structVO}{VO}} \&}]{sys\+\_\+vo\+\_\+cursor }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_a3cd2c684a9631b432237d8189dfb8acb}\label{classACQ__HW__BASE_a3cd2c684a9631b432237d8189dfb8acb}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!````~ACQ\_HW\_BASE@{$\sim$ACQ\_HW\_BASE}}
+\index{````~ACQ\_HW\_BASE@{$\sim$ACQ\_HW\_BASE}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{$\sim$ACQ\_HW\_BASE()}{~ACQ\_HW\_BASE()}}
+{\footnotesize\ttfamily virtual A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::$\sim$\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+SE (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}\label{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!action@{action}}
+\index{action@{action}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{action()}{action()}}
+{\footnotesize\ttfamily void A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::action (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&}]{system\+Interface }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+on new\+Sample, copy \mbox{\hyperlink{structVO}{VO}} from SI, copy \mbox{\hyperlink{structVI}{VI}} to SI 
+
+
+\begin{DoxyParams}{Parameters}
+{\em system\+Interface} & copy SI to \mbox{\hyperlink{structVO}{VO}}, copy \mbox{\hyperlink{structVI}{VI}} to SI, advance local buffer pointer. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classACQ_ad39ef55458d242d039593af84ac0d8e3}{A\+CQ}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classACQ__HW__MEAN_a697120f8909e15cb69d967c8f22aed74}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}}.
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ab4dcb6b80b0468f3eafa7a48ad9f70a0}\label{classACQ__HW__BASE_ab4dcb6b80b0468f3eafa7a48ad9f70a0}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!action2@{action2}}
+\index{action2@{action2}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{action2()}{action2()}}
+{\footnotesize\ttfamily void A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::action2 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&}]{system\+Interface }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+late \mbox{\hyperlink{classACQ__HW__BASE_a7666c98840dd6055f3ca639b5aa6d362}{action()}}, cleanup 
+
+in slack time, copy S\+I.\+O\+UT to \mbox{\hyperlink{structVO}{VO}} archive cursor.
+
+@todo make it optional in case it takes too long 
+
+Reimplemented from \mbox{\hyperlink{classACQ_a674a8bdf45f54bd213e77a92b48250d5}{A\+CQ}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classACQ__HW__MEAN_a61b816cd6716f9ad0c7dcb603b2df185}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}}.
+
+\mbox{\Hypertarget{classACQ__HW__BASE_a28197dc004ef393d7273930cf1e88b28}\label{classACQ__HW__BASE_a28197dc004ef393d7273930cf1e88b28}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!arm@{arm}}
+\index{arm@{arm}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{arm()}{arm()}}
+{\footnotesize\ttfamily void A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::arm (\begin{DoxyParamCaption}\item[{int}]{nsamples }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+prepare to run a shot nsamples long, arm the U\+UT. 
+
+
+
+Reimplemented from \mbox{\hyperlink{classACQ_affc2554e6a33a39dac29d21254bc1782}{A\+CQ}}.
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ad2c7ee1ff0589551795406ef046f5acc}\label{classACQ__HW__BASE_ad2c7ee1ff0589551795406ef046f5acc}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!tlatch@{tlatch}}
+\index{tlatch@{tlatch}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{tlatch()}{tlatch()}}
+{\footnotesize\ttfamily unsigned A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::tlatch (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+returns latest tlatch from lbuf 
+
+
+
+Reimplemented from \mbox{\hyperlink{classACQ_aa4ade73ca14c06e4a037922bfc2fa452}{A\+CQ}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classACQ__HW__BASE_a51a9f20b15f378c599893dffd12bdd6e}\label{classACQ__HW__BASE_a51a9f20b15f378c599893dffd12bdd6e}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!dev@{dev}}
+\index{dev@{dev}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{dev}{dev}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structDev}{Dev}}$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::dev\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ab0cf4af2d5db33c5b946b695b595bd56}\label{classACQ__HW__BASE_ab0cf4af2d5db33c5b946b695b595bd56}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!dox@{dox}}
+\index{dox@{dox}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{dox}{dox}}
+{\footnotesize\ttfamily unsigned$\ast$ A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::dox\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ac7f80978b59f2fff4deb16908b7f4636}\label{classACQ__HW__BASE_ac7f80978b59f2fff4deb16908b7f4636}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!pw32\_double\_buffer@{pw32\_double\_buffer}}
+\index{pw32\_double\_buffer@{pw32\_double\_buffer}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{pw32\_double\_buffer}{pw32\_double\_buffer}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::pw32\+\_\+double\+\_\+buffer\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}\label{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!sample@{sample}}
+\index{sample@{sample}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{sample}{sample}}
+{\footnotesize\ttfamily int A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::sample\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ac8a735c8c3d7070136cf476a0143bdf3}\label{classACQ__HW__BASE_ac8a735c8c3d7070136cf476a0143bdf3}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!spix@{spix}}
+\index{spix@{spix}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{spix}{spix}}
+{\footnotesize\ttfamily const int A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::spix\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classACQ__HW__BASE_ada5f4ae273303c676026aedaaf0615c5}\label{classACQ__HW__BASE_ada5f4ae273303c676026aedaaf0615c5}} 
+\index{ACQ\_HW\_BASE@{ACQ\_HW\_BASE}!tl0@{tl0}}
+\index{tl0@{tl0}!ACQ\_HW\_BASE@{ACQ\_HW\_BASE}}
+\doxysubsubsection{\texorpdfstring{tl0}{tl0}}
+{\footnotesize\ttfamily unsigned A\+C\+Q\+\_\+\+H\+W\+\_\+\+B\+A\+S\+E\+::tl0\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,258 @@
+\hypertarget{structAFHBA__DEV}{}\doxysection{A\+F\+H\+B\+A\+\_\+\+D\+EV Struct Reference}
+\label{structAFHBA__DEV}\index{AFHBA\_DEV@{AFHBA\_DEV}}
+
+
+{\ttfamily \#include $<$acq-\/fiber-\/hba.\+h$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV_1_1PciMapping}{Pci\+Mapping}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}{S\+FP}} \{ \mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a0aa7d518e9cd6b56beaf91c119faf15a}{S\+F\+P\+\_\+A}}, 
+\mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a8d71d4aace0d76b2a5c4aec910d4f137}{S\+F\+P\+\_\+B}}, 
+\mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a9ee6b939b299a5df8f2d2b1ce19aa2d0}{S\+F\+P\+\_\+C}}, 
+\mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60af9b541c5b54120c39a917bd68ecbef82}{S\+F\+P\+\_\+D}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{structAFHBA__DEV_aee7ebc759574dea1d82595bec014c45b}{name}} \mbox{[}16\mbox{]}
+\item 
+char \mbox{\hyperlink{structAFHBA__DEV_a1f3accf9a6c918addd92edc6db3555c9}{mon\+\_\+name}} \mbox{[}16\mbox{]}
+\item 
+char \mbox{\hyperlink{structAFHBA__DEV_a91c77dca06d0604c36066c29ff3b5ecc}{slot\+\_\+name}} \mbox{[}16\mbox{]}
+\item 
+struct pci\+\_\+dev $\ast$ \mbox{\hyperlink{structAFHBA__DEV_ab296ad34ee906508a91628cc708c0e4e}{pci\+\_\+dev}}
+\item 
+struct device $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a5a00bea39ff7dbef851807ca550a7bce}{class\+\_\+dev}}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_a6f0b8028f10c906f766eacbc9bc169c3}{idx}}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_aafb8796f9f439ac5e2066cefe8575b10}{major}}
+\item 
+struct list\+\_\+head \mbox{\hyperlink{structAFHBA__DEV_a943180447cc1c813524c7d3fb6cf6d9c}{list}}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_a119ef86f39c3de55c6576f564cf9f3a0}{map\+\_\+count}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV_1_1PciMapping}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+Pci\+Mapping}} \mbox{\hyperlink{structAFHBA__DEV_a08683690740cf8be14ade346fb5c559f}{mappings}} \mbox{[}\mbox{\hyperlink{acq-fiber-hba_8h_a15803d57ce517062baf9ac442ba66727}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+\+M\+AX}}\mbox{]}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_aa185e558a52dd54bda35b9a90afc9fda}{remote\+\_\+com\+\_\+bar}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{structAFHBA__DEV_ab061fc8f580584c1a004ada11868b5c0}{peer}}
+\item 
+void $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a977f83ec87bf6e976987f11b61743ef4}{remote}}
+\item 
+enum \mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+S\+FP}} \mbox{\hyperlink{structAFHBA__DEV_aed419a93d97f701f91704d0751abe9ce}{sfp}}
+\item 
+unsigned \mbox{\hyperlink{structAFHBA__DEV_af295c9bf34eb223dc2e9422d3ff26c2c}{A\+CR}}
+\item 
+struct proc\+\_\+dir\+\_\+entry $\ast$ \mbox{\hyperlink{structAFHBA__DEV_ab18975bbd836492b16d01c51bcf63a2a}{proc\+\_\+dir\+\_\+root}}
+\item 
+struct dentry $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a67c13d276a6034ecc3059179befa22aa}{debug\+\_\+dir}}
+\item 
+char $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a98f612b292879d24307efbfc88babdc5}{debug\+\_\+names}}
+\item 
+struct \mbox{\hyperlink{structHostBuffer}{Host\+Buffer}} $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a04b667fb8f74f6b021f1b238b7ac20b4}{hb1}}
+\item 
+struct \mbox{\hyperlink{structAFHBA__STREAM__DEV}{A\+F\+H\+B\+A\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+D\+EV}} $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a63df8625651d61d29b79c5a65d45a897}{stream\+\_\+dev}}
+\item 
+struct file\+\_\+operations $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a9e36e4b6dfda1f70fc0ac66eb6a3f5ad}{stream\+\_\+fops}}
+\item 
+struct platform\+\_\+device $\ast$ \mbox{\hyperlink{structAFHBA__DEV_a8719e7c15b04902cb853fcf22d4ab8e6}{hba\+\_\+sfp\+\_\+i2c}} \mbox{[}2\mbox{]}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_aa5797f572837f8cb2efc2f00f2a97b2d}{link\+\_\+up}}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_a2375a49920b1ec6e25e7feec60b97016}{aurora\+\_\+error\+\_\+count}}
+\item 
+int \mbox{\hyperlink{structAFHBA__DEV_a03a70e20a168e39891561f28c646007e}{aurora\+\_\+status\+\_\+read\+\_\+count}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}\label{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!SFP@{SFP}}
+\index{SFP@{SFP}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{SFP}{SFP}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+S\+FP}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SFP\_A@{SFP\_A}!AFHBA\_DEV@{AFHBA\_DEV}}\index{AFHBA\_DEV@{AFHBA\_DEV}!SFP\_A@{SFP\_A}}}\mbox{\Hypertarget{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a0aa7d518e9cd6b56beaf91c119faf15a}\label{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a0aa7d518e9cd6b56beaf91c119faf15a}} 
+S\+F\+P\+\_\+A&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SFP\_B@{SFP\_B}!AFHBA\_DEV@{AFHBA\_DEV}}\index{AFHBA\_DEV@{AFHBA\_DEV}!SFP\_B@{SFP\_B}}}\mbox{\Hypertarget{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a8d71d4aace0d76b2a5c4aec910d4f137}\label{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a8d71d4aace0d76b2a5c4aec910d4f137}} 
+S\+F\+P\+\_\+B&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SFP\_C@{SFP\_C}!AFHBA\_DEV@{AFHBA\_DEV}}\index{AFHBA\_DEV@{AFHBA\_DEV}!SFP\_C@{SFP\_C}}}\mbox{\Hypertarget{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a9ee6b939b299a5df8f2d2b1ce19aa2d0}\label{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60a9ee6b939b299a5df8f2d2b1ce19aa2d0}} 
+S\+F\+P\+\_\+C&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SFP\_D@{SFP\_D}!AFHBA\_DEV@{AFHBA\_DEV}}\index{AFHBA\_DEV@{AFHBA\_DEV}!SFP\_D@{SFP\_D}}}\mbox{\Hypertarget{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60af9b541c5b54120c39a917bd68ecbef82}\label{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60af9b541c5b54120c39a917bd68ecbef82}} 
+S\+F\+P\+\_\+D&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{structAFHBA__DEV_af295c9bf34eb223dc2e9422d3ff26c2c}\label{structAFHBA__DEV_af295c9bf34eb223dc2e9422d3ff26c2c}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!ACR@{ACR}}
+\index{ACR@{ACR}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{ACR}{ACR}}
+{\footnotesize\ttfamily unsigned A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+A\+CR}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a2375a49920b1ec6e25e7feec60b97016}\label{structAFHBA__DEV_a2375a49920b1ec6e25e7feec60b97016}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!aurora\_error\_count@{aurora\_error\_count}}
+\index{aurora\_error\_count@{aurora\_error\_count}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{aurora\_error\_count}{aurora\_error\_count}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::aurora\+\_\+error\+\_\+count}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a03a70e20a168e39891561f28c646007e}\label{structAFHBA__DEV_a03a70e20a168e39891561f28c646007e}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!aurora\_status\_read\_count@{aurora\_status\_read\_count}}
+\index{aurora\_status\_read\_count@{aurora\_status\_read\_count}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{aurora\_status\_read\_count}{aurora\_status\_read\_count}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::aurora\+\_\+status\+\_\+read\+\_\+count}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a5a00bea39ff7dbef851807ca550a7bce}\label{structAFHBA__DEV_a5a00bea39ff7dbef851807ca550a7bce}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!class\_dev@{class\_dev}}
+\index{class\_dev@{class\_dev}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{class\_dev}{class\_dev}}
+{\footnotesize\ttfamily struct device$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::class\+\_\+dev}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a67c13d276a6034ecc3059179befa22aa}\label{structAFHBA__DEV_a67c13d276a6034ecc3059179befa22aa}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!debug\_dir@{debug\_dir}}
+\index{debug\_dir@{debug\_dir}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{debug\_dir}{debug\_dir}}
+{\footnotesize\ttfamily struct dentry$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::debug\+\_\+dir}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a98f612b292879d24307efbfc88babdc5}\label{structAFHBA__DEV_a98f612b292879d24307efbfc88babdc5}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!debug\_names@{debug\_names}}
+\index{debug\_names@{debug\_names}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{debug\_names}{debug\_names}}
+{\footnotesize\ttfamily char$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::debug\+\_\+names}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a04b667fb8f74f6b021f1b238b7ac20b4}\label{structAFHBA__DEV_a04b667fb8f74f6b021f1b238b7ac20b4}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!hb1@{hb1}}
+\index{hb1@{hb1}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{hb1}{hb1}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structHostBuffer}{Host\+Buffer}}$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::hb1}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a8719e7c15b04902cb853fcf22d4ab8e6}\label{structAFHBA__DEV_a8719e7c15b04902cb853fcf22d4ab8e6}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!hba\_sfp\_i2c@{hba\_sfp\_i2c}}
+\index{hba\_sfp\_i2c@{hba\_sfp\_i2c}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{hba\_sfp\_i2c}{hba\_sfp\_i2c}}
+{\footnotesize\ttfamily struct platform\+\_\+device$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::hba\+\_\+sfp\+\_\+i2c\mbox{[}2\mbox{]}}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a6f0b8028f10c906f766eacbc9bc169c3}\label{structAFHBA__DEV_a6f0b8028f10c906f766eacbc9bc169c3}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!idx@{idx}}
+\index{idx@{idx}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{idx}{idx}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::idx}
+
+\mbox{\Hypertarget{structAFHBA__DEV_aa5797f572837f8cb2efc2f00f2a97b2d}\label{structAFHBA__DEV_aa5797f572837f8cb2efc2f00f2a97b2d}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!link\_up@{link\_up}}
+\index{link\_up@{link\_up}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{link\_up}{link\_up}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::link\+\_\+up}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a943180447cc1c813524c7d3fb6cf6d9c}\label{structAFHBA__DEV_a943180447cc1c813524c7d3fb6cf6d9c}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!list@{list}}
+\index{list@{list}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{list}{list}}
+{\footnotesize\ttfamily struct list\+\_\+head A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::list}
+
+\mbox{\Hypertarget{structAFHBA__DEV_aafb8796f9f439ac5e2066cefe8575b10}\label{structAFHBA__DEV_aafb8796f9f439ac5e2066cefe8575b10}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!major@{major}}
+\index{major@{major}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{major}{major}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::major}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a119ef86f39c3de55c6576f564cf9f3a0}\label{structAFHBA__DEV_a119ef86f39c3de55c6576f564cf9f3a0}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!map\_count@{map\_count}}
+\index{map\_count@{map\_count}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{map\_count}{map\_count}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::map\+\_\+count}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a08683690740cf8be14ade346fb5c559f}\label{structAFHBA__DEV_a08683690740cf8be14ade346fb5c559f}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!mappings@{mappings}}
+\index{mappings@{mappings}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{mappings}{mappings}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV_1_1PciMapping}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+Pci\+Mapping}} A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::mappings\mbox{[}\mbox{\hyperlink{acq-fiber-hba_8h_a15803d57ce517062baf9ac442ba66727}{M\+A\+P\+\_\+\+C\+O\+U\+N\+T\+\_\+\+M\+AX}}\mbox{]}}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a1f3accf9a6c918addd92edc6db3555c9}\label{structAFHBA__DEV_a1f3accf9a6c918addd92edc6db3555c9}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!mon\_name@{mon\_name}}
+\index{mon\_name@{mon\_name}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{mon\_name}{mon\_name}}
+{\footnotesize\ttfamily char A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::mon\+\_\+name\mbox{[}16\mbox{]}}
+
+\mbox{\Hypertarget{structAFHBA__DEV_aee7ebc759574dea1d82595bec014c45b}\label{structAFHBA__DEV_aee7ebc759574dea1d82595bec014c45b}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!name@{name}}
+\index{name@{name}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily char A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::name\mbox{[}16\mbox{]}}
+
+\mbox{\Hypertarget{structAFHBA__DEV_ab296ad34ee906508a91628cc708c0e4e}\label{structAFHBA__DEV_ab296ad34ee906508a91628cc708c0e4e}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!pci\_dev@{pci\_dev}}
+\index{pci\_dev@{pci\_dev}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{pci\_dev}{pci\_dev}}
+{\footnotesize\ttfamily struct pci\+\_\+dev$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::pci\+\_\+dev}
+
+\mbox{\Hypertarget{structAFHBA__DEV_ab061fc8f580584c1a004ada11868b5c0}\label{structAFHBA__DEV_ab061fc8f580584c1a004ada11868b5c0}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!peer@{peer}}
+\index{peer@{peer}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{peer}{peer}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::peer}
+
+\mbox{\Hypertarget{structAFHBA__DEV_ab18975bbd836492b16d01c51bcf63a2a}\label{structAFHBA__DEV_ab18975bbd836492b16d01c51bcf63a2a}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!proc\_dir\_root@{proc\_dir\_root}}
+\index{proc\_dir\_root@{proc\_dir\_root}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{proc\_dir\_root}{proc\_dir\_root}}
+{\footnotesize\ttfamily struct proc\+\_\+dir\+\_\+entry$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::proc\+\_\+dir\+\_\+root}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a977f83ec87bf6e976987f11b61743ef4}\label{structAFHBA__DEV_a977f83ec87bf6e976987f11b61743ef4}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!remote@{remote}}
+\index{remote@{remote}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{remote}{remote}}
+{\footnotesize\ttfamily void$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::remote}
+
+\mbox{\Hypertarget{structAFHBA__DEV_aa185e558a52dd54bda35b9a90afc9fda}\label{structAFHBA__DEV_aa185e558a52dd54bda35b9a90afc9fda}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!remote\_com\_bar@{remote\_com\_bar}}
+\index{remote\_com\_bar@{remote\_com\_bar}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{remote\_com\_bar}{remote\_com\_bar}}
+{\footnotesize\ttfamily int A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::remote\+\_\+com\+\_\+bar}
+
+\mbox{\Hypertarget{structAFHBA__DEV_aed419a93d97f701f91704d0751abe9ce}\label{structAFHBA__DEV_aed419a93d97f701f91704d0751abe9ce}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!sfp@{sfp}}
+\index{sfp@{sfp}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{sfp}{sfp}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{structAFHBA__DEV_a6d656ffc7da521e6d723c5548079ae60}{A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::\+S\+FP}} A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::sfp}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a91c77dca06d0604c36066c29ff3b5ecc}\label{structAFHBA__DEV_a91c77dca06d0604c36066c29ff3b5ecc}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!slot\_name@{slot\_name}}
+\index{slot\_name@{slot\_name}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{slot\_name}{slot\_name}}
+{\footnotesize\ttfamily char A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::slot\+\_\+name\mbox{[}16\mbox{]}}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a63df8625651d61d29b79c5a65d45a897}\label{structAFHBA__DEV_a63df8625651d61d29b79c5a65d45a897}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!stream\_dev@{stream\_dev}}
+\index{stream\_dev@{stream\_dev}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{stream\_dev}{stream\_dev}}
+{\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__STREAM__DEV}{A\+F\+H\+B\+A\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+D\+EV}}$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::stream\+\_\+dev}
+
+\mbox{\Hypertarget{structAFHBA__DEV_a9e36e4b6dfda1f70fc0ac66eb6a3f5ad}\label{structAFHBA__DEV_a9e36e4b6dfda1f70fc0ac66eb6a3f5ad}} 
+\index{AFHBA\_DEV@{AFHBA\_DEV}!stream\_fops@{stream\_fops}}
+\index{stream\_fops@{stream\_fops}!AFHBA\_DEV@{AFHBA\_DEV}}
+\doxysubsubsection{\texorpdfstring{stream\_fops}{stream\_fops}}
+{\footnotesize\ttfamily struct file\+\_\+operations$\ast$ A\+F\+H\+B\+A\+\_\+\+D\+E\+V\+::stream\+\_\+fops}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{acq-fiber-hba_8h}{acq-\/fiber-\/hba.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,133 @@
+\hypertarget{AcqSys_8h}{}\doxysection{A\+C\+Q\+P\+R\+O\+C/\+Acq\+Sys.h File Reference}
+\label{AcqSys_8h}\index{ACQPROC/AcqSys.h@{ACQPROC/AcqSys.h}}
+
+
+acqproc global class interface definition.  
+
+
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structVI}{VI}}
+\begin{DoxyCompactList}\small\item\em Models Vector Input. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structVO}{VO}}
+\begin{DoxyCompactList}\small\item\em Models Vector Output. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classIO}{IO}}
+\begin{DoxyCompactList}\small\item\em Base Class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classACQ}{A\+CQ}}
+\begin{DoxyCompactList}\small\item\em abstract model of an A\+C\+Q2106 box. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classHBA}{H\+BA}}
+\begin{DoxyCompactList}\small\item\em Models a Host Bus Adapter like A\+F\+H\+B\+A404. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structSystemInterface}{System\+Interface}}
+\begin{DoxyCompactList}\small\item\em Models interface with external P\+CS. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structSystemInterface_1_1Inputs}{System\+Interface\+::\+Inputs}}
+\begin{DoxyCompactList}\small\item\em O\+NE vector each type, all \mbox{\hyperlink{structVI}{VI}} from all U\+U\+TS are split into types and aggregated in the appropriate vectors. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structSystemInterface_1_1Outputs}{System\+Interface\+::\+Outputs}}
+\begin{DoxyCompactList}\small\item\em O\+NE vector each type, scatter each type to appropriate \mbox{\hyperlink{structVO}{VO}} all U\+U\+TS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceG}{G}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{AcqSys_8h_a57faad28f7a6fab00a7189408fc862d4}{P\+W32\+L\+EN}}~32
+\item 
+\#define \mbox{\hyperlink{AcqSys_8h_a1f21cf5737d621cd5d8b710af1168ba8}{P\+FN}}~\+\_\+\+\_\+\+P\+R\+E\+T\+T\+Y\+\_\+\+F\+U\+N\+C\+T\+I\+O\+N\+\_\+\+\_\+
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned \mbox{\hyperlink{AcqSys_8h_ac41b13b80f89b9ffbb9161730a7656e5}{P\+W32V}}\mbox{[}\mbox{\hyperlink{AcqSys_8h_a57faad28f7a6fab00a7189408fc862d4}{P\+W32\+L\+EN}}\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072}{S\+P\+IX}} \{ \mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072a808dd1682a365fbb3eab97f139a6792c}{T\+L\+A\+T\+CH}} = 0, 
+\mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072aea7b3b358477e3faeea0aa187cc97259}{U\+S\+E\+CS}} = 1, 
+\mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072ab73b20d091ffef591b48330141fda01e}{P\+O\+L\+L\+C\+O\+U\+NT}} = 2
+ \}
+\begin{DoxyCompactList}\small\item\em S\+P\+IX\+: defined fields in S\+P32 array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}{getenv}} (const char $\ast$key, int def, int($\ast$cvt)(const char $\ast$key)=atoi)
+\item 
+{\footnotesize template$<$class T $>$ }\\T $\ast$ \mbox{\hyperlink{AcqSys_8h_a4c9949ef1c09c94eca4a709218de2ef0}{new\+\_\+zarray}} (int nelems)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+acqproc global class interface definition. 
+
+Created on\+: 27 Feb 2020 Author\+: pgm 
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{AcqSys_8h_a1f21cf5737d621cd5d8b710af1168ba8}\label{AcqSys_8h_a1f21cf5737d621cd5d8b710af1168ba8}} 
+\index{AcqSys.h@{AcqSys.h}!PFN@{PFN}}
+\index{PFN@{PFN}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{PFN}{PFN}}
+{\footnotesize\ttfamily \#define P\+FN~\+\_\+\+\_\+\+P\+R\+E\+T\+T\+Y\+\_\+\+F\+U\+N\+C\+T\+I\+O\+N\+\_\+\+\_\+}
+
+\mbox{\Hypertarget{AcqSys_8h_a57faad28f7a6fab00a7189408fc862d4}\label{AcqSys_8h_a57faad28f7a6fab00a7189408fc862d4}} 
+\index{AcqSys.h@{AcqSys.h}!PW32LEN@{PW32LEN}}
+\index{PW32LEN@{PW32LEN}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{PW32LEN}{PW32LEN}}
+{\footnotesize\ttfamily \#define P\+W32\+L\+EN~32}
+
+
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{AcqSys_8h_ac41b13b80f89b9ffbb9161730a7656e5}\label{AcqSys_8h_ac41b13b80f89b9ffbb9161730a7656e5}} 
+\index{AcqSys.h@{AcqSys.h}!PW32V@{PW32V}}
+\index{PW32V@{PW32V}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{PW32V}{PW32V}}
+{\footnotesize\ttfamily typedef unsigned P\+W32V\mbox{[}\mbox{\hyperlink{AcqSys_8h_a57faad28f7a6fab00a7189408fc862d4}{P\+W32\+L\+EN}}\mbox{]}}
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072}\label{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072}} 
+\index{AcqSys.h@{AcqSys.h}!SPIX@{SPIX}}
+\index{SPIX@{SPIX}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{SPIX}{SPIX}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072}{S\+P\+IX}}}
+
+
+
+S\+P\+IX\+: defined fields in S\+P32 array. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TLATCH@{TLATCH}!AcqSys.h@{AcqSys.h}}\index{AcqSys.h@{AcqSys.h}!TLATCH@{TLATCH}}}\mbox{\Hypertarget{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072a808dd1682a365fbb3eab97f139a6792c}\label{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072a808dd1682a365fbb3eab97f139a6792c}} 
+T\+L\+A\+T\+CH&Sample Number. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USECS@{USECS}!AcqSys.h@{AcqSys.h}}\index{AcqSys.h@{AcqSys.h}!USECS@{USECS}}}\mbox{\Hypertarget{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072aea7b3b358477e3faeea0aa187cc97259}\label{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072aea7b3b358477e3faeea0aa187cc97259}} 
+U\+S\+E\+CS&microseconds since trigger \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{POLLCOUNT@{POLLCOUNT}!AcqSys.h@{AcqSys.h}}\index{AcqSys.h@{AcqSys.h}!POLLCOUNT@{POLLCOUNT}}}\mbox{\Hypertarget{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072ab73b20d091ffef591b48330141fda01e}\label{AcqSys_8h_a56caefa6c128565661f19c3cb03e7072ab73b20d091ffef591b48330141fda01e}} 
+P\+O\+L\+L\+C\+O\+U\+NT&pollcount\+: number of times SW polled for incoming. $<$=1 \+: E\+R\+R\+OR (data too early) \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}\label{AcqSys_8h_a6d77f7fc7ed5c79139293d6cf2727c68}} 
+\index{AcqSys.h@{AcqSys.h}!getenv@{getenv}}
+\index{getenv@{getenv}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{getenv()}{getenv()}}
+{\footnotesize\ttfamily int getenv (\begin{DoxyParamCaption}\item[{const char $\ast$}]{key,  }\item[{int}]{def,  }\item[{int($\ast$)(const char $\ast$key)}]{cvt = {\ttfamily atoi} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{AcqSys_8h_a4c9949ef1c09c94eca4a709218de2ef0}\label{AcqSys_8h_a4c9949ef1c09c94eca4a709218de2ef0}} 
+\index{AcqSys.h@{AcqSys.h}!new\_zarray@{new\_zarray}}
+\index{new\_zarray@{new\_zarray}!AcqSys.h@{AcqSys.h}}
+\doxysubsubsection{\texorpdfstring{new\_zarray()}{new\_zarray()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T$\ast$ new\+\_\+zarray (\begin{DoxyParamCaption}\item[{int}]{nelems }\end{DoxyParamCaption})}
+

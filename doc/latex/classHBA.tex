@@ -1,0 +1,200 @@
+\hypertarget{classHBA}{}\doxysection{H\+BA Class Reference}
+\label{classHBA}\index{HBA@{HBA}}
+
+
+Models a Host Bus Adapter like A\+F\+H\+B\+A404.  
+
+
+
+
+{\ttfamily \#include $<$Acq\+Sys.\+h$>$}
+
+Inheritance diagram for H\+BA\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classHBA}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classHBA_a22040242c1492b03b9c86f54fdb400f3}{$\sim$\+H\+BA}} ()
+\item 
+virtual void \mbox{\hyperlink{classHBA_a27ad227f1b88a27773f6fcb916b42992}{start\+\_\+shot}} ()
+\item 
+virtual void \mbox{\hyperlink{classHBA_acbb46cd58bf96d34875156c67e3533ac}{process\+Sample}} (\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&system\+Interface, int sample)
+\begin{DoxyCompactList}\small\item\em core run time function, process\+Sample. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classHBA_a1c3e381c11bf15d9db08ad7304e517ad}{dump\+\_\+config}} ()
+\begin{DoxyCompactList}\small\item\em output complete configuration with calculated offsets \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classHBA_adde093827f1b4b9ced94ce4e9d9a0013}{dump\+\_\+data}} (const char $\ast$basename)
+\begin{DoxyCompactList}\small\item\em output raw data for each \mbox{\hyperlink{classACQ}{A\+CQ}} \end{DoxyCompactList}\item 
+virtual string \mbox{\hyperlink{classHBA_a18ea20faeefb9a33ad42ed47e523f4a6}{to\+String}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classHBA}{H\+BA}} \& \mbox{\hyperlink{classHBA_a40bcac1cde063b33fd5cfc7f275ea841}{create}} (const char $\ast$json\+\_\+def, int \+\_\+maxsam)
+\begin{DoxyCompactList}\small\item\em H\+B\+A\+::\+Create() factory function. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{classHBA}{H\+BA}} \& \mbox{\hyperlink{classHBA_a2a5f7d3d54970995eb18891066064913}{instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{classHBA_a7acf5dcf0f49aa892b5b7204fad7b00a}{devnum}}
+\item 
+vector$<$ \mbox{\hyperlink{classACQ}{A\+CQ}} $\ast$ $>$ \mbox{\hyperlink{classHBA_a5cf7e5d16038894e477dbf2bd84ddc0d}{uuts}}
+\begin{DoxyCompactList}\small\item\em vector of \mbox{\hyperlink{classACQ}{A\+CQ}} U\+UT\textquotesingle{}s \end{DoxyCompactList}\item 
+vector$<$ int $>$ \mbox{\hyperlink{classHBA_a9e1560fb836a83ed2fefa600c3515fc6}{devs}}
+\begin{DoxyCompactList}\small\item\em A\+F\+H\+BA devnum. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{structVI}{VI}} \mbox{\hyperlink{classHBA_a5059d212fcabd2c1f9a5d6f1b760d7c4}{vi}}
+\begin{DoxyCompactList}\small\item\em total system size each Input type. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{structVO}{VO}} \mbox{\hyperlink{classHBA_a18e364ff7d39f27e5ce9c9cca9c99d11}{vo}}
+\begin{DoxyCompactList}\small\item\em total system size each Output type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{classHBA_a503094c0a5878605de9d0f915ef6498c}{maxsam}}
+\begin{DoxyCompactList}\small\item\em max samples in shot (for raw memory alloc) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Models a Host Bus Adapter like A\+F\+H\+B\+A404. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classHBA_a22040242c1492b03b9c86f54fdb400f3}\label{classHBA_a22040242c1492b03b9c86f54fdb400f3}} 
+\index{HBA@{HBA}!````~HBA@{$\sim$HBA}}
+\index{````~HBA@{$\sim$HBA}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{$\sim$HBA()}{~HBA()}}
+{\footnotesize\ttfamily H\+B\+A\+::$\sim$\+H\+BA (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classHBA_a40bcac1cde063b33fd5cfc7f275ea841}\label{classHBA_a40bcac1cde063b33fd5cfc7f275ea841}} 
+\index{HBA@{HBA}!create@{create}}
+\index{create@{create}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classHBA}{H\+BA}} \& H\+B\+A\+::create (\begin{DoxyParamCaption}\item[{const char $\ast$}]{json\+\_\+def,  }\item[{int}]{\+\_\+maxsam }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+H\+B\+A\+::\+Create() factory function. 
+
+\mbox{\Hypertarget{classHBA_a1c3e381c11bf15d9db08ad7304e517ad}\label{classHBA_a1c3e381c11bf15d9db08ad7304e517ad}} 
+\index{HBA@{HBA}!dump\_config@{dump\_config}}
+\index{dump\_config@{dump\_config}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{dump\_config()}{dump\_config()}}
+{\footnotesize\ttfamily void H\+B\+A\+::dump\+\_\+config (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+output complete configuration with calculated offsets 
+
+\mbox{\Hypertarget{classHBA_adde093827f1b4b9ced94ce4e9d9a0013}\label{classHBA_adde093827f1b4b9ced94ce4e9d9a0013}} 
+\index{HBA@{HBA}!dump\_data@{dump\_data}}
+\index{dump\_data@{dump\_data}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{dump\_data()}{dump\_data()}}
+{\footnotesize\ttfamily void H\+B\+A\+::dump\+\_\+data (\begin{DoxyParamCaption}\item[{const char $\ast$}]{basename }\end{DoxyParamCaption})}
+
+
+
+output raw data for each \mbox{\hyperlink{classACQ}{A\+CQ}} 
+
+\mbox{\Hypertarget{classHBA_a2a5f7d3d54970995eb18891066064913}\label{classHBA_a2a5f7d3d54970995eb18891066064913}} 
+\index{HBA@{HBA}!instance@{instance}}
+\index{instance@{instance}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}}
+{\footnotesize\ttfamily static \mbox{\hyperlink{classHBA}{H\+BA}}\& H\+B\+A\+::instance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classHBA_acbb46cd58bf96d34875156c67e3533ac}\label{classHBA_acbb46cd58bf96d34875156c67e3533ac}} 
+\index{HBA@{HBA}!processSample@{processSample}}
+\index{processSample@{processSample}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{processSample()}{processSample()}}
+{\footnotesize\ttfamily void H\+B\+A\+::process\+Sample (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structSystemInterface}{System\+Interface}} \&}]{system\+Interface,  }\item[{int}]{sample }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+core run time function, process\+Sample. 
+
+\mbox{\Hypertarget{classHBA_a27ad227f1b88a27773f6fcb916b42992}\label{classHBA_a27ad227f1b88a27773f6fcb916b42992}} 
+\index{HBA@{HBA}!start\_shot@{start\_shot}}
+\index{start\_shot@{start\_shot}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{start\_shot()}{start\_shot()}}
+{\footnotesize\ttfamily void H\+B\+A\+::start\+\_\+shot (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\mbox{\Hypertarget{classHBA_a18ea20faeefb9a33ad42ed47e523f4a6}\label{classHBA_a18ea20faeefb9a33ad42ed47e523f4a6}} 
+\index{HBA@{HBA}!toString@{toString}}
+\index{toString@{toString}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily string H\+B\+A\+::to\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classIO_a19c40bdcfec77b24578bc50665acd106}{IO}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classHBA_a7acf5dcf0f49aa892b5b7204fad7b00a}\label{classHBA_a7acf5dcf0f49aa892b5b7204fad7b00a}} 
+\index{HBA@{HBA}!devnum@{devnum}}
+\index{devnum@{devnum}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{devnum}{devnum}}
+{\footnotesize\ttfamily int H\+B\+A\+::devnum}
+
+\mbox{\Hypertarget{classHBA_a9e1560fb836a83ed2fefa600c3515fc6}\label{classHBA_a9e1560fb836a83ed2fefa600c3515fc6}} 
+\index{HBA@{HBA}!devs@{devs}}
+\index{devs@{devs}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{devs}{devs}}
+{\footnotesize\ttfamily vector$<$int$>$ H\+B\+A\+::devs}
+
+
+
+A\+F\+H\+BA devnum. 
+
+NB\+: \char`\"{}\+H\+B\+A\char`\"{} ... works with $>$4 ports, so multiple \mbox{\hyperlink{classHBA}{H\+BA}}\textquotesingle{}s supported \mbox{\Hypertarget{classHBA_a503094c0a5878605de9d0f915ef6498c}\label{classHBA_a503094c0a5878605de9d0f915ef6498c}} 
+\index{HBA@{HBA}!maxsam@{maxsam}}
+\index{maxsam@{maxsam}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{maxsam}{maxsam}}
+{\footnotesize\ttfamily int H\+B\+A\+::maxsam\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+max samples in shot (for raw memory alloc) 
+
+\mbox{\Hypertarget{classHBA_a5cf7e5d16038894e477dbf2bd84ddc0d}\label{classHBA_a5cf7e5d16038894e477dbf2bd84ddc0d}} 
+\index{HBA@{HBA}!uuts@{uuts}}
+\index{uuts@{uuts}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{uuts}{uuts}}
+{\footnotesize\ttfamily vector$<$\mbox{\hyperlink{classACQ}{A\+CQ}}$\ast$$>$ H\+B\+A\+::uuts}
+
+
+
+vector of \mbox{\hyperlink{classACQ}{A\+CQ}} U\+UT\textquotesingle{}s 
+
+\mbox{\Hypertarget{classHBA_a5059d212fcabd2c1f9a5d6f1b760d7c4}\label{classHBA_a5059d212fcabd2c1f9a5d6f1b760d7c4}} 
+\index{HBA@{HBA}!vi@{vi}}
+\index{vi@{vi}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{vi}{vi}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{structVI}{VI}} H\+B\+A\+::vi}
+
+
+
+total system size each Input type. 
+
+\mbox{\Hypertarget{classHBA_a18e364ff7d39f27e5ce9c9cca9c99d11}\label{classHBA_a18e364ff7d39f27e5ce9c9cca9c99d11}} 
+\index{HBA@{HBA}!vo@{vo}}
+\index{vo@{vo}!HBA@{HBA}}
+\doxysubsubsection{\texorpdfstring{vo}{vo}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{structVO}{VO}} H\+B\+A\+::vo}
+
+
+
+total system size each Output type. 
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqSys_8h}{Acq\+Sys.\+h}}\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}}\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqSys_8cpp}{Acq\+Sys.\+cpp}}\end{DoxyCompactItemize}

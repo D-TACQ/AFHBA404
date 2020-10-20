@@ -1,0 +1,61 @@
+\hypertarget{RTM__T__Device_8cpp}{}\doxysection{S\+T\+R\+E\+A\+M/\+R\+T\+M\+\_\+\+T\+\_\+\+Device.cpp File Reference}
+\label{RTM__T__Device_8cpp}\index{STREAM/RTM\_T\_Device.cpp@{STREAM/RTM\_T\_Device.cpp}}
+
+
+interface to R\+T\+M\+\_\+T Device (historic name for A\+F\+H\+B\+A404)  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}local.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}R\+T\+M\+\_\+\+T\+\_\+\+Device.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}}~\char`\"{}/sys/module/afhba/parameters/\char`\"{}
+\item 
+\#define \mbox{\hyperlink{RTM__T__Device_8cpp_a46130dc86f2322714bba26960b64e7bb}{B\+U\+F\+F\+E\+R\+\_\+\+L\+EN}}~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}buffer\+\_\+len\char`\"{}
+\item 
+\#define \mbox{\hyperlink{RTM__T__Device_8cpp_a9edd9094928a345418d8d05c9a8e209f}{N\+B\+U\+F\+F\+E\+RS}}~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}nbuffers\char`\"{}
+\item 
+\#define \mbox{\hyperlink{RTM__T__Device_8cpp_af96e6c13c7ffec73aee1823b9c10b5dc}{T\+R\+A\+N\+S\+F\+E\+R\+\_\+\+B\+U\+F\+F\+E\+RS}}~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}transfer\+\_\+buffers\char`\"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+interface to R\+T\+M\+\_\+T Device (historic name for A\+F\+H\+B\+A404) 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{RTM__T__Device_8cpp_a46130dc86f2322714bba26960b64e7bb}\label{RTM__T__Device_8cpp_a46130dc86f2322714bba26960b64e7bb}} 
+\index{RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}!BUFFER\_LEN@{BUFFER\_LEN}}
+\index{BUFFER\_LEN@{BUFFER\_LEN}!RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}}
+\doxysubsubsection{\texorpdfstring{BUFFER\_LEN}{BUFFER\_LEN}}
+{\footnotesize\ttfamily \#define B\+U\+F\+F\+E\+R\+\_\+\+L\+EN~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}buffer\+\_\+len\char`\"{}}
+
+\mbox{\Hypertarget{RTM__T__Device_8cpp_a9edd9094928a345418d8d05c9a8e209f}\label{RTM__T__Device_8cpp_a9edd9094928a345418d8d05c9a8e209f}} 
+\index{RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}!NBUFFERS@{NBUFFERS}}
+\index{NBUFFERS@{NBUFFERS}!RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}}
+\doxysubsubsection{\texorpdfstring{NBUFFERS}{NBUFFERS}}
+{\footnotesize\ttfamily \#define N\+B\+U\+F\+F\+E\+RS~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}nbuffers\char`\"{}}
+
+\mbox{\Hypertarget{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}\label{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}} 
+\index{RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}!PARAMETERS@{PARAMETERS}}
+\index{PARAMETERS@{PARAMETERS}!RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}}
+\doxysubsubsection{\texorpdfstring{PARAMETERS}{PARAMETERS}}
+{\footnotesize\ttfamily \#define P\+A\+R\+A\+M\+E\+T\+E\+RS~\char`\"{}/sys/module/afhba/parameters/\char`\"{}}
+
+\mbox{\Hypertarget{RTM__T__Device_8cpp_af96e6c13c7ffec73aee1823b9c10b5dc}\label{RTM__T__Device_8cpp_af96e6c13c7ffec73aee1823b9c10b5dc}} 
+\index{RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}!TRANSFER\_BUFFERS@{TRANSFER\_BUFFERS}}
+\index{TRANSFER\_BUFFERS@{TRANSFER\_BUFFERS}!RTM\_T\_Device.cpp@{RTM\_T\_Device.cpp}}
+\doxysubsubsection{\texorpdfstring{TRANSFER\_BUFFERS}{TRANSFER\_BUFFERS}}
+{\footnotesize\ttfamily \#define T\+R\+A\+N\+S\+F\+E\+R\+\_\+\+B\+U\+F\+F\+E\+RS~\mbox{\hyperlink{RTM__T__Device_8cpp_a9e4247f482c47b0c2ed1a5684bae1f26}{P\+A\+R\+A\+M\+E\+T\+E\+RS}} \char`\"{}transfer\+\_\+buffers\char`\"{}}
+

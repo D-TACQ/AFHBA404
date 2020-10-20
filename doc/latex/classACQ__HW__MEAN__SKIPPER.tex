@@ -1,0 +1,60 @@
+\hypertarget{classACQ__HW__MEAN__SKIPPER}{}\doxysection{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER Class Reference}
+\label{classACQ__HW__MEAN__SKIPPER}\index{ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}}
+
+
+takes mean of N samples, new\+Sample returns true after {\bfseries{skip}} samples  
+
+
+Inheritance diagram for A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classACQ__HW__MEAN__SKIPPER}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classACQ__HW__MEAN__SKIPPER_a7106b7333670f688d82d977be1a40c42}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER}} (int \mbox{\hyperlink{classACQ_a2af6cf10b6644724bfedc1fb5fa7a976}{devnum}}, string \+\_\+name, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo, \mbox{\hyperlink{structVI}{VI}} \+\_\+vi\+\_\+offsets, \mbox{\hyperlink{structVO}{VO}} \+\_\+vo\+\_\+offsets, \mbox{\hyperlink{structVI}{VI}} \&\+\_\+sys\+\_\+vi\+\_\+cursor, \mbox{\hyperlink{structVO}{VO}} \&\+\_\+sys\+\_\+vo\+\_\+cursor, int \+\_\+nmean, int \+\_\+nskip)
+\item 
+virtual bool \mbox{\hyperlink{classACQ__HW__MEAN__SKIPPER_ab73b2470efa4617e9dbf2da7976ab278}{new\+Sample}} (int \mbox{\hyperlink{classACQ__HW__BASE_a6b107395b9e73ab3c16bdf78e5f35bc1}{sample}})
+\begin{DoxyCompactList}\small\item\em checks host buffer for new sample, if so copies to lbuf and reports true \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+takes mean of N samples, new\+Sample returns true after {\bfseries{skip}} samples 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classACQ__HW__MEAN__SKIPPER_a7106b7333670f688d82d977be1a40c42}\label{classACQ__HW__MEAN__SKIPPER_a7106b7333670f688d82d977be1a40c42}} 
+\index{ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}!ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}}
+\index{ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}!ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}}
+\doxysubsubsection{\texorpdfstring{ACQ\_HW\_MEAN\_SKIPPER()}{ACQ\_HW\_MEAN\_SKIPPER()}}
+{\footnotesize\ttfamily A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+E\+R\+::\+A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+ER (\begin{DoxyParamCaption}\item[{int}]{devnum,  }\item[{string}]{\+\_\+name,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo,  }\item[{\mbox{\hyperlink{structVI}{VI}}}]{\+\_\+vi\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVO}{VO}}}]{\+\_\+vo\+\_\+offsets,  }\item[{\mbox{\hyperlink{structVI}{VI}} \&}]{\+\_\+sys\+\_\+vi\+\_\+cursor,  }\item[{\mbox{\hyperlink{structVO}{VO}} \&}]{\+\_\+sys\+\_\+vo\+\_\+cursor,  }\item[{int}]{\+\_\+nmean,  }\item[{int}]{\+\_\+nskip }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classACQ__HW__MEAN__SKIPPER_ab73b2470efa4617e9dbf2da7976ab278}\label{classACQ__HW__MEAN__SKIPPER_ab73b2470efa4617e9dbf2da7976ab278}} 
+\index{ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}!newSample@{newSample}}
+\index{newSample@{newSample}!ACQ\_HW\_MEAN\_SKIPPER@{ACQ\_HW\_MEAN\_SKIPPER}}
+\doxysubsubsection{\texorpdfstring{newSample()}{newSample()}}
+{\footnotesize\ttfamily bool A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+A\+N\+\_\+\+S\+K\+I\+P\+P\+E\+R\+::new\+Sample (\begin{DoxyParamCaption}\item[{int}]{sample }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+checks host buffer for new sample, if so copies to lbuf and reports true 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sample} & checks host buffer for new sample, if so copies to lbuf and reports true \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classACQ__HW__MEAN_a778998401cf2320de0d33420fbaed520}{A\+C\+Q\+\_\+\+H\+W\+\_\+\+M\+E\+AN}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+A\+C\+Q\+P\+R\+O\+C/\mbox{\hyperlink{AcqHw_8cpp}{Acq\+Hw.\+cpp}}\end{DoxyCompactItemize}
