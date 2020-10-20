@@ -70,12 +70,11 @@ $(function() {
 <div class="title">afhba_sysfs.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>sysfs interface aka "knobs"  
-<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="acq-fiber-hba_8h_source.html">acq-fiber-hba.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="afhba__stream__drv_8h_source.html">afhba_stream_drv.h</a>&quot;</code><br />
-</div><table class="memberdecls">
+</div>
+<p><a href="afhba__sysfs_8c_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:aab5f10d7f6c80d1616bf1161ecdb3cff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__sysfs_8c.html#aab5f10d7f6c80d1616bf1161ecdb3cff">DATA_FIFO_STAT</a>(DIR,  SHL)</td></tr>
@@ -125,9 +124,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a8856616e3fa45184d60513cefb82e649"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__sysfs_8c.html#a8856616e3fa45184d60513cefb82e649">buffer_len</a></td></tr>
 <tr class="separator:a8856616e3fa45184d60513cefb82e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>sysfs interface aka "knobs" </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a911a5fb12dc6ed1aa5e62d3aed1c8967"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a911a5fb12dc6ed1aa5e62d3aed1c8967">&#9670;&nbsp;</a></span>_ERRLAT</h2>
 
@@ -143,6 +140,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00358">358</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
 
 </div>
 </div>
@@ -185,6 +184,8 @@ Variables</h2></td></tr>
 <div class="line">                                    \</div>
 <div class="line">static DEVICE_ATTR(data_fifo_stat_##DIR, (S_IRUSR|S_IRGRP), show_data_fifo_stat_##DIR, 0)</div>
 </div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00058">58</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="a073e35ee410f0fdde804a2a0f05fcef1"></a>
@@ -226,6 +227,8 @@ Variables</h2></td></tr>
 <div class="line">                                    \</div>
 <div class="line">static DEVICE_ATTR(desc_fifo_stat_##DIR, (S_IRUSR|S_IRGRP), show_desc_fifo_stat_##DIR, 0)</div>
 </div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00076">76</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="aed3d2690756aec3641983096fc593f1e"></a>
@@ -267,6 +270,8 @@ Variables</h2></td></tr>
 <div class="line">                                    \</div>
 <div class="line">static DEVICE_ATTR(dma_ctrl_##DIR, (S_IRUSR|S_IRGRP), show_dma_ctrl_##DIR, 0)</div>
 </div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00116">116</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="a7a04bfbd81e9cdaa77a1df44415598c2"></a>
@@ -308,6 +313,8 @@ Variables</h2></td></tr>
 <div class="line">                                    \</div>
 <div class="line">static DEVICE_ATTR(dma_latest_##DIR##_desc, (S_IRUSR|S_IRGRP), show_dma_latest_##DIR, 0)</div>
 </div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00149">149</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="a813828110f858dd171cf861933c9332d"></a>
@@ -325,6 +332,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00359">359</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
 
 </div>
 </div>
@@ -345,6 +354,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00590">590</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="a277f3932399bc90cb1d012e150194179"></a>
@@ -362,6 +373,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00624">624</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
 
 </div>
 </div>
@@ -381,6 +394,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00600">600</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <a id="aa567e9f66611fe5577f5febd26a600a9"></a>
@@ -398,6 +413,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00642">642</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
 
 </div>
 </div>
@@ -657,6 +674,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__sysfs_8c_source.html#l00222">222</a> of file <a class="el" href="afhba__sysfs_8c_source.html">afhba_sysfs.c</a>.</p>
+
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
@@ -672,14 +691,16 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00077">77</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="aacq-fiber-hba_8h_html_a615baf97a1981fa224c1a6d200ad7e0a"><div class="ttname"><a href="acq-fiber-hba_8h.html#a615baf97a1981fa224c1a6d200ad7e0a">afhba_lookupDeviceFromClass</a></div><div class="ttdeci">struct AFHBA_DEV * afhba_lookupDeviceFromClass(struct device *dev)</div><div class="ttdef"><b>Definition:</b> afhba_devman.c:52</div></div>
-<div class="ttc" id="aafhba__stream__drv_8h_html_a0592c6481f6cea5a445fa86b8063762c"><div class="ttname"><a href="afhba__stream__drv_8h.html#a0592c6481f6cea5a445fa86b8063762c">DMA_DESC_FIFSTA_RD</a></div><div class="ttdeci">#define DMA_DESC_FIFSTA_RD(adev)</div><div class="ttdef"><b>Definition:</b> afhba_stream_drv.h:239</div></div>
-<div class="ttc" id="aafhba__stream__drv_8h_html_a930a7e2fe34f32fe9bfeeb119314637d"><div class="ttname"><a href="afhba__stream__drv_8h.html#a930a7e2fe34f32fe9bfeeb119314637d">DMA_DATA_FIFSTA_RD</a></div><div class="ttdeci">#define DMA_DATA_FIFSTA_RD(adev)</div><div class="ttdef"><b>Definition:</b> afhba_stream_drv.h:238</div></div>
-<div class="ttc" id="astructAFHBA__DEV_html"><div class="ttname"><a href="structAFHBA__DEV.html">AFHBA_DEV</a></div><div class="ttdef"><b>Definition:</b> acq-fiber-hba.h:112</div></div>
-<div class="ttc" id="aafhba__stream__drv_8h_html_a187b648e9ff7b64e5d8a7f19186635cc"><div class="ttname"><a href="afhba__stream__drv_8h.html#a187b648e9ff7b64e5d8a7f19186635cc">DMA_CTRL_RD</a></div><div class="ttdeci">#define DMA_CTRL_RD(adev)</div><div class="ttdef"><b>Definition:</b> afhba_stream_drv.h:182</div></div>
+<div class="ttc" id="aacq-fiber-hba_8h_html_a615baf97a1981fa224c1a6d200ad7e0a"><div class="ttname"><a href="acq-fiber-hba_8h.html#a615baf97a1981fa224c1a6d200ad7e0a">afhba_lookupDeviceFromClass</a></div><div class="ttdeci">struct AFHBA_DEV * afhba_lookupDeviceFromClass(struct device *dev)</div><div class="ttdef"><b>Definition:</b> <a href="afhba__devman_8c_source.html#l00052">afhba_devman.c:52</a></div></div>
+<div class="ttc" id="aafhba__stream__drv_8h_html_a0592c6481f6cea5a445fa86b8063762c"><div class="ttname"><a href="afhba__stream__drv_8h.html#a0592c6481f6cea5a445fa86b8063762c">DMA_DESC_FIFSTA_RD</a></div><div class="ttdeci">#define DMA_DESC_FIFSTA_RD(adev)</div><div class="ttdef"><b>Definition:</b> <a href="afhba__stream__drv_8h_source.html#l00240">afhba_stream_drv.h:239</a></div></div>
+<div class="ttc" id="aafhba__stream__drv_8h_html_a930a7e2fe34f32fe9bfeeb119314637d"><div class="ttname"><a href="afhba__stream__drv_8h.html#a930a7e2fe34f32fe9bfeeb119314637d">DMA_DATA_FIFSTA_RD</a></div><div class="ttdeci">#define DMA_DATA_FIFSTA_RD(adev)</div><div class="ttdef"><b>Definition:</b> <a href="afhba__stream__drv_8h_source.html#l00239">afhba_stream_drv.h:238</a></div></div>
+<div class="ttc" id="astructAFHBA__DEV_html"><div class="ttname"><a href="structAFHBA__DEV.html">AFHBA_DEV</a></div><div class="ttdef"><b>Definition:</b> <a href="acq-fiber-hba_8h_source.html#l00111">acq-fiber-hba.h:111</a></div></div>
+<div class="ttc" id="aafhba__stream__drv_8h_html_a187b648e9ff7b64e5d8a7f19186635cc"><div class="ttname"><a href="afhba__stream__drv_8h.html#a187b648e9ff7b64e5d8a7f19186635cc">DMA_CTRL_RD</a></div><div class="ttdeci">#define DMA_CTRL_RD(adev)</div><div class="ttdef"><b>Definition:</b> <a href="afhba__stream__drv_8h_source.html#l00183">afhba_stream_drv.h:182</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

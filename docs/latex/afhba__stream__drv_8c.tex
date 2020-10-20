@@ -1,10 +1,5 @@
 \hypertarget{afhba__stream__drv_8c}{}\doxysection{afhba\+\_\+stream\+\_\+drv.\+c File Reference}
 \label{afhba__stream__drv_8c}\index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
-
-
-A\+F\+H\+B\+A404 {\bfseries{core device driver}}, streaming D\+MA functions.  
-
-
 {\ttfamily \#include $<$linux/module.\+h$>$}\newline
 {\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}afhba\+\_\+stream\+\_\+drv.\+h\char`\"{}}\newline
@@ -191,11 +186,11 @@ int \mbox{\hyperlink{afhba__stream__drv_8c_a6888997381a284c0c5b84b50b0a69091}{af
 int \mbox{\hyperlink{afhba__stream__drv_8c_a3aa01387b73f8ad32a9f9f9c55abce3e}{afs\+\_\+dma\+\_\+release}} (struct inode $\ast$inode, struct file $\ast$file)
 \item 
 ssize\+\_\+t \mbox{\hyperlink{afhba__stream__drv_8c_a19117da77ae6b46961258fd2d36c584f}{afs\+\_\+dma\+\_\+read}} (struct file $\ast$file, char \+\_\+\+\_\+user $\ast$buf, size\+\_\+t count, loff\+\_\+t $\ast$f\+\_\+pos)
-\begin{DoxyCompactList}\small\item\em returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of unsigned return len is sizeof(array) \end{DoxyCompactList}\item 
+\item 
 ssize\+\_\+t \mbox{\hyperlink{afhba__stream__drv_8c_a1fb0236d0b7e74b511e020c60f9de08e}{afs\+\_\+dma\+\_\+read\+\_\+poll}} (struct file $\ast$file, char \+\_\+\+\_\+user $\ast$buf, size\+\_\+t count, loff\+\_\+t $\ast$f\+\_\+pos)
-\begin{DoxyCompactList}\small\item\em returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of unsigned return len is sizeof(array) \end{DoxyCompactList}\item 
+\item 
 ssize\+\_\+t \mbox{\hyperlink{afhba__stream__drv_8c_afefec43af9bdc253498b2f809782aff1}{afs\+\_\+dma\+\_\+write}} (struct file $\ast$file, const char $\ast$buf, size\+\_\+t count, loff\+\_\+t $\ast$f\+\_\+pos)
-\begin{DoxyCompactList}\small\item\em write completed data. \end{DoxyCompactList}\item 
+\item 
 int \mbox{\hyperlink{afhba__stream__drv_8c_acee35fe45766d97007efc6e7749cd970}{fix\+\_\+dma\+\_\+buff\+\_\+size}} (struct \mbox{\hyperlink{structAB}{AB}} $\ast$ab, struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} $\ast$xdef)
 \item 
 long \mbox{\hyperlink{afhba__stream__drv_8c_a018bc184d04233745e14487acc42ccd6}{afs\+\_\+start\+\_\+\+A\+I\+\_\+\+AB}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, struct \mbox{\hyperlink{structAB}{AB}} $\ast$ab)
@@ -203,11 +198,11 @@ long \mbox{\hyperlink{afhba__stream__drv_8c_a018bc184d04233745e14487acc42ccd6}{a
 long \mbox{\hyperlink{afhba__stream__drv_8c_a9f85340d39e3ba2b206f5aaf60850f2b}{afs\+\_\+start\+\_\+\+A\+BN}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev, struct \mbox{\hyperlink{structABN}{A\+BN}} $\ast$\mbox{\hyperlink{InlineDataHandlerMuxAO__LLC_8cpp_a7dcdc7734da01cb509747736b9d28501}{abn}}, enum \mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}{D\+M\+A\+\_\+\+S\+EL}} dma\+\_\+sel)
 \item 
 long \mbox{\hyperlink{afhba__stream__drv_8c_a56dae8844680fbcdfd86f412018846e3}{afs\+\_\+dma\+\_\+ioctl}} (struct file $\ast$file, unsigned int cmd, unsigned long arg)
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} entry point \end{DoxyCompactList}\item 
+\item 
 int \mbox{\hyperlink{afhba__stream__drv_8c_a2756f0f3f392a9a1c8ee49f811484720}{afs\+\_\+mmap\+\_\+host}} (struct file $\ast$file, struct vm\+\_\+area\+\_\+struct $\ast$vma)
-\begin{DoxyCompactList}\small\item\em {\bfseries{mmap}} the host buffer. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em mmap the host buffer. \end{DoxyCompactList}\item 
 int \mbox{\hyperlink{afhba__stream__drv_8c_a042bd0620fe1ee87f43a85e1257ad714}{afs\+\_\+open}} (struct inode $\ast$inode, struct file $\ast$file)
-\begin{DoxyCompactList}\small\item\em {\bfseries{open}} entry point \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{afhba__stream__drv_8c_a664f0fdc316af32aa95197265a53ae39}{afs\+\_\+create\+\_\+sysfs}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
 \item 
 int \mbox{\hyperlink{afhba__stream__drv_8c_a998a8a4d91eae0f4d53ab20568a826f9}{afhba\+\_\+stream\+\_\+drv\+\_\+init}} (struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)
@@ -259,13 +254,6 @@ int \mbox{\hyperlink{afhba__stream__drv_8c_aef7be387d15610bada94523e2322352f}{us
 \end{DoxyCompactItemize}
 
 
-\doxysubsection{Detailed Description}
-A\+F\+H\+B\+A404 {\bfseries{core device driver}}, streaming D\+MA functions. 
-
-\mbox{\hyperlink{afhba__stream__drv_8c}{afhba\+\_\+stream\+\_\+drv.\+c}}
-
-Created on\+: 19 Jan 2015 Author\+: pgm 
-
 \doxysubsection{Macro Definition Documentation}
 \mbox{\Hypertarget{afhba__stream__drv_8c_a777271704e0109c19fee4dbdd35aef5d}\label{afhba__stream__drv_8c_a777271704e0109c19fee4dbdd35aef5d}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!CHANGE\_STATE@{CHANGE\_STATE}}
@@ -279,11 +267,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{COPY\_FROM\_USER}{COPY\_FROM\_USER}}
 {\footnotesize\ttfamily \#define C\+O\+P\+Y\+\_\+\+F\+R\+O\+M\+\_\+\+U\+S\+ER(\begin{DoxyParamCaption}\item[{}]{to,  }\item[{}]{from,  }\item[{}]{len }\end{DoxyParamCaption})~if (copy\+\_\+from\+\_\+user(to, from, len)) \{ return -\/E\+F\+A\+U\+LT; \}}
 
+
+
+Definition at line 194 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0492b185f8363718e4b2feb16d0d3a7a}\label{afhba__stream__drv_8c_a0492b185f8363718e4b2feb16d0d3a7a}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!COPY\_TO\_USER@{COPY\_TO\_USER}}
 \index{COPY\_TO\_USER@{COPY\_TO\_USER}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{COPY\_TO\_USER}{COPY\_TO\_USER}}
 {\footnotesize\ttfamily \#define C\+O\+P\+Y\+\_\+\+T\+O\+\_\+\+U\+S\+ER(\begin{DoxyParamCaption}\item[{}]{to,  }\item[{}]{from,  }\item[{}]{len }\end{DoxyParamCaption})~if (copy\+\_\+to\+\_\+user(to, from, len)) \{ return -\/E\+F\+A\+U\+LT; \}}
+
+
+
+Definition at line 197 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a654173c247b52fd2b1b2d6786fc1befb}\label{afhba__stream__drv_8c_a654173c247b52fd2b1b2d6786fc1befb}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!DATA\_FIFO\_SZ@{DATA\_FIFO\_SZ}}
@@ -291,11 +287,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{DATA\_FIFO\_SZ}{DATA\_FIFO\_SZ}}
 {\footnotesize\ttfamily \#define D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+SZ~(\mbox{\hyperlink{afhba__stream__drv_8h_a12dde3215bce69fded07968b4bfe2bd0}{R\+T\+D\+M\+A\+C\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+NT}}$\ast$sizeof(unsigned))}
 
+
+
+Definition at line 784 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a28d80d46646b70dec949eb503ffac664}\label{afhba__stream__drv_8c_a28d80d46646b70dec949eb503ffac664}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!DEF\_BUFFER\_LEN@{DEF\_BUFFER\_LEN}}
 \index{DEF\_BUFFER\_LEN@{DEF\_BUFFER\_LEN}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{DEF\_BUFFER\_LEN}{DEF\_BUFFER\_LEN}}
 {\footnotesize\ttfamily \#define D\+E\+F\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+L\+EN~0x100000}
+
+
+
+Definition at line 47 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_af517190dc6cb0e3c98f487d8c69c390a}\label{afhba__stream__drv_8c_af517190dc6cb0e3c98f487d8c69c390a}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!DESC\_FIFO\_SZ@{DESC\_FIFO\_SZ}}
@@ -303,11 +307,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{DESC\_FIFO\_SZ}{DESC\_FIFO\_SZ}}
 {\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+SZ~(\mbox{\hyperlink{afhba__stream__drv_8h_ad501989c72cedfe05c380e18ea813941}{R\+T\+D\+M\+A\+C\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+C\+NT}}$\ast$sizeof(unsigned))}
 
+
+
+Definition at line 785 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a85c975f662fd2203e47ee4753972f973}\label{afhba__stream__drv_8c_a85c975f662fd2203e47ee4753972f973}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!EXPORT\_SYMTAB@{EXPORT\_SYMTAB}}
 \index{EXPORT\_SYMTAB@{EXPORT\_SYMTAB}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{EXPORT\_SYMTAB}{EXPORT\_SYMTAB}}
 {\footnotesize\ttfamily \#define E\+X\+P\+O\+R\+T\+\_\+\+S\+Y\+M\+T\+AB}
+
+
+
+Definition at line 34 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_aa58bc4ea66597a76678cb5fc4cf5f0d4}\label{afhba__stream__drv_8c_aa58bc4ea66597a76678cb5fc4cf5f0d4}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!LL\_BLOCK@{LL\_BLOCK}}
@@ -315,11 +327,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{LL\_BLOCK}{LL\_BLOCK}}
 {\footnotesize\ttfamily \#define L\+L\+\_\+\+B\+L\+O\+CK~64}
 
+
+
+Definition at line 469 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_aac1bc5a9708ec15743ac98b9767994cd}\label{afhba__stream__drv_8c_aac1bc5a9708ec15743ac98b9767994cd}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!LL\_MAX\_CNT@{LL\_MAX\_CNT}}
 \index{LL\_MAX\_CNT@{LL\_MAX\_CNT}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{LL\_MAX\_CNT}{LL\_MAX\_CNT}}
 {\footnotesize\ttfamily \#define L\+L\+\_\+\+M\+A\+X\+\_\+\+C\+NT~16}
+
+
+
+Definition at line 468 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a04b3488dc6129c47e649ddf8df2b1152}\label{afhba__stream__drv_8c_a04b3488dc6129c47e649ddf8df2b1152}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!LL\_MAX\_LEN@{LL\_MAX\_LEN}}
@@ -327,17 +347,29 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{LL\_MAX\_LEN}{LL\_MAX\_LEN}}
 {\footnotesize\ttfamily \#define L\+L\+\_\+\+M\+A\+X\+\_\+\+L\+EN~(\mbox{\hyperlink{afhba__stream__drv_8c_aac1bc5a9708ec15743ac98b9767994cd}{L\+L\+\_\+\+M\+A\+X\+\_\+\+C\+NT}}$\ast$\mbox{\hyperlink{afhba__stream__drv_8c_aa58bc4ea66597a76678cb5fc4cf5f0d4}{L\+L\+\_\+\+B\+L\+O\+CK}})}
 
+
+
+Definition at line 471 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a98b1457085efb88f83caa071b0dbe741}\label{afhba__stream__drv_8c_a98b1457085efb88f83caa071b0dbe741}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!LL\_NB@{LL\_NB}}
 \index{LL\_NB@{LL\_NB}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{LL\_NB}{LL\_NB}}
 {\footnotesize\ttfamily \#define L\+L\+\_\+\+NB(\begin{DoxyParamCaption}\item[{}]{cnt }\end{DoxyParamCaption})~((cnt)-\/1)}
 
+
+
+Definition at line 470 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_ae54da537be07069aceda86c59827f5ff}\label{afhba__stream__drv_8c_ae54da537be07069aceda86c59827f5ff}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!MSLEEP\_TO@{MSLEEP\_TO}}
 \index{MSLEEP\_TO@{MSLEEP\_TO}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{MSLEEP\_TO}{MSLEEP\_TO}}
 {\footnotesize\ttfamily \#define M\+S\+L\+E\+E\+P\+\_\+\+TO~10}
+
+
+
+Definition at line 636 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_ab6bca16ed021b1e211fde8669758f199}\label{afhba__stream__drv_8c_ab6bca16ed021b1e211fde8669758f199}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!NEW@{NEW}}
@@ -363,17 +395,29 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{REVID}{REVID}}
 {\footnotesize\ttfamily \#define R\+E\+V\+ID~\char`\"{}R1072\char`\"{}}
 
+
+
+Definition at line 45 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a12dde3215bce69fded07968b4bfe2bd0}\label{afhba__stream__drv_8c_a12dde3215bce69fded07968b4bfe2bd0}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!RTDMAC\_DATA\_FIFO\_CNT@{RTDMAC\_DATA\_FIFO\_CNT}}
 \index{RTDMAC\_DATA\_FIFO\_CNT@{RTDMAC\_DATA\_FIFO\_CNT}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{RTDMAC\_DATA\_FIFO\_CNT}{RTDMAC\_DATA\_FIFO\_CNT}}
 {\footnotesize\ttfamily \#define R\+T\+D\+M\+A\+C\+\_\+\+D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+C\+NT~0x1000}
 
+
+
+Definition at line 781 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_ad501989c72cedfe05c380e18ea813941}\label{afhba__stream__drv_8c_ad501989c72cedfe05c380e18ea813941}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!RTDMAC\_DESC\_FIFO\_CNT@{RTDMAC\_DESC\_FIFO\_CNT}}
 \index{RTDMAC\_DESC\_FIFO\_CNT@{RTDMAC\_DESC\_FIFO\_CNT}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{RTDMAC\_DESC\_FIFO\_CNT}{RTDMAC\_DESC\_FIFO\_CNT}}
 {\footnotesize\ttfamily \#define R\+T\+D\+M\+A\+C\+\_\+\+D\+E\+S\+C\+\_\+\+F\+I\+F\+O\+\_\+\+C\+NT~0x1000}
+
+
+
+Definition at line 782 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_aa697b25ce629340796b4121108e55f86}\label{afhba__stream__drv_8c_aa697b25ce629340796b4121108e55f86}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!ZI\_FMT@{ZI\_FMT}}
@@ -390,11 +434,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{\_\_afs\_dma\_reset()}{\_\_afs\_dma\_reset()}}
 {\footnotesize\ttfamily void \+\_\+\+\_\+afs\+\_\+dma\+\_\+reset (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{dma\+\_\+sel }\end{DoxyParamCaption})}
 
+
+
+Definition at line 555 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_aa640f4215ec3a00abad8f9eb77ab07d7}\label{afhba__stream__drv_8c_aa640f4215ec3a00abad8f9eb77ab07d7}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_\_afs\_start\_dma@{\_\_afs\_start\_dma}}
 \index{\_\_afs\_start\_dma@{\_\_afs\_start\_dma}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{\_\_afs\_start\_dma()}{\_\_afs\_start\_dma()}}
 {\footnotesize\ttfamily void \+\_\+\+\_\+afs\+\_\+start\+\_\+dma (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{dma\+\_\+sel }\end{DoxyParamCaption})}
+
+
+
+Definition at line 570 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a030fefaf23608a69e6adf1c91276a088}\label{afhba__stream__drv_8c_a030fefaf23608a69e6adf1c91276a088}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_\_afs\_stop\_dma@{\_\_afs\_stop\_dma}}
@@ -402,11 +454,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{\_\_afs\_stop\_dma()}{\_\_afs\_stop\_dma()}}
 {\footnotesize\ttfamily void \+\_\+\+\_\+afs\+\_\+stop\+\_\+dma (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{dma\+\_\+sel }\end{DoxyParamCaption})}
 
+
+
+Definition at line 563 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a233c0342a175dad7cc8fd99630980cae}\label{afhba__stream__drv_8c_a233c0342a175dad7cc8fd99630980cae}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_read\_dmareg@{\_afs\_read\_dmareg}}
 \index{\_afs\_read\_dmareg@{\_afs\_read\_dmareg}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{\_afs\_read\_dmareg()}{\_afs\_read\_dmareg()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \+\_\+afs\+\_\+read\+\_\+dmareg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff }\end{DoxyParamCaption})}
+
+
+
+Definition at line 313 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_adc49ed04231db0e41efe0fc5c25ca7ff}\label{afhba__stream__drv_8c_adc49ed04231db0e41efe0fc5c25ca7ff}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_read\_pcireg@{\_afs\_read\_pcireg}}
@@ -414,11 +474,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{\_afs\_read\_pcireg()}{\_afs\_read\_pcireg()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \+\_\+afs\+\_\+read\+\_\+pcireg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff }\end{DoxyParamCaption})}
 
+
+
+Definition at line 332 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a8c3ed364a2b11d8ca3a21c6ac3a8171f}\label{afhba__stream__drv_8c_a8c3ed364a2b11d8ca3a21c6ac3a8171f}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_read\_zynqreg@{\_afs\_read\_zynqreg}}
 \index{\_afs\_read\_zynqreg@{\_afs\_read\_zynqreg}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{\_afs\_read\_zynqreg()}{\_afs\_read\_zynqreg()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}} \+\_\+afs\+\_\+read\+\_\+zynqreg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff }\end{DoxyParamCaption})}
+
+
+
+Definition at line 287 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a831db746d540bedda70579bb4b851987}\label{afhba__stream__drv_8c_a831db746d540bedda70579bb4b851987}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_write\_comreg@{\_afs\_write\_comreg}}
@@ -426,11 +494,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{\_afs\_write\_comreg()}{\_afs\_write\_comreg()}}
 {\footnotesize\ttfamily void \+\_\+afs\+\_\+write\+\_\+comreg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{value }\end{DoxyParamCaption})}
 
+
+
+Definition at line 296 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a22da44f681fa5bf421fb8b174d75f661}\label{afhba__stream__drv_8c_a22da44f681fa5bf421fb8b174d75f661}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_write\_dmareg@{\_afs\_write\_dmareg}}
 \index{\_afs\_write\_dmareg@{\_afs\_write\_dmareg}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{\_afs\_write\_dmareg()}{\_afs\_write\_dmareg()}}
 {\footnotesize\ttfamily void \+\_\+afs\+\_\+write\+\_\+dmareg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{value }\end{DoxyParamCaption})}
+
+
+
+Definition at line 304 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a4fddbbf919d57b001f97bca2b2521b62}\label{afhba__stream__drv_8c_a4fddbbf919d57b001f97bca2b2521b62}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!\_afs\_write\_pcireg@{\_afs\_write\_pcireg}}
@@ -438,11 +514,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{\_afs\_write\_pcireg()}{\_afs\_write\_pcireg()}}
 {\footnotesize\ttfamily void \+\_\+afs\+\_\+write\+\_\+pcireg (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{regoff,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{value }\end{DoxyParamCaption})}
 
+
+
+Definition at line 322 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a65c82f153ec4d08ea92319ed6d3c1e71}\label{afhba__stream__drv_8c_a65c82f153ec4d08ea92319ed6d3c1e71}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afhba\_stream\_drv\_del@{afhba\_stream\_drv\_del}}
 \index{afhba\_stream\_drv\_del@{afhba\_stream\_drv\_del}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_stream\_drv\_del()}{afhba\_stream\_drv\_del()}}
 {\footnotesize\ttfamily int afhba\+\_\+stream\+\_\+drv\+\_\+del (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2246 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a998a8a4d91eae0f4d53ab20568a826f9}\label{afhba__stream__drv_8c_a998a8a4d91eae0f4d53ab20568a826f9}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afhba\_stream\_drv\_init@{afhba\_stream\_drv\_init}}
@@ -450,11 +534,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{afhba\_stream\_drv\_init()}{afhba\_stream\_drv\_init()}}
 {\footnotesize\ttfamily int afhba\+\_\+stream\+\_\+drv\+\_\+init (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 2229 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a9c9d3e771c72bfce57e2487a342c8b52}\label{afhba__stream__drv_8c_a9c9d3e771c72bfce57e2487a342c8b52}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_comms\_init@{afs\_comms\_init}}
 \index{afs\_comms\_init@{afs\_comms\_init}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_comms\_init()}{afs\_comms\_init()}}
 {\footnotesize\ttfamily int afs\+\_\+comms\+\_\+init (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 749 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a3dbafa9a98192f8ca20e3d5b2d5d737d}\label{afhba__stream__drv_8c_a3dbafa9a98192f8ca20e3d5b2d5d737d}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_comms\_ready@{afs\_comms\_ready}}
@@ -462,11 +554,19 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{afs\_comms\_ready()}{afs\_comms\_ready()}}
 {\footnotesize\ttfamily int afs\+\_\+comms\+\_\+ready (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 773 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a664f0fdc316af32aa95197265a53ae39}\label{afhba__stream__drv_8c_a664f0fdc316af32aa95197265a53ae39}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_create\_sysfs@{afs\_create\_sysfs}}
 \index{afs\_create\_sysfs@{afs\_create\_sysfs}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_create\_sysfs()}{afs\_create\_sysfs()}}
 {\footnotesize\ttfamily void afs\+\_\+create\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2213 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a56dae8844680fbcdfd86f412018846e3}\label{afhba__stream__drv_8c_a56dae8844680fbcdfd86f412018846e3}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_ioctl@{afs\_dma\_ioctl}}
@@ -476,7 +576,7 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 
 
 
-{\bfseries{ioctl}} entry point 
+Definition at line 1944 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a6888997381a284c0c5b84b50b0a69091}\label{afhba__stream__drv_8c_a6888997381a284c0c5b84b50b0a69091}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_open@{afs\_dma\_open}}
@@ -484,7 +584,11 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 \doxysubsubsection{\texorpdfstring{afs\_dma\_open()}{afs\_dma\_open()}}
 {\footnotesize\ttfamily int afs\+\_\+dma\+\_\+open (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file }\end{DoxyParamCaption})}
 
-@todo protect with lock ?\mbox{\Hypertarget{afhba__stream__drv_8c_a19117da77ae6b46961258fd2d36c584f}\label{afhba__stream__drv_8c_a19117da77ae6b46961258fd2d36c584f}} 
+@todo protect with lock ?
+
+Definition at line 1505 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
+\mbox{\Hypertarget{afhba__stream__drv_8c_a19117da77ae6b46961258fd2d36c584f}\label{afhba__stream__drv_8c_a19117da77ae6b46961258fd2d36c584f}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_read@{afs\_dma\_read}}
 \index{afs\_dma\_read@{afs\_dma\_read}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_dma\_read()}{afs\_dma\_read()}}
@@ -492,7 +596,7 @@ Created on\+: 19 Jan 2015 Author\+: pgm
 
 
 
-returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of unsigned return len is sizeof(array) 
+Definition at line 1592 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a1fb0236d0b7e74b511e020c60f9de08e}\label{afhba__stream__drv_8c_a1fb0236d0b7e74b511e020c60f9de08e}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_read\_poll@{afs\_dma\_read\_poll}}
@@ -502,13 +606,17 @@ returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of 
 
 
 
-returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of unsigned return len is sizeof(array) 
+Definition at line 1694 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a3aa01387b73f8ad32a9f9f9c55abce3e}\label{afhba__stream__drv_8c_a3aa01387b73f8ad32a9f9f9c55abce3e}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_release@{afs\_dma\_release}}
 \index{afs\_dma\_release@{afs\_dma\_release}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_dma\_release()}{afs\_dma\_release()}}
 {\footnotesize\ttfamily int afs\+\_\+dma\+\_\+release (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1545 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_afefec43af9bdc253498b2f809782aff1}\label{afhba__stream__drv_8c_afefec43af9bdc253498b2f809782aff1}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_dma\_write@{afs\_dma\_write}}
@@ -518,13 +626,17 @@ returns when buffer\mbox{[}s\mbox{]} available data is buffer index as array of 
 
 
 
-write completed data. 
+Definition at line 1759 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
-data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are removed from full and placed onto empty. \mbox{\Hypertarget{afhba__stream__drv_8c_a711700388216bc8918929744833d3959}\label{afhba__stream__drv_8c_a711700388216bc8918929744833d3959}} 
+\mbox{\Hypertarget{afhba__stream__drv_8c_a711700388216bc8918929744833d3959}\label{afhba__stream__drv_8c_a711700388216bc8918929744833d3959}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_histo\_open@{afs\_histo\_open}}
 \index{afs\_histo\_open@{afs\_histo\_open}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_histo\_open()}{afs\_histo\_open()}}
 {\footnotesize\ttfamily int afs\+\_\+histo\+\_\+open (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file,  }\item[{unsigned $\ast$}]{histo,  }\item[{int}]{hcount }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1382 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a10324f4463a4c64a35055207b42dafb0}\label{afhba__stream__drv_8c_a10324f4463a4c64a35055207b42dafb0}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_histo\_read@{afs\_histo\_read}}
@@ -532,17 +644,29 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_histo\_read()}{afs\_histo\_read()}}
 {\footnotesize\ttfamily ssize\+\_\+t afs\+\_\+histo\+\_\+read (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{char $\ast$}]{buf,  }\item[{size\+\_\+t}]{count,  }\item[{loff\+\_\+t $\ast$}]{f\+\_\+pos }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1327 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a428181a53f308d5dc4327b1a5fc2251a}\label{afhba__stream__drv_8c_a428181a53f308d5dc4327b1a5fc2251a}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_init\_buffers@{afs\_init\_buffers}}
 \index{afs\_init\_buffers@{afs\_init\_buffers}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_init\_buffers()}{afs\_init\_buffers()}}
 {\footnotesize\ttfamily int afs\+\_\+init\+\_\+buffers (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1001 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a773bafacf5cd3a0a439eb22e49e29580}\label{afhba__stream__drv_8c_a773bafacf5cd3a0a439eb22e49e29580}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_load\_pull\_descriptor@{afs\_load\_pull\_descriptor}}
 \index{afs\_load\_pull\_descriptor@{afs\_load\_pull\_descriptor}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_load\_pull\_descriptor()}{afs\_load\_pull\_descriptor()}}
 {\footnotesize\ttfamily void afs\+\_\+load\+\_\+pull\+\_\+descriptor (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{idesc }\end{DoxyParamCaption})}
+
+
+
+Definition at line 353 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a2756f0f3f392a9a1c8ee49f811484720}\label{afhba__stream__drv_8c_a2756f0f3f392a9a1c8ee49f811484720}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_mmap\_host@{afs\_mmap\_host}}
@@ -552,7 +676,11 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 
 
 
-{\bfseries{mmap}} the host buffer. 
+mmap the host buffer. 
+
+
+
+Definition at line 2025 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a042bd0620fe1ee87f43a85e1257ad714}\label{afhba__stream__drv_8c_a042bd0620fe1ee87f43a85e1257ad714}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_open@{afs\_open}}
@@ -562,7 +690,7 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 
 
 
-{\bfseries{open}} entry point 
+Definition at line 2075 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_ae6bdfc093685df3cf8907ff68d25da21}\label{afhba__stream__drv_8c_ae6bdfc093685df3cf8907ff68d25da21}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_reset\_buffers@{afs\_reset\_buffers}}
@@ -570,11 +698,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_reset\_buffers()}{afs\_reset\_buffers()}}
 {\footnotesize\ttfamily int afs\+\_\+reset\+\_\+buffers (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1390 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a9f85340d39e3ba2b206f5aaf60850f2b}\label{afhba__stream__drv_8c_a9f85340d39e3ba2b206f5aaf60850f2b}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_start\_ABN@{afs\_start\_ABN}}
 \index{afs\_start\_ABN@{afs\_start\_ABN}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_start\_ABN()}{afs\_start\_ABN()}}
 {\footnotesize\ttfamily long afs\+\_\+start\+\_\+\+A\+BN (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{struct \mbox{\hyperlink{structABN}{A\+BN}} $\ast$}]{abn,  }\item[{enum \mbox{\hyperlink{acq-fiber-hba_8h_aa71e444677615564ffa37a7fd035b18b}{D\+M\+A\+\_\+\+S\+EL}}}]{dma\+\_\+sel }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1896 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a018bc184d04233745e14487acc42ccd6}\label{afhba__stream__drv_8c_a018bc184d04233745e14487acc42ccd6}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_start\_AI\_AB@{afs\_start\_AI\_AB}}
@@ -582,11 +718,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_start\_AI\_AB()}{afs\_start\_AI\_AB()}}
 {\footnotesize\ttfamily long afs\+\_\+start\+\_\+\+A\+I\+\_\+\+AB (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{struct \mbox{\hyperlink{structAB}{AB}} $\ast$}]{ab }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1860 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a9bd2f749e7c255349b1e201da51f865f}\label{afhba__stream__drv_8c_a9bd2f749e7c255349b1e201da51f865f}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_start\_ai\_llc@{afs\_start\_ai\_llc}}
 \index{afs\_start\_ai\_llc@{afs\_start\_ai\_llc}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_start\_ai\_llc()}{afs\_start\_ai\_llc()}}
 {\footnotesize\ttfamily long afs\+\_\+start\+\_\+ai\+\_\+llc (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} $\ast$}]{xllc\+\_\+def }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1468 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_ae205bf0cd97515cad155732aee5edfe2}\label{afhba__stream__drv_8c_ae205bf0cd97515cad155732aee5edfe2}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_start\_ao\_llc@{afs\_start\_ao\_llc}}
@@ -594,11 +738,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_start\_ao\_llc()}{afs\_start\_ao\_llc()}}
 {\footnotesize\ttfamily long afs\+\_\+start\+\_\+ao\+\_\+llc (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} $\ast$}]{xllc\+\_\+def }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1490 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_affacd282fb7095f49b573d9a27195c9a}\label{afhba__stream__drv_8c_affacd282fb7095f49b573d9a27195c9a}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_stop\_llc\_pull@{afs\_stop\_llc\_pull}}
 \index{afs\_stop\_llc\_pull@{afs\_stop\_llc\_pull}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_stop\_llc\_pull()}{afs\_stop\_llc\_pull()}}
 {\footnotesize\ttfamily void afs\+\_\+stop\+\_\+llc\+\_\+pull (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1432 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a246d0a0a99267062179a5471e46be986}\label{afhba__stream__drv_8c_a246d0a0a99267062179a5471e46be986}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_stop\_llc\_push@{afs\_stop\_llc\_push}}
@@ -606,11 +758,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_stop\_llc\_push()}{afs\_stop\_llc\_push()}}
 {\footnotesize\ttfamily void afs\+\_\+stop\+\_\+llc\+\_\+push (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1423 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_ae729e917f6ac3e614bff1a529ba704d3}\label{afhba__stream__drv_8c_ae729e917f6ac3e614bff1a529ba704d3}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_stop\_stream\_pull@{afs\_stop\_stream\_pull}}
 \index{afs\_stop\_stream\_pull@{afs\_stop\_stream\_pull}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{afs\_stop\_stream\_pull()}{afs\_stop\_stream\_pull()}}
 {\footnotesize\ttfamily void afs\+\_\+stop\+\_\+stream\+\_\+pull (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1444 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_af5ebd5ff59c0eea9d2187b4ac01ab8ba}\label{afhba__stream__drv_8c_af5ebd5ff59c0eea9d2187b4ac01ab8ba}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!afs\_stop\_stream\_push@{afs\_stop\_stream\_push}}
@@ -618,11 +778,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{afs\_stop\_stream\_push()}{afs\_stop\_stream\_push()}}
 {\footnotesize\ttfamily void afs\+\_\+stop\+\_\+stream\+\_\+push (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1438 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_acee35fe45766d97007efc6e7749cd970}\label{afhba__stream__drv_8c_acee35fe45766d97007efc6e7749cd970}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!fix\_dma\_buff\_size@{fix\_dma\_buff\_size}}
 \index{fix\_dma\_buff\_size@{fix\_dma\_buff\_size}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{fix\_dma\_buff\_size()}{fix\_dma\_buff\_size()}}
 {\footnotesize\ttfamily int fix\+\_\+dma\+\_\+buff\+\_\+size (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAB}{AB}} $\ast$}]{ab,  }\item[{struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} $\ast$}]{xdef }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1834 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a1acb390c1d3ae8c2ec1a6d59e8a8964a}\label{afhba__stream__drv_8c_a1acb390c1d3ae8c2ec1a6d59e8a8964a}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!hb\_from\_descr@{hb\_from\_descr}}
@@ -630,11 +798,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{hb\_from\_descr()}{hb\_from\_descr()}}
 {\footnotesize\ttfamily struct \mbox{\hyperlink{structHostBuffer}{Host\+Buffer}}$\ast$ hb\+\_\+from\+\_\+descr (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{\mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}}}]{inflight\+\_\+descr }\end{DoxyParamCaption})}
 
+
+
+Definition at line 853 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a1d3c05bdbcc3eb007e57d9b0f2cf85bf}\label{afhba__stream__drv_8c_a1d3c05bdbcc3eb007e57d9b0f2cf85bf}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!init\_descriptors\_ht@{init\_descriptors\_ht}}
 \index{init\_descriptors\_ht@{init\_descriptors\_ht}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{init\_descriptors\_ht()}{init\_descriptors\_ht()}}
 {\footnotesize\ttfamily void init\+\_\+descriptors\+\_\+ht (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__STREAM__DEV}{A\+F\+H\+B\+A\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+D\+EV}} $\ast$}]{sdev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 156 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a185feb8d250a8be9f1e75c360ca8d103}\label{afhba__stream__drv_8c_a185feb8d250a8be9f1e75c360ca8d103}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!job\_is\_go@{job\_is\_go}}
@@ -642,11 +818,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{job\_is\_go()}{job\_is\_go()}}
 {\footnotesize\ttfamily int job\+\_\+is\+\_\+go (\begin{DoxyParamCaption}\item[{struct J\+OB $\ast$}]{job }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1169 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a8ce49ee548ebb815c5e1de0b5afb7bc0}\label{afhba__stream__drv_8c_a8ce49ee548ebb815c5e1de0b5afb7bc0}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!load\_buffers@{load\_buffers}}
 \index{load\_buffers@{load\_buffers}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{load\_buffers()}{load\_buffers()}}
 {\footnotesize\ttfamily int load\+\_\+buffers (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1175 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a55c566ded50c8d6d1e5a27210767afc0}\label{afhba__stream__drv_8c_a55c566ded50c8d6d1e5a27210767afc0}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!module\_param@{module\_param}}
@@ -882,11 +1066,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{push\_dma\_timeout()}{push\_dma\_timeout()}}
 {\footnotesize\ttfamily int push\+\_\+dma\+\_\+timeout (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 1450 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a5cb634d07042105fbf446bd661b8229c}\label{afhba__stream__drv_8c_a5cb634d07042105fbf446bd661b8229c}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!start\_job@{start\_job}}
 \index{start\_job@{start\_job}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{start\_job()}{start\_job()}}
 {\footnotesize\ttfamily int start\+\_\+job (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1190 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 
 
@@ -897,11 +1089,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{amon\_jiffies}{amon\_jiffies}}
 {\footnotesize\ttfamily int amon\+\_\+jiffies = HZ/3}
 
+
+
+Definition at line 57 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0525402d1178b6607360280576193e79}\label{afhba__stream__drv_8c_a0525402d1178b6607360280576193e79}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!assume\_stuck\_buffers\_are\_ok@{assume\_stuck\_buffers\_are\_ok}}
 \index{assume\_stuck\_buffers\_are\_ok@{assume\_stuck\_buffers\_are\_ok}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{assume\_stuck\_buffers\_are\_ok}{assume\_stuck\_buffers\_are\_ok}}
 {\footnotesize\ttfamily int assume\+\_\+stuck\+\_\+buffers\+\_\+are\+\_\+ok = 1}
+
+
+
+Definition at line 113 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_ad5dcac2c0fe238bc413ab41f81b1c2bd}\label{afhba__stream__drv_8c_ad5dcac2c0fe238bc413ab41f81b1c2bd}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!aurora\_monitor@{aurora\_monitor}}
@@ -909,11 +1109,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{aurora\_monitor}{aurora\_monitor}}
 {\footnotesize\ttfamily int aurora\+\_\+monitor = 0}
 
+
+
+Definition at line 93 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a233a7f940f853f8f127e715b9b1b8c12}\label{afhba__stream__drv_8c_a233a7f940f853f8f127e715b9b1b8c12}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!aurora\_status\_read\_count@{aurora\_status\_read\_count}}
 \index{aurora\_status\_read\_count@{aurora\_status\_read\_count}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{aurora\_status\_read\_count}{aurora\_status\_read\_count}}
 {\footnotesize\ttfamily int aurora\+\_\+status\+\_\+read\+\_\+count = 0}
+
+
+
+Definition at line 105 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0b566ed817423d7640399903311c1cd9}\label{afhba__stream__drv_8c_a0b566ed817423d7640399903311c1cd9}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!aurora\_to\_ms@{aurora\_to\_ms}}
@@ -921,11 +1129,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{aurora\_to\_ms}{aurora\_to\_ms}}
 {\footnotesize\ttfamily int aurora\+\_\+to\+\_\+ms = 1000}
 
+
+
+Definition at line 89 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0ce785a3ba00fa2fd3b521b9c35488b6}\label{afhba__stream__drv_8c_a0ce785a3ba00fa2fd3b521b9c35488b6}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!buffer\_debug@{buffer\_debug}}
 \index{buffer\_debug@{buffer\_debug}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{buffer\_debug}{buffer\_debug}}
 {\footnotesize\ttfamily int buffer\+\_\+debug = 0}
+
+
+
+Definition at line 69 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a8856616e3fa45184d60513cefb82e649}\label{afhba__stream__drv_8c_a8856616e3fa45184d60513cefb82e649}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!buffer\_len@{buffer\_len}}
@@ -933,11 +1149,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{buffer\_len}{buffer\_len}}
 {\footnotesize\ttfamily int buffer\+\_\+len = \mbox{\hyperlink{afhba__stream__drv_8c_a28d80d46646b70dec949eb503ffac664}{D\+E\+F\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+L\+EN}}}
 
+
+
+Definition at line 77 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_adf1fe920193d83c955c9148826f0f0ed}\label{afhba__stream__drv_8c_adf1fe920193d83c955c9148826f0f0ed}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!cos\_interrupt\_ok@{cos\_interrupt\_ok}}
 \index{cos\_interrupt\_ok@{cos\_interrupt\_ok}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{cos\_interrupt\_ok}{cos\_interrupt\_ok}}
 {\footnotesize\ttfamily int cos\+\_\+interrupt\+\_\+ok = 0}
+
+
+
+Definition at line 101 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a035469b1e6da85398979576a0f0321ef}\label{afhba__stream__drv_8c_a035469b1e6da85398979576a0f0321ef}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!dma\_descriptor\_ram@{dma\_descriptor\_ram}}
@@ -945,11 +1169,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{dma\_descriptor\_ram}{dma\_descriptor\_ram}}
 {\footnotesize\ttfamily int dma\+\_\+descriptor\+\_\+ram = 1}
 
+
+
+Definition at line 109 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a312796d206f8818402ae3723f388b8a3}\label{afhba__stream__drv_8c_a312796d206f8818402ae3723f388b8a3}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!eot\_interrupt@{eot\_interrupt}}
 \index{eot\_interrupt@{eot\_interrupt}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{eot\_interrupt}{eot\_interrupt}}
 {\footnotesize\ttfamily int eot\+\_\+interrupt = 0}
+
+
+
+Definition at line 97 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a376dd1f084544c89e1b02a4a9fa46299}\label{afhba__stream__drv_8c_a376dd1f084544c89e1b02a4a9fa46299}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!max\_dma\_load\_retry@{max\_dma\_load\_retry}}
@@ -957,11 +1189,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{max\_dma\_load\_retry}{max\_dma\_load\_retry}}
 {\footnotesize\ttfamily int max\+\_\+dma\+\_\+load\+\_\+retry = 2}
 
+
+
+Definition at line 117 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_ac9202670dc1eb6e3423cfdd33c119341}\label{afhba__stream__drv_8c_ac9202670dc1eb6e3423cfdd33c119341}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!max\_empty\_backlog\_check@{max\_empty\_backlog\_check}}
 \index{max\_empty\_backlog\_check@{max\_empty\_backlog\_check}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{max\_empty\_backlog\_check}{max\_empty\_backlog\_check}}
 {\footnotesize\ttfamily int max\+\_\+empty\+\_\+backlog\+\_\+check = 2}
+
+
+
+Definition at line 124 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a5e6733abb143b0f91bda273e6b0ebbbc}\label{afhba__stream__drv_8c_a5e6733abb143b0f91bda273e6b0ebbbc}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!nbuffers@{nbuffers}}
@@ -969,11 +1209,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{nbuffers}{nbuffers}}
 {\footnotesize\ttfamily int nbuffers = \mbox{\hyperlink{RTM__T__Device_8cpp_a9edd9094928a345418d8d05c9a8e209f}{N\+B\+U\+F\+F\+E\+RS}}}
 
+
+
+Definition at line 73 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a9ecb4dc387683e4ba3fac40af2f0e417}\label{afhba__stream__drv_8c_a9ecb4dc387683e4ba3fac40af2f0e417}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!RX\_TO@{RX\_TO}}
 \index{RX\_TO@{RX\_TO}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{RX\_TO}{RX\_TO}}
 {\footnotesize\ttfamily int R\+X\+\_\+\+TO = 1$\ast$HZ}
+
+
+
+Definition at line 48 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_a49e6c0eaa2fb179f3ca3ea77ef98882c}\label{afhba__stream__drv_8c_a49e6c0eaa2fb179f3ca3ea77ef98882c}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!SMOO@{SMOO}}
@@ -981,11 +1229,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{SMOO}{SMOO}}
 {\footnotesize\ttfamily int S\+M\+OO = 7}
 
+
+
+Definition at line 61 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a87c725e30f7fbd2764f1193cb2650ec7}\label{afhba__stream__drv_8c_a87c725e30f7fbd2764f1193cb2650ec7}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!stalls@{stalls}}
 \index{stalls@{stalls}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{stalls}{stalls}}
 {\footnotesize\ttfamily int stalls = 0}
+
+
+
+Definition at line 65 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_ae1e28c510aaec3c066bfda0da8d19051}\label{afhba__stream__drv_8c_ae1e28c510aaec3c066bfda0da8d19051}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!stop\_on\_skipped\_buffer@{stop\_on\_skipped\_buffer}}
@@ -993,11 +1249,19 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{stop\_on\_skipped\_buffer}{stop\_on\_skipped\_buffer}}
 {\footnotesize\ttfamily int stop\+\_\+on\+\_\+skipped\+\_\+buffer = 0}
 
+
+
+Definition at line 82 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0fd4a2f0a31c06bd3341b0f84f86dcf2}\label{afhba__stream__drv_8c_a0fd4a2f0a31c06bd3341b0f84f86dcf2}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!transfer\_buffers@{transfer\_buffers}}
 \index{transfer\_buffers@{transfer\_buffers}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{transfer\_buffers}{transfer\_buffers}}
 {\footnotesize\ttfamily int transfer\+\_\+buffers = 0x7fffffff}
+
+
+
+Definition at line 85 of file afhba\+\_\+stream\+\_\+drv.\+c.
 
 \mbox{\Hypertarget{afhba__stream__drv_8c_aef7be387d15610bada94523e2322352f}\label{afhba__stream__drv_8c_aef7be387d15610bada94523e2322352f}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!use\_llc\_multi@{use\_llc\_multi}}
@@ -1005,9 +1269,17 @@ data is array of full buffer id\textquotesingle{}s id\textquotesingle{}s are rem
 \doxysubsubsection{\texorpdfstring{use\_llc\_multi}{use\_llc\_multi}}
 {\footnotesize\ttfamily int use\+\_\+llc\+\_\+multi = 0}
 
+
+
+Definition at line 130 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{afhba__stream__drv_8c_a0a18238ae8bfc000b7615fdcd977c0a9}\label{afhba__stream__drv_8c_a0a18238ae8bfc000b7615fdcd977c0a9}} 
 \index{afhba\_stream\_drv.c@{afhba\_stream\_drv.c}!WORK\_TO@{WORK\_TO}}
 \index{WORK\_TO@{WORK\_TO}!afhba\_stream\_drv.c@{afhba\_stream\_drv.c}}
 \doxysubsubsection{\texorpdfstring{WORK\_TO}{WORK\_TO}}
 {\footnotesize\ttfamily int W\+O\+R\+K\+\_\+\+TO = HZ/100}
+
+
+
+Definition at line 52 of file afhba\+\_\+stream\+\_\+drv.\+c.
 

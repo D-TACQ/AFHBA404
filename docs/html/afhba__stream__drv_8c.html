@@ -70,15 +70,14 @@ $(function() {
 <div class="title">afhba_stream_drv.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>AFHBA404 <b>core device driver</b>, streaming DMA functions.  
-<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;linux/module.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="acq-fiber-hba_8h_source.html">acq-fiber-hba.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="afhba__stream__drv_8h_source.html">afhba_stream_drv.h</a>&quot;</code><br />
 <code>#include &lt;linux/poll.h&gt;</code><br />
 <code>#include &lt;linux/version.h&gt;</code><br />
-</div><table class="memberdecls">
+</div>
+<p><a href="afhba__stream__drv_8c_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a85c975f662fd2203e47ee4753972f973"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a85c975f662fd2203e47ee4753972f973">EXPORT_SYMTAB</a></td></tr>
@@ -259,13 +258,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a3aa01387b73f8ad32a9f9f9c55abce3e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a3aa01387b73f8ad32a9f9f9c55abce3e">afs_dma_release</a> (struct inode *inode, struct file *file)</td></tr>
 <tr class="separator:a3aa01387b73f8ad32a9f9f9c55abce3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19117da77ae6b46961258fd2d36c584f"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a19117da77ae6b46961258fd2d36c584f">afs_dma_read</a> (struct file *file, char __user *buf, size_t count, loff_t *f_pos)</td></tr>
-<tr class="memdesc:a19117da77ae6b46961258fd2d36c584f"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns when buffer[s] available data is buffer index as array of unsigned return len is sizeof(array)  <a href="afhba__stream__drv_8c.html#a19117da77ae6b46961258fd2d36c584f">More...</a><br /></td></tr>
 <tr class="separator:a19117da77ae6b46961258fd2d36c584f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fb0236d0b7e74b511e020c60f9de08e"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a1fb0236d0b7e74b511e020c60f9de08e">afs_dma_read_poll</a> (struct file *file, char __user *buf, size_t count, loff_t *f_pos)</td></tr>
-<tr class="memdesc:a1fb0236d0b7e74b511e020c60f9de08e"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns when buffer[s] available data is buffer index as array of unsigned return len is sizeof(array)  <a href="afhba__stream__drv_8c.html#a1fb0236d0b7e74b511e020c60f9de08e">More...</a><br /></td></tr>
 <tr class="separator:a1fb0236d0b7e74b511e020c60f9de08e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afefec43af9bdc253498b2f809782aff1"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#afefec43af9bdc253498b2f809782aff1">afs_dma_write</a> (struct file *file, const char *buf, size_t count, loff_t *f_pos)</td></tr>
-<tr class="memdesc:afefec43af9bdc253498b2f809782aff1"><td class="mdescLeft">&#160;</td><td class="mdescRight">write completed data.  <a href="afhba__stream__drv_8c.html#afefec43af9bdc253498b2f809782aff1">More...</a><br /></td></tr>
 <tr class="separator:afefec43af9bdc253498b2f809782aff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acee35fe45766d97007efc6e7749cd970"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#acee35fe45766d97007efc6e7749cd970">fix_dma_buff_size</a> (struct <a class="el" href="structAB.html">AB</a> *ab, struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a> *xdef)</td></tr>
 <tr class="separator:acee35fe45766d97007efc6e7749cd970"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -274,13 +270,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a9f85340d39e3ba2b206f5aaf60850f2b"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a9f85340d39e3ba2b206f5aaf60850f2b">afs_start_ABN</a> (struct <a class="el" href="structAFHBA__DEV.html">AFHBA_DEV</a> *adev, struct <a class="el" href="structABN.html">ABN</a> *<a class="el" href="InlineDataHandlerMuxAO__LLC_8cpp.html#a7dcdc7734da01cb509747736b9d28501">abn</a>, enum <a class="el" href="acq-fiber-hba_8h.html#aa71e444677615564ffa37a7fd035b18b">DMA_SEL</a> dma_sel)</td></tr>
 <tr class="separator:a9f85340d39e3ba2b206f5aaf60850f2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56dae8844680fbcdfd86f412018846e3"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a56dae8844680fbcdfd86f412018846e3">afs_dma_ioctl</a> (struct file *file, unsigned int cmd, unsigned long arg)</td></tr>
-<tr class="memdesc:a56dae8844680fbcdfd86f412018846e3"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> entry point  <a href="afhba__stream__drv_8c.html#a56dae8844680fbcdfd86f412018846e3">More...</a><br /></td></tr>
 <tr class="separator:a56dae8844680fbcdfd86f412018846e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2756f0f3f392a9a1c8ee49f811484720"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a2756f0f3f392a9a1c8ee49f811484720">afs_mmap_host</a> (struct file *file, struct vm_area_struct *vma)</td></tr>
-<tr class="memdesc:a2756f0f3f392a9a1c8ee49f811484720"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>mmap</b> the host buffer.  <a href="afhba__stream__drv_8c.html#a2756f0f3f392a9a1c8ee49f811484720">More...</a><br /></td></tr>
+<tr class="memdesc:a2756f0f3f392a9a1c8ee49f811484720"><td class="mdescLeft">&#160;</td><td class="mdescRight">mmap the host buffer.  <a href="afhba__stream__drv_8c.html#a2756f0f3f392a9a1c8ee49f811484720">More...</a><br /></td></tr>
 <tr class="separator:a2756f0f3f392a9a1c8ee49f811484720"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a042bd0620fe1ee87f43a85e1257ad714"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a042bd0620fe1ee87f43a85e1257ad714">afs_open</a> (struct inode *inode, struct file *file)</td></tr>
-<tr class="memdesc:a042bd0620fe1ee87f43a85e1257ad714"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>open</b> entry point  <a href="afhba__stream__drv_8c.html#a042bd0620fe1ee87f43a85e1257ad714">More...</a><br /></td></tr>
 <tr class="separator:a042bd0620fe1ee87f43a85e1257ad714"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a664f0fdc316af32aa95197265a53ae39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#a664f0fdc316af32aa95197265a53ae39">afs_create_sysfs</a> (struct <a class="el" href="structAFHBA__DEV.html">AFHBA_DEV</a> *adev)</td></tr>
 <tr class="separator:a664f0fdc316af32aa95197265a53ae39"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -332,11 +326,7 @@ Variables</h2></td></tr>
 <tr class="memitem:aef7be387d15610bada94523e2322352f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="afhba__stream__drv_8c.html#aef7be387d15610bada94523e2322352f">use_llc_multi</a> = 0</td></tr>
 <tr class="separator:aef7be387d15610bada94523e2322352f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>AFHBA404 <b>core device driver</b>, streaming DMA functions. </p>
-<p><a class="el" href="afhba__stream__drv_8c.html" title="AFHBA404 core device driver, streaming DMA functions.">afhba_stream_drv.c</a></p>
-<p>Created on: 19 Jan 2015 Author: pgm </p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a777271704e0109c19fee4dbdd35aef5d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a777271704e0109c19fee4dbdd35aef5d">&#9670;&nbsp;</a></span>CHANGE_STATE</h2>
 
@@ -387,6 +377,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00194">194</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a0492b185f8363718e4b2feb16d0d3a7a"></a>
@@ -421,6 +413,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00197">197</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a654173c247b52fd2b1b2d6786fc1befb"></a>
@@ -434,6 +428,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00784">784</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -449,6 +445,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00047">47</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="af517190dc6cb0e3c98f487d8c69c390a"></a>
@@ -462,6 +460,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00785">785</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -477,6 +477,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00034">34</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="aa58bc4ea66597a76678cb5fc4cf5f0d4"></a>
@@ -490,6 +492,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00469">469</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -505,6 +509,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00468">468</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a04b3488dc6129c47e649ddf8df2b1152"></a>
@@ -518,6 +524,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00471">471</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -537,6 +545,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00470">470</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="ae54da537be07069aceda86c59827f5ff"></a>
@@ -550,6 +560,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00636">636</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -607,6 +619,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00045">45</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a12dde3215bce69fded07968b4bfe2bd0"></a>
@@ -621,6 +635,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00781">781</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="ad501989c72cedfe05c380e18ea813941"></a>
@@ -634,6 +650,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00782">782</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -678,6 +696,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00555">555</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="aa640f4215ec3a00abad8f9eb77ab07d7"></a>
@@ -705,6 +725,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00570">570</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -734,6 +756,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00563">563</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a233c0342a175dad7cc8fd99630980cae"></a>
@@ -761,6 +785,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00313">313</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -790,6 +816,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00332">332</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a8c3ed364a2b11d8ca3a21c6ac3a8171f"></a>
@@ -817,6 +845,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00287">287</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -852,6 +882,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00296">296</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a22da44f681fa5bf421fb8b174d75f661"></a>
@@ -885,6 +917,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00304">304</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -920,6 +954,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00322">322</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a65c82f153ec4d08ea92319ed6d3c1e71"></a>
@@ -937,6 +973,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l02246">2246</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -956,6 +994,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l02229">2229</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a9c9d3e771c72bfce57e2487a342c8b52"></a>
@@ -973,6 +1013,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00749">749</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -992,6 +1034,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00773">773</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a664f0fdc316af32aa95197265a53ae39"></a>
@@ -1009,6 +1053,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l02213">2213</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1044,7 +1090,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> entry point </p>
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01944">1944</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1074,6 +1120,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>@todo protect with lock ?</p>
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01505">1505</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1115,7 +1163,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>returns when buffer[s] available data is buffer index as array of unsigned return len is sizeof(array) </p>
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01592">1592</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1157,7 +1205,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>returns when buffer[s] available data is buffer index as array of unsigned return len is sizeof(array) </p>
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01694">1694</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1186,6 +1234,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01545">1545</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1227,8 +1277,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>write completed data. </p>
-<p>data is array of full buffer id's id's are removed from full and placed onto empty. </p>
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01759">1759</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1270,6 +1319,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01382">1382</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a10324f4463a4c64a35055207b42dafb0"></a>
@@ -1310,6 +1361,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01327">1327</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a428181a53f308d5dc4327b1a5fc2251a"></a>
@@ -1327,6 +1380,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01001">1001</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1356,6 +1411,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00353">353</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a2756f0f3f392a9a1c8ee49f811484720"></a>
@@ -1384,7 +1441,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>mmap</b> the host buffer. </p>
+<p>mmap the host buffer. </p>
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l02025">2025</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1414,7 +1473,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>open</b> entry point </p>
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l02075">2075</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1433,6 +1492,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01390">1390</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1468,6 +1529,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01896">1896</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a018bc184d04233745e14487acc42ccd6"></a>
@@ -1495,6 +1558,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01860">1860</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1524,6 +1589,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01468">1468</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="ae205bf0cd97515cad155732aee5edfe2"></a>
@@ -1552,6 +1619,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01490">1490</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="affacd282fb7095f49b573d9a27195c9a"></a>
@@ -1569,6 +1638,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01432">1432</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1588,6 +1659,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01423">1423</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="ae729e917f6ac3e614bff1a529ba704d3"></a>
@@ -1606,6 +1679,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01444">1444</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="af5ebd5ff59c0eea9d2187b4ac01ab8ba"></a>
@@ -1623,6 +1698,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01438">1438</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1652,6 +1729,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01834">1834</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a1acb390c1d3ae8c2ec1a6d59e8a8964a"></a>
@@ -1680,6 +1759,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00853">853</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a1d3c05bdbcc3eb007e57d9b0f2cf85bf"></a>
@@ -1697,6 +1778,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00156">156</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -1716,6 +1799,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01169">1169</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a8ce49ee548ebb815c5e1de0b5afb7bc0"></a>
@@ -1733,6 +1818,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01175">1175</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -2978,6 +3065,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01450">1450</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a5cb634d07042105fbf446bd661b8229c"></a>
@@ -2996,6 +3085,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l01190">1190</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
@@ -3011,6 +3102,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00057">57</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a0525402d1178b6607360280576193e79"></a>
@@ -3024,6 +3117,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00113">113</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3039,6 +3134,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00093">93</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a233a7f940f853f8f127e715b9b1b8c12"></a>
@@ -3052,6 +3149,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00105">105</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3067,6 +3166,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00089">89</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a0ce785a3ba00fa2fd3b521b9c35488b6"></a>
@@ -3080,6 +3181,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00069">69</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3095,6 +3198,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00077">77</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="adf1fe920193d83c955c9148826f0f0ed"></a>
@@ -3108,6 +3213,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00101">101</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3123,6 +3230,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00109">109</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a312796d206f8818402ae3723f388b8a3"></a>
@@ -3136,6 +3245,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00097">97</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3151,6 +3262,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00117">117</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="ac9202670dc1eb6e3423cfdd33c119341"></a>
@@ -3164,6 +3277,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00124">124</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3179,6 +3294,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00073">73</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a9ecb4dc387683e4ba3fac40af2f0e417"></a>
@@ -3192,6 +3309,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00048">48</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3207,6 +3326,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00061">61</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a87c725e30f7fbd2764f1193cb2650ec7"></a>
@@ -3220,6 +3341,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00065">65</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3235,6 +3358,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00082">82</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a0fd4a2f0a31c06bd3341b0f84f86dcf2"></a>
@@ -3248,6 +3373,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00085">85</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>
@@ -3263,6 +3390,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00130">130</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
+
 </div>
 </div>
 <a id="a0a18238ae8bfc000b7615fdcd977c0a9"></a>
@@ -3276,6 +3405,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="afhba__stream__drv_8c_source.html#l00052">52</a> of file <a class="el" href="afhba__stream__drv_8c_source.html">afhba_stream_drv.c</a>.</p>
 
 </div>
 </div>

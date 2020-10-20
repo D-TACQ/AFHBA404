@@ -69,10 +69,6 @@ $(function() {
 <div class="title">rtm-t_ioctl.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>RTM-T [AFHBA404] Driver external API. <br  />
-  
-<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;linux/ioctl.h&gt;</code><br />
 </div>
 <p><a href="rtm-t__ioctl_8h_source.html">Go to the source code of this file.</a></p>
@@ -80,20 +76,15 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLLC__DEF.html">LLC_DEF</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">arg for ioctl RTM_T_START_LLC  <a href="structLLC__DEF.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">&lt; arg for ioctl RTM_T_START_LLC  <a href="structLLC__DEF.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structAO__LLC__DEF.html">AO_LLC_DEF</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">arg for ioctl RTM_T_START_AOLLC <br  />
-  <a href="structAO__LLC__DEF.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structXLLC__DEF.html">XLLC_DEF</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structAB.html">AB</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define two buffers A, B for ping/pong <br  />
-  <a href="structAB.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structABN.html">ABN</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define N buffers.  <a href="structABN.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structAO__BURST.html">AO_BURST</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,39 +106,37 @@ Macros</h2></td></tr>
 <tr class="memitem:a19cb89a1e1ca9a3311f8c405618eeffd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>&#160;&#160;&#160;0xDB</td></tr>
 <tr class="separator:a19cb89a1e1ca9a3311f8c405618eeffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f26653be653063292cfc51664de57a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a5f26653be653063292cfc51664de57a2">RTM_T_START_STREAM</a>&#160;&#160;&#160;_IO(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   1)</td></tr>
-<tr class="memdesc:a5f26653be653063292cfc51664de57a2"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> Start High Throughput Streaming  <a href="rtm-t__ioctl_8h.html#a5f26653be653063292cfc51664de57a2">More...</a><br /></td></tr>
+<tr class="memdesc:a5f26653be653063292cfc51664de57a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl Start High Throughput Streaming  <a href="rtm-t__ioctl_8h.html#a5f26653be653063292cfc51664de57a2">More...</a><br /></td></tr>
 <tr class="separator:a5f26653be653063292cfc51664de57a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7445842c8fd2b4314efa1ec27e147cbe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a7445842c8fd2b4314efa1ec27e147cbe">RTM_T_START_LLC</a>&#160;&#160;&#160;_IOW(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   2, struct <a class="el" href="structLLC__DEF.html">LLC_DEF</a>)</td></tr>
-<tr class="memdesc:a7445842c8fd2b4314efa1ec27e147cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> Start Low Latency Control  <a href="rtm-t__ioctl_8h.html#a7445842c8fd2b4314efa1ec27e147cbe">More...</a><br /></td></tr>
+<tr class="memdesc:a7445842c8fd2b4314efa1ec27e147cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl Start Low Latency Control  <a href="rtm-t__ioctl_8h.html#a7445842c8fd2b4314efa1ec27e147cbe">More...</a><br /></td></tr>
 <tr class="separator:a7445842c8fd2b4314efa1ec27e147cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb9bab76828a04f4226921f44e1608e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#abb9bab76828a04f4226921f44e1608e6">RTM_T_START_STREAM_MAX</a>&#160;&#160;&#160;_IOW(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   3, <a class="el" href="local_8h.html#ae0a7c37f5a766b8e881b7ca59f579d01">u32</a>)</td></tr>
-<tr class="memdesc:abb9bab76828a04f4226921f44e1608e6"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> Start High Throughput Streaming specify max buffers.  <a href="rtm-t__ioctl_8h.html#abb9bab76828a04f4226921f44e1608e6">More...</a><br /></td></tr>
+<tr class="memdesc:abb9bab76828a04f4226921f44e1608e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl Start High Throughput Streaming specify max buffers.  <a href="rtm-t__ioctl_8h.html#abb9bab76828a04f4226921f44e1608e6">More...</a><br /></td></tr>
 <tr class="separator:abb9bab76828a04f4226921f44e1608e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab89f619fbc7791a4615485387ab8b60d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#ab89f619fbc7791a4615485387ab8b60d">RTM_T_START_AOLLC</a>&#160;&#160;&#160;_IOW(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   4, struct <a class="el" href="structAO__LLC__DEF.html">AO_LLC_DEF</a>)</td></tr>
 <tr class="separator:ab89f619fbc7791a4615485387ab8b60d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95401c772e8706b4c9e3a373ba75adc8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a95401c772e8706b4c9e3a373ba75adc8">AFHBA_START_AI_LLC</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   5, struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a>)</td></tr>
-<tr class="memdesc:a95401c772e8706b4c9e3a373ba75adc8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> ACQ2106 Start Low Latency Control Inbound outputs actual pa used  <a href="rtm-t__ioctl_8h.html#a95401c772e8706b4c9e3a373ba75adc8">More...</a><br /></td></tr>
+<tr class="memdesc:a95401c772e8706b4c9e3a373ba75adc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl ACQ2106 Start Low Latency Control Inbound outputs actual pa used  <a href="rtm-t__ioctl_8h.html#a95401c772e8706b4c9e3a373ba75adc8">More...</a><br /></td></tr>
 <tr class="separator:a95401c772e8706b4c9e3a373ba75adc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0cd1753f5a4b47e517f19d45826366b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#ab0cd1753f5a4b47e517f19d45826366b">AFHBA_START_AO_LLC</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   6, struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a>)</td></tr>
-<tr class="memdesc:ab0cd1753f5a4b47e517f19d45826366b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> ACQ2106 Start Low Latency Control Outbound  <a href="rtm-t__ioctl_8h.html#ab0cd1753f5a4b47e517f19d45826366b">More...</a><br /></td></tr>
+<tr class="memdesc:ab0cd1753f5a4b47e517f19d45826366b"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl ACQ2106 Start Low Latency Control Outbound  <a href="rtm-t__ioctl_8h.html#ab0cd1753f5a4b47e517f19d45826366b">More...</a><br /></td></tr>
 <tr class="separator:ab0cd1753f5a4b47e517f19d45826366b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecd9984201fc0bff94ba0366824fa0cb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#aecd9984201fc0bff94ba0366824fa0cb">AFHBA_START_AI_AB</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   7, struct <a class="el" href="structAB.html">AB</a>)</td></tr>
-<tr class="memdesc:aecd9984201fc0bff94ba0366824fa0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> ACQ2106 Start AI, Buffer A/B struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a> [2].  <a href="rtm-t__ioctl_8h.html#aecd9984201fc0bff94ba0366824fa0cb">More...</a><br /></td></tr>
+<tr class="memdesc:aecd9984201fc0bff94ba0366824fa0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl ACQ2106 Start AI, Buffer A/B struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a> [2].  <a href="rtm-t__ioctl_8h.html#aecd9984201fc0bff94ba0366824fa0cb">More...</a><br /></td></tr>
 <tr class="separator:aecd9984201fc0bff94ba0366824fa0cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dba13bc8584e15ab25255c93c70ba5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a5dba13bc8584e15ab25255c93c70ba5e">AFHBA_START_AI_ABN</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>, 8, struct <a class="el" href="structABN.html">ABN</a>)</td></tr>
-<tr class="memdesc:a5dba13bc8584e15ab25255c93c70ba5e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> AFHBA_START_AI_ABN LLC, multiple buffers, INPUT  <a href="rtm-t__ioctl_8h.html#a5dba13bc8584e15ab25255c93c70ba5e">More...</a><br /></td></tr>
 <tr class="separator:a5dba13bc8584e15ab25255c93c70ba5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfd9ae5d7bf563b229ece4b9d5b4520a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#abfd9ae5d7bf563b229ece4b9d5b4520a">AFHBA_START_AO_ABN</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>, 9, struct <a class="el" href="structABN.html">ABN</a>)</td></tr>
-<tr class="memdesc:abfd9ae5d7bf563b229ece4b9d5b4520a"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT  <a href="rtm-t__ioctl_8h.html#abfd9ae5d7bf563b229ece4b9d5b4520a">More...</a><br /></td></tr>
+<tr class="memdesc:abfd9ae5d7bf563b229ece4b9d5b4520a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl AFHBA_START_AI_ABN LLC, multiple buffers, INPUT  <a href="rtm-t__ioctl_8h.html#abfd9ae5d7bf563b229ece4b9d5b4520a">More...</a><br /></td></tr>
 <tr class="separator:abfd9ae5d7bf563b229ece4b9d5b4520a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cdb82052f8ec19d0f92a4cf5c02bbf9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#a2cdb82052f8ec19d0f92a4cf5c02bbf9">AFHBA_AO_BURST_INIT</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>, 10, struct <a class="el" href="structAO__BURST.html">AO_BURST</a>)</td></tr>
-<tr class="memdesc:a2cdb82052f8ec19d0f92a4cf5c02bbf9"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> define an <a class="el" href="structAO__BURST.html">AO_BURST</a> setup  <a href="rtm-t__ioctl_8h.html#a2cdb82052f8ec19d0f92a4cf5c02bbf9">More...</a><br /></td></tr>
+<tr class="memdesc:a2cdb82052f8ec19d0f92a4cf5c02bbf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">ioctl AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT  <a href="rtm-t__ioctl_8h.html#a2cdb82052f8ec19d0f92a4cf5c02bbf9">More...</a><br /></td></tr>
 <tr class="separator:a2cdb82052f8ec19d0f92a4cf5c02bbf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe5e22d8d0e7502097ef85534ea90449"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#afe5e22d8d0e7502097ef85534ea90449">AFHBA_AO_BURST_SETBUF</a>&#160;&#160;&#160;_IOWR(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>, 12, <a class="el" href="local_8h.html#ae0a7c37f5a766b8e881b7ca59f579d01">u32</a>)</td></tr>
-<tr class="memdesc:afe5e22d8d0e7502097ef85534ea90449"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> define current buffer id  <a href="rtm-t__ioctl_8h.html#afe5e22d8d0e7502097ef85534ea90449">More...</a><br /></td></tr>
 <tr class="separator:afe5e22d8d0e7502097ef85534ea90449"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa20cfa5f51effc427f10febe084ea789"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#aa20cfa5f51effc427f10febe084ea789">RTM_T_START_STREAM_AO</a>&#160;&#160;&#160;_IO(<a class="el" href="rtm-t__ioctl_8h.html#a19cb89a1e1ca9a3311f8c405618eeffd">DMAGIC</a>,   11)</td></tr>
-<tr class="memdesc:aa20cfa5f51effc427f10febe084ea789"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>ioctl</b> RTM_T_START_STREAM_AO appears in stub app code, but not in driver .  <a href="rtm-t__ioctl_8h.html#aa20cfa5f51effc427f10febe084ea789">More...</a><br /></td></tr>
+<tr class="memdesc:aa20cfa5f51effc427f10febe084ea789"><td class="mdescLeft">&#160;</td><td class="mdescRight">RTM_T_START_STREAM_AO appears in stub app code, but not in driver .  <a href="rtm-t__ioctl_8h.html#aa20cfa5f51effc427f10febe084ea789">More...</a><br /></td></tr>
 <tr class="separator:aa20cfa5f51effc427f10febe084ea789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfe199ab45deb75175115f684839a4db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rtm-t__ioctl_8h.html#abfe199ab45deb75175115f684839a4db">IBUF_MAGIC</a>&#160;&#160;&#160;0xb1f00000</td></tr>
 <tr class="separator:abfe199ab45deb75175115f684839a4db"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,9 +154,9 @@ Macros</h2></td></tr>
 <tr class="separator:ac2646c00606a92c624fd5e8b2bb526ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>RTM-T [AFHBA404] Driver external API. <br  />
- </p>
-<p>D-TACQ RTM-T Device Driver API. </p>
+<div class="textblock"><p>D-TACQ RTM-T Device Driver API. </p>
+
+<p class="definition">Definition in file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a2cdb82052f8ec19d0f92a4cf5c02bbf9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2cdb82052f8ec19d0f92a4cf5c02bbf9">&#9670;&nbsp;</a></span>AFHBA_AO_BURST_INIT</h2>
@@ -181,7 +170,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> define an <a class="el" href="structAO__BURST.html">AO_BURST</a> setup </p>
+<p>ioctl AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00111">111</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -197,7 +188,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> define current buffer id </p>
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00113">113</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -213,8 +204,10 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> ACQ2106 Start AI, Buffer A/B struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a> [2]. </p>
+<p>ioctl ACQ2106 Start AI, Buffer A/B struct <a class="el" href="structXLLC__DEF.html">XLLC_DEF</a> [2]. </p>
 <p>streaming rules: 4K boundary, 1K size modulus </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00102">102</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -230,7 +223,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> AFHBA_START_AI_ABN LLC, multiple buffers, INPUT </p>
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00105">105</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -246,7 +239,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> ACQ2106 Start Low Latency Control Inbound outputs actual pa used </p>
+<p>ioctl ACQ2106 Start Low Latency Control Inbound outputs actual pa used </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00094">94</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -262,7 +257,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT </p>
+<p>ioctl AFHBA_START_AI_ABN LLC, multiple buffers, INPUT </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00107">107</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -278,7 +275,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> ACQ2106 Start Low Latency Control Outbound </p>
+<p>ioctl ACQ2106 Start Low Latency Control Outbound </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00097">97</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -294,6 +293,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00066">66</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="a19cb89a1e1ca9a3311f8c405618eeffd"></a>
@@ -307,6 +308,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00078">78</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -322,6 +325,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00127">127</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="a648e8c1d61f2a73f3937cbb49f6ce461"></a>
@@ -335,6 +340,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00126">126</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -350,6 +357,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00124">124</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="ab7a491c99e8480baa78b2f4bd8343e12"></a>
@@ -363,6 +372,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00125">125</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -378,6 +389,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00122">122</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="af0941a6c2a5692c0cf453b134692fcda"></a>
@@ -391,6 +404,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00123">123</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -406,6 +421,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00064">64</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="a339f7a45d441ac3a30d0c190172a7e41"></a>
@@ -419,6 +436,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00056">56</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -434,6 +453,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00089">89</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="a7445842c8fd2b4314efa1ec27e147cbe"></a>
@@ -448,7 +469,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> Start Low Latency Control </p>
+<p>ioctl Start Low Latency Control </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00083">83</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -464,7 +487,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> Start High Throughput Streaming </p>
+<p>ioctl Start High Throughput Streaming </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00081">81</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -480,7 +505,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> RTM_T_START_STREAM_AO appears in stub app code, but not in driver . </p>
+<p>RTM_T_START_STREAM_AO appears in stub app code, but not in driver . </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00116">116</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -496,7 +523,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><b>ioctl</b> Start High Throughput Streaming specify max buffers. </p>
+<p>ioctl Start High Throughput Streaming specify max buffers. </p>
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00087">87</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -512,6 +541,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00076">76</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
+
 </div>
 </div>
 <a id="ac2646c00606a92c624fd5e8b2bb526ab"></a>
@@ -525,6 +556,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00128">128</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>
@@ -543,6 +576,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="rtm-t__ioctl_8h_source.html#l00074">74</a> of file <a class="el" href="rtm-t__ioctl_8h_source.html">rtm-t_ioctl.h</a>.</p>
 
 </div>
 </div>

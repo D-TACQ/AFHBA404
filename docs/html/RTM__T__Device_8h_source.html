@@ -77,101 +77,101 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: pgm</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#ifndef RTM_T_DEVICE_H_</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define RTM_T_DEVICE_H_</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;fcntl.h&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html">   21</a></span>&#160;<span class="keyword">class </span><a class="code" href="classRTM__T__Device.html">RTM_T_Device</a> {</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">enum</span> { CTRL_ROOT=-1, MINOR_REGREAD=253, MINOR_DMAREAD=254 };</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef RTM_T_DEVICE_H_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define RTM_T_DEVICE_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;fcntl.h&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html">   17</a></span>&#160;<span class="keyword">class </span><a class="code" href="classRTM__T__Device.html">RTM_T_Device</a> {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">enum</span> { CTRL_ROOT=-1, MINOR_REGREAD=253, MINOR_DMAREAD=254 };</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    std::map&lt;int, std::string&gt; names;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    std::map&lt;int, void*&gt; host_buffers;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    std::map&lt;int, int&gt; handles;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    std::map&lt;int, std::string&gt; names;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    std::map&lt;int, void*&gt; host_buffers;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    std::map&lt;int, int&gt; handles;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> _open(<span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keywordtype">int</span> mode = O_RDWR){</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordtype">int</span> fp = open(names[<span class="keywordtype">id</span>].c_str(), mode);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keywordflow">if</span> (fp == -1){</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            perror(names[<span class="keywordtype">id</span>].c_str());</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;            _exit(errno);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        }<span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            handles[id] = fp;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> _close(<span class="keywordtype">void</span>){</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        std::map&lt;int, int&gt;::const_iterator iter;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">for</span> (iter = handles.begin(); iter != handles.end(); ++iter){</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;            close(iter-&gt;second);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">   48</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">devnum</a>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">   49</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">nbuffers</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">   50</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">maxlen</a>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">   51</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">transfer_buffers</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classRTM__T__Device.html#a706c700d9f7a6d5ad9c9dec24295d08c">RTM_T_Device</a>(<span class="keywordtype">int</span> _devnum);</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">   54</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">~RTM_T_Device</a>() {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        _close();</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">   57</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">getDevice</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">return</span> names[MINOR_DMAREAD].c_str();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">   60</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">getDeviceHandle</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">return</span> handles[MINOR_DMAREAD];</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">   63</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">getRegsDevice</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> names[MINOR_REGREAD].c_str();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">   66</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> *<a class="code" href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">getHostBufferMapping</a>(<span class="keywordtype">int</span> ibuf = 0) {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordflow">return</span> host_buffers[ibuf];</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">   69</a></span>&#160;    <span class="keywordtype">void</span> *<a class="code" href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">getHostBufferMappingW</a>(<span class="keywordtype">int</span> ibuf = 0) {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> host_buffers[ibuf];</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordtype">void</span> _open(<span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keywordtype">int</span> mode = O_RDWR){</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">int</span> fp = open(names[<span class="keywordtype">id</span>].c_str(), mode);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordflow">if</span> (fp == -1){</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            perror(names[<span class="keywordtype">id</span>].c_str());</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            _exit(errno);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        }<span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            handles[id] = fp;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> _close(<span class="keywordtype">void</span>){</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        std::map&lt;int, int&gt;::const_iterator iter;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">for</span> (iter = handles.begin(); iter != handles.end(); ++iter){</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            close(iter-&gt;second);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">   44</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">devnum</a>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">   45</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">nbuffers</a>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">   46</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">maxlen</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">   47</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code" href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">transfer_buffers</a>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classRTM__T__Device.html#a706c700d9f7a6d5ad9c9dec24295d08c">RTM_T_Device</a>(<span class="keywordtype">int</span> _devnum);</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">   50</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">~RTM_T_Device</a>() {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        _close();</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">   53</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">getDevice</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">return</span> names[MINOR_DMAREAD].c_str();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">   56</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">getDeviceHandle</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> handles[MINOR_DMAREAD];</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">   59</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">getRegsDevice</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">return</span> names[MINOR_REGREAD].c_str();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">   62</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> *<a class="code" href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">getHostBufferMapping</a>(<span class="keywordtype">int</span> ibuf = 0) {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordflow">return</span> host_buffers[ibuf];</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">   65</a></span>&#160;    <span class="keywordtype">void</span> *<a class="code" href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">getHostBufferMappingW</a>(<span class="keywordtype">int</span> ibuf = 0) {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">return</span> host_buffers[ibuf];</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">   69</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">getControlRoot</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> names[CTRL_ROOT].c_str();</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">   73</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">getControlRoot</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordflow">return</span> names[CTRL_ROOT].c_str();</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">   76</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">getDevnum</a>(<span class="keywordtype">void</span>)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">devnum</a>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">   79</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">next</a>(<span class="keywordtype">int</span> ibuf){</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">return</span> ++ibuf == <a class="code" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">nbuffers</a>? 0: ibuf;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">   72</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">getDevnum</a>(<span class="keywordtype">void</span>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">devnum</a>;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">   75</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">next</a>(<span class="keywordtype">int</span> ibuf){</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">return</span> ++ibuf == <a class="code" href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">nbuffers</a>? 0: ibuf;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">enum</span> {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <a class="code" href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">MAXBUF</a> = 32      <span class="comment">// maximum buffers per read</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">   81</a></span>&#160;    };</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">enum</span> {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <a class="code" href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">MAXBUF</a> = 32      <span class="comment">// maximum buffers per read</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">   85</a></span>&#160;    };</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;};</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* RTM_T_DEVICE_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;};</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* RTM_T_DEVICE_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassRTM__T__Device_html_a3191f2f7156f4c88af45dcef88b36abc"><div class="ttname"><a href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">RTM_T_Device::nbuffers</a></div><div class="ttdeci">const unsigned nbuffers</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:49</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a0c4c3aca22bdf81788601d5408ffdcc1"><div class="ttname"><a href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">RTM_T_Device::getHostBufferMapping</a></div><div class="ttdeci">const void * getHostBufferMapping(int ibuf=0)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:66</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_aa5b0082f950eb3546fabfc309cdd86f2"><div class="ttname"><a href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">RTM_T_Device::next</a></div><div class="ttdeci">int next(int ibuf)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:79</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a706c700d9f7a6d5ad9c9dec24295d08c"><div class="ttname"><a href="classRTM__T__Device.html#a706c700d9f7a6d5ad9c9dec24295d08c">RTM_T_Device::RTM_T_Device</a></div><div class="ttdeci">RTM_T_Device(int _devnum)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.cpp:34</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_ab700d956a39645030fae7d432b6eaf8e"><div class="ttname"><a href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">RTM_T_Device::getHostBufferMappingW</a></div><div class="ttdeci">void * getHostBufferMappingW(int ibuf=0)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:69</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a26fa5c0ecfcd79d87a3d6dfcc8c1f29d"><div class="ttname"><a href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">RTM_T_Device::~RTM_T_Device</a></div><div class="ttdeci">virtual ~RTM_T_Device()</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:54</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a65e3b8c646829574ef3a34897552d6d7"><div class="ttname"><a href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">RTM_T_Device::getDevnum</a></div><div class="ttdeci">int getDevnum(void) const</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:76</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a67019d9f7242892c44b8a29d4cf44ab6"><div class="ttname"><a href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">RTM_T_Device::maxlen</a></div><div class="ttdeci">const unsigned maxlen</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:50</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a22c7acd623faa9ba543bf0925dc86fa1"><div class="ttname"><a href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">RTM_T_Device::getDeviceHandle</a></div><div class="ttdeci">const int getDeviceHandle(void)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:60</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a87427d3f054a9b71c04eaa520b78c988"><div class="ttname"><a href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">RTM_T_Device::getControlRoot</a></div><div class="ttdeci">const char * getControlRoot(void)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:73</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a869ebf80bde387d0dad9f7883e185100"><div class="ttname"><a href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">RTM_T_Device::getRegsDevice</a></div><div class="ttdeci">const char * getRegsDevice(void)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:63</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a"><div class="ttname"><a href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">RTM_T_Device::MAXBUF</a></div><div class="ttdeci">@ MAXBUF</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:84</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_aa727fdfd481e197e1823711196f4aaa7"><div class="ttname"><a href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">RTM_T_Device::transfer_buffers</a></div><div class="ttdeci">const unsigned transfer_buffers</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:51</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_a09170906b89ce2c53811db4be4f3150e"><div class="ttname"><a href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">RTM_T_Device::devnum</a></div><div class="ttdeci">const unsigned devnum</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:48</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html"><div class="ttname"><a href="classRTM__T__Device.html">RTM_T_Device</a></div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:21</div></div>
-<div class="ttc" id="aclassRTM__T__Device_html_af9f13aba86c51bf84c4f9ff15fce795e"><div class="ttname"><a href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">RTM_T_Device::getDevice</a></div><div class="ttdeci">const char * getDevice(void)</div><div class="ttdef"><b>Definition:</b> RTM_T_Device.h:57</div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a3191f2f7156f4c88af45dcef88b36abc"><div class="ttname"><a href="classRTM__T__Device.html#a3191f2f7156f4c88af45dcef88b36abc">RTM_T_Device::nbuffers</a></div><div class="ttdeci">const unsigned nbuffers</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00045">RTM_T_Device.h:45</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a0c4c3aca22bdf81788601d5408ffdcc1"><div class="ttname"><a href="classRTM__T__Device.html#a0c4c3aca22bdf81788601d5408ffdcc1">RTM_T_Device::getHostBufferMapping</a></div><div class="ttdeci">const void * getHostBufferMapping(int ibuf=0)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00062">RTM_T_Device.h:62</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_aa5b0082f950eb3546fabfc309cdd86f2"><div class="ttname"><a href="classRTM__T__Device.html#aa5b0082f950eb3546fabfc309cdd86f2">RTM_T_Device::next</a></div><div class="ttdeci">int next(int ibuf)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00075">RTM_T_Device.h:75</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a706c700d9f7a6d5ad9c9dec24295d08c"><div class="ttname"><a href="classRTM__T__Device.html#a706c700d9f7a6d5ad9c9dec24295d08c">RTM_T_Device::RTM_T_Device</a></div><div class="ttdeci">RTM_T_Device(int _devnum)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8cpp_source.html#l00030">RTM_T_Device.cpp:30</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_ab700d956a39645030fae7d432b6eaf8e"><div class="ttname"><a href="classRTM__T__Device.html#ab700d956a39645030fae7d432b6eaf8e">RTM_T_Device::getHostBufferMappingW</a></div><div class="ttdeci">void * getHostBufferMappingW(int ibuf=0)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00065">RTM_T_Device.h:65</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a26fa5c0ecfcd79d87a3d6dfcc8c1f29d"><div class="ttname"><a href="classRTM__T__Device.html#a26fa5c0ecfcd79d87a3d6dfcc8c1f29d">RTM_T_Device::~RTM_T_Device</a></div><div class="ttdeci">virtual ~RTM_T_Device()</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00050">RTM_T_Device.h:50</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a65e3b8c646829574ef3a34897552d6d7"><div class="ttname"><a href="classRTM__T__Device.html#a65e3b8c646829574ef3a34897552d6d7">RTM_T_Device::getDevnum</a></div><div class="ttdeci">int getDevnum(void) const</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00072">RTM_T_Device.h:72</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a67019d9f7242892c44b8a29d4cf44ab6"><div class="ttname"><a href="classRTM__T__Device.html#a67019d9f7242892c44b8a29d4cf44ab6">RTM_T_Device::maxlen</a></div><div class="ttdeci">const unsigned maxlen</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00046">RTM_T_Device.h:46</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a22c7acd623faa9ba543bf0925dc86fa1"><div class="ttname"><a href="classRTM__T__Device.html#a22c7acd623faa9ba543bf0925dc86fa1">RTM_T_Device::getDeviceHandle</a></div><div class="ttdeci">const int getDeviceHandle(void)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00056">RTM_T_Device.h:56</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a87427d3f054a9b71c04eaa520b78c988"><div class="ttname"><a href="classRTM__T__Device.html#a87427d3f054a9b71c04eaa520b78c988">RTM_T_Device::getControlRoot</a></div><div class="ttdeci">const char * getControlRoot(void)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00069">RTM_T_Device.h:69</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a869ebf80bde387d0dad9f7883e185100"><div class="ttname"><a href="classRTM__T__Device.html#a869ebf80bde387d0dad9f7883e185100">RTM_T_Device::getRegsDevice</a></div><div class="ttdeci">const char * getRegsDevice(void)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00059">RTM_T_Device.h:59</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a"><div class="ttname"><a href="classRTM__T__Device.html#a41d9e7d5e9cb61933ca734fe65738082ae455e6f97b8d4d65662af61e31ba7c0a">RTM_T_Device::MAXBUF</a></div><div class="ttdeci">@ MAXBUF</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00081">RTM_T_Device.h:80</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_aa727fdfd481e197e1823711196f4aaa7"><div class="ttname"><a href="classRTM__T__Device.html#aa727fdfd481e197e1823711196f4aaa7">RTM_T_Device::transfer_buffers</a></div><div class="ttdeci">const unsigned transfer_buffers</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00047">RTM_T_Device.h:47</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_a09170906b89ce2c53811db4be4f3150e"><div class="ttname"><a href="classRTM__T__Device.html#a09170906b89ce2c53811db4be4f3150e">RTM_T_Device::devnum</a></div><div class="ttdeci">const unsigned devnum</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00044">RTM_T_Device.h:44</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html"><div class="ttname"><a href="classRTM__T__Device.html">RTM_T_Device</a></div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00017">RTM_T_Device.h:17</a></div></div>
+<div class="ttc" id="aclassRTM__T__Device_html_af9f13aba86c51bf84c4f9ff15fce795e"><div class="ttname"><a href="classRTM__T__Device.html#af9f13aba86c51bf84c4f9ff15fce795e">RTM_T_Device::getDevice</a></div><div class="ttdeci">const char * getDevice(void)</div><div class="ttdef"><b>Definition:</b> <a href="RTM__T__Device_8h_source.html#l00053">RTM_T_Device.h:53</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

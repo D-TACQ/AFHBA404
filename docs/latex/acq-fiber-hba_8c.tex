@@ -1,10 +1,5 @@
 \hypertarget{acq-fiber-hba_8c}{}\doxysection{acq-\/fiber-\/hba.c File Reference}
 \label{acq-fiber-hba_8c}\index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
-
-
-instantiates {\bfseries{kernel device driver}}  
-
-
 {\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
 {\ttfamily \#include $<$linux/module.\+h$>$}\newline
 {\ttfamily \#include \char`\"{}d-\/tacq\+\_\+pci\+\_\+id.\+h\char`\"{}}\newline
@@ -122,21 +117,6 @@ int \mbox{\hyperlink{acq-fiber-hba_8c_a8856616e3fa45184d60513cefb82e649}{buffer\
 \end{DoxyCompactItemize}
 
 
-\doxysubsection{Detailed Description}
-instantiates {\bfseries{kernel device driver}} 
-
--\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/--- $\ast$ Copyright (C) 2014 Peter Milne, D-\/\+T\+A\+CQ Solutions Ltd ~\newline
- $<$peter dot milne at D hyphen T\+A\+C\+Q dot com$>$ ~\newline
- www.\+d-\/tacq.\+com Created on\+: 10 Aug 2014 ~\newline
- Author\+: pgm ~\newline
-
-\begin{DoxyItemize}
-\item This program is free software; you can redistribute it and/or modify $\ast$ it under the terms of Version 2 of the G\+NU General Public License $\ast$ as published by the Free Software Foundation; $\ast$
-\item This program is distributed in the hope that it will be useful, $\ast$ but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of $\ast$ M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the $\ast$ G\+NU General Public License for more details. $\ast$
-\item You should have received a copy of the G\+NU General Public License $\ast$ along with this program; if not, write to the Free Software $\ast$ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, U\+SA. ~\newline
- 
-\end{DoxyItemize}
-
 \doxysubsection{Macro Definition Documentation}
 \mbox{\Hypertarget{acq-fiber-hba_8c_af8d916ce666dc0fa0a58e59ae6b27203}\label{acq-fiber-hba_8c_af8d916ce666dc0fa0a58e59ae6b27203}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!AFHBA\_PCI\_CMD@{AFHBA\_PCI\_CMD}}
@@ -144,11 +124,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{AFHBA\_PCI\_CMD}{AFHBA\_PCI\_CMD}}
 {\footnotesize\ttfamily \#define A\+F\+H\+B\+A\+\_\+\+P\+C\+I\+\_\+\+C\+MD~(P\+C\+I\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+M\+A\+S\+T\+ER $\vert$ P\+C\+I\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+M\+E\+M\+O\+RY)}
 
+
+
+Definition at line 349 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a85c975f662fd2203e47ee4753972f973}\label{acq-fiber-hba_8c_a85c975f662fd2203e47ee4753972f973}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!EXPORT\_SYMTAB@{EXPORT\_SYMTAB}}
 \index{EXPORT\_SYMTAB@{EXPORT\_SYMTAB}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{EXPORT\_SYMTAB}{EXPORT\_SYMTAB}}
 {\footnotesize\ttfamily \#define E\+X\+P\+O\+R\+T\+\_\+\+S\+Y\+M\+T\+AB}
+
+
+
+Definition at line 46 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a4939f74a286cc8f11fc496bbc801a143}\label{acq-fiber-hba_8c_a4939f74a286cc8f11fc496bbc801a143}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!NOSTREAM@{NOSTREAM}}
@@ -156,17 +144,29 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{NOSTREAM}{NOSTREAM}}
 {\footnotesize\ttfamily \#define N\+O\+S\+T\+R\+E\+AM~\mbox{\hyperlink{acq-fiber-hba_8c_a553dcf44ae70715e28148465868a4637}{null\+\_\+stream\+\_\+drv\+\_\+init}}}
 
+
+
+Definition at line 433 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_aa57974323bef0262551029d83546b8e9}\label{acq-fiber-hba_8c_aa57974323bef0262551029d83546b8e9}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!STREAM@{STREAM}}
 \index{STREAM@{STREAM}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{STREAM}{STREAM}}
 {\footnotesize\ttfamily \#define \mbox{\hyperlink{structSTREAM}{S\+T\+R\+E\+AM}}~\mbox{\hyperlink{afhba__stream__drv_8c_a998a8a4d91eae0f4d53ab20568a826f9}{afhba\+\_\+stream\+\_\+drv\+\_\+init}}}
 
+
+
+Definition at line 432 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a6d0b5fde7bc1ff9b656c11a74ffdb9d3}\label{acq-fiber-hba_8c_a6d0b5fde7bc1ff9b656c11a74ffdb9d3}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!VALID\_BAR@{VALID\_BAR}}
 \index{VALID\_BAR@{VALID\_BAR}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{VALID\_BAR}{VALID\_BAR}}
 {\footnotesize\ttfamily \#define V\+A\+L\+I\+D\+\_\+\+B\+AR(\begin{DoxyParamCaption}\item[{}]{bar }\end{DoxyParamCaption})~((bar) != \mbox{\hyperlink{acq-fiber-hba_8h_a15a2127c69dd29928d218c850a5e0a95}{N\+O\+\_\+\+B\+AR}})}
+
+
+
+Definition at line 88 of file acq-\/fiber-\/hba.\+c.
 
 
 
@@ -177,11 +177,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{\_afhba\_probe()}{\_afhba\_probe()}}
 {\footnotesize\ttfamily int \+\_\+afhba\+\_\+probe (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev,  }\item[{int}]{remote\+\_\+bar,  }\item[{int($\ast$)(struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$adev)}]{stream\+\_\+drv\+\_\+init }\end{DoxyParamCaption})}
 
+
+
+Definition at line 364 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a8734845fd016da587c675a363681f08d}\label{acq-fiber-hba_8c_a8734845fd016da587c675a363681f08d}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!adevCreate@{adevCreate}}
 \index{adevCreate@{adevCreate}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{adevCreate()}{adevCreate()}}
 {\footnotesize\ttfamily struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}}$\ast$ adev\+Create (\begin{DoxyParamCaption}\item[{struct pci\+\_\+dev $\ast$}]{dev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 326 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a3a7a4efc7cd887d55142e10807244740}\label{acq-fiber-hba_8c_a3a7a4efc7cd887d55142e10807244740}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!adevDelete@{adevDelete}}
@@ -189,11 +197,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{adevDelete()}{adevDelete()}}
 {\footnotesize\ttfamily void adev\+Delete (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 341 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a506b28e7424e738db4ff6a0e59dbbed7}\label{acq-fiber-hba_8c_a506b28e7424e738db4ff6a0e59dbbed7}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba2\_probe@{afhba2\_probe}}
 \index{afhba2\_probe@{afhba2\_probe}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba2\_probe()}{afhba2\_probe()}}
 {\footnotesize\ttfamily int afhba2\+\_\+probe (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 434 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a08ed0348e20eedd7d931fb3eb9a25fbd}\label{acq-fiber-hba_8c_a08ed0348e20eedd7d931fb3eb9a25fbd}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba4\_probe@{afhba4\_probe}}
@@ -201,11 +217,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba4\_probe()}{afhba4\_probe()}}
 {\footnotesize\ttfamily int afhba4\+\_\+probe (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 458 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a95f16f6cf2fceebc916c77682da7a447}\label{acq-fiber-hba_8c_a95f16f6cf2fceebc916c77682da7a447}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_exit\_module@{afhba\_exit\_module}}
 \index{afhba\_exit\_module@{afhba\_exit\_module}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_exit\_module()}{afhba\_exit\_module()}}
 {\footnotesize\ttfamily void afhba\+\_\+exit\+\_\+module (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 598 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a5bc42e8cbd3cfdb10d66be6a9d04faad}\label{acq-fiber-hba_8c_a5bc42e8cbd3cfdb10d66be6a9d04faad}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_init\_module@{afhba\_init\_module}}
@@ -213,11 +237,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_init\_module()}{afhba\_init\_module()}}
 {\footnotesize\ttfamily int \+\_\+\+\_\+init afhba\+\_\+init\+\_\+module (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
 
+
+
+Definition at line 584 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a6fa330e14b751ca3b8236fef0d6d2f4e}\label{acq-fiber-hba_8c_a6fa330e14b751ca3b8236fef0d6d2f4e}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_map@{afhba\_map}}
 \index{afhba\_map@{afhba\_map}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_map()}{afhba\_map()}}
 {\footnotesize\ttfamily void afhba\+\_\+map (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 249 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a68391d7a1d712bb3b21d04c336db7ae2}\label{acq-fiber-hba_8c_a68391d7a1d712bb3b21d04c336db7ae2}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_mmap\_bar@{afhba\_mmap\_bar}}
@@ -225,11 +257,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_mmap\_bar()}{afhba\_mmap\_bar()}}
 {\footnotesize\ttfamily int afhba\+\_\+mmap\+\_\+bar (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{struct vm\+\_\+area\+\_\+struct $\ast$}]{vma }\end{DoxyParamCaption})}
 
+
+
+Definition at line 197 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a14befba314b72c3e6af541fdcc1a1150}\label{acq-fiber-hba_8c_a14befba314b72c3e6af541fdcc1a1150}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_mmap\_hb@{afhba\_mmap\_hb}}
 \index{afhba\_mmap\_hb@{afhba\_mmap\_hb}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_mmap\_hb()}{afhba\_mmap\_hb()}}
 {\footnotesize\ttfamily int afhba\+\_\+mmap\+\_\+hb (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{struct vm\+\_\+area\+\_\+struct $\ast$}]{vma }\end{DoxyParamCaption})}
+
+
+
+Definition at line 219 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a1115573240c644f4618d131b490cc90c}\label{acq-fiber-hba_8c_a1115573240c644f4618d131b490cc90c}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_mtca\_probe@{afhba\_mtca\_probe}}
@@ -237,11 +277,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_mtca\_probe()}{afhba\_mtca\_probe()}}
 {\footnotesize\ttfamily int afhba\+\_\+mtca\+\_\+probe (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 491 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_ab807b8323be0159567f0f8ac82bf6236}\label{acq-fiber-hba_8c_ab807b8323be0159567f0f8ac82bf6236}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_open@{afhba\_open}}
 \index{afhba\_open@{afhba\_open}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_open()}{afhba\_open()}}
 {\footnotesize\ttfamily int afhba\+\_\+open (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file }\end{DoxyParamCaption})}
+
+
+
+Definition at line 156 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_ac42c4e32fac4b94d4f6d733f646dba6c}\label{acq-fiber-hba_8c_ac42c4e32fac4b94d4f6d733f646dba6c}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_probe@{afhba\_probe}}
@@ -249,11 +297,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_probe()}{afhba\_probe()}}
 {\footnotesize\ttfamily int afhba\+\_\+probe (\begin{DoxyParamCaption}\item[{struct pci\+\_\+dev $\ast$}]{dev,  }\item[{const struct pci\+\_\+device\+\_\+id $\ast$}]{ent }\end{DoxyParamCaption})}
 
+
+
+Definition at line 508 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a1a9a9336f057eb051225c8e162c9e0d7}\label{acq-fiber-hba_8c_a1a9a9336f057eb051225c8e162c9e0d7}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_read@{afhba\_read}}
 \index{afhba\_read@{afhba\_read}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_read()}{afhba\_read()}}
 {\footnotesize\ttfamily ssize\+\_\+t afhba\+\_\+read (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{char \+\_\+\+\_\+user $\ast$}]{buf,  }\item[{size\+\_\+t}]{count,  }\item[{loff\+\_\+t $\ast$}]{f\+\_\+pos }\end{DoxyParamCaption})}
+
+
+
+Definition at line 186 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a81805b51e2930c797a76cd75e78fb579}\label{acq-fiber-hba_8c_a81805b51e2930c797a76cd75e78fb579}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_release@{afhba\_release}}
@@ -261,11 +317,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_release()}{afhba\_release()}}
 {\footnotesize\ttfamily int afhba\+\_\+release (\begin{DoxyParamCaption}\item[{struct inode $\ast$}]{inode,  }\item[{struct file $\ast$}]{file }\end{DoxyParamCaption})}
 
+
+
+Definition at line 241 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a6bdce9d6a79b91248bbaf7709d34ce0c}\label{acq-fiber-hba_8c_a6bdce9d6a79b91248bbaf7709d34ce0c}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_remove@{afhba\_remove}}
 \index{afhba\_remove@{afhba\_remove}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_remove()}{afhba\_remove()}}
 {\footnotesize\ttfamily void afhba\+\_\+remove (\begin{DoxyParamCaption}\item[{struct pci\+\_\+dev $\ast$}]{dev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 541 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a830346129b7b8a6e2e46f5b937a070b8}\label{acq-fiber-hba_8c_a830346129b7b8a6e2e46f5b937a070b8}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_write@{afhba\_write}}
@@ -273,17 +337,29 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_write()}{afhba\_write()}}
 {\footnotesize\ttfamily ssize\+\_\+t afhba\+\_\+write (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{const char $\ast$}]{buf,  }\item[{size\+\_\+t}]{count,  }\item[{loff\+\_\+t $\ast$}]{f\+\_\+pos }\end{DoxyParamCaption})}
 
+
+
+Definition at line 192 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a8c59bbdf12e55aeedc7c7d7b008df602}\label{acq-fiber-hba_8c_a8c59bbdf12e55aeedc7c7d7b008df602}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!bar\_read@{bar\_read}}
 \index{bar\_read@{bar\_read}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{bar\_read()}{bar\_read()}}
 {\footnotesize\ttfamily ssize\+\_\+t bar\+\_\+read (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{char $\ast$}]{buf,  }\item[{size\+\_\+t}]{count,  }\item[{loff\+\_\+t $\ast$}]{f\+\_\+pos,  }\item[{int}]{B\+AR }\end{DoxyParamCaption})}
 
+
+
+Definition at line 90 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a2163dcee57f2a2f6253289511ce50c44}\label{acq-fiber-hba_8c_a2163dcee57f2a2f6253289511ce50c44}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!bar\_write@{bar\_write}}
 \index{bar\_write@{bar\_write}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{bar\_write()}{bar\_write()}}
 {\footnotesize\ttfamily ssize\+\_\+t bar\+\_\+write (\begin{DoxyParamCaption}\item[{struct file $\ast$}]{file,  }\item[{const char $\ast$}]{buf,  }\item[{size\+\_\+t}]{count,  }\item[{loff\+\_\+t $\ast$}]{f\+\_\+pos,  }\item[{int}]{B\+AR,  }\item[{int}]{O\+F\+F\+S\+ET }\end{DoxyParamCaption})}
+
+
+
+Definition at line 124 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_ab80fb1affdbae89af4f528ce55b9d32a}\label{acq-fiber-hba_8c_ab80fb1affdbae89af4f528ce55b9d32a}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!EXPORT\_SYMBOL\_GPL@{EXPORT\_SYMBOL\_GPL}}
@@ -296,6 +372,10 @@ instantiates {\bfseries{kernel device driver}}
 \index{force\_busmaster\_mode@{force\_busmaster\_mode}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{force\_busmaster\_mode()}{force\_busmaster\_mode()}}
 {\footnotesize\ttfamily void force\+\_\+busmaster\+\_\+mode (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 350 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a61afa7aa9986af7c2f45c5547cbb7cac}\label{acq-fiber-hba_8c_a61afa7aa9986af7c2f45c5547cbb7cac}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!LIST\_HEAD@{LIST\_HEAD}}
@@ -377,6 +457,10 @@ instantiates {\bfseries{kernel device driver}}
 
 
 
+Definition at line 426 of file acq-\/fiber-\/hba.\+c.
+
+
+
 \doxysubsection{Variable Documentation}
 \mbox{\Hypertarget{acq-fiber-hba_8c_adb76bc37bf74214c10a795422fb409a5}\label{acq-fiber-hba_8c_adb76bc37bf74214c10a795422fb409a5}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba4\_stream@{afhba4\_stream}}
@@ -384,11 +468,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba4\_stream}{afhba4\_stream}}
 {\footnotesize\ttfamily int afhba4\+\_\+stream = 0}
 
+
+
+Definition at line 59 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a174f9214124bee9c0ce28e9ca0b080bc}\label{acq-fiber-hba_8c_a174f9214124bee9c0ce28e9ca0b080bc}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_\_copyright@{afhba\_\_copyright}}
 \index{afhba\_\_copyright@{afhba\_\_copyright}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_\_copyright}{afhba\_\_copyright}}
 {\footnotesize\ttfamily char afhba\+\_\+\+\_\+copyright\mbox{[}$\,$\mbox{]} = \char`\"{}Copyright (c) 2010/2014 D-\/T\+A\+CQ Solutions Ltd\char`\"{}}
+
+
+
+Definition at line 33 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a7140a7451d22074d73156bbd2c994e0b}\label{acq-fiber-hba_8c_a7140a7451d22074d73156bbd2c994e0b}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_\_driver\_string@{afhba\_\_driver\_string}}
@@ -396,11 +488,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_\_driver\_string}{afhba\_\_driver\_string}}
 {\footnotesize\ttfamily char afhba\+\_\+\+\_\+driver\+\_\+string\mbox{[}$\,$\mbox{]} = \char`\"{}D-\/T\+A\+CQ \mbox{\hyperlink{classACQ}{A\+CQ}}-\/F\+I\+B\+ER-\/\mbox{\hyperlink{classHBA}{H\+BA}} Driver for A\+C\+Q400\char`\"{}}
 
+
+
+Definition at line 31 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_af96f39b537df81e186b5254536ca3b4a}\label{acq-fiber-hba_8c_af96f39b537df81e186b5254536ca3b4a}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_\_driver\_version@{afhba\_\_driver\_version}}
 \index{afhba\_\_driver\_version@{afhba\_\_driver\_version}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_\_driver\_version}{afhba\_\_driver\_version}}
 {\footnotesize\ttfamily char afhba\+\_\+\+\_\+driver\+\_\+version\mbox{[}$\,$\mbox{]} = \char`\"{}B1113\char`\"{}}
+
+
+
+Definition at line 32 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a15b3d79763be277a23530b9e7f9a7224}\label{acq-fiber-hba_8c_a15b3d79763be277a23530b9e7f9a7224}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_debug@{afhba\_debug}}
@@ -408,11 +508,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_debug}{afhba\_debug}}
 {\footnotesize\ttfamily int afhba\+\_\+debug = 0}
 
+
+
+Definition at line 49 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a8a73ec965d0ea41349c694583be4b531}\label{acq-fiber-hba_8c_a8a73ec965d0ea41349c694583be4b531}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_device\_class@{afhba\_device\_class}}
 \index{afhba\_device\_class@{afhba\_device\_class}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_device\_class}{afhba\_device\_class}}
 {\footnotesize\ttfamily struct class$\ast$ afhba\+\_\+device\+\_\+class}
+
+
+
+Definition at line 36 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a2e893917448a679260e980e4b5b1bf56}\label{acq-fiber-hba_8c_a2e893917448a679260e980e4b5b1bf56}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_devnames@{afhba\_devnames}}
@@ -420,11 +528,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_devnames}{afhba\_devnames}}
 {\footnotesize\ttfamily const char$\ast$ afhba\+\_\+devnames\mbox{[}\mbox{\hyperlink{acq-fiber-hba_8h_a9b30c8e32c366824be94a7408f48b027}{M\+A\+X\+D\+EV}}\mbox{]}}
 
+
+
+Definition at line 41 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a65531cc2a3495126deb2893164fbbf10}\label{acq-fiber-hba_8c_a65531cc2a3495126deb2893164fbbf10}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_driver\_name@{afhba\_driver\_name}}
 \index{afhba\_driver\_name@{afhba\_driver\_name}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_driver\_name}{afhba\_driver\_name}}
 {\footnotesize\ttfamily char afhba\+\_\+driver\+\_\+name\mbox{[}$\,$\mbox{]} = \char`\"{}afhba\char`\"{}}
+
+
+
+Definition at line 30 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a912202a538dd365563e8edbb4bab5329}\label{acq-fiber-hba_8c_a912202a538dd365563e8edbb4bab5329}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!afhba\_nports@{afhba\_nports}}
@@ -432,11 +548,19 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{afhba\_nports}{afhba\_nports}}
 {\footnotesize\ttfamily int afhba\+\_\+nports = 4}
 
+
+
+Definition at line 62 of file acq-\/fiber-\/hba.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_a9b72cefa8dcfb0b4b33cefbfce262e34}\label{acq-fiber-hba_8c_a9b72cefa8dcfb0b4b33cefbfce262e34}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!bad\_bios\_bar\_limit@{bad\_bios\_bar\_limit}}
 \index{bad\_bios\_bar\_limit@{bad\_bios\_bar\_limit}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{bad\_bios\_bar\_limit}{bad\_bios\_bar\_limit}}
 {\footnotesize\ttfamily int bad\+\_\+bios\+\_\+bar\+\_\+limit = 0}
+
+
+
+Definition at line 65 of file acq-\/fiber-\/hba.\+c.
 
 \mbox{\Hypertarget{acq-fiber-hba_8c_a8856616e3fa45184d60513cefb82e649}\label{acq-fiber-hba_8c_a8856616e3fa45184d60513cefb82e649}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!buffer\_len@{buffer\_len}}
@@ -444,9 +568,17 @@ instantiates {\bfseries{kernel device driver}}
 \doxysubsubsection{\texorpdfstring{buffer\_len}{buffer\_len}}
 {\footnotesize\ttfamily int buffer\+\_\+len}
 
+
+
+Definition at line 77 of file afhba\+\_\+stream\+\_\+drv.\+c.
+
 \mbox{\Hypertarget{acq-fiber-hba_8c_aeab3221413a00cb4c818c02a0c2f3ca3}\label{acq-fiber-hba_8c_aeab3221413a00cb4c818c02a0c2f3ca3}} 
 \index{acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}!ll\_mode\_only@{ll\_mode\_only}}
 \index{ll\_mode\_only@{ll\_mode\_only}!acq-\/fiber-\/hba.c@{acq-\/fiber-\/hba.c}}
 \doxysubsubsection{\texorpdfstring{ll\_mode\_only}{ll\_mode\_only}}
 {\footnotesize\ttfamily int ll\+\_\+mode\+\_\+only = 1}
+
+
+
+Definition at line 53 of file acq-\/fiber-\/hba.\+c.
 

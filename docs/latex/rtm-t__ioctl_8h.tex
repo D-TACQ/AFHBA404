@@ -1,27 +1,19 @@
 \hypertarget{rtm-t__ioctl_8h}{}\doxysection{rtm-\/t\+\_\+ioctl.h File Reference}
 \label{rtm-t__ioctl_8h}\index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
-
-
-R\+T\+M-\/T \mbox{[}A\+F\+H\+B\+A404\mbox{]} Driver external A\+PI. ~\newline
-  
-
-
 {\ttfamily \#include $<$linux/ioctl.\+h$>$}\newline
 \doxysubsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
 struct \mbox{\hyperlink{structLLC__DEF}{L\+L\+C\+\_\+\+D\+EF}}
-\begin{DoxyCompactList}\small\item\em arg for ioctl R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+L\+LC \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em $<$ arg for ioctl R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+L\+LC \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{structAO__LLC__DEF}{A\+O\+\_\+\+L\+L\+C\+\_\+\+D\+EF}}
-\begin{DoxyCompactList}\small\item\em arg for ioctl R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+L\+LC ~\newline
- \end{DoxyCompactList}\item 
+\item 
 struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}}
 \item 
 struct \mbox{\hyperlink{structAB}{AB}}
-\begin{DoxyCompactList}\small\item\em Define two buffers A, B for ping/pong ~\newline
- \end{DoxyCompactList}\item 
+\item 
 struct \mbox{\hyperlink{structABN}{A\+BN}}
-\begin{DoxyCompactList}\small\item\em Define N buffers. \end{DoxyCompactList}\item 
+\item 
 struct \mbox{\hyperlink{structAO__BURST}{A\+O\+\_\+\+B\+U\+R\+ST}}
 \item 
 struct \mbox{\hyperlink{structStreamBufferDef}{Stream\+Buffer\+Def}}
@@ -42,29 +34,29 @@ struct \mbox{\hyperlink{structStreamBufferDef}{Stream\+Buffer\+Def}}
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}}~0x\+DB
 \item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a5f26653be653063292cfc51664de57a2}{R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+AM}}~\+\_\+\+IO(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   1)
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} Start High Throughput Streaming \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl Start High Throughput Streaming \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a7445842c8fd2b4314efa1ec27e147cbe}{R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+L\+LC}}~\+\_\+\+I\+OW(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   2, struct \mbox{\hyperlink{structLLC__DEF}{L\+L\+C\+\_\+\+D\+EF}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} Start Low Latency Control \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl Start Low Latency Control \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_abb9bab76828a04f4226921f44e1608e6}{R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+M\+AX}}~\+\_\+\+I\+OW(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   3, \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} Start High Throughput Streaming specify max buffers. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl Start High Throughput Streaming specify max buffers. \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_ab89f619fbc7791a4615485387ab8b60d}{R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+L\+LC}}~\+\_\+\+I\+OW(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   4, struct \mbox{\hyperlink{structAO__LLC__DEF}{A\+O\+\_\+\+L\+L\+C\+\_\+\+D\+EF}})
 \item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a95401c772e8706b4c9e3a373ba75adc8}{A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+L\+LC}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   5, struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} A\+C\+Q2106 Start Low Latency Control Inbound outputs actual pa used \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl A\+C\+Q2106 Start Low Latency Control Inbound outputs actual pa used \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_ab0cd1753f5a4b47e517f19d45826366b}{A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+L\+LC}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   6, struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} A\+C\+Q2106 Start Low Latency Control Outbound \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl A\+C\+Q2106 Start Low Latency Control Outbound \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_aecd9984201fc0bff94ba0366824fa0cb}{A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+AB}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   7, struct \mbox{\hyperlink{structAB}{AB}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} A\+C\+Q2106 Start AI, Buffer A/B struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} \mbox{[}2\mbox{]}. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl A\+C\+Q2106 Start AI, Buffer A/B struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} \mbox{[}2\mbox{]}. \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a5dba13bc8584e15ab25255c93c70ba5e}{A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+A\+BN}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}}, 8, struct \mbox{\hyperlink{structABN}{A\+BN}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+A\+BN L\+LC, multiple buffers, I\+N\+P\+UT \end{DoxyCompactList}\item 
+\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_abfd9ae5d7bf563b229ece4b9d5b4520a}{A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+A\+BN}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}}, 9, struct \mbox{\hyperlink{structABN}{A\+BN}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+A\+BN L\+LC, multiple buffers, O\+U\+T\+P\+UT \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+A\+BN L\+LC, multiple buffers, I\+N\+P\+UT \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_a2cdb82052f8ec19d0f92a4cf5c02bbf9}{A\+F\+H\+B\+A\+\_\+\+A\+O\+\_\+\+B\+U\+R\+S\+T\+\_\+\+I\+N\+IT}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}}, 10, struct \mbox{\hyperlink{structAO__BURST}{A\+O\+\_\+\+B\+U\+R\+ST}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} define an \mbox{\hyperlink{structAO__BURST}{A\+O\+\_\+\+B\+U\+R\+ST}} setup \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em ioctl A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+A\+BN L\+LC, multiple buffers, O\+U\+T\+P\+UT \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_afe5e22d8d0e7502097ef85534ea90449}{A\+F\+H\+B\+A\+\_\+\+A\+O\+\_\+\+B\+U\+R\+S\+T\+\_\+\+S\+E\+T\+B\+UF}}~\+\_\+\+I\+O\+WR(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}}, 12, \mbox{\hyperlink{local_8h_ae0a7c37f5a766b8e881b7ca59f579d01}{u32}})
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} define current buffer id \end{DoxyCompactList}\item 
+\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_aa20cfa5f51effc427f10febe084ea789}{R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+AO}}~\+\_\+\+IO(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   11)
-\begin{DoxyCompactList}\small\item\em {\bfseries{ioctl}} R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+AO appears in stub app code, but not in driver . \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+AO appears in stub app code, but not in driver . \end{DoxyCompactList}\item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_abfe199ab45deb75175115f684839a4db}{I\+B\+U\+F\+\_\+\+M\+A\+G\+IC}}~0xb1f00000
 \item 
 \#define \mbox{\hyperlink{rtm-t__ioctl_8h_af0941a6c2a5692c0cf453b134692fcda}{I\+B\+U\+F\+\_\+\+M\+A\+G\+I\+C\+\_\+\+M\+A\+SK}}~0xfff00000
@@ -82,9 +74,6 @@ struct \mbox{\hyperlink{structStreamBufferDef}{Stream\+Buffer\+Def}}
 
 
 \doxysubsection{Detailed Description}
-R\+T\+M-\/T \mbox{[}A\+F\+H\+B\+A404\mbox{]} Driver external A\+PI. ~\newline
- 
-
 D-\/\+T\+A\+CQ R\+T\+M-\/T Device Driver A\+PI. 
 
 \doxysubsection{Macro Definition Documentation}
@@ -96,7 +85,11 @@ D-\/\+T\+A\+CQ R\+T\+M-\/T Device Driver A\+PI.
 
 
 
-{\bfseries{ioctl}} define an \mbox{\hyperlink{structAO__BURST}{A\+O\+\_\+\+B\+U\+R\+ST}} setup 
+ioctl A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+A\+BN L\+LC, multiple buffers, O\+U\+T\+P\+UT 
+
+
+
+Definition at line 111 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_afe5e22d8d0e7502097ef85534ea90449}\label{rtm-t__ioctl_8h_afe5e22d8d0e7502097ef85534ea90449}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_AO\_BURST\_SETBUF@{AFHBA\_AO\_BURST\_SETBUF}}
@@ -106,7 +99,7 @@ D-\/\+T\+A\+CQ R\+T\+M-\/T Device Driver A\+PI.
 
 
 
-{\bfseries{ioctl}} define current buffer id 
+Definition at line 113 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_aecd9984201fc0bff94ba0366824fa0cb}\label{rtm-t__ioctl_8h_aecd9984201fc0bff94ba0366824fa0cb}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_START\_AI\_AB@{AFHBA\_START\_AI\_AB}}
@@ -116,9 +109,13 @@ D-\/\+T\+A\+CQ R\+T\+M-\/T Device Driver A\+PI.
 
 
 
-{\bfseries{ioctl}} A\+C\+Q2106 Start AI, Buffer A/B struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} \mbox{[}2\mbox{]}. 
+ioctl A\+C\+Q2106 Start AI, Buffer A/B struct \mbox{\hyperlink{structXLLC__DEF}{X\+L\+L\+C\+\_\+\+D\+EF}} \mbox{[}2\mbox{]}. 
 
-streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_8h_a5dba13bc8584e15ab25255c93c70ba5e}\label{rtm-t__ioctl_8h_a5dba13bc8584e15ab25255c93c70ba5e}} 
+streaming rules\+: 4K boundary, 1K size modulus 
+
+Definition at line 102 of file rtm-\/t\+\_\+ioctl.\+h.
+
+\mbox{\Hypertarget{rtm-t__ioctl_8h_a5dba13bc8584e15ab25255c93c70ba5e}\label{rtm-t__ioctl_8h_a5dba13bc8584e15ab25255c93c70ba5e}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_START\_AI\_ABN@{AFHBA\_START\_AI\_ABN}}
 \index{AFHBA\_START\_AI\_ABN@{AFHBA\_START\_AI\_ABN}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{AFHBA\_START\_AI\_ABN}{AFHBA\_START\_AI\_ABN}}
@@ -126,7 +123,7 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+A\+BN L\+LC, multiple buffers, I\+N\+P\+UT 
+Definition at line 105 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a95401c772e8706b4c9e3a373ba75adc8}\label{rtm-t__ioctl_8h_a95401c772e8706b4c9e3a373ba75adc8}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_START\_AI\_LLC@{AFHBA\_START\_AI\_LLC}}
@@ -136,7 +133,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} A\+C\+Q2106 Start Low Latency Control Inbound outputs actual pa used 
+ioctl A\+C\+Q2106 Start Low Latency Control Inbound outputs actual pa used 
+
+
+
+Definition at line 94 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_abfd9ae5d7bf563b229ece4b9d5b4520a}\label{rtm-t__ioctl_8h_abfd9ae5d7bf563b229ece4b9d5b4520a}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_START\_AO\_ABN@{AFHBA\_START\_AO\_ABN}}
@@ -146,7 +147,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+\_\+\+A\+BN L\+LC, multiple buffers, O\+U\+T\+P\+UT 
+ioctl A\+F\+H\+B\+A\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+I\+\_\+\+A\+BN L\+LC, multiple buffers, I\+N\+P\+UT 
+
+
+
+Definition at line 107 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ab0cd1753f5a4b47e517f19d45826366b}\label{rtm-t__ioctl_8h_ab0cd1753f5a4b47e517f19d45826366b}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AFHBA\_START\_AO\_LLC@{AFHBA\_START\_AO\_LLC}}
@@ -156,7 +161,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} A\+C\+Q2106 Start Low Latency Control Outbound 
+ioctl A\+C\+Q2106 Start Low Latency Control Outbound 
+
+
+
+Definition at line 97 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_abbb43b45ebbb7040e80cb47578b01675}\label{rtm-t__ioctl_8h_abbb43b45ebbb7040e80cb47578b01675}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!AO\_BURST\_ID@{AO\_BURST\_ID}}
@@ -164,11 +173,19 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{AO\_BURST\_ID}{AO\_BURST\_ID}}
 {\footnotesize\ttfamily \#define A\+O\+\_\+\+B\+U\+R\+S\+T\+\_\+\+ID~0x\+A0\+B55555}
 
+
+
+Definition at line 66 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}\label{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!DMAGIC@{DMAGIC}}
 \index{DMAGIC@{DMAGIC}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{DMAGIC}{DMAGIC}}
 {\footnotesize\ttfamily \#define D\+M\+A\+G\+IC~0x\+DB}
+
+
+
+Definition at line 78 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a0d30bf4b97e037f302faa0fddeff3810}\label{rtm-t__ioctl_8h_a0d30bf4b97e037f302faa0fddeff3810}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!ESTA\_CRC@{ESTA\_CRC}}
@@ -176,11 +193,19 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{ESTA\_CRC}{ESTA\_CRC}}
 {\footnotesize\ttfamily \#define E\+S\+T\+A\+\_\+\+C\+RC~0x0000ffff}
 
+
+
+Definition at line 127 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a648e8c1d61f2a73f3937cbb49f6ce461}\label{rtm-t__ioctl_8h_a648e8c1d61f2a73f3937cbb49f6ce461}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!IBUF\_IBUF@{IBUF\_IBUF}}
 \index{IBUF\_IBUF@{IBUF\_IBUF}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{IBUF\_IBUF}{IBUF\_IBUF}}
 {\footnotesize\ttfamily \#define I\+B\+U\+F\+\_\+\+I\+B\+UF~0x0000ffff}
+
+
+
+Definition at line 126 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a8c97b390b5ee2b9b369591b183b0a1f1}\label{rtm-t__ioctl_8h_a8c97b390b5ee2b9b369591b183b0a1f1}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!IBUF\_IDX@{IBUF\_IDX}}
@@ -188,11 +213,19 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{IBUF\_IDX}{IBUF\_IDX}}
 {\footnotesize\ttfamily \#define I\+B\+U\+F\+\_\+\+I\+DX~0x000f0000}
 
+
+
+Definition at line 124 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ab7a491c99e8480baa78b2f4bd8343e12}\label{rtm-t__ioctl_8h_ab7a491c99e8480baa78b2f4bd8343e12}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!IBUF\_IDX\_SHL@{IBUF\_IDX\_SHL}}
 \index{IBUF\_IDX\_SHL@{IBUF\_IDX\_SHL}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{IBUF\_IDX\_SHL}{IBUF\_IDX\_SHL}}
 {\footnotesize\ttfamily \#define I\+B\+U\+F\+\_\+\+I\+D\+X\+\_\+\+S\+HL~16}
+
+
+
+Definition at line 125 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_abfe199ab45deb75175115f684839a4db}\label{rtm-t__ioctl_8h_abfe199ab45deb75175115f684839a4db}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!IBUF\_MAGIC@{IBUF\_MAGIC}}
@@ -200,11 +233,19 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{IBUF\_MAGIC}{IBUF\_MAGIC}}
 {\footnotesize\ttfamily \#define I\+B\+U\+F\+\_\+\+M\+A\+G\+IC~0xb1f00000}
 
+
+
+Definition at line 122 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_af0941a6c2a5692c0cf453b134692fcda}\label{rtm-t__ioctl_8h_af0941a6c2a5692c0cf453b134692fcda}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!IBUF\_MAGIC\_MASK@{IBUF\_MAGIC\_MASK}}
 \index{IBUF\_MAGIC\_MASK@{IBUF\_MAGIC\_MASK}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{IBUF\_MAGIC\_MASK}{IBUF\_MAGIC\_MASK}}
 {\footnotesize\ttfamily \#define I\+B\+U\+F\+\_\+\+M\+A\+G\+I\+C\+\_\+\+M\+A\+SK~0xfff00000}
+
+
+
+Definition at line 123 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a80a274a9dfaa25aaf96b6d5348db1849}\label{rtm-t__ioctl_8h_a80a274a9dfaa25aaf96b6d5348db1849}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!MAX\_AO\_BUF@{MAX\_AO\_BUF}}
@@ -212,17 +253,29 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{MAX\_AO\_BUF}{MAX\_AO\_BUF}}
 {\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+A\+O\+\_\+\+B\+UF~4}
 
+
+
+Definition at line 64 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a339f7a45d441ac3a30d0c190172a7e41}\label{rtm-t__ioctl_8h_a339f7a45d441ac3a30d0c190172a7e41}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!MAXABN@{MAXABN}}
 \index{MAXABN@{MAXABN}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{MAXABN}{MAXABN}}
 {\footnotesize\ttfamily \#define M\+A\+X\+A\+BN~256}
 
+
+
+Definition at line 56 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ab89f619fbc7791a4615485387ab8b60d}\label{rtm-t__ioctl_8h_ab89f619fbc7791a4615485387ab8b60d}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_START\_AOLLC@{RTM\_T\_START\_AOLLC}}
 \index{RTM\_T\_START\_AOLLC@{RTM\_T\_START\_AOLLC}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{RTM\_T\_START\_AOLLC}{RTM\_T\_START\_AOLLC}}
 {\footnotesize\ttfamily \#define R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+A\+O\+L\+LC~\+\_\+\+I\+OW(\mbox{\hyperlink{rtm-t__ioctl_8h_a19cb89a1e1ca9a3311f8c405618eeffd}{D\+M\+A\+G\+IC}},   4, struct \mbox{\hyperlink{structAO__LLC__DEF}{A\+O\+\_\+\+L\+L\+C\+\_\+\+D\+EF}})}
+
+
+
+Definition at line 89 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a7445842c8fd2b4314efa1ec27e147cbe}\label{rtm-t__ioctl_8h_a7445842c8fd2b4314efa1ec27e147cbe}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_START\_LLC@{RTM\_T\_START\_LLC}}
@@ -232,7 +285,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} Start Low Latency Control 
+ioctl Start Low Latency Control 
+
+
+
+Definition at line 83 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_a5f26653be653063292cfc51664de57a2}\label{rtm-t__ioctl_8h_a5f26653be653063292cfc51664de57a2}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_START\_STREAM@{RTM\_T\_START\_STREAM}}
@@ -242,7 +299,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} Start High Throughput Streaming 
+ioctl Start High Throughput Streaming 
+
+
+
+Definition at line 81 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_aa20cfa5f51effc427f10febe084ea789}\label{rtm-t__ioctl_8h_aa20cfa5f51effc427f10febe084ea789}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_START\_STREAM\_AO@{RTM\_T\_START\_STREAM\_AO}}
@@ -252,7 +313,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+AO appears in stub app code, but not in driver . 
+R\+T\+M\+\_\+\+T\+\_\+\+S\+T\+A\+R\+T\+\_\+\+S\+T\+R\+E\+A\+M\+\_\+\+AO appears in stub app code, but not in driver . 
+
+
+
+Definition at line 116 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_abb9bab76828a04f4226921f44e1608e6}\label{rtm-t__ioctl_8h_abb9bab76828a04f4226921f44e1608e6}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_START\_STREAM\_MAX@{RTM\_T\_START\_STREAM\_MAX}}
@@ -262,7 +327,11 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 
 
 
-{\bfseries{ioctl}} Start High Throughput Streaming specify max buffers. 
+ioctl Start High Throughput Streaming specify max buffers. 
+
+
+
+Definition at line 87 of file rtm-\/t\+\_\+ioctl.\+h.
 
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ab2748374cec699b4d95f63d5fb7a855c}\label{rtm-t__ioctl_8h_ab2748374cec699b4d95f63d5fb7a855c}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!RTM\_T\_USE\_HOSTBUF@{RTM\_T\_USE\_HOSTBUF}}
@@ -270,15 +339,27 @@ streaming rules\+: 4K boundary, 1K size modulus \mbox{\Hypertarget{rtm-t__ioctl_
 \doxysubsubsection{\texorpdfstring{RTM\_T\_USE\_HOSTBUF}{RTM\_T\_USE\_HOSTBUF}}
 {\footnotesize\ttfamily \#define R\+T\+M\+\_\+\+T\+\_\+\+U\+S\+E\+\_\+\+H\+O\+S\+T\+B\+UF~0}
 
+
+
+Definition at line 76 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ac2646c00606a92c624fd5e8b2bb526ab}\label{rtm-t__ioctl_8h_ac2646c00606a92c624fd5e8b2bb526ab}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!SBDSZ@{SBDSZ}}
 \index{SBDSZ@{SBDSZ}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{SBDSZ}{SBDSZ}}
 {\footnotesize\ttfamily \#define S\+B\+D\+SZ~sizeof(struct \mbox{\hyperlink{structStreamBufferDef}{Stream\+Buffer\+Def}})}
 
+
+
+Definition at line 128 of file rtm-\/t\+\_\+ioctl.\+h.
+
 \mbox{\Hypertarget{rtm-t__ioctl_8h_ae42e7fcd315a9b0e144b6e76bd365b32}\label{rtm-t__ioctl_8h_ae42e7fcd315a9b0e144b6e76bd365b32}} 
 \index{rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}!VALID\_AO\_BURST@{VALID\_AO\_BURST}}
 \index{VALID\_AO\_BURST@{VALID\_AO\_BURST}!rtm-\/t\_ioctl.h@{rtm-\/t\_ioctl.h}}
 \doxysubsubsection{\texorpdfstring{VALID\_AO\_BURST}{VALID\_AO\_BURST}}
 {\footnotesize\ttfamily \#define V\+A\+L\+I\+D\+\_\+\+A\+O\+\_\+\+B\+U\+R\+ST(\begin{DoxyParamCaption}\item[{}]{p }\end{DoxyParamCaption})~(((struct \mbox{\hyperlink{structAO__BURST}{A\+O\+\_\+\+B\+U\+R\+ST}}$\ast$)p)-\/$>$id == \mbox{\hyperlink{rtm-t__ioctl_8h_abbb43b45ebbb7040e80cb47578b01675}{A\+O\+\_\+\+B\+U\+R\+S\+T\+\_\+\+ID}})}
+
+
+
+Definition at line 74 of file rtm-\/t\+\_\+ioctl.\+h.
 

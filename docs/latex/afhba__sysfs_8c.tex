@@ -1,10 +1,5 @@
 \hypertarget{afhba__sysfs_8c}{}\doxysection{afhba\+\_\+sysfs.\+c File Reference}
 \label{afhba__sysfs_8c}\index{afhba\_sysfs.c@{afhba\_sysfs.c}}
-
-
-sysfs interface aka \char`\"{}knobs\char`\"{}  
-
-
 {\ttfamily \#include \char`\"{}acq-\/fiber-\/hba.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}afhba\+\_\+stream\+\_\+drv.\+h\char`\"{}}\newline
 \doxysubsection*{Macros}
@@ -58,17 +53,16 @@ int \mbox{\hyperlink{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}{buffer\+
 \end{DoxyCompactItemize}
 
 
-\doxysubsection{Detailed Description}
-sysfs interface aka \char`\"{}knobs\char`\"{} 
-
-
-
 \doxysubsection{Macro Definition Documentation}
 \mbox{\Hypertarget{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}\label{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!\_ERRLAT@{\_ERRLAT}}
 \index{\_ERRLAT@{\_ERRLAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
 \doxysubsubsection{\texorpdfstring{\_ERRLAT}{\_ERRLAT}}
 {\footnotesize\ttfamily \#define \+\_\+\+E\+R\+R\+L\+AT(\begin{DoxyParamCaption}\item[{}]{yymask }\end{DoxyParamCaption})~((yymask) == 0x0ffff $\vert$$\vert$ (yymask) == 0)}
+
+
+
+Definition at line 358 of file afhba\+\_\+sysfs.\+c.
 
 \mbox{\Hypertarget{afhba__sysfs_8c_aab5f10d7f6c80d1616bf1161ecdb3cff}\label{afhba__sysfs_8c_aab5f10d7f6c80d1616bf1161ecdb3cff}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}}
@@ -93,6 +87,10 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \DoxyCodeLine{static DEVICE\_ATTR(data\_fifo\_stat\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_data\_fifo\_stat\_\#\#DIR, 0)}
 
 \end{DoxyCode}
+
+
+Definition at line 58 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_a073e35ee410f0fdde804a2a0f05fcef1}\label{afhba__sysfs_8c_a073e35ee410f0fdde804a2a0f05fcef1}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}}
 \index{DESC\_FIFO\_STAT@{DESC\_FIFO\_STAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
@@ -116,6 +114,10 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \DoxyCodeLine{static DEVICE\_ATTR(desc\_fifo\_stat\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_desc\_fifo\_stat\_\#\#DIR, 0)}
 
 \end{DoxyCode}
+
+
+Definition at line 76 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_aed3d2690756aec3641983096fc593f1e}\label{afhba__sysfs_8c_aed3d2690756aec3641983096fc593f1e}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_CTRL@{DMA\_CTRL}}
 \index{DMA\_CTRL@{DMA\_CTRL}!afhba\_sysfs.c@{afhba\_sysfs.c}}
@@ -139,6 +141,10 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \DoxyCodeLine{static DEVICE\_ATTR(dma\_ctrl\_\#\#DIR, (S\_IRUSR|S\_IRGRP), show\_dma\_ctrl\_\#\#DIR, 0)}
 
 \end{DoxyCode}
+
+
+Definition at line 116 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_a7a04bfbd81e9cdaa77a1df44415598c2}\label{afhba__sysfs_8c_a7a04bfbd81e9cdaa77a1df44415598c2}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!DMA\_LATEST@{DMA\_LATEST}}
 \index{DMA\_LATEST@{DMA\_LATEST}!afhba\_sysfs.c@{afhba\_sysfs.c}}
@@ -162,11 +168,19 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \DoxyCodeLine{static DEVICE\_ATTR(dma\_latest\_\#\#DIR\#\#\_desc, (S\_IRUSR|S\_IRGRP), show\_dma\_latest\_\#\#DIR, 0)}
 
 \end{DoxyCode}
+
+
+Definition at line 149 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_a813828110f858dd171cf861933c9332d}\label{afhba__sysfs_8c_a813828110f858dd171cf861933c9332d}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!ERRLAT@{ERRLAT}}
 \index{ERRLAT@{ERRLAT}!afhba\_sysfs.c@{afhba\_sysfs.c}}
 \doxysubsubsection{\texorpdfstring{ERRLAT}{ERRLAT}}
 {\footnotesize\ttfamily \#define E\+R\+R\+L\+AT(\begin{DoxyParamCaption}\item[{}]{yy }\end{DoxyParamCaption})~(\mbox{\hyperlink{afhba__sysfs_8c_a911a5fb12dc6ed1aa5e62d3aed1c8967}{\+\_\+\+E\+R\+R\+L\+AT}}((yy)\&0x0ffff))}
+
+
+
+Definition at line 359 of file afhba\+\_\+sysfs.\+c.
 
 
 
@@ -177,11 +191,19 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs()}{afhba\_create\_sysfs()}}
 {\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 590 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_a277f3932399bc90cb1d012e150194179}\label{afhba__sysfs_8c_a277f3932399bc90cb1d012e150194179}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}}
 \index{afhba\_create\_sysfs\_class@{afhba\_create\_sysfs\_class}!afhba\_sysfs.c@{afhba\_sysfs.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_create\_sysfs\_class()}{afhba\_create\_sysfs\_class()}}
 {\footnotesize\ttfamily void afhba\+\_\+create\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 624 of file afhba\+\_\+sysfs.\+c.
 
 \mbox{\Hypertarget{afhba__sysfs_8c_a6bc404feecf295923c435e95c6365ef2}\label{afhba__sysfs_8c_a6bc404feecf295923c435e95c6365ef2}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_remove\_sysfs@{afhba\_remove\_sysfs}}
@@ -189,11 +211,19 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 \doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs()}{afhba\_remove\_sysfs()}}
 {\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
 
+
+
+Definition at line 600 of file afhba\+\_\+sysfs.\+c.
+
 \mbox{\Hypertarget{afhba__sysfs_8c_aa567e9f66611fe5577f5febd26a600a9}\label{afhba__sysfs_8c_aa567e9f66611fe5577f5febd26a600a9}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}}
 \index{afhba\_remove\_sysfs\_class@{afhba\_remove\_sysfs\_class}!afhba\_sysfs.c@{afhba\_sysfs.c}}
 \doxysubsubsection{\texorpdfstring{afhba\_remove\_sysfs\_class()}{afhba\_remove\_sysfs\_class()}}
 {\footnotesize\ttfamily void afhba\+\_\+remove\+\_\+sysfs\+\_\+class (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structAFHBA__DEV}{A\+F\+H\+B\+A\+\_\+\+D\+EV}} $\ast$}]{adev }\end{DoxyParamCaption})}
+
+
+
+Definition at line 642 of file afhba\+\_\+sysfs.\+c.
 
 \mbox{\Hypertarget{afhba__sysfs_8c_a4c047ff852ed38ce7961b989a9685f8c}\label{afhba__sysfs_8c_a4c047ff852ed38ce7961b989a9685f8c}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!DATA\_FIFO\_STAT@{DATA\_FIFO\_STAT}}
@@ -251,10 +281,18 @@ sysfs interface aka \char`\"{}knobs\char`\"{}
 
 
 
+Definition at line 222 of file afhba\+\_\+sysfs.\+c.
+
+
+
 \doxysubsection{Variable Documentation}
 \mbox{\Hypertarget{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}\label{afhba__sysfs_8c_a8856616e3fa45184d60513cefb82e649}} 
 \index{afhba\_sysfs.c@{afhba\_sysfs.c}!buffer\_len@{buffer\_len}}
 \index{buffer\_len@{buffer\_len}!afhba\_sysfs.c@{afhba\_sysfs.c}}
 \doxysubsubsection{\texorpdfstring{buffer\_len}{buffer\_len}}
 {\footnotesize\ttfamily int buffer\+\_\+len}
+
+
+
+Definition at line 77 of file afhba\+\_\+stream\+\_\+drv.\+c.
 

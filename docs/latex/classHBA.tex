@@ -60,12 +60,20 @@ static int \mbox{\hyperlink{classHBA_a503094c0a5878605de9d0f915ef6498c}{maxsam}}
 \doxysubsection{Detailed Description}
 Models a Host Bus Adapter like A\+F\+H\+B\+A404. 
 
+Definition at line 122 of file Acq\+Sys.\+h.
+
+
+
 \doxysubsection{Constructor \& Destructor Documentation}
 \mbox{\Hypertarget{classHBA_a22040242c1492b03b9c86f54fdb400f3}\label{classHBA_a22040242c1492b03b9c86f54fdb400f3}} 
 \index{HBA@{HBA}!````~HBA@{$\sim$HBA}}
 \index{````~HBA@{$\sim$HBA}!HBA@{HBA}}
 \doxysubsubsection{\texorpdfstring{$\sim$HBA()}{~HBA()}}
 {\footnotesize\ttfamily H\+B\+A\+::$\sim$\+H\+BA (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line 174 of file Acq\+Sys.\+cpp.
 
 
 
@@ -80,6 +88,10 @@ Models a Host Bus Adapter like A\+F\+H\+B\+A404.
 
 H\+B\+A\+::\+Create() factory function. 
 
+
+
+Definition at line 329 of file Acq\+Sys.\+cpp.
+
 \mbox{\Hypertarget{classHBA_a1c3e381c11bf15d9db08ad7304e517ad}\label{classHBA_a1c3e381c11bf15d9db08ad7304e517ad}} 
 \index{HBA@{HBA}!dump\_config@{dump\_config}}
 \index{dump\_config@{dump\_config}!HBA@{HBA}}
@@ -89,6 +101,10 @@ H\+B\+A\+::\+Create() factory function.
 
 
 output complete configuration with calculated offsets 
+
+
+
+Definition at line 100 of file Acq\+Sys.\+cpp.
 
 \mbox{\Hypertarget{classHBA_adde093827f1b4b9ced94ce4e9d9a0013}\label{classHBA_adde093827f1b4b9ced94ce4e9d9a0013}} 
 \index{HBA@{HBA}!dump\_data@{dump\_data}}
@@ -100,11 +116,19 @@ output complete configuration with calculated offsets
 
 output raw data for each \mbox{\hyperlink{classACQ}{A\+CQ}} 
 
+
+
+Definition at line 110 of file Acq\+Sys.\+cpp.
+
 \mbox{\Hypertarget{classHBA_a2a5f7d3d54970995eb18891066064913}\label{classHBA_a2a5f7d3d54970995eb18891066064913}} 
 \index{HBA@{HBA}!instance@{instance}}
 \index{instance@{instance}!HBA@{HBA}}
 \doxysubsubsection{\texorpdfstring{instance()}{instance()}}
 {\footnotesize\ttfamily static \mbox{\hyperlink{classHBA}{H\+BA}}\& H\+B\+A\+::instance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 136 of file Acq\+Sys.\+h.
 
 \mbox{\Hypertarget{classHBA_acbb46cd58bf96d34875156c67e3533ac}\label{classHBA_acbb46cd58bf96d34875156c67e3533ac}} 
 \index{HBA@{HBA}!processSample@{processSample}}
@@ -116,11 +140,19 @@ output raw data for each \mbox{\hyperlink{classACQ}{A\+CQ}}
 
 core run time function, process\+Sample. 
 
+
+
+Definition at line 184 of file Acq\+Sys.\+cpp.
+
 \mbox{\Hypertarget{classHBA_a27ad227f1b88a27773f6fcb916b42992}\label{classHBA_a27ad227f1b88a27773f6fcb916b42992}} 
 \index{HBA@{HBA}!start\_shot@{start\_shot}}
 \index{start\_shot@{start\_shot}!HBA@{HBA}}
 \doxysubsubsection{\texorpdfstring{start\_shot()}{start\_shot()}}
 {\footnotesize\ttfamily void H\+B\+A\+::start\+\_\+shot (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line 64 of file Acq\+Hw.\+cpp.
 
 \mbox{\Hypertarget{classHBA_a18ea20faeefb9a33ad42ed47e523f4a6}\label{classHBA_a18ea20faeefb9a33ad42ed47e523f4a6}} 
 \index{HBA@{HBA}!toString@{toString}}
@@ -134,12 +166,20 @@ Reimplemented from \mbox{\hyperlink{classIO_a19c40bdcfec77b24578bc50665acd106}{I
 
 
 
+Definition at line 205 of file Acq\+Sys.\+cpp.
+
+
+
 \doxysubsection{Member Data Documentation}
 \mbox{\Hypertarget{classHBA_a7acf5dcf0f49aa892b5b7204fad7b00a}\label{classHBA_a7acf5dcf0f49aa892b5b7204fad7b00a}} 
 \index{HBA@{HBA}!devnum@{devnum}}
 \index{devnum@{devnum}!HBA@{HBA}}
 \doxysubsubsection{\texorpdfstring{devnum}{devnum}}
 {\footnotesize\ttfamily int H\+B\+A\+::devnum}
+
+
+
+Definition at line 128 of file Acq\+Sys.\+h.
 
 \mbox{\Hypertarget{classHBA_a9e1560fb836a83ed2fefa600c3515fc6}\label{classHBA_a9e1560fb836a83ed2fefa600c3515fc6}} 
 \index{HBA@{HBA}!devs@{devs}}
@@ -151,7 +191,11 @@ Reimplemented from \mbox{\hyperlink{classIO_a19c40bdcfec77b24578bc50665acd106}{I
 
 A\+F\+H\+BA devnum. 
 
-NB\+: \char`\"{}\+H\+B\+A\char`\"{} ... works with $>$4 ports, so multiple \mbox{\hyperlink{classHBA}{H\+BA}}\textquotesingle{}s supported \mbox{\Hypertarget{classHBA_a503094c0a5878605de9d0f915ef6498c}\label{classHBA_a503094c0a5878605de9d0f915ef6498c}} 
+NB\+: \char`\"{}\+H\+B\+A\char`\"{} ... works with $>$4 ports, so multiple \mbox{\hyperlink{classHBA}{H\+BA}}\textquotesingle{}s supported 
+
+Definition at line 130 of file Acq\+Sys.\+h.
+
+\mbox{\Hypertarget{classHBA_a503094c0a5878605de9d0f915ef6498c}\label{classHBA_a503094c0a5878605de9d0f915ef6498c}} 
 \index{HBA@{HBA}!maxsam@{maxsam}}
 \index{maxsam@{maxsam}!HBA@{HBA}}
 \doxysubsubsection{\texorpdfstring{maxsam}{maxsam}}
@@ -160,6 +204,10 @@ NB\+: \char`\"{}\+H\+B\+A\char`\"{} ... works with $>$4 ports, so multiple \mbox
 
 
 max samples in shot (for raw memory alloc) 
+
+
+
+Definition at line 133 of file Acq\+Sys.\+h.
 
 \mbox{\Hypertarget{classHBA_a5cf7e5d16038894e477dbf2bd84ddc0d}\label{classHBA_a5cf7e5d16038894e477dbf2bd84ddc0d}} 
 \index{HBA@{HBA}!uuts@{uuts}}
@@ -171,6 +219,10 @@ max samples in shot (for raw memory alloc)
 
 vector of \mbox{\hyperlink{classACQ}{A\+CQ}} U\+UT\textquotesingle{}s 
 
+
+
+Definition at line 129 of file Acq\+Sys.\+h.
+
 \mbox{\Hypertarget{classHBA_a5059d212fcabd2c1f9a5d6f1b760d7c4}\label{classHBA_a5059d212fcabd2c1f9a5d6f1b760d7c4}} 
 \index{HBA@{HBA}!vi@{vi}}
 \index{vi@{vi}!HBA@{HBA}}
@@ -181,6 +233,10 @@ vector of \mbox{\hyperlink{classACQ}{A\+CQ}} U\+UT\textquotesingle{}s
 
 total system size each Input type. 
 
+
+
+Definition at line 131 of file Acq\+Sys.\+h.
+
 \mbox{\Hypertarget{classHBA_a18e364ff7d39f27e5ce9c9cca9c99d11}\label{classHBA_a18e364ff7d39f27e5ce9c9cca9c99d11}} 
 \index{HBA@{HBA}!vo@{vo}}
 \index{vo@{vo}!HBA@{HBA}}
@@ -190,6 +246,10 @@ total system size each Input type.
 
 
 total system size each Output type. 
+
+
+
+Definition at line 132 of file Acq\+Sys.\+h.
 
 
 
