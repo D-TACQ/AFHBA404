@@ -4,6 +4,7 @@
 import numpy as np
 #import matplotlib.pyplot as plt
 import argparse
+import json
 
 """
 Avoid this error on piping to head
@@ -41,6 +42,8 @@ def fix_args(args):
 
 
 def run_analysis(args):
+    if args.combine != None:
+        combine(args)
     short_data = np.fromfile(args.src, dtype=np.int16)
     long_data = np.fromfile(args.src, dtype=np.int32)
 
@@ -96,7 +99,37 @@ def run_analysis(args):
         except IOError:
             break
 
-    #plot_chan(short_data, 1, 4)
+    return None
+
+
+def get_uut_info(uut_json):
+    uuts = []
+    longwords = 0
+    for uut in uut_json["AFHBA"]["UUT"]:
+        uuts.append(uut["name"])
+        longwords = int(uut["VI"]["SP32"]) + int((uut["VI"]["AI16"]) / 2)
+    return longwords, uuts
+
+
+def load_json(json_file):
+    with open(json_file) as _json_file:
+        json_data = json.load(_json_file)
+    return json_data
+
+
+def combine(args):
+
+    uut_json = load_json(args.combine)
+    longwords, uuts = get_uut_info(uut_json)
+
+    data = []
+    for uut in uuts:
+        uut_data = np.fromfile("{}_VI.dat".format(
+            uut), dtype=np.int32).reshape((-1, longwords))
+        data.append(uut_data)
+
+    total_data = np.concatenate(data, axis=1).flatten()
+    total_data.tofile("LLCONTROL/afhba.0.log")
     return None
 
 
@@ -110,6 +143,7 @@ def run_main():
     parser.add_argument('--spcols', default="ALL", help="SP cols to plot, default: ALL, opts: IX, SC, US, DUS")
     parser.add_argument('--aicols', default="", help="list of AI channels to dump index from 1")
     parser.add_argument('--uutcols', default=None, help="list uuts to include in --aicols dump [default:ALL]")
+    parser.add_argument('--combine', default=None, help="Set this to a json config file path to combine ACQPROC data.")
     parser.add_argument('--verbose', type=int, default=0, help="verbose")
     run_analysis(fix_args(parser.parse_args()))
 
