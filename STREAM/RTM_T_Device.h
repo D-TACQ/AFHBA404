@@ -5,6 +5,10 @@
  *      Author: pgm
  */
 
+/** @file RTM_T_Device.h
+ *  @brief interface to RTM_T Device (historic name for AFHBA404)
+ */
+
 #ifndef RTM_T_DEVICE_H_
 #define RTM_T_DEVICE_H_
 

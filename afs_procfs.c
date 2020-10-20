@@ -1,4 +1,7 @@
-/* ------------------------------------------------------------------------- */
+/** @file afs_procfs.c
+*   @brief procfs interface, simple diagnostics
+*
+ * * ------------------------------------------------------------------------- */
 /* acq400_drv.c  D-TACQ ACQ400 FMC  DRIVER   
  * afs_procfs.c
  *

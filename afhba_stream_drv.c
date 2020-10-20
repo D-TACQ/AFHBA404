@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- */
-/* afhba_stream_drv.c D-TACQ ACQ400 FMC  DRIVER
+/** @file afhba_stream_drv.c
+ *  @brief AFHBA404 **core device driver**, streaming DMA functions
+ *
  * afhba_stream_drv.c
  *
  *  Created on: 19 Jan 2015
@@ -1591,7 +1592,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 
 ssize_t afs_dma_read(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
-/* returns when buffer[s] available
+/** returns when buffer[s] available
  * data is buffer index as array of unsigned
  * return len is sizeof(array)
  */
@@ -1693,7 +1694,7 @@ static unsigned int afs_dma_poll(struct file* file, poll_table *poll_table)
 
 ssize_t afs_dma_read_poll(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
-/* returns when buffer[s] available
+/** returns when buffer[s] available
  * data is buffer index as array of unsigned
  * return len is sizeof(array)
  */
@@ -1758,7 +1759,7 @@ read99:
 
 ssize_t afs_dma_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos)
-/* write completed data.
+/** write completed data.
  * data is array of full buffer id's
  * id's are removed from full and placed onto empty.
  */
@@ -1838,19 +1839,19 @@ int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
 	int ii;
 	for (ii = 0; ii < 16; ++ii){
 		if (1<<ii > nblocks){
-			int len1 = (1<<(ii-1))*1024;
+			int len1 	= (1<<(ii-1))*1024;
 			xdef[0] 	= ab->buffers[0];
 			xdef[1].pa 	= xdef[0].pa + len1;
-			xdef[1].len 	= xdef[0].len - len1;
-			xdef[0].len 	= len1;
+			xdef[1].len = xdef[0].len - len1;
+			xdef[0].len = len1;
 			xdef[2] 	= ab->buffers[1];
 			xdef[3].pa 	= xdef[2].pa + len1;
-			xdef[3].len 	= xdef[2].len - len1;
-			xdef[2].len 	= len1;
+			xdef[3].len = xdef[2].len - len1;
+			xdef[2].len = len1;
 			return 4;
 		}else if (1<<ii == nblocks){
-			xdef[0] = ab->buffers[0];
-			xdef[1] = ab->buffers[1];
+			xdef[0] 	= ab->buffers[0];
+			xdef[1] 	= ab->buffers[1];
 			return 2;
 		}
 	}
@@ -1943,6 +1944,7 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
+/** **ioctl** entry point */
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -2024,7 +2026,7 @@ long afs_dma_ioctl(struct file *file,
 
 int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
 /**
- * mmap the host buffer.
+ * **mmap** the host buffer.
  */
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
@@ -2073,6 +2075,7 @@ static struct file_operations afs_fops_dma_poll = {
 
 
 int afs_open(struct inode *inode, struct file *file)
+/** **open** entry point */
 {
 	struct AFHBA_DEV *adev = DEV(file);
 

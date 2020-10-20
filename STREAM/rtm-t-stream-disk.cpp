@@ -19,7 +19,8 @@
 /* ------------------------------------------------------------------------- */
 
 
-/** @file rtm-t-stream-disk.cpp D-TACQ PCIe RTM_T test app.
+/** @file rtm-t-stream-disk.cpp
+ *  @brief D-TACQ PCIe RTM_T test app.
  * Continuous streaming to disk using PCIe
  * see bin/stream-to-ramdisk for example usage
  * */

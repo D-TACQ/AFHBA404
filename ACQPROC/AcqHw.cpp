@@ -505,10 +505,10 @@ bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
 }
 
 /**
- *  ACQ::factory is configured by environment variabls to setup the core of the acquisition
+ *  ACQ::factory is configured by environment variables to setup the core of the acquisition
 
-- HW=Value,Skip : Value 0: Simulate (check config file) Value 1: run normal hardware. >1 take mean of N samples Skip: > 0 Skip N samples before mena
-- HW_MULTI=N    : Regular capture with N DMA buffers. Allows control program to run at Fs/N
+- **HW**=Value,Skip : Value 0: Simulate (check config file) Value 1: run normal hardware. >1 take mean of N samples Skip: > 0 Skip N samples before mena
+- **HW_MULTI**=N    : Regular capture with N DMA buffers. Allows control program to run at Fs/N
  */
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)

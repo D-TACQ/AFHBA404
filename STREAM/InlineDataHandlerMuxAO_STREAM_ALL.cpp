@@ -17,6 +17,9 @@
  * echo 1,1 2,16 > /dev/shm/amx_ao_map
  */
 
+/** @file InlineDataHandlerMuxAO_STREAM_ALL.cpp
+ *  @brief Analog Multiplexer **AMX** instantiation of InlineDataHandler
+ */
 
 #include <stdio.h>
 

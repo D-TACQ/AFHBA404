@@ -19,7 +19,8 @@
 /* ------------------------------------------------------------------------- */
 
 
-/** @file rtm-t-stream.cpp D-TACQ PCIe RTM_T stream access.
+/** @file rtm-t-stream.cpp
+ *  @brief D-TACQ PCIe RTM_T stream access solib
  * Continuous streaming using PCIe and buffers
  * */
 

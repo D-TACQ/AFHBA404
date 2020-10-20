@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- *
- * afhba_debugfs.c  		                     	                    
+/** @file afhba_debugfs.c
+ *  @brief debug register access
+ *
  * ------------------------------------------------------------------------- *
  *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd                
  *                      <peter dot milne at D hyphen TACQ dot com>          

@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- *
- * acq-fiber-hba.c  		                     	                    
+/** @file acq-fiber-hba.c
+ *  @brief instantiates **kernel device driver**
+ *
  * ------------------------------------------------------------------------- *
  *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd                
  *                      <peter dot milne at D hyphen TACQ dot com>          

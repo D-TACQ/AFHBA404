@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- */
-/* afhba_core.c AFHBA						     */
+/** @file afhba_core.c
+ *  @brief AFHBA404 hardware register access
+ */
 /*
  * afhba_core.c
  *

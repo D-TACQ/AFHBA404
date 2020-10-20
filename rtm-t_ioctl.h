@@ -1,4 +1,5 @@
-/* rtm-t_ioctl.h RTM-T Driver external API				     */
+/** @file rtm-t_ioctl.h
+ *  @brief RTM-T [AFHBA404] Driver external API.						     */
 /* ------------------------------------------------------------------------- */
 /*   Copyright (C) 2010 Peter Milne, D-TACQ Solutions Ltd
  *                      <Peter dot Milne at D hyphen TACQ dot com>
@@ -25,7 +26,7 @@
 #include <linux/ioctl.h>
 
 
-struct LLC_DEF			/**< arg for ioctl RTM_T_START_LLC */
+struct LLC_DEF			/** arg for ioctl RTM_T_START_LLC */
 {
 	u8 clk_div;		/**< 1..255: ECM value 1..255 usec with 1MHz EXTCLK */
 	u8 fill;
@@ -35,26 +36,28 @@ struct LLC_DEF			/**< arg for ioctl RTM_T_START_LLC */
 	                         *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
 };
 
-struct AO_LLC_DEF
-{				/**< arg for ioctl RTM_T_START_AOLLC         */
+struct AO_LLC_DEF	/** arg for ioctl RTM_T_START_AOLLC         */
+{
 	int length;		/**< length in bytes 8, 64 or 72             */
 	u32 src_pa;		/**< source bus address round to 1k boundary.
 			         *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
 };
 
 struct XLLC_DEF {
-	unsigned len;     /**< length in bytes - will round up to next %64 */
-	u32 pa;		  /**< SRC or DST buffer PA - round to 1K
-	 	 	   *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
+	unsigned len;     	/** length in bytes - will round up to next %64 */
+	u32 pa;		  		/**< SRC or DST buffer PA - round to 1K
+	 	 	   	   	   	 *   RTM_T_USE_HOSTBUF=> use Driver buffer 0 */
 };
 
-struct AB {
+struct AB 			/** Define two buffers A, B for ping/pong        */
+{
 	struct XLLC_DEF buffers[2];
 };
 
 #define MAXABN	256
 
-struct ABN {
+struct ABN 			/** Define N buffers.   */
+{
 	int ndesc;
 	struct XLLC_DEF buffers[MAXABN];
 	/* others tag on behind */
@@ -77,42 +80,45 @@ struct AO_BURST {
 #define DMAGIC 0xDB
 
 #define RTM_T_START_STREAM	_IO(DMAGIC,   1)
-/**< ioctl Start High Throughput Streaming */
+/**< **ioctl** Start High Throughput Streaming */
 #define RTM_T_START_LLC	 	_IOW(DMAGIC,   2, struct LLC_DEF)
-/**< ioctl Start Low Latency Control */
+/**< **ioctl** Start Low Latency Control */
 
 
 #define RTM_T_START_STREAM_MAX	_IOW(DMAGIC,   3, u32)
-/**< ioctl Start High Throughput Streaming specify max buffers. */
+/**< **ioctl** Start High Throughput Streaming specify max buffers. */
 
 #define RTM_T_START_AOLLC	_IOW(DMAGIC,   4, struct AO_LLC_DEF)
 
 #define AFHBA_START_AI_LLC	_IOWR(DMAGIC,   5, struct XLLC_DEF)
-/**< ioctl ACQ2106 Start Low Latency Control Inbound
+/**< **ioctl** ACQ2106 Start Low Latency Control Inbound
  * outputs actual pa used
  */
 
 #define AFHBA_START_AO_LLC	_IOWR(DMAGIC,   6, struct XLLC_DEF)
-/**< ioctl ACQ2106 Start Low Latency Control Outbound */
+/**< **ioctl** ACQ2106 Start Low Latency Control Outbound */
 
 #define AFHBA_START_AI_AB	_IOWR(DMAGIC,   7, struct AB)
-/**< ioctl ACQ2106 Start AI, Buffer A/B struct XLLC_DEF [2]. 
+/**< **ioctl** ACQ2106 Start AI, Buffer A/B struct XLLC_DEF [2].
  * streaming rules: 4K boundary, 1K size modulus
  */
 
 
 #define AFHBA_START_AI_ABN	_IOWR(DMAGIC, 8, struct ABN)
-/** ioctl AFHBA_START_AI_ABN LLC, multiple buffers, INPUT */
+/**< **ioctl** AFHBA_START_AI_ABN LLC, multiple buffers, INPUT */
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
-/** ioctl AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
+/**< **ioctl** AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
 
-/* define an AO_BURST setup */
+
 #define AFHBA_AO_BURST_INIT		 _IOWR(DMAGIC, 10, struct AO_BURST)
-/* define current buffer id */
-#define AFHBA_AO_BURST_SETBUF  	_IOWR(DMAGIC, 12, u32)
+/**< **ioctl** define an AO_BURST setup */
 
-/** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
+#define AFHBA_AO_BURST_SETBUF  	_IOWR(DMAGIC, 12, u32)
+/**< **ioctl** define current buffer id */
+
+
 #define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
+/**< **ioctl** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
 
 struct StreamBufferDef {
 	u32 ibuf;

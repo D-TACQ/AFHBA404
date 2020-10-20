@@ -1,12 +1,12 @@
-/*
- * afhab_minor.h
+/** @file afhba_minor.h
+ *  @brief defines cdev minor number functions
  *
  *  Created on: 21 Jan 2015
  *      Author: pgm
  */
 
-#ifndef AFHAB_MINOR_H_
-#define AFHAB_MINOR_H_
+#ifndef AFHBA_MINOR_H_
+#define AFHBA_MINOR_H_
 
 #define MINOR_REGREAD	253
 
@@ -20,4 +20,4 @@
 #define MINOR_REMOTE	247
 #define MINOR_CATCHUP_HISTO	246
 
-#endif /* AFHAB_MINOR_H_ */
+#endif /* AFHBA_MINOR_H_ */
