@@ -34,7 +34,7 @@ Typical use case:
 
 * ACQ2106+4xACQ424ELF-32+2xAO424ELF32 : 128AI, 64AO, run in an LLC loop at 100kSPS.
 
-For modern use of LLC, see [ACQPROC-README] (./ACQPROC-README.md)
+For modern use of LLC, see [ACQPROC-README](./ACQPROC-README.md)
 
 ### 2. Device driver
 
@@ -104,6 +104,7 @@ For further details, please refer to
 * INSTALL
 * README.ACQ2106.HTS
 * LLCONTROL/README.AFHBA404
+* Code Documentation: https://d-tacq.github.io/AFHBA404/html/index.html
 
 
 
