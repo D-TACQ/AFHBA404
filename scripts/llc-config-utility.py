@@ -163,7 +163,7 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
     return None
 
 
-def config_VI(args, uut, AISITES, DIOSITES, PWMSITES):
+def config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod=False):
     uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
     if args.us == 1:
         trg = uut.s1.trg.split(" ")[0].split("=")[1]
@@ -172,6 +172,9 @@ def config_VI(args, uut, AISITES, DIOSITES, PWMSITES):
         uut.s0.LLC_instrument_latency = 1
     if args.fp_sync_clk == 1:
         config_sync_clk(uut)
+    if sod:
+        for site in AISITES:
+            uut.modules[site].sod = 1
     config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES)
 
 
@@ -249,9 +252,10 @@ def config_auto(args, uut, uut_json=None):
     uut = acq400_hapi.Acq2106(uut)
 
     AISITES, AOSITES, DIOSITES, PWMSITES = enum_sites(uut, uut_json)
+    sod = True if 'sod' in uut_json['type'] else False
 
     if len(AISITES) != 0:
-        config_VI(args, uut, AISITES, DIOSITES, PWMSITES)
+        config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod)
 
     if len(DIOSITES) != 0 or len(AOSITES) != 0:
         config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES)
@@ -286,7 +290,8 @@ def run_main():
     args = parser.parse_args()
     if args.auto == 1:
         json = load_json(args.json_file)
-        uut_json = [uut['type'] for uut in json['AFHBA']['UUT']]
+        uut_json = [uut for uut in json['AFHBA']['UUT']]
+        #print("DEBUG: {}".format(uut_json))
         for index, uut in enumerate(args.uuts):
             config_auto(args, uut, uut_json[index])
     return None
