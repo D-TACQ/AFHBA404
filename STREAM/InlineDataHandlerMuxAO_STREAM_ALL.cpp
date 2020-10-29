@@ -116,7 +116,7 @@ public:
 	{
 		const short* ai0 = (const short*)src;
 		const short* ai = ai0;
-		short* ao = (short*)dev->getHostBufferMappingW(ao_buf_ix = !ao_buf_ix);
+		short* ao = (short*)dev->getHostBufferMappingW(ao_buf_ix); 
 		const int instep = ai_count*ai_stride;
 		updateMuxSelection();
 
@@ -134,6 +134,7 @@ public:
 			perror("ioctl AFHBA_AO_BURST_SETBUF");
 			exit(1);
 		}
+		ao_buf_ix = !ao_buf_ix;
 	}
 };
 
