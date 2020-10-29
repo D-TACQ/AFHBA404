@@ -101,6 +101,9 @@ public:
 				ao_dev, ao_count, ai_count, ai_start, ai_stride, wavelen);
 
 		dev = new RTM_T_Device(ao_dev);
+		memset(dev->getHostBufferMappingW(0), 0, dev->maxlen);
+		memset(dev->getHostBufferMappingW(1), 0, dev->maxlen);
+
 		ao_ai_mapping = new unsigned[ao_count];
 		for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
 			ao_ai_mapping[ao_ch] = ao_ch;
