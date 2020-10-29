@@ -130,7 +130,19 @@ public:
 			}
 			for (int ao_ch = 0; ao_ch < ao_count; ++ao_ch){
 				unsigned ai_ch = ao_ai_mapping[ao_ch];
-				ao[ao_ch] = ai_ch==AO_MAP_ZERO? 0 : ai[ai_ch];
+				short yy = 0;
+				switch(ai_ch){
+				case AO_MAP_ZERO:
+					break;
+				case 1234:
+					// return a ramp value
+					yy = sample;
+					break;
+				default:
+					yy = ai[ai_ch];
+					break;
+				}
+				ao[ao_ch] = yy;
 			}
 		}
 		if (ioctl(dev->getDeviceHandle(), AFHBA_AO_BURST_SETBUF, ao_buf_ix)){
