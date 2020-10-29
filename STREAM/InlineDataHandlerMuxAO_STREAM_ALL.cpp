@@ -134,7 +134,7 @@ public:
 			perror("ioctl AFHBA_AO_BURST_SETBUF");
 			exit(1);
 		}
-		ao_buf_ix = !ao_buf_ix;
+		//ao_buf_ix = !ao_buf_ix;
 	}
 };
 
