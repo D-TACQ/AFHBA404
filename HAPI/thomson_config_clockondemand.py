@@ -21,7 +21,9 @@ def lcm(a, b):
     """Compute the lowest common multiple of a and b"""
     return a * b / gcd(a, b)
 
+
 EXTCLKDIV = int(os.getenv("EXTCLKDIV", "100"))
+EXT_UCLK = int(os.getenv("EXT_UCLK", "0"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
@@ -101,6 +103,27 @@ def init_ai(uut):
     uut.s0.bufferlen = lcm(ssb, 4096)
 
 
+def set_ext_uclk_counter(uuts):
+    """
+    Configure system to use an external clock source
+    as the usec counter.
+    """
+    for num, uut in enumerate(uuts):
+
+        if num == 0:
+            uut.s0.SIG_SRC_SYNC_0 = 'GPG0'
+            uut.s0.SIG_SRC_CLK_0 = 'HDMI'
+        else:
+            uut.s0.SIG_SRC_SYNC_0 = 'HDMI'
+
+        uut.s1.sync = '1,0,1'
+        uut.s0.spad1_us_clk_src = 1
+        uut.s0.SIG_SYNC_OUT_SYNC_DX = 'd0'
+        uut.s1.clk_from_sync = 1
+
+    return None
+
+
 def run_main(args):
     uuts = [ acq400_hapi.Acq2106(addr) for addr in args.uuts ]
     uutm = uuts[0]
@@ -115,6 +138,8 @@ def run_main(args):
     set_delay(uutm, args)
     for uut in uuts:
         init_ai(uut)
+    if EXT_UCLK:
+        set_ext_uclk_counter(uuts)
 
 
 
