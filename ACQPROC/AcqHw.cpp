@@ -104,9 +104,9 @@ protected:
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 		dev->xllc_def.len = G::samples_buffer*vi.len();
-		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
+		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam+2);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
-		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
+		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
 	}
 	virtual ~ACQ_HW_BASE() {
