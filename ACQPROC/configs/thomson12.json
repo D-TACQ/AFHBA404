@@ -3,7 +3,7 @@
         "UUT": [
                 {
 	                "name" : "acq2106_200",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -11,7 +11,7 @@
                 },
                 {
 	                "name" : "acq2106_201",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -19,7 +19,7 @@
                 },
                 {
 	                "name" : "acq2106_202",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -27,7 +27,7 @@
                 },
                 {   
 	                "name" : "acq2106_203",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -35,7 +35,7 @@
                 },
                 {
 	                "name" : "acq2106_300",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -43,7 +43,7 @@
                 },
                 {   
 	                "name" : "acq2106_301",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -51,7 +51,7 @@
                 },
                 {
 	                "name" : "acq2106_302",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -59,7 +59,7 @@
                 },
                 {   
 	                "name" : "acq2106_303",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -67,7 +67,7 @@
                 },
                 {   
 	                "name" : "acq2106_400",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -75,7 +75,7 @@
                 },
                 {   
 	                "name" : "acq2106_401",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -83,7 +83,7 @@
                 },
                 {   
 	                "name" : "acq2106_402",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -91,7 +91,7 @@
                 },
                 {   
 	                "name" : "acq2106_403",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16

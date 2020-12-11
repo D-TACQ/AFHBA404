@@ -1,0 +1,70 @@
+{
+    "AFHBA": {
+        "DEVNUM": 0,
+        "UUT": [
+            {
+                "name": "acq2106_238",
+                "type": "pcs,sod",
+                "sync_role": "master",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_261",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_262",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_263",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_264",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_265",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            },
+            {
+                "name": "acq2106_266",
+                "type": "pcs,sod",
+                "sync_role": "slave",
+                "VI": {
+                    "AI16": 192,
+                    "SP32": 16
+                }
+            }
+        ]
+    }
+}
