@@ -19,8 +19,8 @@ export LD_LIBRARY_PATH=/usr/local/mdsplus/lib64/
 export EXTCLKDIV=${EXTCLKDIV:-10}
 
 set_clocks() {
-	echo SITECLIENT_TRACE=1 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_clockondemand.py --delay=$DELAY $UUTS
-	EXT_UCLK=$EXT_UCLK SITECLIENT_TRACE=0 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_clockondemand.py --delay=$DELAY $UUTS
+	echo SITECLIENT_TRACE=1 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_sampleondemand.py --delay=$DELAY $UUTS
+	EXT_UCLK=$EXT_UCLK SITECLIENT_TRACE=0 SIMULATE=0 $AFHBA404DIR/HAPI/thomson_config_sampleondemand.py --delay=$DELAY $UUTS
 }
 
 
