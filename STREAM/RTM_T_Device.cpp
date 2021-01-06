@@ -5,6 +5,10 @@
  *      Author: pgm
  */
 
+/** @file RTM_T_Device.cpp
+ *  @brief interface to RTM_T Device (historic name for AFHBA404)
+ */
+
 using namespace std;
 
 #include <stdio.h>

@@ -17,7 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /* ------------------------------------------------------------------------- */
 
-/** @file xiloader decode/load xilinx .bit file
+/** @file xiloader.c
+ *  @brief decode/load xilinx .bit file
+ *
  * Refs:
 */
 

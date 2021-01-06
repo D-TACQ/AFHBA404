@@ -1,3 +1,6 @@
+/** @file afhba_sysfs.c
+ *  @brief sysfs interface aka "knobs"
+ */
 /* ------------------------------------------------------------------------- */
 /* acq400_drv.c  D-TACQ ACQ400 FMC  DRIVER   
  * afhba_sysfs.c

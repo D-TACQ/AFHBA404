@@ -136,11 +136,15 @@ struct AFHBA_STREAM_DEV {
 	int push_ram_cursor;
 	int pull_ram_cursor;
 
+
+
 	int comms_init_done;
 
 	char irq_names[4][32];
 
 	bool aurora_fail_detected;
+	bool push_descr_ram;  /* use ram descriptor on PUSH */
+	bool pull_descr_ram;  /* use ram descriptor on PULL */
 	enum ZI_REPORT { ZI_BAD = -1, ZI_NULL = 0, ZI_GOOD = 1 } zi_report;
 
 	int shot;

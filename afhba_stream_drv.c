@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- */
-/* afhba_stream_drv.c D-TACQ ACQ400 FMC  DRIVER
+/** @file afhba_stream_drv.c
+ *  @brief AFHBA404 **core device driver**, streaming DMA functions
+ *
  * afhba_stream_drv.c
  *
  *  Created on: 19 Jan 2015
@@ -41,7 +42,7 @@
 #include <linux/version.h>
 
 
-#define REVID	"R1070"
+#define REVID	"R1072"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -97,6 +98,10 @@ MODULE_PARM_DESC(aurora_monitor, "enable to check cable state in run loop, disab
 int eot_interrupt = 0;
 module_param(eot_interrupt, int, 0644);
 MODULE_PARM_DESC(eot_interrupt, "1: interrupt every, 0: interrupt none, N: interrupt interval");
+
+int cos_interrupt_ok = 0;
+module_param(cos_interrupt_ok, int, 0644);
+MODULE_PARM_DESC(cos_interrupt_ok, "1: interrupt every, 0: interrupt none, N: interrupt interval");
 
 int aurora_status_read_count = 0;
 module_param(aurora_status_read_count, int, 0644);
@@ -335,7 +340,8 @@ u32 _afs_read_pcireg(struct AFHBA_DEV *adev, int regoff)
 }
 static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram){
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->push_descr_ram){
 		if  (!adev->stream_dev->job.dma_started){
 			write_ram_descr(adev, DMA_PUSH_DESC_RAM, idesc);
 		}
@@ -347,7 +353,8 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 
 void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
-	if (dma_descriptor_ram){
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->pull_descr_ram){
 		if  (!adev->stream_dev->job.dma_started){
 			write_ram_descr(adev, DMA_PULL_DESC_RAM, idesc);
 		}
@@ -366,10 +373,13 @@ static void afs_init_dma_clr(struct AFHBA_DEV *adev)
 static void afs_configure_streaming_dma(
 		struct AFHBA_DEV *adev, enum DMA_SEL dma_sel)
 {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
 	u32 dma_ctrl = DMA_CTRL_RD(adev);
 	u32 check;
 	dma_ctrl &= ~dma_pp(dma_sel, DMA_CTRL_LOW_LAT|DMA_CTRL_RECYCLE);
-	if (dma_descriptor_ram){
+	if (((dma_sel&DMA_PUSH_SEL) && sdev->push_descr_ram) ||
+		((dma_sel&DMA_PULL_SEL) && sdev->pull_descr_ram)    ){
 		dma_ctrl |= DMA_CTRL_RAM;
 	}else{
 		dma_ctrl &= ~DMA_CTRL_RAM;
@@ -497,6 +507,7 @@ static void afs_load_dram_descriptors_ll(
 				__FUNCTION__, idb, reg_off, adev->remote+reg_off, dma_desc);
 
 			writel(dma_desc, adev->remote+reg_off);
+			msleep(5);
 		}
 	}
 
@@ -573,6 +584,7 @@ void __afs_start_dma(struct AFHBA_DEV *adev, u32 dma_sel)
 static int afs_aurora_errors(struct AFHBA_DEV *adev)
 {
 	u32 stat = afhba_read_reg(adev, ASR(adev->ACR));
+	int link_warning = 0;
 
 	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
 		u32 ctrl = afhba_read_reg(adev, adev->ACR);
@@ -588,6 +600,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			adev->sfp-SFP_A + 'A',
 			adev->aurora_error_count,
 			stat, AFHBA_AURORA_STAT_ERR, stat&AFHBA_AURORA_STAT_ERR);
+			link_warning = 1;
 		}
 		stat = afhba_read_reg(adev, ASR(adev->ACR));
 		if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
@@ -599,7 +612,7 @@ static int afs_aurora_errors(struct AFHBA_DEV *adev)
 			msleep(1000);
 			return -1;
 		}else{
-			return 1;
+			return link_warning? -1: 1;
 		}
 	}else{
 		return 0;
@@ -678,22 +691,60 @@ static int _afs_check_read(struct AFHBA_DEV *adev)
 static int _afs_comms_init(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	int to = 0;
+	enum { WAIT_INIT, WAIT_LANE_UP, WAIT_LANE_STILL_UP, CHECK_READ, TXEN } state = WAIT_INIT;
+	int ticks_in_state = 0;
+#define CHANGE_STATE(s) state = (s); ticks_in_state = 0; continue
 
-	afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
+	for ( ; ; msleep(MSLEEP_TO), ++ticks_in_state){
+		dev_info(pdev(adev), "%s state:%d %s ticks:%d", __FUNCTION__, state,
+				state==WAIT_INIT? "WAIT_INIT": state==WAIT_LANE_UP? "WAIT_LANE_UP":
+				state==WAIT_LANE_STILL_UP?"WAIT_LANE_STILL_UP": state==CHECK_READ? "CHECK_READ":
+				state==TXEN? "TXEN": "???",
+				ticks_in_state);
 
-	while(!afs_aurora_lane_up(adev)){
-		msleep(to += MSLEEP_TO);
-		if (to > aurora_to_ms){
+		switch(state){
+		case WAIT_INIT:
+			afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
+			CHANGE_STATE(WAIT_LANE_UP);
+			break;
+		case WAIT_LANE_UP:
+			if (afs_aurora_lane_up(adev)){
+				CHANGE_STATE(WAIT_LANE_STILL_UP);
+			}else{
+				if (ticks_in_state > 100){
+					return 0;
+				}
+			}
+			break;
+		case WAIT_LANE_STILL_UP:
+			if (afs_aurora_lane_up(adev)){
+				if (ticks_in_state > 3){
+					dev_info(pdev(adev), "%s call mirror_init 01", __FUNCTION__);
+					afs_init_dma_clr(adev);
+					_afs_pcie_mirror_init(adev);
+					CHANGE_STATE(CHECK_READ);
+				}
+			}else{
+				CHANGE_STATE(WAIT_LANE_UP);
+			}
+			break;
+		case CHECK_READ:
+			sdev->comms_init_done = _afs_check_read(adev) == 0;
+			if (afs_aurora_errors(adev) == -1 ){
+				dev_warn(pdev(adev), "%s bad aurora, TXDIS", __FUNCTION__);
+				afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_TXDIS);
+				CHANGE_STATE(TXEN);
+			}else{
+				return sdev->comms_init_done;
+			}
+		case TXEN:
+			afhba_write_reg(adev, adev->ACR, 0);
+			CHANGE_STATE(WAIT_INIT);
+		default:
+			dev_err(pdev(adev), "%s illegal state %d", __FUNCTION__, state);
 			return 0;
 		}
 	}
-	/* ... now make _sure_ it's up .. */
-	msleep(MSLEEP_TO);
-	afs_init_dma_clr(adev);
-	_afs_pcie_mirror_init(adev);
-
-	return sdev->comms_init_done = _afs_check_read(adev) == 0;
 }
 
 int afs_comms_init(struct AFHBA_DEV *adev)
@@ -708,7 +759,7 @@ int afs_comms_init(struct AFHBA_DEV *adev)
 		if (!sdev->comms_init_done){
 			sdev->comms_init_done = _afs_comms_init(adev);
 		}
-		afs_aurora_errors(adev);
+
 		return sdev->comms_init_done;
 	}else{
 		if (adev->link_up){
@@ -1008,6 +1059,10 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	init_waitqueue_head(&sdev->return_waitq);
 
 	mutex_unlock(&sdev->list_mutex);
+
+	if (dma_descriptor_ram){
+		sdev->push_descr_ram = sdev->pull_descr_ram = 1;
+	}
 
 	init_histo_buffers(sdev);
 	dev_dbg(pdev(adev), "afs_init_buffers() 99");
@@ -1537,7 +1592,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 
 ssize_t afs_dma_read(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
-/* returns when buffer[s] available
+/** returns when buffer[s] available
  * data is buffer index as array of unsigned
  * return len is sizeof(array)
  */
@@ -1639,7 +1694,7 @@ static unsigned int afs_dma_poll(struct file* file, poll_table *poll_table)
 
 ssize_t afs_dma_read_poll(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
-/* returns when buffer[s] available
+/** returns when buffer[s] available
  * data is buffer index as array of unsigned
  * return len is sizeof(array)
  */
@@ -1704,7 +1759,7 @@ read99:
 
 ssize_t afs_dma_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos)
-/* write completed data.
+/** write completed data.
  * data is array of full buffer id's
  * id's are removed from full and placed onto empty.
  */
@@ -1784,19 +1839,19 @@ int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
 	int ii;
 	for (ii = 0; ii < 16; ++ii){
 		if (1<<ii > nblocks){
-			int len1 = (1<<(ii-1))*1024;
+			int len1 	= (1<<(ii-1))*1024;
 			xdef[0] 	= ab->buffers[0];
 			xdef[1].pa 	= xdef[0].pa + len1;
-			xdef[1].len 	= xdef[0].len - len1;
-			xdef[0].len 	= len1;
+			xdef[1].len = xdef[0].len - len1;
+			xdef[0].len = len1;
 			xdef[2] 	= ab->buffers[1];
 			xdef[3].pa 	= xdef[2].pa + len1;
-			xdef[3].len 	= xdef[2].len - len1;
-			xdef[2].len 	= len1;
+			xdef[3].len = xdef[2].len - len1;
+			xdef[2].len = len1;
 			return 4;
 		}else if (1<<ii == nblocks){
-			xdef[0] = ab->buffers[0];
-			xdef[1] = ab->buffers[1];
+			xdef[0] 	= ab->buffers[0];
+			xdef[1] 	= ab->buffers[1];
 			return 2;
 		}
 	}
@@ -1886,38 +1941,10 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	return 0;
 }
 
-/*
-static int ao_burst_work(void *arg)
-{
-	struct AFHBA_DEV *adev = (struct AFHBA_DEV*)arg;
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
 
-	struct sched_param param = { .sched_priority = 10 };
-	sched_setscheduler(current, SCHED_FIFO, &param);
-
-	while(!kthread_should_stop()){
-		int timeout = wait_event_interruptible_timeout(
-			sdev->work.w_waitq,
-			test_and_clear_bit(WORK_REQUEST, &sdev->work.w_to_do),
-			aobd) == 0;
-		afs_load_push_descriptor(adev, aobd->srcdesc);
-	}
-}
-*/
-void start_ao_burst(struct AFHBA_DEV *adev)
-{
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	struct AO_BURST_DEV* aobd = AO_BURST_DEV(sdev);
-	struct AO_BURST* aob = &aobd->ao_burst;
-
-
-	aobd->srcdesc = 0;
-
-//	sdev->work.w_task = kthread_run(ao_burst_work, adev, adev->name);
-}
 long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
+/** **ioctl** entry point */
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1976,46 +2003,20 @@ long afs_dma_ioctl(struct file *file,
 			dev_err(pdev(adev), "AFHBA_AO_BURST_INIT other user data active");
 			return -EBUSY;
 		}else{
-			/*
-			struct AO_BURST_DEV *aobd = kzalloc(sizeof(struct AO_BURST_DEV), GFP_KERNEL);
-
-			if (!VALID_AO_BURST(&aobd->ao_burst)){
-				dev_err(pdev(adev), "AFHBA_AO_BURST_INIT argument not valid");
-				return -EINVAL;
-			}
-			COPY_FROM_USER(&aobd->ao_burst, varg, sizeof(struct AO_BURST));
-			sdev->user = aobd;
-
-			start_ao_burst(adev);
-			*/
+			u32 dma_ctrl = DMA_CTRL_RD(adev);
+			dma_ctrl |= dma_pp(DMA_PULL_SEL, DMA_CTRL_EN);
+			sdev->pull_descr_ram = 0;
+			sdev->onStopPull = afs_stop_stream_pull;
+			afs_load_pull_descriptor(adev, 0);
+			DMA_CTRL_WR(adev, dma_ctrl);
 			return 0;
 		}
 	}
 	case AFHBA_AO_BURST_SETBUF:
 	{
-		/*
-		if (!(sdev->user && VALID_AO_BURST(&AO_BURST_DEV(sdev)->ao_burst))){
-			return -EINVAL;
-		}else{
-		*/
-			struct AO_BURST_DEV *aobd = AO_BURST_DEV(sdev);
-			u32 srcix = 0;
-
-
-			/*
-			COPY_FROM_USER(&srcix, varg, sizeof(u32));
-			if (srcix >=0 && srcix < aobd->ao_burst.nbuf){
-				afs_load_push_descriptor(adev, aobd->srcdesc);
-				aobd->srcdesc = srcix;
-			}else{
-				return -EINVAL;
-			}
-			*/
-			afs_load_pull_descriptor(adev, srcix);
-			return 0;
-			/*
-		}
-		*/
+		u32 srcix = arg;
+		afs_load_pull_descriptor(adev, srcix);
+		return 0;
 	}
 	default:
 		return -ENOTTY;
@@ -2025,7 +2026,7 @@ long afs_dma_ioctl(struct file *file,
 
 int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
 /**
- * mmap the host buffer.
+ * **mmap** the host buffer.
  */
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
@@ -2074,6 +2075,7 @@ static struct file_operations afs_fops_dma_poll = {
 
 
 int afs_open(struct inode *inode, struct file *file)
+/** **open** entry point */
 {
 	struct AFHBA_DEV *adev = DEV(file);
 
@@ -2234,7 +2236,8 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
-	if (adev->peer == 0){
+
+	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
 	}
 	startWork(adev);

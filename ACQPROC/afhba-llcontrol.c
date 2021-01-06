@@ -1,4 +1,6 @@
-/* ------------------------------------------------------------------------- */
+/** @file afhba-llcontrol.c
+ *  @brief device driver memory mapping interface.
+ */
 /* afhba-llcontrol-common.h  D-TACQ ACQ400 FMC  DRIVER                                   
  * Project: AFHBA404
  * Created: 5 Mar 2018  			/ User: pgm

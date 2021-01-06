@@ -1,5 +1,5 @@
-/*
- * AcqSys.h
+/** @file AcqSys.h
+ *  @brief acqproc global class interface definition.
  *
  *  Created on: 27 Feb 2020
  *      Author: pgm
@@ -38,6 +38,10 @@ enum SPIX {
 	USECS = 1,			/**< microseconds since trigger */
 	POLLCOUNT = 2,			/**< pollcount: number of times SW polled for incoming. <=1 : ERROR (data too early) */
 };
+
+#define PW32LEN  32
+typedef unsigned PW32V[PW32LEN];
+
 /** Models Vector Output.
  * Vector Output is a single sample output data set, fetched by single DMA from ACQ
  */
@@ -48,6 +52,7 @@ struct VO {
 	VO offsets(void) const;
 	int AO16;		/**< #AO16 values from the algorithm. OUTPUT to HW */
 	int DO32;		/**< #DO32 values from the algorithm. OUTPUT to HW */
+	int PW32;		/**< #PW32 values from the algorithm. OUTPUT to HW */
 	int CC32;		/**< #CALC values from the algorithm. NOT OUTPUT to HW */
 	VO();
 };
@@ -80,22 +85,24 @@ protected:
 	ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
         virtual ~ACQ();
 
-	bool nowait;	// newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts
-	unsigned wd_mask;
+	bool nowait;			/**< newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts). */
+	unsigned wd_mask;		/**< watchdog mask. */
 	int pollcount;
-	int devnum;
+	int devnum;				/**< AFHBA404 device numbers 0..N. */
 public:
 	const VI vi_offsets; 	/**< byte offset for each Input type in Local Vector In */
 	const VO vo_offsets; 	/**< byte offset for each Output type in Local Vector Out */
-	const VI vi_cursor;	/**< index for each Input type in System Interface */
-	const VO vo_cursor;	/**< index for each Output type in System Interface */
+	const VI vi_cursor;		/**< index for each Input type in System Interface */
+	const VO vo_cursor;		/**< index for each Output type in System Interface */
 
 	virtual string toString();
 
 	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
 	virtual void action(SystemInterface& systemInterface) {}
+	/*< early stage action */
 	virtual void action2(SystemInterface& systemInterface) {}
+	/*< second stage action */
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
@@ -165,12 +172,13 @@ public:
 		unsigned *DI32;
 		unsigned *SP32;
 	} IN;
-	/**< ONE vector each type, scatter each type to appropriate VO all UUTS
+	/** ONE vector each type, scatter each type to appropriate VO all UUTS
 	 */
 	struct Outputs {
 		short* AO16;
 		unsigned *DO32;
-		unsigned *CC32;			/* calc values from PCS .. NOT outputs. */
+		PW32V *PW32;			/**< 32 demand values packed into shorts */
+		unsigned *CC32;			/**< calc values from PCS .. NOT outputs. */
 	} OUT;
 
 	SystemInterface(const HBA& _hba);
@@ -204,6 +212,9 @@ public:
 	}
 	unsigned DO32_count() const {
 		return hba.vo.DO32;
+	}
+	unsigned PW32_count() const {
+		return hba.vo.PW32;
 	}
 	unsigned CC32_count() const {
 		return hba.vo.CC32;

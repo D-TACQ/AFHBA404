@@ -1,4 +1,6 @@
-/*
+/** @file AcqHw.cpp
+ *  @brief hardware implementation layer
+ *
  * AcqHw.cpp  :ACQ device with hardware hooks
  *
  *  Created on: 1 Mar 2020
@@ -13,6 +15,7 @@ extern "C" {
 }
 
 #include "AcqSys.h"
+#include "Env.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -33,6 +36,7 @@ struct Dev {
 	int devnum;
 	int fd;
 	char* host_buffer;
+	/** local buffer interface .. for archive. */
 	struct LBUF {
 		char* base;
 		char* cursor;
@@ -83,19 +87,26 @@ protected:
 	unsigned tl0;
 
 	unsigned *dox;
+	int sample;
+	const int spix;
+	int pw32_double_buffer;   // for back-compatibility with old PWM code
 
 	ACQ_HW_BASE(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ(devnum, _name, _vi, _vo, _vi_offsets,
 				_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-				tl0(0xdeadbeef), dev(new Dev(devnum))
+				dev(new Dev(devnum)),
+				tl0(0xdeadbeef),
+				sample(0),
+				spix(vi_offsets.SP32/sizeof(unsigned)+SPIX::TLATCH),
+				pw32_double_buffer(Env::getenv("PW32_DOUBLE_BUFFER", 1))
 	{
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 		dev->xllc_def.len = G::samples_buffer*vi.len();
-		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam);
+		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam+2);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
-		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam);
+		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
 	}
 	virtual ~ACQ_HW_BASE() {
@@ -109,11 +120,16 @@ protected:
 	/**< prepare to run a shot nsamples long, arm the UUT. */
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
+	virtual void action(SystemInterface& systemInterface);
+	/**< on newSample, copy VO from SI, copy VI to SI */
+	virtual void action2(SystemInterface& systemInterface);
+	/**< late action(), cleanup */
 };
 
+/** concrete base class. */
 class ACQ_HW: public ACQ_HW_BASE
 {
-	int sample;
+
 public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -121,10 +137,7 @@ public:
 	{}
 	virtual bool newSample(int sample);
 	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
-	virtual void action(SystemInterface& systemInterface);
-	/**< on newSample, copy VO from SI, copy VI to SI */
-	virtual void action2(SystemInterface& systemInterface);
-	/**< late action(), cleanup */
+
 };
 
 /* TLATCH now uses the dynamic set value */
@@ -135,7 +148,7 @@ public:
 ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor), sample(0)
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
 	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
@@ -166,8 +179,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			}
 
 			if (vo.DO32){
-				const char* hw_trace = getenv("DO32_HW_TRACE");
-				if (hw_trace && atoi(hw_trace)){
+				if(Env::getenv("DO32_HW_TRACE", 0)){
 				/* marker pattern for the PAD area for hardware trace */
 					for (int ii = 0; ii <= 0xf; ++ii){
 						dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
@@ -186,13 +198,9 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	 memcpy(reinterpret_cast<char*>(systemInterface.IN.field+vi_cursor.field), dev->lbuf_vi.cursor+vi_offsets.field, \
 			vi.field*sizeof(systemInterface.IN.field[0])))
 
-/** copy SI.field to VO */
-#define SITOVO(field) \
-	(vo.field && \
-	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
-			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
-void ACQ_HW::action(SystemInterface& systemInterface)
+
+void ACQ_HW_BASE::action(SystemInterface& systemInterface)
 /**< copy SI to VO, copy VI to SI, advance local buffer pointer. */
 {
 	VITOSI(AI16);
@@ -210,6 +218,12 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 	VITOSI(SP32);
 }
 
+/** copy SI.field to VO */
+#define SITOVO(field) \
+	(vo.field && \
+	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
+			 vo.field*sizeof(systemInterface.OUT.field[0])))
+
 /** copy SI.field to XO archive. */
 #define SITOVO2(field) \
 	(vo.field && \
@@ -218,15 +232,18 @@ void ACQ_HW::action(SystemInterface& systemInterface)
 
 /** in slack time, copy SI.OUT to VO archive cursor.
  * @@todo make it optional in case it takes too long */
-void ACQ_HW::action2(SystemInterface& systemInterface) {
+void ACQ_HW_BASE::action2(SystemInterface& systemInterface) {
 	SITOVO(AO16);
 	SITOVO(DO32);
+	if (pw32_double_buffer) SITOVO(PW32);
 
 	SITOVO2(AO16);
 	SITOVO2(DO32);
+	SITOVO2(PW32);
 	SITOVO2(CC32);
 	if (++sample < HBA::maxsam){
 		dev->lbuf_vi.cursor += vi.len();
+		dev->lbuf_vo.cursor += vo.len();
 	}
 	pollcount = 0;
 }
@@ -262,11 +279,96 @@ void ACQ_HW_BASE::arm(int nsamples)
 }
 
 
-class ACQ_HW_MEAN: public ACQ_HW_BASE
+/** as per ACQ_HW, but with **multi** dma buffers
+ * use for applications like THOMSON where **multi** back to back bursts occur
+ * by using **multi** buffers, there's no pileup.
+ * the system will still output a single sample per buffer, the tempo of the output will be bursty
+ */
+class ACQ_HW_MULTI: public ACQ_HW_BASE
 {
 protected:
-	const int nmean;
-	const int spix;
+	int pw32_double_buffer;   // for back-compatibility with old PWM code
+	int nb;
+	int **raw;
+
+	unsigned tlatch0(int ib){
+		return raw[ib][spix];
+	}
+	unsigned *tl0_array;
+	int verbose;
+public:
+	ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nbuffers);
+	virtual ~ACQ_HW_MULTI()
+	{}
+	virtual bool newSample(int sample);
+	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
+};
+
+ACQ_HW_MULTI::ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nbuffers):
+		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
+								_vo_offsets, sys_vi_cursor, sys_vo_cursor),
+		nb(_nbuffers),
+		tl0_array(new unsigned[_nbuffers]),
+		verbose(Env::getenv("ACQ_HW_MULTI_VERBOSE", 0))
+{
+	struct ABN abn;
+	int ib;
+
+	raw = new int* [nb];
+	abn.ndesc = nb;
+	abn.buffers[0].pa = dev->xllc_def.pa;
+
+	for (ib = 0; ib < nb; ++ib){
+		if (dev->xllc_def.pa != RTM_T_USE_HOSTBUF){
+			assert(0);			// this path not valid.
+			abn.buffers[ib].pa = dev->xllc_def.pa + ib*PAGE_SIZE;
+		}
+		abn.buffers[ib].len = dev->xllc_def.len;
+		raw[ib] = (int*)(dev->host_buffer + ib*PAGE_SIZE);
+	}
+
+	if (ioctl(dev->fd, AFHBA_START_AI_ABN, &abn)){
+		perror("ioctl AFHBA_START_AI_ABN");
+		exit(1);
+	}
+
+	if (verbose) for (ib = 0; ib < nb; ++ib){
+		printf("[%d] [%d] AI buf pa: 0x%08x len %d\n", dev->devnum, ib, dev->xllc_def.pa, dev->xllc_def.len);
+	}
+	printf("[%d] AI buf pa: 0x%08x len %d nb:%d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len, nb);
+
+	for (ib = 0; ib < nb; ++ib){
+		tl0_array[ib] = 0xdeadbeef;
+	}
+}
+
+/** checks host buffer for new sample, if so copies to lbuf and reports true */
+bool ACQ_HW_MULTI::newSample(int sample)
+{
+	int ib = sample%nb;
+    unsigned tl1;
+	// @@todo HANDLE MULTIPLE BUFFERS
+	if (nowait || (tl1 = tlatch0(ib)) != tl0_array[ib]){
+		memcpy(dev->lbuf_vi.cursor, raw[ib], vi.len());
+		tl0_array[ib] = tl1;
+		return true;
+	}else if (sample == 0 && wd_mask){
+		dox[0] ^= wd_mask;
+		return false;
+	}else{
+		return false;
+	}
+}
+
+/** output the mean of **nb** values
+ */
+class ACQ_HW_MEAN: public ACQ_HW_MULTI
+{
+protected:
+	const int& nmean;
+
 	unsigned *dox;
 	int **raw;
 	unsigned *tl0_array;
@@ -290,44 +392,12 @@ public:
 
 ACQ_HW_MEAN::ACQ_HW_MEAN(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int _nmean) :
-		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
-						_vo_offsets, sys_vi_cursor, sys_vo_cursor),
-		nmean(_nmean),
-		spix(vi_offsets.SP32/sizeof(unsigned)+SPIX::TLATCH),
-		tl0_array(new unsigned[_nmean]),
-		verbose(0)
+		ACQ_HW_MULTI(devnum, _name, _vi, _vo, _vi_offsets,
+						_vo_offsets, sys_vi_cursor, sys_vo_cursor, _nmean),
+		nmean(nb),
+		verbose(Env::getenv("ACQ_HW_MEAN_VERBOSE", 0))
 {
-	struct ABN abn;
-	int ib;
 
-	raw = new int* [nmean];
-	abn.ndesc = nmean;
-	abn.buffers[0].pa = dev->xllc_def.pa;
-
-	for (ib = 0; ib < nmean; ++ib){
-		if (dev->xllc_def.pa != RTM_T_USE_HOSTBUF){
-			assert(0);			// this path not valid.
-			abn.buffers[ib].pa = dev->xllc_def.pa + ib*PAGE_SIZE;
-		}
-		abn.buffers[ib].len = dev->xllc_def.len;
-		raw[ib] = (int*)(dev->host_buffer + ib*PAGE_SIZE);
-	}
-
-	if (ioctl(dev->fd, AFHBA_START_AI_ABN, &abn)){
-		perror("ioctl AFHBA_START_AI_ABN");
-		exit(1);
-	}
-	printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
-
-	if (getenv("ACQ_HW_MEAN_VERBOSE")){
-		verbose = atoi(getenv("ACQ_HW_MEAN_VERBOSE"));
-	}
-	if (verbose){
-		fprintf(stderr, "%s nmean:%d spix:%d\n", __FUNCTION__, nmean, spix);
-	}
-	for (ib = 0; ib < nmean; ++ib){
-		tl0_array[ib] = 0xdeadbeef;
-	}
 }
 
 bool ACQ_HW_MEAN::_newSample(int sample)
@@ -357,7 +427,7 @@ bool ACQ_HW_MEAN::newSample(int sample)
 }
 
 void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
-/**< on newSample, copy VO from SI, copy VI to SI */
+/** on newSample, copy VO from SI, copy VI to SI */
 {
 /** SIMPLIFY: supports AI32 ONLY!
  * COMPLEXIFY : re-scale as LJ 24 bit number so that HW=1 threshold is still valid, then OR the channel ID back in.
@@ -374,12 +444,12 @@ void ACQ_HW_MEAN::action(SystemInterface& systemInterface)
 	}
 }
 void ACQ_HW_MEAN::action2(SystemInterface& systemInterface)
-/**< late action(), cleanup */
+/** late action(), cleanup */
 {
 
 }
 
-/* takes mean of N samples, newSample returns true after <skip> samples */
+/** takes mean of N samples, newSample returns true after **skip** samples */
 class ACQ_HW_MEAN_SKIPPER: public ACQ_HW_MEAN {
 	const int nskip;
 public:
@@ -434,7 +504,12 @@ bool ACQ_HW_MEAN_SKIPPER::newSample(int sample)
 	}
 }
 
+/**
+ *  ACQ::factory is configured by environment variables to setup the core of the acquisition
 
+- **HW**=Value,Skip : Value 0: Simulate (check config file) Value 1: run normal hardware. >1 take mean of N samples Skip: > 0 Skip N samples before mena
+- **HW_MULTI**=N    : Regular capture with N DMA buffers. Allows control program to run at Fs/N
+ */
 ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor)
 {
@@ -446,6 +521,10 @@ ACQ* ACQ::factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 
 	if (HW == 1){
+		int multi = Env::getenv("HW_MULTI", 0);
+		if (multi){
+			return new ACQ_HW_MULTI(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor, multi);
+		}
 		return new ACQ_HW(devnum, _name, _vi, _vo, _vi_offsets, _vo_offsets, sys_vi_cursor, sys_vo_cursor);
 	}else if (HW > 1){
 		if (skip > 1){

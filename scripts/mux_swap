@@ -1,9 +1,27 @@
 #!/bin/bash
-M1=0
+M1=7
 M2=3
+
+
+manual() {
+	echo "playing $(cat /dev/shm/amx_ao_map)"
+	echo "say when"; read stuff
+	[ "$stuff" = "q" ] && exit 0
+}
+auto() {
+	usleep 20000
+}
+
+TEMPO=${TEMPO:-auto}
+set() {
+	echo $* > /dev/shm/amx_ao_map
+	$TEMPO
+}
+
+
+
 while [ 1 ]; do
-	echo > /dev/shm/amx_llc_start_stride $M1,10
-	usleep 10000
-	echo > /dev/shm/amx_llc_start_stride $M2,10
-	usleep 10000
+	set $M1,1
+	set $M2,1
+	set $M1,1 $M2,1
 done

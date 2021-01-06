@@ -7,6 +7,19 @@ let TLEN="$POST*120/100"
 
 UUT1=acq2106_076
 UUT2=acq2106_079
+ACQPROC_CONFIG=${ACQPROC_CONFIG:-./ACQPROC/configs/epfl_llc_4AO.json}
+ACPROC=true
+
+if $ACQPROC; then
+    FILE="${UUT1}_VI.dat"
+    echo "DEBUG1: $FILE"
+else
+    FILE="afhba.0.log"
+    echo "DEBUG2 $FILE"
+fi
+
+AOSITES=${AOSITES:-"1,2"}
+
 # INBOX: acq2106_076, 6 x AI424
 # OUTBOX: acq2106_079, 2 x AO424
 
@@ -24,6 +37,16 @@ set_clocks() {
 	$UUT1 $UUT2
 	)
 }
+
+
+set_uut() {
+    (cd PROJECTS/AFHBA404/HAPI;
+    SITECLIENT_TRACE=1
+    AOSITES=$AOSITES DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
+    )
+}
+
+
 control_program() {
 	cd PROJECTS/AFHBA404/LLCONTROL
 	#echo CONTROL PROGRAM 01
@@ -48,7 +71,7 @@ control_program() {
 	export TASKSET="taskset 0x10"
 # New variable to offset the PWM dataset in the VO Buffer
         export PWM_OFFSET=132
-	[ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
+        [ "x$TASKSET" != "x" ] && echo TASKSET $TASKSET
 	$TASKSET ./afhba-llcontrol-two-fiber $POST &
 	echo wait for llcontrol, PID $CTRLPID
 	wait
@@ -60,13 +83,34 @@ control_program() {
 		$UUT1 afhba.0.log
 }
 
+
+control_program2() {
+
+    # Run the control program here
+    cd PROJECTS/AFHBA404/
+    cat - > control_program.env <<EOF
+    export DEVMAX=1 # $DEVMAX
+    export VERBOSE=0 # $VERBOSE
+    export HW=1
+    export RTPRIO=10
+    export AFFINITY=$AFFINITY
+    export SINGLE_THREAD_CONTROL=control_dup1
+EOF
+    sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
+    [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
+    echo "Finished"
+    export NCOLS=112
+    export STORE_COLS="96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111"
+    /home/dt100/bin/mds_put_slice.py --ncols $NCOLS --dtype np.uint32 --store_cols $STORE_COLS \
+            --tlatch_report=1 --node_name "CH%02d" --default_node ST \
+            $UUT1 ${UUT1}_VI.dat
+
+    cd -
+}
+
+
 control_script() {
-       (cd PROJECTS/AFHBA404/HAPI;
-       echo CONTROL SCRIPT 01
-       SITECLIENT_TRACE=1
-       DOSITES="5,6" PWMSITES="6" python ./llc-test-harness-twobox.py $UUT1 $UUT2
-       echo CONTROL SCRIPT 99
-       )
+
        (cd PROJECTS/ACQ400/HAPI/acq400_hapi/user_apps/acq400;
         STATUSMONITOR_TRACE=0 ./acq400_capture.py \
 		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=1" \
@@ -100,10 +144,17 @@ xcontrol_script)
 	control_script;;
 *)
 	set_clocks
-        pwm_control
+	set_uut
 	new_shot --verbose 1 $UUT1
-	sudo $0 control_program &
-
+        if $ACQPROC; then
+            echo "Using ACQPROC"
+            control_program2 &
+        else
+            echo "Using original control program"
+            sudo $0 control_program &
+        fi
+        sleep 2
+	pwm_control
 	control_script
 	wait
 	echo wait complete

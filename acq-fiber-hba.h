@@ -1,5 +1,6 @@
-/* ------------------------------------------------------------------------- *
- * acq-fiber-hba.h  		                     	                    
+/**  @file acq-fiber-hba.h
+ *   @brief AFHBA404 device driver data structs.
+ *
  * ------------------------------------------------------------------------- *
  *   Copyright (C) 2014 Peter Milne, D-TACQ Solutions Ltd                
  *                      <peter dot milne at D hyphen TACQ dot com>          
@@ -241,6 +242,7 @@ struct AFHBA_DEV_PATH {
 #define AFHBA_SPI_WP		(1<<2)
 
 #define AFHBA_AURORA_CTRL_ENA		(1<<31)
+#define AFHBA_AURORA_CTRL_TXDIS		(1<<16)
 #define AFHBA_AURORA_CTRL_CLR		(1<<7)
 #define AFHBA_AURORA_CTRL_PWR_DWN	(1<<4)
 #define AFHBA_AURORA_CTRL_LOOPBACK	(0x7)

@@ -1,4 +1,5 @@
-/*
+/** @file acqproc.cpp
+ * @brief main program with UI, instantiates system.
  * acqproc_th.cpp  : test harness
  *
  *  Created on: 27 Feb 2020
@@ -80,9 +81,11 @@ int main(int argc, char* argv[])
 
 	hba.dump_config();
 
+
 	SystemInterface& si(SystemInterface::factory(hba));
 
 	hba.start_shot();
+
 	si.trigger();
 
 	try {

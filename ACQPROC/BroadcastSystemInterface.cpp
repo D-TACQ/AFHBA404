@@ -1,5 +1,5 @@
-/*
- * DefaultSystemInterface.cpp : sends a broad
+/** @file BroadcastSystemInterface.cpp
+ *  @brief sends a broadcast trigger to all fiber optic links.
  *
  *  Created on: 14 Mar 2020
  *      Author: pgm

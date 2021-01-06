@@ -1,4 +1,6 @@
-/*
+/** @file AcqSys.cpp
+ * @brief creates system configuration from config.
+ *
  * AcqSys.cpp
  *
  *  Created on: 27 Feb 2020
@@ -54,6 +56,7 @@ VO::VO() {
 VO& VO::operator += (const VO& right) {
 	this->AO16 += right.AO16;
 	this->DO32 += right.DO32;
+	this->PW32 += right.PW32;
 	this->CC32 += right.CC32;
 	return *this;
 }
@@ -63,18 +66,21 @@ VO VO::offsets(void) const
 	VO voff;
 	voff.AO16 = 0;
 	voff.DO32 = AO16*sizeof(short);
-	voff.CC32 = voff.DO32 + DO32*sizeof(unsigned);
+	voff.PW32 = voff.DO32 + DO32*sizeof(unsigned);
+	voff.CC32 = voff.PW32 + PW32*sizeof(PW32V);
 	return voff;
 }
 
 
-int VO::len(void) const {
-	return AO16*2 + DO32*4 + CC32*4;
+int VO::hwlen(void) const {
+	return AO16*2 + DO32*4 + PW32*sizeof(PW32V);
 }
 
-int VO::hwlen(void) const {
-	return AO16*2 + DO32*4;
+int VO::len(void) const {
+	return hwlen() + CC32*4;
 }
+
+
 
 IO::IO(string _name, VI _vi, VO _vo): name(_name), vi(_vi), vo(_vo), _string(0)
 {
@@ -246,14 +252,17 @@ void add_si_lengths(json& jsys, HBA& hba)
 	SystemInterface si(hba);
 	json &jgl = jsys["GLOBAL_LEN"];
 	json &jlen_vi = jgl["VI"];
-	jlen_vi = { { "AI16", si.AI16_count() }, 
+	jlen_vi = {
+			{ "AI16", si.AI16_count() },
 		    { "AI32", si.AI32_count() },
 		    { "DI32", si.DI32_count() },
 		    { "SP32", si.SP32_count() }
 		  };
 	json &jlen_vo = jgl["VO"];
-	jlen_vo = { { "AO16", si.AO16_count() },
+	jlen_vo = {
+			{ "AO16", si.AO16_count() },
 		    { "DO32", si.DO32_count() },
+			{ "PW32", si.PW32_count() },
 		    { "CC32", si.CC32_count() }
 		  };
 
@@ -280,6 +289,7 @@ void store_config(json j, string fname, HBA& hba)
 		KVM vo_offsets_map;
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
+		INSERT_IF(vo_offsets_map, vo, vo_offsets, PW32);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, CC32);
 		jlo["VO_OFFSETS"] = vo_offsets_map;
 
@@ -294,6 +304,7 @@ void store_config(json j, string fname, HBA& hba)
 		KVM vo_map;
 		INSERT_IF(vo_map, vo, vo_cursor, AO16);
 		INSERT_IF(vo_map, vo, vo_cursor, DO32);
+		INSERT_IF(vo_map, vo, vo_cursor, PW32);
 		INSERT_IF(vo_map, vo, vo_cursor, CC32);
 		jix["VO"] = vo_map;
 	}
@@ -306,6 +317,13 @@ void store_config(json j, string fname, HBA& hba)
 int HBA::maxsam;
 
 HBA* HBA::the_hba;
+
+
+bool strstr(string haystack, string needle)
+{
+	return haystack.find(needle) != string::npos;
+}
+
 
 /** HBA::Create() factory function. */
 HBA& HBA::create(const char* json_def, int _maxsam)
@@ -341,6 +359,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		VO vo;
 		vo.AO16 = get_int(uut["VO"]["AO16"]);
 		vo.DO32 = get_int(uut["VO"]["DO32"]);
+		vo.PW32 = get_int(uut["VO"]["PW32"]);
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
 
 		ACQ *acq = ACQ::factory(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
@@ -355,17 +374,18 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		} catch (exception& e) {
 			;
 		}
+		string uut_type = uut["type"];
 		// check unit compatibility
 		if (iuut == 0){
-			first_type = uut["type"];
+			first_type = uut_type;
 		}else{
-			if (first_type == "pcs" && uut["type"] == "bolo"){
+			if (::strstr(first_type, "pcs") && ::strstr(uut_type, "bolo")){
 				cerr << "NOTICE: port " << port << " is bolo in non-bolo set, set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "pcs" && uut["type"] == "pcs,nowait"){
+			}else if (::strstr(first_type, "pcs") && ::strstr(uut_type, "nowait")){
 				cerr << "NOTICE: port " << port << " set nowait" << endl;
 				acq->nowait = true;
-			}else if (first_type == "bolo" && uut["type"] != "bolo"){
+			}else if (::strstr(first_type, "bolo") && !::strstr(uut_type, "bolo")){
 				cerr << "WARNING: port " << port << " is NOT bolo when port0 IS bolo" << endl;
 			}
 		}
@@ -388,6 +408,7 @@ SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 
 	OUT.AO16 = new_zarray<short>(AO16_count());
 	OUT.DO32 = new_zarray<unsigned>(DO32_count());
+	OUT.PW32 = new_zarray<PW32V>(PW32_count());
 	OUT.CC32 = new_zarray<unsigned>(CC32_count());
 }
 SystemInterface::~SystemInterface()
@@ -398,6 +419,7 @@ SystemInterface::~SystemInterface()
 	delete [] IN.SP32;
 	delete [] OUT.AO16;
 	delete [] OUT.DO32;
+	delete [] OUT.PW32;
 	delete [] OUT.CC32;
 }
 

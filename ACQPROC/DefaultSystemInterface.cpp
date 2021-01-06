@@ -1,5 +1,7 @@
-/*
- * DefaultSystemInterface.cpp
+/** @file DefaultSystemInterface.cpp
+ *  @brief SystemInterface implementation example
+ *  overloads ringDoorbell() to actually "do work".
+ *  a real implementation should perform a shared memory interface with another process.
  *
  *  Created on: 14 Mar 2020
  *      Author: pgm
@@ -8,6 +10,9 @@
 #include "AcqSys.h"
 #include <string.h>
 
+
+
+#define PWM_MAGIC	0xbe8bb8fa			// makes for a good display
 
 class DummySingleThreadControlSystemInterface: public SystemInterface {
 
@@ -28,6 +33,11 @@ public:
 		for (int ii = 0; ii < DO32_count(); ++ii){
 			OUT.DO32[ii] = tl;
 		}
+		for (int ii = 0; ii < PW32_count(); ++ii){
+			for (int cc = 0; cc < PW32LEN; ++cc){
+				OUT.PW32[ii][cc] = PWM_MAGIC;
+			}
+		}
 	}
 };
 
@@ -35,6 +45,8 @@ int DummySingleThreadControlSystemInterface::DUP1;
 
 SystemInterface& SystemInterface::factory(const HBA& hba)
 {
+	if (G::verbose) printf("%s::%s\n", __FILE__, PFN);
+
 	const char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
 		if (sscanf(key, "control_dup1=%d", &DummySingleThreadControlSystemInterface::DUP1) == 1 ||
