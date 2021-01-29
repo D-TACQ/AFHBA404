@@ -7,6 +7,7 @@ Configures multiple UUTS with ACQ435 for continuous stream with broadcast trigge
 
 import argparse
 import acq400_hapi
+import time
 
 
 def config(args):
@@ -29,7 +30,8 @@ def config(args):
     for uut in uuts:
         uut.s0.CONTINUOUS = '1'                    # ARM the capture.
     for uut in uuts:
-        uut.statmon.wait_armed()
+    	while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "ARM":
+    	    time.sleep(1)
 
 
 def run_main():
