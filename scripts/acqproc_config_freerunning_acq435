@@ -28,6 +28,9 @@ def config(args):
 
     for uut in uuts:
         uut.s0.CONTINUOUS = '1'                    # ARM the capture.
+    for uut in uuts:
+        uut.statmon.wait_armed = '1'                    # ARM the capture.
+
 
 def run_main():
     parser = argparse.ArgumentParser(description='acqproc config freerunning acq435')
