@@ -3,7 +3,7 @@
         "UUT": [
                 {
 	                "name" : "acq2106_145",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -11,7 +11,7 @@
                 },
                 {
 	                "name" : "acq2106_147",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -19,7 +19,7 @@
                 },
                 {
 	                "name" : "acq2106_148",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
@@ -27,7 +27,7 @@
                 },
                 {   
 	                "name" : "acq2106_149",  
-                    "type": "pcs",
+                    "type": "pcs,sod",
                     "VI" : {
                         "AI16" : 192,  
                         "SP32" : 16
