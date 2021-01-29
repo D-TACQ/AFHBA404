@@ -31,6 +31,9 @@ def start(args, uuts):
 
     for uut in uuts:
         uut.s0.CONTINUOUS = '1'                    # ARM the capture.
+    for uut in uuts:
+        uut.statmon.wait_armed = '1'                    # ARM the capture.
+
 
 def config(args):
     uuts = [ acq400_hapi.Acq2106(u) for u in args.uuts ]
