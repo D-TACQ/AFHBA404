@@ -29,7 +29,7 @@ def config(args):
     for uut in uuts:
         uut.s0.CONTINUOUS = '1'                    # ARM the capture.
     for uut in uuts:
-        uut.statmon.wait_armed = '1'                    # ARM the capture.
+        uut.statmon.wait_armed()
 
 
 def run_main():
