@@ -13,6 +13,12 @@ import time
 def config(args):
     uuts = [ acq400_hapi.Acq2106(u) for u in args.uuts ]
     for uut in uuts:
+        uut.s0.CONTINUOUS = '0'                    # STOP any previous capture
+    for uut in uuts:
+    	while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "IDLE":
+    	    time.sleep(1)
+            
+    for uut in uuts:
         uut.s0.set_abort = '1'
         uut.s1.ACQ43X_SAMPLE_RATE = args.acq435SR
 
