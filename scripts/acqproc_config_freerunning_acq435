@@ -41,7 +41,7 @@ def config(args):
         while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "ARM":
             time.sleep(1)
         if args.verbose:
-            print("{} has stopped".format(uut.uut))
+            print("{} is ARMED and waiting for trigger".format(uut.uut))
 
 
 def run_main():
