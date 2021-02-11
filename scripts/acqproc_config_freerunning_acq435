@@ -16,6 +16,14 @@ def stop(args, uuts):
 
 def start(args, uuts):
     for uut in uuts:
+        uut.s0.CONTINUOUS = '0'                    # STOP any previous capture
+    for uut in uuts:
+        while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "IDLE":
+            time.sleep(1)
+        if args.verbose:
+            print("{} has stopped".format(uut.uut))
+
+    for uut in uuts:
         uut.s0.set_abort = '1'
         uut.s1.ACQ43X_SAMPLE_RATE = args.acq435SR
 
@@ -33,8 +41,10 @@ def start(args, uuts):
     for uut in uuts:
         uut.s0.CONTINUOUS = '1'                    # ARM the capture.
     for uut in uuts:
-    	while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "ARM":
-    	    time.sleep(1)
+        while uut.s0.CONTINUOUS_STATE.split(" ")[1] != "ARM":
+            time.sleep(1)
+        if args.verbose:
+            print("{} is ARMED and waiting for trigger".format(uut.uut))
 
 
 def config(args):
@@ -49,6 +59,7 @@ def config(args):
 def run_main():
     parser = argparse.ArgumentParser(description='acqproc config freerunning acq435')
     acq400_hapi.Acq400UI.add_args(parser, transient=False, uuts=True)
+    parser.add_argument('--verbose', default=0, type=int, help='verbose')
     parser.add_argument('--acq435SR', default=49999, type=int, help='set acq435 SR')
     parser.add_argument('--stop', default=0, type=int, help='stop a previous capture')
     config(parser.parse_args())
