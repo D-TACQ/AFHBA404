@@ -40,7 +40,13 @@
 
 #include <linux/poll.h>
 #include <linux/version.h>
+#include <linux/dma-mapping.h>
+#include <linux/iommu.h>
+//#include <linux/scatterlist.h>
+//#include <linux/memory.h>
 
+//#include "nv-p2p.h"
+//#include "gpumemdrv.h"
 
 #define REVID	"R1072"
 
@@ -1072,6 +1078,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 static irqreturn_t afs_cos_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
+	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
 	unsigned cr = afhba_read_reg(adev, HOST_PCIE_INTERRUPT_REG);
 	afhba_write_reg(adev, HOST_PCIE_INTERRUPT_REG, cr);
@@ -1080,23 +1087,67 @@ static irqreturn_t afs_cos_isr(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+static irqreturn_t afs_null_isr(int irq, void* data)
+{
+	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
+	dev_info(pdev(adev), "afs_null_isr %d", irq);
+	return IRQ_HANDLED;
+}
+
+// static int hook_interrupts(struct AFHBA_DEV* adev)
+// {
+// 	int rc = pci_enable_msi(adev->pci_dev);
+// 	if (rc < 0){
+// 		dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", 1);
+// 		return rc;
+// 	}
+// 	rc = request_irq(adev->pci_dev->irq, afs_cos_isr, IRQF_SHARED, "afhba", adev);
+// 	if (rc < 0) {
+// 		pr_warn("afhba.%d: request_irq =%d failed!\n",
+// 				adev->idx, adev->pci_dev->irq);
+// 		pci_disable_msi(adev->pci_dev);
+// 		return rc;
+// 	}
+// 	return rc;
+// }
+// //#endif
 
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
-	int rc = pci_enable_msi(adev->pci_dev);
-	if (rc < 0){
-		dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", 1);
-		return rc;
+#ifdef INTERRUPTS_WORK_OK
+	/* non peer case must happen first */
+	if (adev->peer == 0){
+		struct pci_dev *dev = adev->pci_dev;
+		int nvec = 4;
+		int rc;
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
+		rc = pci_enable_msi_block(dev, nvec = 4);
+		if (rc < 0){
+			dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
+			rc = pci_enable_msi(dev);
+			nvec = 1;
+			if (rc < 0){
+				dev_warn(pdev(adev), "pci_enable_msi() failed");
+			}
+			return rc;
+		}
+#else
+		rc = pci_enable_msi_exact(dev, nvec);
+#endif
+		if (rc < 0){
+			dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", nvec);
+			return rc;
+		}
+
+		return port_request_irq(adev, 0);
+	}else{
+		return port_request_irq(adev, 1);
 	}
-	rc = request_irq(adev->pci_dev->irq, afs_cos_isr, IRQF_SHARED, "afhba", adev);
-	if (rc < 0) {
-		pr_warn("afhba.%d: request_irq =%d failed!\n",
-				adev->idx, adev->pci_dev->irq);
-		pci_disable_msi(adev->pci_dev);
-		return rc;
-	}
+#else
 	return 0;
+#endif
 }
 
 
@@ -1894,6 +1945,490 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 }
 
 
+/*------------------------------------------------------------------------------
+-   GPU DMA functions defined here:
+-   Implementation helped by reading https://github.com/karakozov/gpudma
+-  What currently works:
+-    afhba_gpumem_lock pins the GPU memory and the afhba404 device can access.
+-    the callback function correctly deallocates the memory.
+-  What currently does not work:
+-    gpumem_lock does not correctly create a record of what memory is pinned.
+-    this stops gpumem_unlock and gpumem_state from working correctly.
+-    gpumem_unlock not working means the driver is reliant on the free_nvp_callback
+-      working properly.  This is called when the program using the GPU terminates.
+------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------
+-   free_nvp_callback:
+-     callback function to release memory when the gpu dma is turned off.
+-     this function is called when either:
+-       the program deallocates the memory (cuMemFree, etc.)
+-       the program terminates
+-     good practices should not rely on this, but current implementation does
+-   TODO: add iommu unmap calls to turn off the dma remapping from 32 to 64 bit
+------------------------------------------------------------------------------*/
+void free_nvp_callback(void *data)
+{
+	int res;
+	struct gpumem_t *entry = (struct gpumem_t*)data;
+	if(entry){
+		res = nvidia_p2p_free_page_table(entry->page_table);
+		if(res == 0) {
+				printk(KERN_ERR"%s(): nvidia_p2p_free_page_table() - OK!\n", __FUNCTION__);
+		} else {
+				printk(KERN_ERR"%s(): Error in nvidia_p2p_free_page_table()\n", __FUNCTION__);
+		}
+	}
+}
+int get_nv_page_size(int val)
+{
+    switch(val) {
+    case NVIDIA_P2P_PAGE_SIZE_4KB: return 4*1024;
+    case NVIDIA_P2P_PAGE_SIZE_64KB: return 64*1024;
+    case NVIDIA_P2P_PAGE_SIZE_128KB: return 128*1024;
+    }
+    return 0;
+}
+/*------------------------------------------------------------------------------
+-  gpu_pin:
+-    Function to pin the specified gpu virtual address and get the physical address
+-    Currently unused, this is done manually for channel A in afhba_gpumem_unlock
+-    Should be correctly implemented to generalize the gpu memory pinning for
+-      multiple channel usage.
+-    TODO: get gpumem->table_list allocated correctly as a static struct?
+------------------------------------------------------------------------------*/
+int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping * nv_dma_map, uint64_t addr, uint64_t size){
+  // gpu_pin function is currently unused, this is done manually inside afhba_gpumem_lock
+  // should be separated out to generalize the gpu memory pinning
+  int error = 0;
+  int i;
+  size_t pin_size = 0ULL;
+  struct pci_dev *dev = adev->pci_dev;
+  struct gpumem_t *entry = 0;
+
+  entry = (struct gpumem_t*)kzalloc(sizeof(struct gpumem_t), GFP_KERNEL);
+  if(!entry) {
+     printk(KERN_ERR"%s(): Error allocate memory to mapping struct\n", __FUNCTION__);
+     error = -ENOMEM;
+     goto do_exit;
+  }
+  INIT_LIST_HEAD(&entry->list);
+  entry->virt_start = (addr & GPU_BOUND_MASK);
+  pin_size = addr + size - entry->virt_start;
+
+
+  if(!pin_size) {
+      printk(KERN_ERR"%s(): Error invalid memory size!\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem;
+  }
+
+  printk("addr=%llx, size=%llx, virt_start=%llx, pin_size=%lx",addr,size,entry->virt_start,pin_size);
+  error = nvidia_p2p_get_pages(0, 0, entry->virt_start, pin_size, &entry->page_table, free_nvp_callback, entry);
+  if(error != 0) {
+      printk(KERN_ERR"%s(): Error in nvidia_p2p_get_pages()\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem;
+  }
+
+  dev_info(pdev(adev),"Pinned GPU memory, physical address is %llx.\n",entry->page_table->pages[0]->physical_address);
+
+// Would like for this to work, but the table of pinned gpu memory is not correctly allocated
+// list_add_tail(&entry->list,&adev->gpumem->table_list);
+
+  if(!dev){
+      printk(KERN_ERR"%s(): invalid pci_dev\n",__FUNCTION__);
+      error = -EINVAL;
+      goto do_unlock_pages;
+  }
+
+  error = nvidia_p2p_dma_map_pages(dev,entry->page_table, &nv_dma_map);
+
+  if(error){
+      printk(KERN_ERR"%s(): Error %d in nvidia_p2p_dma_map_pages()\n", __FUNCTION__,error);
+      error = -EFAULT;
+      goto do_unmap_dma;
+  }
+
+  printk("nvidia_dma_mapping: npages= %d\n", nv_dma_map->entries);
+
+  for (i = 0; i < nv_dma_map->entries; i++){
+    printk("nvidia_dma_mapping: dma_address= %llx\n", (unsigned long long)nv_dma_map->dma_addresses[i]);
+  }
+
+  return 0;
+
+do_unmap_dma:
+    nvidia_p2p_dma_unmap_pages(dev, entry->page_table, nv_dma_map);
+do_unlock_pages:
+    nvidia_p2p_put_pages(0, 0, entry->virt_start, entry->page_table);
+do_free_mem:
+    kfree(entry);
+do_exit:
+    return (long) error;
+
+
+
+}
+/*------------------------------------------------------------------------------
+-   afhba_gpumem_lock:
+-     called from an ioctl call, user provides virtual address in gpu memory.
+-     nvidia_p2p_get_pages provides us with the physical address we want to
+-     redirect the dma push address to.
+------------------------------------------------------------------------------*/
+long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
+  int error = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  int i = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  size_t pin_size_ai = 0ULL;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  size_t pin_size_ao = 0ULL;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct pci_dev *dev = adev->pci_dev;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct gpumem_t *entry_ai = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct gpumem_t *entry_ao = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct gpudma_lock_t param;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct nvidia_p2p_dma_mapping *nv_dma_map_ai = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct nvidia_p2p_dma_mapping *nv_dma_map_ao = 0;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  struct gpumem gdev;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  printk("KDEBUG: pci_bus_type = %p\n", &pci_bus_type);
+  struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  unsigned long io_va_ai;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  unsigned long io_va_ao;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+
+
+// This should be done in an initialization routine somewhere...
+   gdev.proc = 0;
+   sema_init(&gdev.sem, 1);
+   printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+   INIT_LIST_HEAD(&gdev.table_list);
+   printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+   adev->gpumem = gdev;
+   printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+
+// Allocate the iommu domain:
+
+	int i_count;
+
+	 for (i_count = 1; i_count < 11; ++i_count)
+	 {
+	   printk("KDEBUG: %d ", i);
+	 }
+	 printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  if (iommu_attach_device(iom_dom,&adev->pci_dev->dev)){
+	printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+    printk("iommu_attach_device failed --aborting.\n");
+    goto do_exit;
+  }
+
+
+//  dev_info(pdev(adev), "Original HostBuffer physical address is %x.\n", adev->hb1->pa);
+
+  if(copy_from_user(&param, (void *)arg, sizeof(struct gpudma_lock_t))) {
+	  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+        printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
+        error = -EFAULT;
+        goto do_exit;
+  }
+
+  io_va_ai = adev->stream_dev->hbx[param.ind_ai].pa;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+  io_va_ao = adev->stream_dev->hbx[param.ind_ao].pa;
+  printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+
+  dev_info(pdev(adev), "Original AI HostBuffer physical address is %lx.\n", io_va_ai);
+  dev_info(pdev(adev), "Original AO HostBuffer physical address is %lx.\n", io_va_ao);
+
+  dev_info(pdev(adev), "Virtual AI GPU address is  %llx.\n", param.addr_ai);
+  dev_info(pdev(adev), "Virtual AO GPU address is  %llx.\n", param.addr_ao);
+
+//  Pin the GPU memory:
+
+// If gpu_pin was being used, call to do the pinning would look like:
+/*
+//  Pin the GPU memory:
+  if (gpu_pin(adev,nv_dma_ao,param.addr_ao,param.size_ao)){
+    printk(KERN_ERR"%s(): Error in gpu_pin()\n", __FUNCTION__);
+   error=-EFAULT;
+    goto do_exit;
+  }
+*/
+// Instead, the AI and AO buffers are done manually
+
+//Allocate our gpumem structs:
+  entry_ai = (struct gpumem_t*)kzalloc(sizeof(struct gpumem_t),GFP_KERNEL);
+  if(!entry_ai) {
+     printk(KERN_ERR"%s(): Error allocate memory to mapping struct\n", __FUNCTION__);
+     error = -ENOMEM;
+     goto do_exit;
+  }
+  entry_ao = (struct gpumem_t*)kzalloc(sizeof(struct gpumem_t),GFP_KERNEL);
+  if(!entry_ai) {
+     printk(KERN_ERR"%s(): Error allocate memory to mapping struct\n", __FUNCTION__);
+     error = -ENOMEM;
+     goto do_exit;
+  }
+
+//Align with GPU page size:
+  INIT_LIST_HEAD(&entry_ai->list);
+  entry_ai->virt_start = (param.addr_ai & GPU_BOUND_MASK);
+  pin_size_ai = param.addr_ai + param.size_ai - entry_ai->virt_start;
+
+  INIT_LIST_HEAD(&entry_ao->list);
+  entry_ao->virt_start = (param.addr_ao & GPU_BOUND_MASK);
+  pin_size_ao = param.addr_ao + param.size_ao - entry_ao->virt_start;
+
+  if(!pin_size_ai){
+      printk(KERN_ERR"%s(): Error invalid memory size!\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem_ai;
+  }
+  if(!pin_size_ao){
+      printk(KERN_ERR"%s(): Error invalid memory size!\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem_ao;
+  }
+
+// Have nvidia driver tell us where these pages physically are:
+  printk("addr=%llx, size=%llx, virt_start=%llx, pin_size=%lx",param.addr_ai,param.size_ai,entry_ai->virt_start,pin_size_ai);
+  printk("addr=%llx, size=%llx, virt_start=%llx, pin_size=%lx",param.addr_ao,param.size_ao,entry_ao->virt_start,pin_size_ao);
+
+  error = nvidia_p2p_get_pages(0, 0, entry_ai->virt_start, pin_size_ai, &entry_ai->page_table, free_nvp_callback, entry_ai);
+  if(error != 0) {
+      printk(KERN_ERR"%s(): Error in nvidia_p2p_get_pages()\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem_ao; // Yes it is ao
+  }
+
+
+  error = nvidia_p2p_get_pages(0, 0, entry_ao->virt_start, pin_size_ao, &entry_ao->page_table, free_nvp_callback, entry_ao);
+  if(error != 0) {
+      printk(KERN_ERR"%s(): Error in nvidia_p2p_get_pages()\n", __FUNCTION__);
+      error = -EINVAL;
+      goto do_free_mem_ao;
+  }
+
+  dev_info(pdev(adev),"Pinned GPU memory, AI physical address is %llx.\n",entry_ai->page_table->pages[0]->physical_address);
+  dev_info(pdev(adev),"Pinned GPU memory, AO physical address is %llx.\n",entry_ao->page_table->pages[0]->physical_address);
+
+
+// Make sure we have valid PCI device:
+  if(!dev){
+      printk(KERN_ERR"%s(): invalid pci_dev\n",__FUNCTION__);
+      error = -EINVAL;
+      goto do_unlock_pages;
+  }
+
+//Get the DMA mapping addresses, the physical address we feed the AFHBA404
+  error = nvidia_p2p_dma_map_pages(dev,entry_ai->page_table, &nv_dma_map_ai);
+  if(error){
+      printk(KERN_ERR"%s(): Error %d in nvidia_p2p_dma_map_pages()\n", __FUNCTION__,error);
+      error = -EFAULT;
+      goto do_unmap_dma_ai;
+  }
+
+  error = nvidia_p2p_dma_map_pages(dev,entry_ao->page_table, &nv_dma_map_ao);
+  if(error){
+      printk(KERN_ERR"%s(): Error %d in nvidia_p2p_dma_map_pages()\n", __FUNCTION__,error);
+      error = -EFAULT;
+      goto do_unmap_dma_ao;
+  }
+
+// Print the pages we obtained:
+  printk("nvidia_dma_mapping: AI npages= %d\n", nv_dma_map_ai->entries);
+  for (i = 0; i < nv_dma_map_ai->entries; i++){
+    printk("nvidia_dma_mapping: dma_address= %llx\n", (unsigned long long)nv_dma_map_ai->dma_addresses[i]);
+  }
+  printk("nvidia_dma_mapping: AO npages= %d\n", nv_dma_map_ao->entries);
+  for (i = 0; i < nv_dma_map_ao->entries; i++){
+    printk("nvidia_dma_mapping: dma_address= %llx\n", (unsigned long long)nv_dma_map_ao->dma_addresses[i]);
+  }
+
+//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
+  if(iommu_map(iom_dom,io_va_ai,nv_dma_map_ai->dma_addresses[0],pin_size_ai,IOMMU_WRITE)){
+    printk("iommu_map failed -- aborting.\n");
+  }else{
+    printk("iommu_map success, io_va_ai %lx points to %llx", io_va_ai,nv_dma_map_ai->dma_addresses[0]);
+    printk("io_va_ai + size_ai is %llx",io_va_ai + param.size_ai);
+  }
+
+
+
+// Do the AO memory:
+//  Pin the GPU memory:
+//  if (gpu_pin(adev,nv_dma_ao,param.addr_ao,param.size_ao)){
+//    printk(KERN_ERR"%s(): Error in gpu_pin()\n", __FUNCTION__);
+//   error=-EFAULT;
+//    goto do_exit;
+//  }
+//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
+  if(iommu_map(iom_dom,io_va_ao,nv_dma_map_ao->dma_addresses[0],pin_size_ao,IOMMU_READ)){
+    printk("iommu_map failed -- aborting.\n");
+  }else{
+    printk("iommu_map success, io_va_ao %lx points to %llx", io_va_ao,nv_dma_map_ao->dma_addresses[0]);
+    printk("io_va_ao + size_ao is %llx",io_va_ao + param.size_ao);
+  }
+
+ // TODO: Add iommu_unmap functionality to the callback function.
+
+
+
+//  dev_info(pdev(adev), "hostbuffer physical address is %x, iova mapped to GPU is %lx.\n", adev->stream_dev->hbx[0].pa, io_va);
+
+
+  return 0;
+
+do_unmap_dma_ao:
+    nvidia_p2p_dma_unmap_pages(dev, entry_ao->page_table, nv_dma_map_ao);
+do_unmap_dma_ai:
+    nvidia_p2p_dma_unmap_pages(dev, entry_ai->page_table, nv_dma_map_ai);
+do_unlock_pages:
+    nvidia_p2p_put_pages(0, 0, entry_ao->virt_start, entry_ao->page_table);
+    nvidia_p2p_put_pages(0, 0, entry_ai->virt_start, entry_ai->page_table);
+do_free_mem_ao:
+    kfree(entry_ao);
+do_free_mem_ai:
+    kfree(entry_ai);
+do_exit:
+    return (long) error;
+}
+
+/*------------------------------------------------------------------------------
+-   afhba_gpumem_unlock:
+-     called from an ioctl call, user provides virtual address in gpu memory.
+-     nvidia_p2p_put_pages allows us to unlock the addresses we previously locked
+-     this currently does not work, the table of locked memory is not working right
+------------------------------------------------------------------------------*/
+long afhba_gpumem_unlock(struct AFHBA_DEV *adev, unsigned long arg)
+{
+    int error = -EINVAL;
+    struct gpumem_t *entry = 0;
+    struct gpudma_unlock_t param;
+    struct list_head *pos, *n;
+
+    if(copy_from_user(&param, (void *)arg, sizeof(struct gpudma_unlock_t))) {
+        printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
+        error = -EFAULT;
+        goto do_exit;
+    }
+
+    list_for_each_safe(pos, n, &adev->gpumem.table_list) {
+
+        entry = list_entry(pos, struct gpumem_t, list);
+        if(entry) {
+            if(entry->handle == param.handle) {
+
+                printk(KERN_ERR"%s(): param.handle = %p\n", __FUNCTION__, param.handle);
+                printk(KERN_ERR"%s(): entry.handle = %p\n", __FUNCTION__, entry->handle);
+
+                if(entry->virt_start && entry->page_table) {
+                    error = nvidia_p2p_put_pages(0, 0, entry->virt_start, entry->page_table);
+                    if(error != 0) {
+                        printk(KERN_ERR"%s(): Error in nvidia_p2p_put_pages()\n", __FUNCTION__);
+                        goto do_exit;
+                    }
+                    printk(KERN_ERR"%s(): nvidia_p2p_put_pages() - Ok!\n", __FUNCTION__);
+                }
+
+                list_del(pos);
+                kfree(entry);
+                break;
+            } else {
+                printk(KERN_ERR"%s(): Skip entry: %p\n", __FUNCTION__, entry->handle);
+            }
+        }
+    }
+    // TODO: add iommu domain unmapping here, to turn off the 32 to 64 bit address translation
+
+do_exit:
+    return (long) error;
+}
+
+long afhba_gpumem_state(struct AFHBA_DEV *adev, unsigned long arg){
+/*------------------------------------------------------------------------------
+-   afhba_gpumem_state:
+-     called from an ioctl call, gives user currently pinned gpu memory.
+-     this currently does not work, the table of locked memory is not working right
+------------------------------------------------------------------------------*/
+    int error = 0;
+    int size = 0;
+    int i=0;
+    struct gpumem_t *entry = 0;
+    struct gpudma_state_t header;
+    struct gpudma_state_t *param;
+    struct list_head *pos, *n;
+
+    struct gpumem *gdev = &adev->gpumem;
+    if(copy_from_user(&header, (void *)arg, sizeof(struct gpudma_state_t))) {
+        printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
+        error = -EFAULT;
+        goto do_exit;
+    }
+
+    list_for_each_safe(pos, n, &gdev->table_list) {
+
+        entry = list_entry(pos, struct gpumem_t, list);
+        if(entry) {
+            if(entry->handle == header.handle) {
+
+                printk(KERN_ERR"%s(): param.handle = %p\n", __FUNCTION__, header.handle);
+                printk(KERN_ERR"%s(): entry.handle = %p\n", __FUNCTION__, entry->handle);
+
+                if(!entry->page_table) {
+                    printk(KERN_ERR"%s(): Error - memory not pinned!\n", __FUNCTION__);
+                    return -EINVAL;
+                }
+
+                if((entry->page_table->entries != header.page_count) || (entry->handle != header.handle)) {
+                    printk(KERN_ERR"%s(): Error - page counters or handle invalid!\n", __FUNCTION__);
+                    return -EINVAL;
+                }
+
+                size = (sizeof(uint64_t)*header.page_count) + sizeof(struct gpudma_state_t);
+                param = kzalloc(size, GFP_KERNEL);
+                if(!param) {
+                    printk(KERN_ERR"%s(): Error allocate memory!\n", __FUNCTION__);
+                    return -ENOMEM;
+                }
+                param->page_size = get_nv_page_size(entry->page_table->page_size);
+                for(i=0; i<entry->page_table->entries; i++) {
+                    struct nvidia_p2p_page *nvp = entry->page_table->pages[i];
+                    if(nvp) {
+                        param->pages[i] = nvp->physical_address;
+                        param->page_count++;
+                        printk(KERN_ERR"%s(): %02d - 0x%llx\n", __FUNCTION__, i, param->pages[i]);
+                    }
+                }
+                printk(KERN_ERR"%s(): page_count = %ld\n", __FUNCTION__, (long int)param->page_count);
+                param->handle = header.handle;
+                if(copy_to_user((void *)arg, param, size)) {
+                    printk(KERN_DEBUG"%s(): Error in copy_to_user()\n", __FUNCTION__);
+                    error = -EFAULT;
+                }
+
+                kfree(param);
+            } else {
+                printk(KERN_ERR"%s(): Skip entry: %p\n", __FUNCTION__, entry->handle);
+            }
+        }
+    }
+
+do_exit:
+    return error;
+}
+//------------------------------------------------------------------------------
+
+
 long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1922,7 +2457,7 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	}
 
 	for (ib = 0; ib < abn->ndesc; ++ib){
-		dev_dbg(pdev(adev), "%s [%2d] pa:%08x len:%d", 
+		dev_dbg(pdev(adev), "%s [%2d] pa:%08x len:%d",
 				__FUNCTION__, ib, abn->buffers[ib].pa, abn->buffers[ib].len);
 	}
 
@@ -2017,6 +2552,23 @@ long afs_dma_ioctl(struct file *file,
 		u32 srcix = arg;
 		afs_load_pull_descriptor(adev, srcix);
 		return 0;
+	}
+	case AFHBA_GPUMEM_LOCK: { // Sets up gpu memory mapping for DMA_PUSH
+		long rc;
+		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+		rc = afhba_gpumem_lock(adev,arg);
+		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+		return rc;
+	}
+	case AFHBA_GPUMEM_UNLOCK: {
+		long rc;
+		rc = afhba_gpumem_unlock(adev,arg);
+		return rc;
+	}
+	case AFHBA_GPUMEM_STATE: {
+		long rc;
+		rc = afhba_gpumem_state(adev,arg);
+		return rc;
 	}
 	default:
 		return -ENOTTY;

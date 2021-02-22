@@ -45,6 +45,9 @@
 #include <linux/uaccess.h>  /* VERIFY_READ|WRITE */
 #include <linux/version.h>
 
+#include "gpumemdrv.h"
+
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
 #include <uapi/linux/sched/types.h>
 #endif
@@ -149,6 +152,15 @@ struct AFHBA_DEV {
 	int link_up;
 	int aurora_error_count;
 	int aurora_status_read_count;
+
+	//For GPU functionality
+//	struct gpumem_t *gpumem_t;
+	struct gpumem gpumem;
+//	struct gpumem {
+//		struct semaphore			sem;
+//		struct proc_dir_enty*	proc;
+//		struct list_head 			table_list;
+//	}
 };
 
 #define SZM1(field)	(sizeof(field)-1)

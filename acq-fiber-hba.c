@@ -329,7 +329,24 @@ struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
 	static int idx;
 	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
 
+	//Try 64-bit DMA mask
+/*	static u64 dma_mask = DMA_BIT_MASK(64);
+	printk("Attempting to use 64-bit DMA_MASK");
+	//Query whether this supports 64-bit DMA:
+	if (pci_set_dma_mask(dev,dma_mask)){
+		printk("Unable to use 64-bit DMA_MASK");
+		dma_mask = DMA_BIT_MASK(32);
+	} else {
+		printk("Set 64-bit DMA_MASK");
+	}
+*/
+
+//	struct iommu_domain *iommu_dmn = iommu_domain_alloc(&pci_bus_type);
+//	int res = iommu_attach_device(iommu_dmn, &dev->dev);
+//	printk("iommu_attach_device returned %d\n",res);
+
 	static u64 dma_mask = DMA_BIT_MASK(32);
+	pci_set_dma_mask(dev,dma_mask);
 
 	adev->pci_dev = dev;
 	adev->idx = idx++;

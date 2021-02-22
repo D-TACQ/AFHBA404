@@ -41,7 +41,7 @@
 
 
 #include "afhba-llcontrol-common.h"
-
+#include <stdint.h>
 /* SPLIT single HB into 2
  * [0] : AI
  * [1] : AO
@@ -188,6 +188,7 @@ void setup()
 		samples_buffer = xllc_def.len/VI_LEN;
 		fprintf(stderr, "WARNING: samples_buffer clipped to %d\n", samples_buffer);
 	}
+
 	if (ioctl(fd, AFHBA_START_AI_LLC, &xllc_def)){
 		perror("ioctl AFHBA_START_AI_LLC");
 		exit(1);
