@@ -15,6 +15,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+#include <stdint.h>
 
 #include "afhba-get_shared_mapping.h"
 #include "../rtm-t_ioctl.h"

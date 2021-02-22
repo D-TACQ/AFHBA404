@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-
+#include <stdint.h>
 #include "afhba-get_shared_mapping.h"
 #include "pwm_internals.h"
 
