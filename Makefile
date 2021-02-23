@@ -9,6 +9,7 @@ CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
 
+
 # default build is the local kernel.
 # build other kernels like this example:
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
