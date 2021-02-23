@@ -2069,6 +2069,40 @@ int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping * nv_dma_map, 
 
 
 }
+
+
+
+static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
+						 unsigned type)
+{
+	struct iommu_domain *domain;
+
+	if (bus == NULL){
+		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
+		return NULL;
+	}
+
+	if (bus->iommu_ops == NULL){
+		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
+		return NULL;
+	}
+
+
+	domain = bus->iommu_ops->domain_alloc(type);
+	if (!domain){
+		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
+		return NULL;
+	}
+
+	domain->ops  = bus->iommu_ops;
+	domain->type = type;
+	/* Assume all sizes by default; the driver may override this later */
+	domain->pgsize_bitmap  = bus->iommu_ops->pgsize_bitmap;
+
+	printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
+	return domain;
+}
+
 /*------------------------------------------------------------------------------
 -   afhba_gpumem_lock:
 -     called from an ioctl call, user provides virtual address in gpu memory.
@@ -2089,11 +2123,12 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct gpumem gdev;
 	unsigned long io_va_ai;
 	unsigned long io_va_ao;
-	struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
+	struct iommu_domain *iom_dom = __iommu_domain_alloc(&pci_bus_type, IOMMU_DOMAIN_UNMANAGED);
 
 	dev_dbg(pdev(adev), "KDEBUG: pci_bus_type = %p\n", &pci_bus_type);
 	if (iom_dom == 0){
-		dev_err(pdev(adev), "iommu_domain_alloc() fail");
+		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
+				adev->pci_dev->dev.bus->iommu_ops);
 		return -1;
 	}
 	printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
@@ -2539,7 +2574,7 @@ long afs_dma_ioctl(struct file *file,
 		long rc;
 		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
 		rc = afhba_gpumem_lock(adev,arg);
-		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+		printk(KERN_ALERT "DEBUG: %d %s %d \n",__FUNCTION__,__LINE__, rc==0? "PASSED": "FAILED");
 		return rc;
 	}
 	case AFHBA_GPUMEM_UNLOCK: {
