@@ -1,30 +1,31 @@
-obj-m := afhba.o
+obj-m += afhba.o
+#obj-m += afhbaspi.o
+#obj-m += afhbasfp.o
 
 SRC := $(shell pwd)
+LDRV:= $(SRC)/linux/drivers
 
-CC = $(CROSS_COMPILE)gcc
-#CC = g++
-CPP = g++
+CONFIG_MODULE_SIG=n
 
-CFLAGS += -g -I$(CUDADIR)/include
-#CFLAGS += -O3 -I$(CUDADIR)/include
-LDLIB += -lm -lrt -lpopt -lpthread -lcuda -L$(CUDADIR)/lib64 -lcudart
-# ONLY BUILD FOR COMPUTE CAPABILITY 6.1
-NVCCFLAGS += -gencode=arch=compute_61,code=sm_61
-NVCCFLAGS += -gencode=arch=compute_61,code=compute_61
-NVCCFLAGS += -rdc=true
+EXTRA_CFLAGS += -DCONFIG_SPI
 
 
-all: apps
-#EXTRA_CFLAGS += -I/usr/src/nvidia-418.39/nvidia/
-EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
-NVIDIA_SRC_DIR += -I/usr/src/nvidia-460.32.03/nvidia/
-ccflags-y += $(EXTRA_CFLAGS)
-KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
 # default build is the local kernel.
 # build other kernels like this example:
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
+
+all: modules apps
+#llc_support
+
+flash: spi_support
+
+flash_clean: spi_clean llc_clean
+
+KRNL ?= $(shell uname -r)
+# FEDORA:
+KHEADERS := /lib/modules/$(KRNL)/build
+
 
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
@@ -36,7 +37,6 @@ afhbaspi-objs = afhba_spi.o afhba_core.o
 afhbasfp-objs =  afhba_i2c_bus.o afhba_core.o
 
 modules:
-	@ echo "Picking NVIDIA driver sources from NVIDIA_SRC_DIR=$(NVIDIA_SRC_DIR). If that does not meet your expectation, you might have a stale driver still around and that might cause problems."
 	make -C $(KHEADERS) M=$(SRC)  modules
 
 modules-dbg:
