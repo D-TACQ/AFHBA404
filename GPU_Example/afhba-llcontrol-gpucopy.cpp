@@ -151,6 +151,14 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 
   printf("DEBUG 2: Pre-ioctl\n");
 
+	printf("%p \n", lock.addr_ai);
+	printf("%p \n", lock.size_ai);
+	printf("%p \n", lock.ind_ai);
+
+	printf("%p \n", lock.addr_ao);
+	printf("%p \n", lock.size_ao);
+	printf("%p \n", lock.ind_ao);
+
   res = ioctl(fd, AFHBA_GPUMEM_LOCK, &lock);
   if (res<0){
     fprintf(stderr,"Error in AFHBA_GPUMEM_LOCK.\n");
