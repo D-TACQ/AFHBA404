@@ -5,7 +5,6 @@ SRC := $(shell pwd)
 CC = $(CROSS_COMPILE)gcc
 #CC = g++
 CPP = g++
-NVCC = nvcc
 
 CFLAGS += -g -I$(CUDADIR)/include
 #CFLAGS += -O3 -I$(CUDADIR)/include
