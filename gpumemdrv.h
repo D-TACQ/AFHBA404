@@ -18,6 +18,7 @@ struct gpumem_t {
     void *handle;
     u64 virt_start;
     nvidia_p2p_page_table_t* page_table;
+    char name[8];
 };
 
 //-----------------------------------------------------------------------------
