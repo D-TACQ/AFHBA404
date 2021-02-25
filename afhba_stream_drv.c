@@ -1075,10 +1075,9 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	return 0;
 }
 
-static irqreturn_t afs_cos_isr(int irq, void *data)
+irqreturn_t afs_cos_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
-	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 
 	unsigned cr = afhba_read_reg(adev, HOST_PCIE_INTERRUPT_REG);
 	afhba_write_reg(adev, HOST_PCIE_INTERRUPT_REG, cr);
@@ -1087,7 +1086,7 @@ static irqreturn_t afs_cos_isr(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t afs_null_isr(int irq, void* data)
+irqreturn_t afs_null_isr(int irq, void* data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
@@ -2430,10 +2429,10 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	if (dma_sel&DMA_PULL_SEL){
 		sdev->onStopPull = afs_stop_llc_pull;
 	}
-
+/*
 	dev_dbg(pdev(adev), "%s descriptors:%d %s", __FUNCTION__, abn->ndesc,
 			abn->buffers[0].pa == RTM_T_USE_HOSTBUF? "RTM_T_USE_HOSTBUF": "USER_ADDR");
-
+*/
 	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
 		abn->buffers[0].pa = sdev->hbx[0].pa;
 
@@ -2543,7 +2542,7 @@ long afs_dma_ioctl(struct file *file,
 		long rc;
 		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
 		rc = afhba_gpumem_lock(adev,arg);
-		printk(KERN_ALERT "DEBUG: %d %s %d \n",__FUNCTION__,__LINE__, rc==0? "PASSED": "FAILED");
+		printk(KERN_ALERT "DEBUG: %s %d %s\n",__FUNCTION__,__LINE__, rc==0? "PASSED": "FAILED");
 		return rc;
 	}
 	case AFHBA_GPUMEM_UNLOCK: {
