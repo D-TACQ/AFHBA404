@@ -4,7 +4,8 @@ obj-m += afhba.o
 
 SRC := $(shell pwd)
 LDRV:= $(SRC)/linux/drivers
-
+EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
+KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
 CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
