@@ -2074,11 +2074,10 @@ do_exit:
 
 static void gpumem_init(struct AFHBA_DEV *adev)
 {
-	struct gpumem gdev;
-	gdev.proc = 0;
-	sema_init(&gdev.sem, 1);
-	INIT_LIST_HEAD(&gdev.table_list);
-	adev->gpumem = gdev;
+	struct gpumem* gdev = &adev->gpumem;
+	gdev->proc = 0;
+	sema_init(&gdev->sem, 1);
+	INIT_LIST_HEAD(&gdev->table_list);
 }
 
 /*------------------------------------------------------------------------------
@@ -2110,7 +2109,6 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 				adev->pci_dev->dev.bus->iommu_ops);
 		return -1;
 	}
-	gpumem_init(adev);
 
 	// Allocate the iommu domain:
 
@@ -2771,6 +2769,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
+	gpumem_init(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
