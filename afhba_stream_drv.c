@@ -2086,6 +2086,15 @@ struct iommu_group {
 };
 
 
+static void gpumem_init(struct AFHBA_DEV *adev)
+{
+	struct gpumem gdev;
+	gdev.proc = 0;
+	sema_init(&gdev.sem, 1);
+	INIT_LIST_HEAD(&gdev.table_list);
+	adev->gpumem = gdev;
+}
+
 /*------------------------------------------------------------------------------
 -   afhba_gpumem_lock:
 -     called from an ioctl call, user provides virtual address in gpu memory.
@@ -2103,7 +2112,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct gpudma_lock_t param;
 	struct nvidia_p2p_dma_mapping *nv_dma_map_ai = 0;
 	struct nvidia_p2p_dma_mapping *nv_dma_map_ao = 0;
-	struct gpumem gdev;
+
 	unsigned long io_va_ai;
 	unsigned long io_va_ao;
 	struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
@@ -2115,21 +2124,9 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 				adev->pci_dev->dev.bus->iommu_ops);
 		return -1;
 	}
-	printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-
-	// This should be done in an initialization routine somewhere...
-	gdev.proc = 0;
-	sema_init(&gdev.sem, 1);
-	INIT_LIST_HEAD(&gdev.table_list);
-	adev->gpumem = gdev;
-	printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+	gpumem_init(adev);
 
 	// Allocate the iommu domain:
-
-	printk(KERN_ALERT "DEBUG: Group %s %d %p\n",__FUNCTION__,__LINE__, pci_dev->dev.iommu_group);
-	if (pci_dev->dev.iommu_group){
-		printk(KERN_ALERT "DEBUG: IOMMU_GROUP %s %d %s\n",__FUNCTION__,__LINE__, pci_dev->dev.iommu_group->name);
-	}
 
 	if ((rc = iommu_attach_device(iom_dom, &adev->pci_dev->dev)) != 0){
 		printk(KERN_ALERT "DEBUG: FAIL %s %d rc %d\n",__FUNCTION__,__LINE__, rc);
@@ -2141,9 +2138,6 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 #endif
 	}
 
-
-	//  dev_info(pdev(adev), "Original HostBuffer physical address is %x.\n", adev->hb1->pa);
-
 	if(copy_from_user(&param, (void *)arg, sizeof(struct gpudma_lock_t))) {
 		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
 		printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
@@ -2152,9 +2146,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	}
 
 	io_va_ai = adev->stream_dev->hbx[param.ind_ai].pa;
-	printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
 	io_va_ao = adev->stream_dev->hbx[param.ind_ao].pa;
-	printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
 
 	dev_info(pdev(adev), "Original AI HostBuffer physical address is %lx.\n", io_va_ai);
 	dev_info(pdev(adev), "Original AO HostBuffer physical address is %lx.\n", io_va_ao);
@@ -2291,25 +2283,20 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 
 	// TODO: Add iommu_unmap functionality to the callback function.
 
-
-
-	//  dev_info(pdev(adev), "hostbuffer physical address is %x, iova mapped to GPU is %lx.\n", adev->stream_dev->hbx[0].pa, io_va);
-
-
 	return 0;
 
-	do_unmap_dma_ao:
+do_unmap_dma_ao:
 	nvidia_p2p_dma_unmap_pages(pci_dev, entry_ao->page_table, nv_dma_map_ao);
-	do_unmap_dma_ai:
+do_unmap_dma_ai:
 	nvidia_p2p_dma_unmap_pages(pci_dev, entry_ai->page_table, nv_dma_map_ai);
-	do_unlock_pages:
+do_unlock_pages:
 	nvidia_p2p_put_pages(0, 0, entry_ao->virt_start, entry_ao->page_table);
 	nvidia_p2p_put_pages(0, 0, entry_ai->virt_start, entry_ai->page_table);
-	do_free_mem_ao:
+do_free_mem_ao:
 	kfree(entry_ao);
-	do_free_mem_ai:
+do_free_mem_ai:
 	kfree(entry_ai);
-	do_exit:
+do_exit:
 	return (long) error;
 }
 
