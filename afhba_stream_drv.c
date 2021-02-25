@@ -2071,38 +2071,6 @@ int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping * nv_dma_map, 
 }
 
 
-
-static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
-						 unsigned type)
-{
-	struct iommu_domain *domain;
-
-	if (bus == NULL){
-		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-		return NULL;
-	}
-
-	if (bus->iommu_ops == NULL){
-		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-		return NULL;
-	}
-
-
-	domain = bus->iommu_ops->domain_alloc(type);
-	if (!domain){
-		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-		return NULL;
-	}
-
-	domain->ops  = bus->iommu_ops;
-	domain->type = type;
-	/* Assume all sizes by default; the driver may override this later */
-	domain->pgsize_bitmap  = bus->iommu_ops->pgsize_bitmap;
-
-	printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-	return domain;
-}
-
 /*------------------------------------------------------------------------------
 -   afhba_gpumem_lock:
 -     called from an ioctl call, user provides virtual address in gpu memory.
@@ -2123,7 +2091,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct gpumem gdev;
 	unsigned long io_va_ai;
 	unsigned long io_va_ao;
-	struct iommu_domain *iom_dom = __iommu_domain_alloc(&pci_bus_type, IOMMU_DOMAIN_UNMANAGED);
+	struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
 
 	dev_dbg(pdev(adev), "KDEBUG: pci_bus_type = %p\n", &pci_bus_type);
 	if (iom_dom == 0){
@@ -2145,6 +2113,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	if (iommu_attach_device(iom_dom,&adev->pci_dev->dev)){
 		printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
 		printk("iommu_attach_device failed --aborting.\n");
+		error = -1;
 		goto do_exit;
 	}
 
