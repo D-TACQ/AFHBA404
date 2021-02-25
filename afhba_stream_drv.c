@@ -2056,13 +2056,13 @@ int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping * nv_dma_map, 
 
 	return 0;
 
-	do_unmap_dma:
+do_unmap_dma:
 	nvidia_p2p_dma_unmap_pages(dev, entry->page_table, nv_dma_map);
-	do_unlock_pages:
+do_unlock_pages:
 	nvidia_p2p_put_pages(0, 0, entry->virt_start, entry->page_table);
-	do_free_mem:
+do_free_mem:
 	kfree(entry);
-	do_exit:
+do_exit:
 	return (long) error;
 
 
@@ -2070,20 +2070,6 @@ int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping * nv_dma_map, 
 }
 
 #define MARK	printk(KERN_ALERT "DEBUG: %s %d\n",__FUNCTION__,__LINE__);
-
-struct iommu_group {
-	struct kobject kobj;
-	struct kobject *devices_kobj;
-	struct list_head devices;
-	struct mutex mutex;
-	struct blocking_notifier_head notifier;
-	void *iommu_data;
-	void (*iommu_data_release)(void *iommu_data);
-	char *name;
-	int id;
-	struct iommu_domain *default_domain;
-	struct iommu_domain *domain;
-};
 
 
 static void gpumem_init(struct AFHBA_DEV *adev)
