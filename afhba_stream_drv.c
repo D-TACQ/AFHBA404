@@ -2133,8 +2133,6 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
 	int rc;
 
-	dev_dbg(pdev(adev), "KDEBUG: pci_bus_type = %p\n", &pci_bus_type);
-
 	if (iom_dom == 0){
 		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
 				adev->pci_dev->dev.bus->iommu_ops);
