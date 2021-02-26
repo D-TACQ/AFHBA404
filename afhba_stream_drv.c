@@ -2138,7 +2138,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	if (iom_dom == 0){
 		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
 				adev->pci_dev->dev.bus->iommu_ops);
-		return -1;
+		return rc = -1;
 	}
 
 	if ((rc = iommu_attach_device(iom_dom, &adev->pci_dev->dev)) != 0){
@@ -2151,9 +2151,8 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	}
 
 	if(copy_from_user(&param, (void *)arg, sizeof(struct gpudma_lock_t))) {
-		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
-		printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
-		return -EFAULT;
+		dev_err(pdev(adev), "%s(): Error in copy_from_user()\n", __FUNCTION__);
+		return rc = -EFAULT;
 	}
 
 	return __afhba_gpumem_lock(adev, &param, iom_dom);
