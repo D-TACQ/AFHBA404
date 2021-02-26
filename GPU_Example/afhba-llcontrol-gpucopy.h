@@ -9,12 +9,34 @@
 #define GPU_EXAMPLE_AFHBA_LLCONTROL_GPUCOPY_H_
 
 
-
-//
-//#include <cuda.h>
-//#include <cuda_runtime.h>
-
 #include "afhba-llcontrol-common.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+
+#define NSAMP     1000000 // How many buffer loops to go through
+#define NCHAN     128
+#define AO_CHAN   32
+#define SPAD_LEN  32
+#define NSHORTS   (NCHAN * 2) + SPAD_LEN
+#define VI_LEN 	    (NSHORTS*sizeof(short))
+#define VI_LONGS	(VI_LEN/sizeof(unsigned))
+#define VO_LEN  (32*sizeof(int))
+#define EOB(buf) (((volatile unsigned *)(buf))[VI_LONGS-1])
+#define BOB(buf) (((volatile unsigned *)(buf))[0])
+
+
+void llcontrol_gpu_example_dummy(void * volatile ai_buffer_ptr,
+                           unsigned * volatile ao_buffer_ptr,
+                           short * total_data,
+                           int nCycles);
 
 
 

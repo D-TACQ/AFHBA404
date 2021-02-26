@@ -30,7 +30,7 @@ apps: $(APPS)
 afhba-llcontrol-gpu: afhba-llcontrol-gpu.o afhba-get_shared_mapping.o pwm_internals.o afhba-llcontrol-gpu-kernels.o
 	nvcc -arch=sm_61 -o $@ $^ $(LDLIB) 
 
-afhba-llcontrol-gpucopy: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o pwm_internals.o afhba-llcontrol-gpu-kernels.o
+afhba-llcontrol-gpucopy: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o pwm_internals.o afhba-llcontrol-gpu-kernels.o afhba_llcontrol_gpu_kernel_p.cu
 	nvcc -arch=sm_61 -o $@ $^ $(LDLIB) 
 
 
