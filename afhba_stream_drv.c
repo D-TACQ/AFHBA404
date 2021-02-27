@@ -2066,13 +2066,37 @@ do_free_mem:
 static void gpumem_init(struct AFHBA_DEV *adev)
 {
 	struct gpumem* gdev = &adev->gpumem;
+
 	gdev->proc = 0;
 	sema_init(&gdev->sem, 1);
 	INIT_LIST_HEAD(&gdev->table_list);
 }
 
+static int iommu_init(struct AFHBA_DEV *adev)
+{
+	int rc = 0;
 
-long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param, struct iommu_domain *iom_dom)
+	if (iommu_present(&pci_bus_type)) {
+		adev->iom_dom = iommu_domain_alloc(&pci_bus_type);
+		if (!adev->iom_dom){
+			dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
+							adev->pci_dev->dev.bus->iommu_ops);
+			return -1;
+		}
+		if ((rc = iommu_attach_device(adev->iom_dom, &adev->pci_dev->dev)) != 0){
+			dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
+					__FUNCTION__,__LINE__, rc);
+	#if 0
+			dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
+			return -rc;
+	#endif
+		}
+	}
+	return rc;
+}
+
+
+long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 {
 	unsigned long io_va_ai = adev->stream_dev->hbx[param->ind_ai].pa;
 	unsigned long io_va_ao = adev->stream_dev->hbx[param->ind_ao].pa;
@@ -2094,7 +2118,7 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param, st
 
 
 	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if(iommu_map(iom_dom, io_va_ai, nv_dma_map_ai->dma_addresses[0], pin_size_ai, IOMMU_WRITE)){
+	if(iommu_map(adev->iom_dom, io_va_ai, nv_dma_map_ai->dma_addresses[0], pin_size_ai, IOMMU_WRITE)){
 		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
 		return -EFAULT;
 	}else{
@@ -2109,7 +2133,7 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param, st
 		return -EFAULT;
 	}
 	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if(iommu_map(iom_dom, io_va_ao, nv_dma_map_ao->dma_addresses[0], pin_size_ao, IOMMU_READ)){
+	if(iommu_map(adev->iom_dom, io_va_ao, nv_dma_map_ao->dma_addresses[0], pin_size_ao, IOMMU_READ)){
 		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
 		return -EFAULT;
 	}else{
@@ -2130,30 +2154,18 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param, st
 ------------------------------------------------------------------------------*/
 long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct gpudma_lock_t param;
-	struct iommu_domain *iom_dom = iommu_domain_alloc(&pci_bus_type);
-	int rc;
 
-	if (iom_dom == 0){
-		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
-				adev->pci_dev->dev.bus->iommu_ops);
-		return rc = -1;
-	}
-
-	if ((rc = iommu_attach_device(iom_dom, &adev->pci_dev->dev)) != 0){
-		dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
-				__FUNCTION__,__LINE__, rc);
-#if 0
-		dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
-		return -rc;
-#endif
+	if (!adev->iom_dom){
+		dev_err(pdev(adev), "%s(): NO IOMMU\n", __FUNCTION__);
+		return -1;
 	}
 
 	if(copy_from_user(&param, (void *)arg, sizeof(struct gpudma_lock_t))) {
 		dev_err(pdev(adev), "%s(): Error in copy_from_user()\n", __FUNCTION__);
-		return rc = -EFAULT;
+		return -EFAULT;
 	}
 
-	return __afhba_gpumem_lock(adev, &param, iom_dom);
+	return __afhba_gpumem_lock(adev, &param);
 }
 
 /*------------------------------------------------------------------------------
@@ -2642,6 +2654,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 
 	afs_init_buffers(adev);
 	gpumem_init(adev);
+	iommu_init(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
@@ -2650,6 +2663,11 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	adev->stream_fops = &afs_fops;
 	afs_init_procfs(adev);
 	afs_create_sysfs(adev);
+
+
+
+
+
 	return 0;
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)

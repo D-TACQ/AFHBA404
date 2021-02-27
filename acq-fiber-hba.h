@@ -154,13 +154,8 @@ struct AFHBA_DEV {
 	int aurora_status_read_count;
 
 	//For GPU functionality
-//	struct gpumem_t *gpumem_t;
 	struct gpumem gpumem;
-//	struct gpumem {
-//		struct semaphore			sem;
-//		struct proc_dir_enty*	proc;
-//		struct list_head 			table_list;
-//	}
+	struct iommu_domain *iom_dom;
 };
 
 #define SZM1(field)	(sizeof(field)-1)
