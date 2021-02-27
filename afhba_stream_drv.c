@@ -2650,7 +2650,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
+	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d GPU", REVID, adev->name, adev->idx);
 
 	afs_init_buffers(adev);
 	gpumem_init(adev);

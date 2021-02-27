@@ -22,7 +22,11 @@ int fd;
 int devnum = 0;
 int samples_buffer = 1;
 int nsamples = 10000000;		/* 10s at 1MSPS */
+short * tdata_cpu;
+short * tdata_gpu;
+int tdata_size;
 int verbose;
+
 //int VI_LEN = 256; // TODO: Make this variable.
 
 
@@ -194,8 +198,8 @@ int setup() {
 		return 1;
 	}
 	printf("Finished get_mapping_gpu");
-
-	get_shared_mapping(devnum, 1, &xllc_def_ao, (void**)&pbufferXO);
+	get_shared_mapping(devnum, 0, &xllc_def_ai, 0);
+	get_shared_mapping(devnum, 1, &xllc_def_ao, 0);
 	xllc_def_ai.len = samples_buffer * VI_LEN;
 
 
@@ -207,12 +211,40 @@ int setup() {
 	printf("%p \n", lock.size_ao);
 	printf("%p \n", lock.ind_ao);
 
+	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ao)){
+			perror("ioctl AFHBA_START_AO_LLC");
+			exit(1);
+		}
+
+	if (ioctl(fd, AFHBA_START_AI_LLC, &xllc_def_ai)){
+			perror("ioctl AFHBA_START_AI_LLC");
+			exit(1);
+		}
+
+
+
 	return 0;
 
 }
 
 
+void prepare_gpu() { // Allocates memory for CPU-GPU communication
+  nsamples = NSAMP;
+  // tdata is the total log of digitizer data, initialize as zeros
+  tdata_size = NSHORTS*(nsamples+1)*sizeof(short);
+  tdata_cpu = (short *)malloc(tdata_size);
+  memset(tdata_cpu,0x00,tdata_size);
+  cudaMalloc((void **) &tdata_gpu, tdata_size);
+  cudaMemcpy(tdata_gpu,tdata_cpu,tdata_size,cudaMemcpyHostToDevice);
+}
+
+
 int run_llcontrol_gpu(){
+	prepare_gpu();
+	llcontrol_gpu_example_dummy((void *)lock.addr_ai, (unsigned *)lock.addr_ao, tdata_gpu, nsamples);
+	unsigned int microseconds = 1000;
+	usleep(microseconds);
+	cudaDeviceSynchronize(); // Wait for kernel to finish
 	return 0;
 }
 
