@@ -42,13 +42,8 @@
 #include <linux/version.h>
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
-//#include <linux/scatterlist.h>
-//#include <linux/memory.h>
 
-//#include "nv-p2p.h"
-//#include "gpumemdrv.h"
-
-#define REVID	"R1072"
+#define REVID	"R1073"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -2076,21 +2071,29 @@ static int iommu_init(struct AFHBA_DEV *adev)
 {
 	int rc = 0;
 
-	if (iommu_present(&pci_bus_type)) {
-		adev->iom_dom = iommu_domain_alloc(&pci_bus_type);
-		if (!adev->iom_dom){
-			dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
-							adev->pci_dev->dev.bus->iommu_ops);
-			return -1;
-		}
-		if ((rc = iommu_attach_device(adev->iom_dom, &adev->pci_dev->dev)) != 0){
-			dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
-					__FUNCTION__,__LINE__, rc);
+	if (!iommu_present(&pci_bus_type)){
+		return 0;
+	}
+
+	adev->iom_dom = iommu_domain_alloc(&pci_bus_type);
+	if (!adev->iom_dom){
+		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
+						adev->pci_dev->dev.bus->iommu_ops);
+		return -1;
+	}
+	dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
+			__FUNCTION__,
+			adev->iom_dom->geometry.aperture_start,
+			adev->iom_dom->geometry.aperture_end,
+			adev->iom_dom->geometry.force_aperture
+			);
+	if ((rc = iommu_attach_device(adev->iom_dom, &adev->pci_dev->dev)) != 0){
+		dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
+				__FUNCTION__,__LINE__, rc);
 	#if 0
-			dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
-			return -rc;
+		dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
+		return -rc;
 	#endif
-		}
 	}
 	return rc;
 }
@@ -2652,9 +2655,9 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d GPU", REVID, adev->name, adev->idx);
 
-	afs_init_buffers(adev);
 	gpumem_init(adev);
 	iommu_init(adev);
+	afs_init_buffers(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
@@ -2663,9 +2666,6 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	adev->stream_fops = &afs_fops;
 	afs_init_procfs(adev);
 	afs_create_sysfs(adev);
-
-
-
 
 
 	return 0;
