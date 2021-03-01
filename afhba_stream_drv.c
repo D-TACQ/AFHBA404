@@ -2217,7 +2217,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 		dev_err(pdev(adev), "afhba_gpumem_lock failed to lock %s %ld", "VI", rc);
 		return rc;
 	}
-	if ((rc = __afhba_gpumem_lock(adev, "VI",
+	if ((rc = __afhba_gpumem_lock(adev, "VO",
 			adev->stream_dev->hbx[param.ind_ao].pa,
 			param.addr_ao, param.size_ao, IOMMU_READ)) != 0){
 		dev_err(pdev(adev), "afhba_gpumem_lock failed to lock %s %ld", "VO", rc);
