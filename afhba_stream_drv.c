@@ -1022,7 +1022,42 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
-	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++hb){
+
+	for (hb = sdev->hbx, ii = 0; ii < 2; ++ii, ++hb){
+		dma_addr_t dma_handle;
+
+		hb->va = (void*)dma_alloc_coherent(
+				&adev->pci_dev->dev,  buffer_len, &dma_handle,
+				GFP_KERNEL|GFP_DMA32);
+
+		if (!hb->va){
+			dev_err(pdev(adev), "failed to allocate buffer %d", ii);
+			break;
+		}
+
+
+		dev_dbg(pdev(adev), "buffer %2d allocated at %p, map it", ii, hb->va);
+
+		hb->ibuf = ii;
+		hb->pa = dma_handle;
+		hb->len = buffer_len;
+
+		dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
+
+		if ((hb->pa & (AFDMAC_PAGE-1)) != 0){
+			dev_err(pdev(adev), "HB NOT PAGE ALIGNED");
+			WARN_ON(true);
+			return -1;
+		}
+
+		hb->descr = hb->pa | 0 | AFDMAC_DESC_EOT | (ii&AFDMAC_DESC_ID_MASK);
+		hb->bstate = BS_EMPTY;
+
+		dev_info(pdev(adev), "COHERENT [%d] %p %08x %d %08x",
+		    ii, hb->va, hb->pa, hb->len, hb->descr);
+		list_add_tail(&hb->list, &sdev->bp_empties.list);
+	}
+	for (; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -1034,7 +1069,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		hb->ibuf = ii;
 		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				buffer_len, PCI_DMA_FROMDEVICE);
+				buffer_len, PCI_DMA_BIDIRECTIONAL);
 		hb->va = buf;
 		hb->len = buffer_len;
 
@@ -1516,6 +1551,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
 
+
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
 	spin_unlock(&sdev->job_lock);
@@ -1524,6 +1560,22 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
+#if 1
+	if (adev->iom_dom){
+		int rc;
+		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
+
+		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
+			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
+		}else{
+			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
+								__FUNCTION__, xllc_def->pa, rc);
+		}
+	}
+#else
+	dev_info(pdev(adev), "%s no iommu_map", __FUNCTION__);
+#endif
+
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
 	spin_lock(&sdev->job_lock);
@@ -1543,6 +1595,21 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
+#if 1
+	if (adev->iom_dom){
+		int rc;
+		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
+
+		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
+			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
+		}else{
+			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
+					__FUNCTION__, xllc_def->pa, rc);
+		}
+	}
+#else
+	dev_info(pdev(adev), "%s no iommu_map", __FUNCTION__);
+#endif
 	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
@@ -1990,7 +2057,7 @@ int get_nv_page_size(int val)
 -      multiple channel usage.
 -    TODO: get gpumem->table_list allocated correctly as a static struct?
 ------------------------------------------------------------------------------*/
-int gpu_pin(struct AFHBA_DEV *adev, struct nvidia_p2p_dma_mapping ** nv_dma_map, uint64_t addr, uint64_t size, char* name, size_t *ppin_size){
+int gpu_pin(struct AFHBA_DEV *adev, const char* name, struct nvidia_p2p_dma_mapping ** nv_dma_map, uint64_t addr, uint64_t size, size_t *ppin_size){
 	// gpu_pin function is currently unused, this is done manually inside afhba_gpumem_lock
 	// should be separated out to generalize the gpu memory pinning
 	int error = 0;
@@ -2098,7 +2165,33 @@ static int iommu_init(struct AFHBA_DEV *adev)
 	return rc;
 }
 
+#if 1
+long __afhba_gpumem_lock(
+		struct AFHBA_DEV *adev, const char* name,
+		unsigned long iova, uint64_t addr, uint64_t sz, unsigned dir)
+{
+	struct nvidia_p2p_dma_mapping *nv_dma_map = 0;
+	size_t pin_size = 0ULL;
 
+	dev_info(pdev(adev), "Original %s HostBuffer physical address is %lx.\n", name, iova);
+	dev_info(pdev(adev), "Virtual %s GPU address is  %llx.\n", name, addr);
+
+	if (gpu_pin(adev, name, &nv_dma_map, addr, sz, &pin_size)){
+		dev_err(pdev(adev), "%s(): Error in gpu_pin()", __FUNCTION__);
+	   	return -EFAULT;
+	}
+
+	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
+	if (iommu_map(adev->iom_dom, iova, nv_dma_map->dma_addresses[0], pin_size, dir)){
+		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
+		return -EFAULT;
+	}else{
+		dev_info(pdev(adev), "iommu_map success %s iova %lx..%llx points to %llx",
+				name, iova, iova+sz, nv_dma_map->dma_addresses[0]);
+	}
+	return 0;
+}
+#else
 long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 {
 	unsigned long io_va_ai = adev->stream_dev->hbx[param->ind_ai].pa;
@@ -2114,14 +2207,14 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 	dev_info(pdev(adev), "Virtual AI GPU address is  %llx.\n", param->addr_ai);
 	dev_info(pdev(adev), "Virtual AO GPU address is  %llx.\n", param->addr_ao);
 
-	if (gpu_pin(adev, &nv_dma_map_ai, param->addr_ai, param->size_ai, "VI", &pin_size_ai)){
+	if (gpu_pin(adev, "VI", &nv_dma_map_ai, param->addr_ai, param->size_ai, "VI", &pin_size_ai)){
 		dev_err(pdev(adev), "%s(): Error in gpu_pin()", __FUNCTION__);
    	   	return -EFAULT;
 	}
 
 
 	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if(iommu_map(adev->iom_dom, io_va_ai, nv_dma_map_ai->dma_addresses[0], pin_size_ai, IOMMU_WRITE)){
+	if (iommu_map(adev->iom_dom, io_va_ai, nv_dma_map_ai->dma_addresses[0], pin_size_ai, IOMMU_WRITE)){
 		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
 		return -EFAULT;
 	}else{
@@ -2131,12 +2224,12 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 	}
 
 
-	if (gpu_pin(adev, &nv_dma_map_ao, param->addr_ao, param->size_ao, "VO", &pin_size_ao)){
+	if (gpu_pin(adev, "VO", &nv_dma_map_ao, param->addr_ao, param->size_ao, &pin_size_ao)){
 		dev_err(pdev(adev), "%s(): Error in gpu_pin()\n", __FUNCTION__);
 		return -EFAULT;
 	}
 	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if(iommu_map(adev->iom_dom, io_va_ao, nv_dma_map_ao->dma_addresses[0], pin_size_ao, IOMMU_READ)){
+	if (iommu_map(adev->iom_dom, io_va_ao, nv_dma_map_ao->dma_addresses[0], pin_size_ao, IOMMU_READ)){
 		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
 		return -EFAULT;
 	}else{
@@ -2149,6 +2242,7 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 
 	return 0;
 }
+#endif
 /*------------------------------------------------------------------------------
 -   afhba_gpumem_lock:
 -     called from an ioctl call, user provides virtual address in gpu memory.
@@ -2157,6 +2251,7 @@ long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
 ------------------------------------------------------------------------------*/
 long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 	struct gpudma_lock_t param;
+	long rc;
 
 	if (!adev->iom_dom){
 		dev_err(pdev(adev), "%s(): NO IOMMU\n", __FUNCTION__);
@@ -2168,7 +2263,19 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg){
 		return -EFAULT;
 	}
 
-	return __afhba_gpumem_lock(adev, &param);
+	if ((rc = __afhba_gpumem_lock(adev, "VI",
+			adev->stream_dev->hbx[param.ind_ai].pa,
+			param.addr_ai, param.size_ai, IOMMU_WRITE)) != 0){
+		dev_err(pdev(adev), "afhba_gpumem_lock failed to lock %s %ld", "VI", rc);
+		return rc;
+	}
+	if ((rc = __afhba_gpumem_lock(adev, "VI",
+			adev->stream_dev->hbx[param.ind_ao].pa,
+			param.addr_ao, param.size_ao, IOMMU_READ)) != 0){
+		dev_err(pdev(adev), "afhba_gpumem_lock failed to lock %s %ld", "VO", rc);
+		return rc;
+	}
+	return 0;
 }
 
 /*------------------------------------------------------------------------------

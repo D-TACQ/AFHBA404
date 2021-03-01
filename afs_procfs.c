@@ -38,6 +38,50 @@ extern struct list_head afhba_devices;
 
 struct proc_dir_entry *afs_proc_root;
 
+/* @TODO: warning ASSUMES this table struct printout fits 4K */
+static int gpu_proc_show(struct seq_file *m, void *v)
+{
+	struct file *file = (struct file *)m->private;
+	struct AFHBA_DEV *adev = PDE_DATA(file_inode(file));
+	struct gpumem_t *cursor;
+	int ii;
+
+	list_for_each_entry(cursor, &adev->gpumem.table_list, list){
+		seq_printf(m, "%s 0x%016llx\n", cursor->name, cursor->virt_start);
+		if (cursor->page_table){
+			for (ii = 0; ii < cursor->page_table->entries; ii++) {
+				seq_printf(m, "%s [%d] 0x%llx\n", cursor->name, ii,
+					cursor->page_table->pages[ii]->physical_address);
+			}
+		}else{
+			seq_printf(m, "%s ERROR: memory NOT pinned\n", cursor->name);
+		}
+	}
+	return 0;
+}
+static int gpu_proc_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, gpu_proc_show, file);
+}
+
+static int addGpuMemProcFile(struct AFHBA_DEV *adev)
+{
+	static struct file_operations gpu_proc_fops = {
+			.owner = THIS_MODULE,
+			.open = gpu_proc_open,
+			.read = seq_read,
+			.llseek = seq_lseek,
+			.release = single_release
+	};
+	if (proc_create_data("GPU", S_IRUGO,
+			adev->proc_dir_root, &gpu_proc_fops, adev) != 0){
+		return 0;
+	}else{
+		dev_err(pdev(adev), "Failed to create entry");
+		return -1;
+	}
+}
+
 static void *hb_seq_start(struct seq_file *sfile, loff_t *pos)
 /* *pos == iblock. returns next TBLOCK* */
 {
@@ -310,6 +354,7 @@ int afs_init_procfs(struct AFHBA_DEV *adev)
 
 	if ((rc = addHostBufferProcFiles(adev)) == 0 &&
 	    (rc = addAppBufferProcFiles(adev))  == 0 &&
+	    (rc = addGpuMemProcFile(adev))  == 0 	     &&
 	    (rc = addJobProcFile(adev) == 0) == 0){
 		return 0;
 	}
