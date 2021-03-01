@@ -141,13 +141,6 @@ int gpu_pin(struct AFHBA_DEV *adev, const char* name, struct nvidia_p2p_dma_mapp
 	dev_info(pdev(adev),"%s %s nvidia_dma_mapping: npages= %d\n",
 			__FUNCTION__, name, (*nv_dma_map)->entries);
 
-	{
-		int ii;
-		for (ii = 0; ii < (*nv_dma_map)->entries; ii++){
-			dev_info(pdev(adev),  "nvidia_dma_mapping: dma_address= %llx\n",
-						(unsigned long long)(*nv_dma_map)->dma_addresses[ii]);
-		}
-	}
 	list_add_tail(&entry->list, &adev->gpumem.table_list);
 	return 0;
 

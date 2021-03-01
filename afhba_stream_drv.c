@@ -1560,7 +1560,8 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-#if 1
+// trying to test regular x86 transfer with intel_iommu=1
+#if 0
 	if (adev->iom_dom){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
@@ -1595,7 +1596,8 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-#if 1
+// trying to test regular x86 transfer with intel_iommu=1
+#if 0
 	if (adev->iom_dom){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
