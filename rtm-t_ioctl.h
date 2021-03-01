@@ -142,12 +142,6 @@ struct AO_BURST {
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
 /**< **ioctl** AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
 
-#define AFHBA_GPUMEM_UNLOCK	_IOWR(DMAGIC,	9, struct gpudma_unlock_t)
-/* Unpins address of GPU memory */
-
-#define AFHBA_GPUMEM_STATE	_IOWR(DMAGIC,  10, struct gpudma_state_t)
-/*Queries the state of the gpu memory that is currently pinned*/
-
 #define AFHBA_AO_BURST_INIT		 _IOWR(DMAGIC, 10, struct AO_BURST)
 /**< **ioctl** define an AO_BURST setup */
 

@@ -14,19 +14,27 @@
 //-----------------------------------------------------------------------------
 
 struct gpumem_t {
-    struct list_head list;
-    void *handle;
-    u64 virt_start;
-    nvidia_p2p_page_table_t* page_table;
-    char name[8];
+	struct list_head list;
+	void *handle;
+	u64 virt_start;
+	nvidia_p2p_page_table_t* page_table;
+	char name[8];
 };
 
+struct iommu_mapping {
+	struct list_head list;
+	unsigned long iova;
+	phys_addr_t paddr;
+	size_t size;
+	int prot;
+};
 //-----------------------------------------------------------------------------
 
 struct gpumem {
     struct semaphore         sem;
     struct proc_dir_entry*   proc;
     struct list_head         table_list;
+    struct list_head         map_list;
 };
 
 //-----------------------------------------------------------------------------
