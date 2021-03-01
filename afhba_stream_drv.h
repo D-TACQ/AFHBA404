@@ -83,9 +83,6 @@ struct AFHBA_STREAM_DEV {
 	int buffer_len;
 	struct HostBuffer *hbx;		/* streaming host buffers [nbuffers] */
 
-
-	struct proc_dir_entry *proc_dir_root;
-
 	struct JOB {
 		unsigned buffers_demand;
 		unsigned buffers_queued;

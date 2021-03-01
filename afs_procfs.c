@@ -226,14 +226,14 @@ static int addHostBufferProcFiles(struct AFHBA_DEV *adev)
 		.llseek = seq_lseek,
 		.release = seq_release
 	};
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+
 	struct proc_dir_entry *hb_entry =
 			proc_create_data("HostBuffers", S_IRUGO,
-					sdev->proc_dir_root, &hb_proc_fops, adev);
+					adev->proc_dir_root, &hb_proc_fops, adev);
 
 	if (hb_entry){
 		hb_entry = proc_create_data("HostDescriptors", S_IRUGO,
-				sdev->proc_dir_root, &hbd_proc_fops, adev);
+				adev->proc_dir_root, &hbd_proc_fops, adev);
 		if (hb_entry){
 			return 0;
 		}
@@ -263,10 +263,9 @@ static int addAppBufferProcFiles(struct AFHBA_DEV *adev)
 		.llseek = seq_lseek,
 		.release = seq_release
 	};
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct proc_dir_entry *ab_entry =
 		proc_create_data("AppBuffers", S_IRUGO,
-			sdev->proc_dir_root, &ab_proc_fops, adev);
+			adev->proc_dir_root, &ab_proc_fops, adev);
 	if (ab_entry){
 		return 0;
 	}
@@ -324,7 +323,6 @@ static int job_proc_open(struct inode *inode, struct file *file)
 }
 static int addJobProcFile(struct AFHBA_DEV *adev)
 {
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	static struct file_operations job_proc_fops = {
 		.owner = THIS_MODULE,
 		.open = job_proc_open,
@@ -333,7 +331,7 @@ static int addJobProcFile(struct AFHBA_DEV *adev)
 		.release = single_release
 	};
 	if (proc_create_data("Job", S_IRUGO,
-			sdev->proc_dir_root, &job_proc_fops, adev) != 0){
+			adev->proc_dir_root, &job_proc_fops, adev) != 0){
 		return 0;
 	}else{
 		dev_err(pdev(adev), "Failed to create entry");
@@ -342,7 +340,6 @@ static int addJobProcFile(struct AFHBA_DEV *adev)
 }
 int afs_init_procfs(struct AFHBA_DEV *adev)
 {
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int rc;
 
 	if (!afs_proc_root){
@@ -350,7 +347,7 @@ int afs_init_procfs(struct AFHBA_DEV *adev)
 		assert(afs_proc_root);
 	}
 
-	sdev->proc_dir_root = proc_mkdir(adev->name, afs_proc_root);
+	adev->proc_dir_root = proc_mkdir(adev->name, afs_proc_root);
 
 	if ((rc = addHostBufferProcFiles(adev)) == 0 &&
 	    (rc = addAppBufferProcFiles(adev))  == 0 &&
