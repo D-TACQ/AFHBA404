@@ -2165,7 +2165,6 @@ static int iommu_init(struct AFHBA_DEV *adev)
 	return rc;
 }
 
-#if 1
 long __afhba_gpumem_lock(
 		struct AFHBA_DEV *adev, const char* name,
 		unsigned long iova, uint64_t addr, uint64_t sz, unsigned dir)
@@ -2191,58 +2190,7 @@ long __afhba_gpumem_lock(
 	}
 	return 0;
 }
-#else
-long __afhba_gpumem_lock(struct AFHBA_DEV *adev, struct gpudma_lock_t *param)
-{
-	unsigned long io_va_ai = adev->stream_dev->hbx[param->ind_ai].pa;
-	unsigned long io_va_ao = adev->stream_dev->hbx[param->ind_ao].pa;
-	struct nvidia_p2p_dma_mapping *nv_dma_map_ai = 0;
-	struct nvidia_p2p_dma_mapping *nv_dma_map_ao = 0;
-        size_t pin_size_ai = 0ULL;
-        size_t pin_size_ao = 0ULL;
 
-	dev_info(pdev(adev), "Original AI HostBuffer physical address is %lx.\n", io_va_ai);
-	dev_info(pdev(adev), "Original AO HostBuffer physical address is %lx.\n", io_va_ao);
-
-	dev_info(pdev(adev), "Virtual AI GPU address is  %llx.\n", param->addr_ai);
-	dev_info(pdev(adev), "Virtual AO GPU address is  %llx.\n", param->addr_ao);
-
-	if (gpu_pin(adev, "VI", &nv_dma_map_ai, param->addr_ai, param->size_ai, "VI", &pin_size_ai)){
-		dev_err(pdev(adev), "%s(): Error in gpu_pin()", __FUNCTION__);
-   	   	return -EFAULT;
-	}
-
-
-	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if (iommu_map(adev->iom_dom, io_va_ai, nv_dma_map_ai->dma_addresses[0], pin_size_ai, IOMMU_WRITE)){
-		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
-		return -EFAULT;
-	}else{
-		dev_info(pdev(adev), "iommu_map success, io_va_ai %lx points to %llx",
-				io_va_ai, nv_dma_map_ai->dma_addresses[0]);
-		dev_info(pdev(adev), "io_va_ai + size_ai is %llx", io_va_ai + param->size_ai);
-	}
-
-
-	if (gpu_pin(adev, "VO", &nv_dma_map_ao, param->addr_ao, param->size_ao, &pin_size_ao)){
-		dev_err(pdev(adev), "%s(): Error in gpu_pin()\n", __FUNCTION__);
-		return -EFAULT;
-	}
-	//  Enable iommu DMA remapping -> AFHBA404 card can only address 32-bit memory
-	if (iommu_map(adev->iom_dom, io_va_ao, nv_dma_map_ao->dma_addresses[0], pin_size_ao, IOMMU_READ)){
-		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
-		return -EFAULT;
-	}else{
-		dev_info(pdev(adev), "iommu_map success, io_va_ao %lx points to %llx",
-				io_va_ao, nv_dma_map_ao->dma_addresses[0]);
-		dev_info(pdev(adev), "io_va_ao + size_ao is %llx", io_va_ao + param->size_ao);
-	}
-
-	// TODO: Add iommu_unmap functionality to the callback function.
-
-	return 0;
-}
-#endif
 /*------------------------------------------------------------------------------
 -   afhba_gpumem_lock:
 -     called from an ioctl call, user provides virtual address in gpu memory.
@@ -2329,78 +2277,6 @@ do_exit:
     return (long) error;
 }
 
-long afhba_gpumem_state(struct AFHBA_DEV *adev, unsigned long arg){
-/*------------------------------------------------------------------------------
--   afhba_gpumem_state:
--     called from an ioctl call, gives user currently pinned gpu memory.
--     this currently does not work, the table of locked memory is not working right
-------------------------------------------------------------------------------*/
-    int error = 0;
-    int size = 0;
-    int i=0;
-    struct gpumem_t *entry = 0;
-    struct gpudma_state_t header;
-    struct gpudma_state_t *param;
-    struct list_head *pos, *n;
-
-    struct gpumem *gdev = &adev->gpumem;
-    if(copy_from_user(&header, (void *)arg, sizeof(struct gpudma_state_t))) {
-        printk(KERN_ERR"%s(): Error in copy_from_user()\n", __FUNCTION__);
-        error = -EFAULT;
-        goto do_exit;
-    }
-
-    list_for_each_safe(pos, n, &gdev->table_list) {
-
-        entry = list_entry(pos, struct gpumem_t, list);
-        if(entry) {
-            if(entry->handle == header.handle) {
-
-                printk(KERN_ERR"%s(): param.handle = %p\n", __FUNCTION__, header.handle);
-                printk(KERN_ERR"%s(): entry.handle = %p\n", __FUNCTION__, entry->handle);
-
-                if(!entry->page_table) {
-                    printk(KERN_ERR"%s(): Error - memory not pinned!\n", __FUNCTION__);
-                    return -EINVAL;
-                }
-
-                if((entry->page_table->entries != header.page_count) || (entry->handle != header.handle)) {
-                    printk(KERN_ERR"%s(): Error - page counters or handle invalid!\n", __FUNCTION__);
-                    return -EINVAL;
-                }
-
-                size = (sizeof(uint64_t)*header.page_count) + sizeof(struct gpudma_state_t);
-                param = kzalloc(size, GFP_KERNEL);
-                if(!param) {
-                    printk(KERN_ERR"%s(): Error allocate memory!\n", __FUNCTION__);
-                    return -ENOMEM;
-                }
-                param->page_size = get_nv_page_size(entry->page_table->page_size);
-                for(i=0; i<entry->page_table->entries; i++) {
-                    struct nvidia_p2p_page *nvp = entry->page_table->pages[i];
-                    if(nvp) {
-                        param->pages[i] = nvp->physical_address;
-                        param->page_count++;
-                        printk(KERN_ERR"%s(): %02d - 0x%llx\n", __FUNCTION__, i, param->pages[i]);
-                    }
-                }
-                printk(KERN_ERR"%s(): page_count = %ld\n", __FUNCTION__, (long int)param->page_count);
-                param->handle = header.handle;
-                if(copy_to_user((void *)arg, param, size)) {
-                    printk(KERN_DEBUG"%s(): Error in copy_to_user()\n", __FUNCTION__);
-                    error = -EFAULT;
-                }
-
-                kfree(param);
-            } else {
-                printk(KERN_ERR"%s(): Skip entry: %p\n", __FUNCTION__, entry->handle);
-            }
-        }
-    }
-
-do_exit:
-    return error;
-}
 //------------------------------------------------------------------------------
 
 
@@ -2538,11 +2414,6 @@ long afs_dma_ioctl(struct file *file,
 	case AFHBA_GPUMEM_UNLOCK: {
 		long rc;
 		rc = afhba_gpumem_unlock(adev,arg);
-		return rc;
-	}
-	case AFHBA_GPUMEM_STATE: {
-		long rc;
-		rc = afhba_gpumem_state(adev,arg);
 		return rc;
 	}
 	default:
