@@ -95,7 +95,9 @@ int get_nv_page_size(int val)
 -      multiple channel usage.
 -    TODO: get gpumem->table_list allocated correctly as a static struct?
 ------------------------------------------------------------------------------*/
-int gpu_pin(struct AFHBA_DEV *adev, const char* name, struct nvidia_p2p_dma_mapping ** nv_dma_map, uint64_t addr, uint64_t size, size_t *ppin_size){
+int gpu_pin(struct AFHBA_DEV *adev, const char* name,
+	struct nvidia_p2p_dma_mapping ** nv_dma_map,
+	uint64_t addr, uint64_t size, size_t *ppin_size){
 	// gpu_pin function is currently unused, this is done manually inside afhba_gpumem_lock
 	// should be separated out to generalize the gpu memory pinning
 	int error = 0;
