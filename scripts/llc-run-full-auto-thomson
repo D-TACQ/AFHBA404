@@ -5,6 +5,7 @@
 POST=${POST:-1000}
 DELAY=${DELAY:-10}
 BUFLEN=${BUFLEN:-4096}
+DEMUX=${DEMUX:-1}
 let TLEN="$POST*120/100"
 
 CTRL_PROG=${CTRL_PROG:-"acqproc"}
@@ -58,7 +59,7 @@ control_script() {
 	echo control_script       
        	echo "$HAPIDIR/user_apps/acq400/acq400_capture.py $UUTS" 
         SITECLIENT_TRACE=0 STATUSMONITOR_TRACE=1 python3 $HAPIDIR/user_apps/acq400/acq400_capture.py \
-		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=0" --soft_trigger=0 \
+		--transient="PRE=0 POST=$TLEN SOFT_TRIGGER=0 DEMUX=$DEMUX" --soft_trigger=0 \
 		$UUTS
 	echo control_script over
 }
