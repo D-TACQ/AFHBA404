@@ -133,6 +133,12 @@ int use_llc_multi = 0;
 module_param(use_llc_multi, int, 0644);
 MODULE_PARM_DESC(use_llc_multi, "use LLC for multi descriptor transfer");
 
+// trying to test regular x86 transfer with intel_iommu=1
+int host_llc_use_iommu_map;
+module_param(host_llc_use_iommu_map, int, 0644);
+MODULE_PARM_DESC(host_llc_use_iommu_map, "if IOMMU is present, try a 1:1 mapping for HOST transfer");
+
+
 static int getOrder(int len)
 {
 	int order;
@@ -1560,12 +1566,15 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-// trying to test regular x86 transfer with intel_iommu=1
-#if 0
-	if (adev->iom_dom){
+
+	if (adev->iom_dom && host_llc_use_iommu_map){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
+		/* IOMMU_WRITE is DMA_FROM_DEVICE */
+		/* https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/dma-mapping.c#L1087 ..
+		 * well, it is for ARM anyway ..
+		 */
 		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
@@ -1573,9 +1582,6 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 								__FUNCTION__, xllc_def->pa, rc);
 		}
 	}
-#else
-	dev_info(pdev(adev), "%s no iommu_map", __FUNCTION__);
-#endif
 
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
@@ -1586,6 +1592,9 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
+
+
+
 long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1597,11 +1606,11 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
 // trying to test regular x86 transfer with intel_iommu=1
-#if 0
-	if (adev->iom_dom){
+	if (host_llc_use_iommu_map && adev->iom_dom){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
+		/* IOMMU_READ is DMA_TO_DEVICE */
 		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
@@ -1609,9 +1618,6 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 					__FUNCTION__, xllc_def->pa, rc);
 		}
 	}
-#else
-	dev_info(pdev(adev), "%s no iommu_map", __FUNCTION__);
-#endif
 	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
@@ -2360,7 +2366,10 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d GPU", REVID, adev->name, adev->idx);
 
+#ifdef CONFIG_GPU
+#warning CONFIG_GPU set
 	gpumem_init(adev);
+#endif
 	iommu_init(adev);
 	afs_init_buffers(adev);
 

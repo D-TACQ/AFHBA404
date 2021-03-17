@@ -9,8 +9,10 @@ KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.
 CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
-EXTRA_CFLAGS += -DCONFIG_GPU
 
+# enable next two lines for GPU
+EXTRA_CFLAGS += -DCONFIG_GPU
+EXTRA_GPU = afhba_gpu.o
 
 # default build is the local kernel.
 # build other kernels like this example:
@@ -31,7 +33,7 @@ KHEADERS := /lib/modules/$(KRNL)/build
 
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
-	afhba_core.o  afhba_gpu.o \
+	afhba_core.o  $(EXTRA_GPU) \
 	afs_procfs.o
 
 afhbaspi-objs = afhba_spi.o afhba_core.o
