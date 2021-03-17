@@ -26,7 +26,7 @@ def check_col_counters(arm_data, host_data, column, nchan, test="sample counts")
     arm_column = arm_data[column::nchan]
     host_column = host_data[column::nchan]
     if arm_column != host_column:
-        print("ARM and HOST {} are not identical. This is okay, doing more tests to confirm...".format(test))
+        print("ARM and HOST {} are not identical. Doing more tests to confirm data validity...".format(test))
 
     return None
 
@@ -49,7 +49,6 @@ def check_data(arm_data, host_data):
         try:
             if sample[SPAD0] != host_data[counter][SPAD0]:
                 print("ARM sample: {} not in host_data.".format(sample[SPAD0]))
-                print(sample[SPAD0], host_data[counter][SPAD0])
                 indices.append(num)
             else:
                 counter += 1
