@@ -194,6 +194,8 @@ int iommu_init(struct AFHBA_DEV *adev)
 	#if 0
 		dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
 		return -rc;
+	#else
+		dev_warn(pdev(adev), "iommu_attach_device failed -- should abort, but soldiering on...\n");
 	#endif
 	}
 	return rc;
