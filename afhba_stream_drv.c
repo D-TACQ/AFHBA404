@@ -1781,7 +1781,9 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	sdev->pid = 0;
 	if (sdev->user) kfree(sdev->user);
 
-	afhba_free_iommu(adev);
+	if (adev->iommu_dom){
+		afhba_free_iommu(adev);
+	}
 #ifdef CONFIG_GPU
 	afhba_free_gpumem(adev);
 #endif
