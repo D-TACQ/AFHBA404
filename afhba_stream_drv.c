@@ -1575,7 +1575,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		/* https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/dma-mapping.c#L1087 ..
 		 * well, it is for ARM anyway ..
 		 */
-		if ((rc = iommu_map(adev->iommu_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
 			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
@@ -1610,8 +1610,8 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
 		/* IOMMU_READ is DMA_TO_DEVICE */
-		if ((rc = iommu_map(adev->iommu_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
 			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
