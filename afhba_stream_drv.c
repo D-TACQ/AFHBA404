@@ -250,19 +250,19 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
               phys_addr_t paddr, uint64_t size, unsigned prot)
 {
-        struct iommu_mapping *mapping =
-                        (struct iommu_mapping*)kzalloc(sizeof(struct iommu_mapping), GFP_KERNEL);
-
         if (iommu_map(adev->iommu_dom, iova, paddr, size, prot)){
                 dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
                 return -EFAULT;
         }else{
-                INIT_LIST_HEAD(&mapping->list);
-                mapping->iova = iova;
-                mapping->paddr = paddr;
-                mapping->size = size;
-                mapping->prot = prot;
-                list_add_tail(&mapping->list, &adev->iommu_map_list);
+                struct iommu_mapping *saved_mapping =
+                                (struct iommu_mapping*)kzalloc(sizeof(struct iommu_mapping), GFP_KERNEL);
+
+                INIT_LIST_HEAD(&saved_mapping->list);
+                saved_mapping->iova = iova;
+                saved_mapping->paddr = paddr;
+                saved_mapping->size = size;
+                saved_mapping->prot = prot;
+                list_add_tail(&saved_mapping->list, &adev->iommu_map_list);
                 return 0;
         }
 }
@@ -270,18 +270,18 @@ int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
 
 void afhba_free_iommu(struct AFHBA_DEV *adev)
 {
-        struct iommu_mapping *entry;
+        struct iommu_mapping *saved_mapping;
         struct iommu_mapping *cursor;
-        list_for_each_entry_safe(entry, cursor, &adev->iommu_map_list, list){
-                size_t rc = iommu_unmap(adev->iommu_dom, entry->iova, entry->size);
+        list_for_each_entry_safe(saved_mapping, cursor, &adev->iommu_map_list, list){
+                size_t rc = iommu_unmap(adev->iommu_dom, saved_mapping->iova, saved_mapping->size);
                 if (rc == 0){
                         dev_info(pdev(adev), "%s(): iommu_unmap() - OK!\n", __FUNCTION__);
                 }else{
                         dev_err(pdev(adev), "%s(): iommu_unmap FAIL \n", __FUNCTION__);
                 }
 
-                list_del(&entry->list);
-                kfree(entry);
+                list_del(&saved_mapping->list);
+                kfree(saved_mapping);
         }
 }
 
