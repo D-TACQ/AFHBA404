@@ -1567,7 +1567,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
 
-	if (adev->iom_dom && host_llc_use_iommu_map){
+	if (adev->iommu_dom && host_llc_use_iommu_map){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
@@ -1575,7 +1575,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		/* https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/dma-mapping.c#L1087 ..
 		 * well, it is for ARM anyway ..
 		 */
-		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
+		if ((rc = iommu_map(adev->iommu_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
 			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
@@ -1606,12 +1606,12 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
 // trying to test regular x86 transfer with intel_iommu=1
-	if (host_llc_use_iommu_map && adev->iom_dom){
+	if (host_llc_use_iommu_map && adev->iommu_dom){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
 		/* IOMMU_READ is DMA_TO_DEVICE */
-		if ((rc = iommu_map(adev->iom_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
+		if ((rc = iommu_map(adev->iommu_dom, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
 			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
@@ -1671,21 +1671,21 @@ int iommu_init(struct AFHBA_DEV *adev)
         if (!iommu_present(&pci_bus_type)){
                 return 0;
         }
-        INIT_LIST_HEAD(&adev->map_list);
+        INIT_LIST_HEAD(&adev->iommu_map_list);
 
-        adev->iom_dom = iommu_domain_alloc(&pci_bus_type);
-        if (!adev->iom_dom){
+        adev->iommu_dom = iommu_domain_alloc(&pci_bus_type);
+        if (!adev->iommu_dom){
                 dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
                                                 adev->pci_dev->dev.bus->iommu_ops);
                 return -1;
         }
         dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
                         __FUNCTION__,
-                        adev->iom_dom->geometry.aperture_start,
-                        adev->iom_dom->geometry.aperture_end,
-                        adev->iom_dom->geometry.force_aperture
+                        adev->iommu_dom->geometry.aperture_start,
+                        adev->iommu_dom->geometry.aperture_end,
+                        adev->iommu_dom->geometry.force_aperture
                         );
-        if ((rc = iommu_attach_device(adev->iom_dom, &adev->pci_dev->dev)) != 0){
+        if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
                 dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
                                 __FUNCTION__,__LINE__, rc);
         #if 0
@@ -1704,7 +1704,7 @@ int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
         struct iommu_mapping *mapping =
                         (struct iommu_mapping*)kzalloc(sizeof(struct iommu_mapping), GFP_KERNEL);
 
-        if (iommu_map(adev->iom_dom, iova, paddr, size, prot)){
+        if (iommu_map(adev->iommu_dom, iova, paddr, size, prot)){
                 dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
                 return -EFAULT;
         }else{
@@ -1713,7 +1713,7 @@ int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
                 mapping->paddr = paddr;
                 mapping->size = size;
                 mapping->prot = prot;
-                list_add_tail(&mapping->list, &adev->map_list);
+                list_add_tail(&mapping->list, &adev->iommu_map_list);
                 return 0;
         }
 }
@@ -1723,8 +1723,8 @@ void afhba_free_iommu(struct AFHBA_DEV *adev)
 {
         struct iommu_mapping *entry;
         struct iommu_mapping *cursor;
-        list_for_each_entry_safe(entry, cursor, &adev->map_list, list){
-                size_t rc = iommu_unmap(adev->iom_dom, entry->iova, entry->size);
+        list_for_each_entry_safe(entry, cursor, &adev->iommu_map_list, list){
+                size_t rc = iommu_unmap(adev->iommu_dom, entry->iova, entry->size);
                 if (rc == 0){
                         dev_info(pdev(adev), "%s(): iommu_unmap() - OK!\n", __FUNCTION__);
                 }else{

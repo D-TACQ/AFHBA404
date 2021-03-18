@@ -167,8 +167,8 @@ struct AFHBA_DEV {
 	//For GPU functionality
 	struct gpumem gpumem;
 #endif
-	struct iommu_domain *iom_dom;
-	struct list_head map_list;
+	struct iommu_domain *iommu_dom;
+	struct list_head iommu_map_list;
 };
 
 #define SZM1(field)	(sizeof(field)-1)

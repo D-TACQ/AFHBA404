@@ -188,7 +188,7 @@ long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg)
 	struct gpudma_lock_t param;
 	long rc;
 
-	if (!adev->iom_dom){
+	if (!adev->iommu_dom){
 		dev_err(pdev(adev), "%s(): NO IOMMU\n", __FUNCTION__);
 		return -1;
 	}
