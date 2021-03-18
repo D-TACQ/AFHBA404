@@ -353,11 +353,13 @@ int afs_init_procfs(struct AFHBA_DEV *adev)
 
 	if ((rc = addHostBufferProcFiles(adev)) == 0 &&
 	    (rc = addAppBufferProcFiles(adev))  == 0 &&
+	    (rc = addIommuMapProcFile(adev))  	== 0 &&
 #ifdef CONFIG_GPU
-	    (rc = addGpuMemProcFile(adev))  == 0 	     &&
-	    (rc = addIommuMapProcFile(adev))  == 0 	     &&
+	    (rc = addGpuMemProcFile(adev))  	== 0 &&
 #endif
-	    (rc = addJobProcFile(adev) == 0) == 0){
+	    (rc = addJobProcFile(adev) 		== 0) == 0)
+
+	{
 		return 0;
 	}
 
