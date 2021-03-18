@@ -44,22 +44,6 @@ void free_nvp_callback(void *data)
 	dev_info(0, "%s(): stub - free on release\n", __FUNCTION__);
 }
 
-void afhba_free_iommu(struct AFHBA_DEV *adev)
-{
-	struct iommu_mapping *entry;
-	struct iommu_mapping *cursor;
-	list_for_each_entry_safe(entry, cursor, &adev->gpumem.map_list, list){
-		size_t rc = iommu_unmap(adev->iom_dom, entry->iova, entry->size);
-		if (rc == 0){
-			dev_info(pdev(adev), "%s(): iommu_unmap() - OK!\n", __FUNCTION__);
-		}else{
-			dev_err(pdev(adev), "%s(): iommu_unmap FAIL \n", __FUNCTION__);
-		}
-
-		list_del(&entry->list);
-		kfree(entry);
-	}
-}
 
 void afhba_free_gpumem(struct AFHBA_DEV *adev)
 {
@@ -165,62 +149,8 @@ void gpumem_init(struct AFHBA_DEV *adev)
 	gdev->proc = 0;
 	sema_init(&gdev->sem, 1);
 	INIT_LIST_HEAD(&gdev->table_list);
-	INIT_LIST_HEAD(&gdev->map_list);
 }
 
-int iommu_init(struct AFHBA_DEV *adev)
-{
-	int rc = 0;
-
-	if (!iommu_present(&pci_bus_type)){
-		return 0;
-	}
-
-	adev->iom_dom = iommu_domain_alloc(&pci_bus_type);
-	if (!adev->iom_dom){
-		dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
-						adev->pci_dev->dev.bus->iommu_ops);
-		return -1;
-	}
-	dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
-			__FUNCTION__,
-			adev->iom_dom->geometry.aperture_start,
-			adev->iom_dom->geometry.aperture_end,
-			adev->iom_dom->geometry.force_aperture
-			);
-	if ((rc = iommu_attach_device(adev->iom_dom, &adev->pci_dev->dev)) != 0){
-		dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
-				__FUNCTION__,__LINE__, rc);
-	#if 0
-		dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
-		return -rc;
-	#else
-		dev_warn(pdev(adev), "iommu_attach_device failed -- should abort, but soldiering on...\n");
-	#endif
-	}
-	return rc;
-}
-
-
-int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
-	      phys_addr_t paddr, uint64_t size, unsigned prot)
-{
-	struct iommu_mapping *mapping =
-			(struct iommu_mapping*)kzalloc(sizeof(struct iommu_mapping), GFP_KERNEL);
-
-	if (iommu_map(adev->iom_dom, iova, paddr, size, prot)){
-		dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
-		return -EFAULT;
-	}else{
-		INIT_LIST_HEAD(&mapping->list);
-		mapping->iova = iova;
-		mapping->paddr = paddr;
-		mapping->size = size;
-		mapping->prot = prot;
-		list_add_tail(&mapping->list, &adev->gpumem.map_list);
-		return 0;
-	}
-}
 long __afhba_gpumem_lock(
 		struct AFHBA_DEV *adev, const char* name,
 		unsigned long iova, uint64_t addr, uint64_t size, unsigned prot)
@@ -334,45 +264,6 @@ do_exit:
     return (long) error;
 }
 
-
-/* @TODO: warning ASSUMES this table struct printout fits 4K */
-static int iommu_proc_show(struct seq_file *m, void *v)
-{
-	struct file *file = (struct file *)m->private;
-	struct AFHBA_DEV *adev = PDE_DATA(file_inode(file));
-	struct iommu_mapping *cursor;
-
-	list_for_each_entry(cursor, &adev->gpumem.map_list, list){
-		seq_printf(m, "iova 0x%08lx -> 0x%016llx len:%lx dir:%s\n",
-				cursor->iova, cursor->paddr, cursor->size,
-					cursor->prot==IOMMU_WRITE? "IOMMU_WRITE":
-					cursor->prot==IOMMU_READ?  "IOMMU_READ" :
-					"IOMMU_ERROR");
-	}
-	return 0;
-}
-static int iommu_proc_open(struct inode *inode, struct file *file)
-{
-	return single_open(file, iommu_proc_show, file);
-}
-
-int addIommuMapProcFile(struct AFHBA_DEV *adev)
-{
-	static struct file_operations iommu_proc_fops = {
-			.owner = THIS_MODULE,
-			.open = iommu_proc_open,
-			.read = seq_read,
-			.llseek = seq_lseek,
-			.release = single_release
-	};
-	if (proc_create_data("IOMMU_maps", S_IRUGO,
-			adev->proc_dir_root, &iommu_proc_fops, adev) != 0){
-		return 0;
-	}else{
-		dev_err(pdev(adev), "Failed to create entry");
-		return -1;
-	}
-}
 
 /* @TODO: warning ASSUMES this table struct printout fits 4K */
 static int gpu_proc_show(struct seq_file *m, void *v)

@@ -113,6 +113,15 @@ struct HostBuffer {
 
 struct AFHBA_STREAM_DEV;
 
+struct iommu_mapping {
+	struct iommu_domain *iom_dom;
+        struct list_head list;
+        unsigned long iova;
+        phys_addr_t paddr;
+        size_t size;
+        int prot;
+};
+
 struct AFHBA_DEV {
 	char name[16];
 	char mon_name[16];
@@ -157,8 +166,9 @@ struct AFHBA_DEV {
 #ifdef CONFIG_GPU
 	//For GPU functionality
 	struct gpumem gpumem;
-	struct iommu_domain *iom_dom;
 #endif
+	struct iommu_domain *iom_dom;
+	struct list_head map_list;
 };
 
 #define SZM1(field)	(sizeof(field)-1)

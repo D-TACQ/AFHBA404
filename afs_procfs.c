@@ -298,6 +298,48 @@ static int addJobProcFile(struct AFHBA_DEV *adev)
 		return -1;
 	}
 }
+
+
+/* @TODO: warning ASSUMES this table struct printout fits 4K */
+static int iommu_proc_show(struct seq_file *m, void *v)
+{
+        struct file *file = (struct file *)m->private;
+        struct AFHBA_DEV *adev = PDE_DATA(file_inode(file));
+        struct iommu_mapping *cursor;
+
+        list_for_each_entry(cursor, &adev->map_list, list){
+                seq_printf(m, "iova 0x%08lx -> 0x%016llx len:%lx dir:%s\n",
+                                cursor->iova, cursor->paddr, cursor->size,
+                                        cursor->prot==IOMMU_WRITE? "IOMMU_WRITE":
+                                        cursor->prot==IOMMU_READ?  "IOMMU_READ" :
+                                        "IOMMU_ERROR");
+        }
+        return 0;
+}
+static int iommu_proc_open(struct inode *inode, struct file *file)
+{
+        return single_open(file, iommu_proc_show, file);
+}
+
+int addIommuMapProcFile(struct AFHBA_DEV *adev)
+{
+        static struct file_operations iommu_proc_fops = {
+                        .owner = THIS_MODULE,
+                        .open = iommu_proc_open,
+                        .read = seq_read,
+                        .llseek = seq_lseek,
+                        .release = single_release
+        };
+        if (proc_create_data("IOMMU_maps", S_IRUGO,
+                        adev->proc_dir_root, &iommu_proc_fops, adev) != 0){
+                return 0;
+        }else{
+                dev_err(pdev(adev), "Failed to create entry");
+                return -1;
+        }
+}
+
+
 int afs_init_procfs(struct AFHBA_DEV *adev)
 {
 	int rc;
