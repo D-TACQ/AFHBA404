@@ -27,7 +27,8 @@ EXT_UCLK = int(os.getenv("EXT_UCLK", "0"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
-
+# Default thomson buffer length is 4096. Now user configurable.
+BUFLEN = int(os.getenv("BUFLEN", "4096"))
 
 def hit_resets(svc):
     for knob in svc.help():
@@ -99,8 +100,7 @@ def init_ai(uut):
     uut.s1.clk = '1,0,1'
     uut.s0.run0
     ssb = int(uut.s0.ssb)
-    #ssb = int(uut.s0.NCHAN)*2
-    uut.s0.bufferlen = lcm(ssb, 4096)
+    uut.s0.bufferlen = BUFLEN
 
 
 def set_ext_uclk_counter(uuts):
