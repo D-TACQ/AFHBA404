@@ -1663,6 +1663,48 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	return 0;
 }
 
+
+
+/**
+ * iommu_init()
+ *  lazy init : will return quickly if not required or already done.
+ * MUST be AFTER buffer allocation.
+ */
+int iommu_init(struct AFHBA_DEV *adev)
+{
+        int rc = 0;
+
+        if (!iommu_present(&pci_bus_type)){
+                return 0;
+        }else if (adev->iommu_dom){
+        	return 0;
+        }
+
+        INIT_LIST_HEAD(&adev->iommu_map_list);
+
+        adev->iommu_dom = iommu_domain_alloc(&pci_bus_type);
+        if (!adev->iommu_dom){
+                dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
+                                                adev->pci_dev->dev.bus->iommu_ops);
+                return -1;
+        }
+        dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
+                        __FUNCTION__,
+                        adev->iommu_dom->geometry.aperture_start,
+                        adev->iommu_dom->geometry.aperture_end,
+                        adev->iommu_dom->geometry.force_aperture
+                        );
+        if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
+                dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
+                                __FUNCTION__,__LINE__, rc);
+                dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
+                return -rc;
+        }
+        dev_info(pdev(adev), "%s iommu_attach_device() SUCCESS", __FUNCTION__);
+        return rc;
+}
+
+
 int afs_dma_open(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
@@ -1670,6 +1712,8 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	int ii;
 
+
+	iommu_init(adev);
 	dev_dbg(pdev(adev), "45: DMA open");
 
 	/** @@todo protect with lock ? */
@@ -1702,42 +1746,6 @@ int afs_dma_open(struct inode *inode, struct file *file)
 	dev_dbg(pdev(adev), "99");
 	return 0;
 }
-
-
-int iommu_init(struct AFHBA_DEV *adev)
-{
-        int rc = 0;
-
-        if (!iommu_present(&pci_bus_type)){
-                return 0;
-        }
-        INIT_LIST_HEAD(&adev->iommu_map_list);
-
-        adev->iommu_dom = iommu_domain_alloc(&pci_bus_type);
-        if (!adev->iommu_dom){
-                dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
-                                                adev->pci_dev->dev.bus->iommu_ops);
-                return -1;
-        }
-        dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
-                        __FUNCTION__,
-                        adev->iommu_dom->geometry.aperture_start,
-                        adev->iommu_dom->geometry.aperture_end,
-                        adev->iommu_dom->geometry.force_aperture
-                        );
-        if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
-                dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
-                                __FUNCTION__,__LINE__, rc);
-        #if 0
-                dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
-                return -rc;
-        #else
-                dev_warn(pdev(adev), "iommu_attach_device failed -- should abort, but soldiering on...\n");
-        #endif
-        }
-        return rc;
-}
-
 
 
 int afs_dma_release(struct inode *inode, struct file *file)
@@ -2451,7 +2459,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 #warning CONFIG_GPU set
 	gpumem_init(adev);
 #endif
-	iommu_init(adev);
+
 	afs_init_buffers(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
