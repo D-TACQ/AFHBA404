@@ -1680,7 +1680,7 @@ int iommu_init(struct AFHBA_DEV *adev)
         	return 0;
         }
 
-        INIT_LIST_HEAD(&adev->iommu_map_list);
+
 
         adev->iommu_dom = iommu_domain_alloc(&pci_bus_type);
         if (!adev->iommu_dom){
@@ -2459,7 +2459,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 #warning CONFIG_GPU set
 	gpumem_init(adev);
 #endif
-
+	INIT_LIST_HEAD(&adev->iommu_map_list);
 	afs_init_buffers(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
