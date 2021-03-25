@@ -274,7 +274,7 @@ void afhba_free_iommu(struct AFHBA_DEV *adev)
         struct iommu_mapping *cursor;
         list_for_each_entry_safe(saved_mapping, cursor, &adev->iommu_map_list, list){
                 size_t rc = iommu_unmap(adev->iommu_dom, saved_mapping->iova, saved_mapping->size);
-                if (rc == 0){
+                if (rc >= 0){
                         dev_info(pdev(adev), "%s(): iommu_unmap() - OK!\n", __FUNCTION__);
                 }else{
                         dev_err(pdev(adev), "%s(): iommu_unmap FAIL \n", __FUNCTION__);

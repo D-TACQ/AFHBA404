@@ -307,6 +307,11 @@ static int iommu_proc_show(struct seq_file *m, void *v)
         struct AFHBA_DEV *adev = PDE_DATA(file_inode(file));
         struct iommu_mapping *cursor;
 
+        if (adev->iommu_map_list == 0){
+        	seq_printf(m, "lazy initialize has not been done\n");
+        	return 0;
+        }
+
         list_for_each_entry(cursor, &adev->iommu_map_list, list){
                 seq_printf(m, "iova 0x%08lx -> 0x%016llx len:%lx dir:%s\n",
                                 cursor->iova, cursor->paddr, cursor->size,
