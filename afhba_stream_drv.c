@@ -138,6 +138,22 @@ int host_llc_use_iommu_map;
 module_param(host_llc_use_iommu_map, int, 0644);
 MODULE_PARM_DESC(host_llc_use_iommu_map, "if IOMMU is present, try a 1:1 mapping for HOST transfer");
 
+#if 0
+#define IOMMU_READ	(1 << 0)
+#define IOMMU_WRITE	(1 << 1)
+#define IOMMU_CACHE	(1 << 2) /* DMA cache coherency */
+#define IOMMU_NOEXEC	(1 << 3)
+#define IOMMU_MMIO	(1 << 4) /* e.g. things like MSI doorbells */
+#endif
+
+int vi_perms = IOMMU_WRITE;
+module_param(vi_perms, int, 0644);
+MODULE_PARM_DESC(vi_perms, "VI permissions: 2: WRITE 4:SNOOP");
+
+int vo_perms = IOMMU_READ;
+module_param(vo_perms, int, 0644);
+MODULE_PARM_DESC(vo_perms, "VI permissions: 1: READ 4:SNOOP");
+
 
 static int getOrder(int len)
 {
@@ -1615,7 +1631,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		/* https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/dma-mapping.c#L1087 ..
 		 * well, it is for ARM anyway ..
 		 */
-		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, IOMMU_WRITE)) != 0){
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, vi_perms)) != 0){
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
 			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
@@ -1650,7 +1666,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
 
-		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, IOMMU_READ)) != 0){
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, vo_perms)) != 0){
 		/* IOMMU_READ is DMA_TO_DEVICE */
 			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
 		}else{
