@@ -1065,9 +1065,9 @@ static void init_histo_buffers(struct AFHBA_STREAM_DEV* sdev)
 int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	struct HostBuffer *hb;
+	struct HostBuffer *hb = sdev->hbx;
 	int order = getOrder(buffer_len);
-	int ii;
+	int ii = 0;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
@@ -1084,8 +1084,8 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
-
-	for (hb = sdev->hbx, ii = 0; ii < 2; ++ii, ++hb){
+#if 0
+	for (; ii < 2; ++ii, ++hb){
 		dma_addr_t dma_handle;
 
 		hb->va = (void*)dma_alloc_coherent(
@@ -1119,6 +1119,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 		    ii, hb->va, hb->pa, hb->len, hb->descr);
 		list_add_tail(&hb->list, &sdev->bp_empties.list);
 	}
+#endif
 	for (; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
@@ -1711,13 +1712,16 @@ int iommu_init(struct AFHBA_DEV *adev)
                         adev->iommu_dom->geometry.force_aperture
                         );
 #if 0
-        rc = iommu_domain_window_enable(adev->iommu_domain, 0, 0, 1ULL << 36,
+        rc = iommu_domain_window_enable(adev->iommu_dom, 0, 0, 1ULL << 36,
         					 IOMMU_READ | IOMMU_WRITE);
         if (rc < 0) {
-        	dev_err(dev, "%s(): iommu_domain_window_enable() = %d",
-        		__func__, ret);
+        	dev_err(pdev(adev), "%s(): iommu_domain_window_enable() = %d",
+        		__func__, rc);
 
-        }
+        }else{
+		dev_info(pdev(adev), "%s iommu_domain_window_enable() SUCCESS", __FUNCTION__);
+	}
+
 #endif
         if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
                 dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
