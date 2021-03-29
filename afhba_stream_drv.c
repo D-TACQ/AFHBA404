@@ -128,6 +128,9 @@ module_param(max_empty_backlog_check, int , 0644);
 MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of deck, set to two to check skips");
 
 
+int max_coherent = 2;
+module_param(max_coherent, int , 0644);
+MODULE_PARM_DESC(max_coherent, "allocate this many coherent DMA buffers");
 
 int use_llc_multi = 0;
 module_param(use_llc_multi, int, 0644);
@@ -1084,8 +1087,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
-#if 0
-	for (; ii < 2; ++ii, ++hb){
+	for (; ii < max_coherent; ++ii, ++hb){
 		dma_addr_t dma_handle;
 
 		hb->va = (void*)dma_alloc_coherent(
@@ -1119,7 +1121,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 		    ii, hb->va, hb->pa, hb->len, hb->descr);
 		list_add_tail(&hb->list, &sdev->bp_empties.list);
 	}
-#endif
+
 	for (; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
