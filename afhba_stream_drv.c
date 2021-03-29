@@ -1062,12 +1062,14 @@ static void init_histo_buffers(struct AFHBA_STREAM_DEV* sdev)
 	}
 }
 
+#define MAXCOHERENT	2
+
 int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	struct HostBuffer *hb;
+	struct HostBuffer *hb = sdev->hbx;
 	int order = getOrder(buffer_len);
-	int ii;
+	int ii = 0;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
@@ -1085,7 +1087,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
 
-	for (hb = sdev->hbx, ii = 0; ii < 2; ++ii, ++hb){
+	for (; ii < MAXCOHERENT; ++ii, ++hb){
 		dma_addr_t dma_handle;
 
 		hb->va = (void*)dma_alloc_coherent(
