@@ -1710,6 +1710,15 @@ int iommu_init(struct AFHBA_DEV *adev)
                         adev->iommu_dom->geometry.aperture_end,
                         adev->iommu_dom->geometry.force_aperture
                         );
+#if 0
+        rc = iommu_domain_window_enable(adev->iommu_domain, 0, 0, 1ULL << 36,
+        					 IOMMU_READ | IOMMU_WRITE);
+        if (rc < 0) {
+        	dev_err(dev, "%s(): iommu_domain_window_enable() = %d",
+        		__func__, ret);
+
+        }
+#endif
         if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
                 dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
                                 __FUNCTION__,__LINE__, rc);
