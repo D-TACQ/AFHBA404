@@ -48,7 +48,7 @@ POST=${POST:-40000} 	# Number of samples to capture
 CLK=${CLK:-100000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-0}
 SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
-AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
+AFFINITY=${AFFINITY:-2}        # cpu affinity. 0=none, 1=use cpu0 2=use cpu1, for example
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
