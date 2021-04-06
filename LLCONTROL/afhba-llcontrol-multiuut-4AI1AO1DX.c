@@ -244,6 +244,7 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 void _disconnect(struct Dev* dev)
 {
+	free(dev->lbuf);
 	munmap(dev->host_buffer, HB_LEN);
 	close(dev->fd);
 }
@@ -262,7 +263,7 @@ void disconnect()
 }
 void setup()
 {
-	setup_logging(devnum);
+
 	get_connected();
 	goRealTime();
 }
@@ -340,6 +341,7 @@ int main(int argc, char* argv[])
 {
 	int shot = 0;
 	ui(argc, argv);
+	setup_logging(devnum);
 
 	if (maxshots == 1){
 		setup();
