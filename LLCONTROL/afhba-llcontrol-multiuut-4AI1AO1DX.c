@@ -280,6 +280,7 @@ void dio_watchdog(short *ao)
         unsigned* dox = (unsigned *)ao;
 
 	dox[DO_IX] ^= WD_BIT;
+        ao[0] ^= WD_BIT;
 }
 
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
