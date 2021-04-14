@@ -269,7 +269,7 @@ def get_json_vi_len(uut_json):
     return AI + DI + SP
 
 
-def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut):
+def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name):
     CRED = "\x1b[1;31m"
     CEND = "\33[0m"
     agg_vector = calculate_vector_length(uut, AISITES, DIOSITES, PWMSITES)
@@ -281,8 +281,8 @@ def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut):
     json_dist_vector = get_json_vo_len(uut_json)
 
     if total_agg_vector != json_agg_vector:
-        print(CRED, "Problem found: UUT aggregator different from JSON. Please check JSON.", CEND)
-        print(CRED, "Aggregator vector: {}, json aggregator vector: {}".format(agg_vector, json_agg_vector), CEND)
+        print(CRED, "Problem found: UUT: {} aggregator different from JSON. Please check JSON.".format(uut_name), CEND)
+        print(CRED, "Aggregator vector: {}, json aggregator vector: {}".format(total_agg_vector, json_agg_vector), CEND)
     if dist_vector != json_dist_vector:
         print(CRED, "Problem found: UUT distributor different from JSON. Please check JSON.", CEND)
         print(CRED, "Distributor vector: {}, json distributor vector: {}".format(dist_vector, json_dist_vector), CEND)
@@ -290,13 +290,14 @@ def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut):
 
 
 def config_auto(args, uut, uut_json=None):
-
+    
+    uut_name = uut
     uut = acq400_hapi.Acq2106(uut)
 
     AISITES, AOSITES, DIOSITES, PWMSITES = enum_sites(uut, uut_json)
     sod = True if 'sod' in uut_json['type'] else False
     
-    verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut)
+    verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name)
 
     if len(AISITES) != 0:
         config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod)
