@@ -97,7 +97,6 @@ def calculate_vector_length(uut, SITES, DIOSITES, PWMSITES):
         for site in DIOSITES:
             vector_length += 64
 
-
     return vector_length
 
 
@@ -246,12 +245,58 @@ def enum_sites(uut, uut_json=None):
     return AISITES, AOSITES, DIOSITES, PWMSITES
 
 
-def config_auto(args, uut, uut_json=None):
+def get_json_vo_len(uut_json):
+    AO = 0
+    DO = 0
+    if 'AO16' in uut_json['VO'].keys():
+        AO += uut_json['VO']['AO16'] * 2
+    if 'DO32' in uut_json['VO'].keys():
+        DO += uut_json['VO']['DO32'] * 4
+    return AO + DO
 
+
+def get_json_vi_len(uut_json):
+    AI = 0
+    DI = 0
+    SP = 0
+    if 'AI16' in uut_json['VI'].keys():
+        AI += uut_json['VI']['AI16'] * 2
+    if 'DI32' in uut_json['VI'].keys():
+        DI += uut_json['VI']['DI32'] * 4
+    if 'SP32' in uut_json['VI'].keys():
+        SP += uut_json['VI']['SP32'] * 4
+    return AI + DI + SP
+
+
+def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name):
+    CRED = "\x1b[1;31m"
+    CEND = "\33[0m"
+    agg_vector = calculate_vector_length(uut, AISITES, DIOSITES, PWMSITES)
+    spad = calculate_spad(agg_vector)
+    total_agg_vector = agg_vector + (spad * 4)
+    dist_vector = calculate_vector_length(uut, AOSITES, DIOSITES, PWMSITES)
+
+    json_agg_vector = get_json_vi_len(uut_json)
+    json_dist_vector = get_json_vo_len(uut_json)
+
+    if total_agg_vector != json_agg_vector:
+        print(CRED, "Problem found: UUT: {} aggregator different from JSON. Please check JSON.".format(uut_name), CEND)
+        print(CRED, "Aggregator vector: {}, json aggregator vector: {}".format(total_agg_vector, json_agg_vector), CEND)
+    if dist_vector != json_dist_vector:
+        print(CRED, "Problem found: UUT distributor different from JSON. Please check JSON.", CEND)
+        print(CRED, "Distributor vector: {}, json distributor vector: {}".format(dist_vector, json_dist_vector), CEND)
+    return None
+
+
+def config_auto(args, uut, uut_json=None):
+    
+    uut_name = uut
     uut = acq400_hapi.Acq2106(uut)
 
     AISITES, AOSITES, DIOSITES, PWMSITES = enum_sites(uut, uut_json)
     sod = True if 'sod' in uut_json['type'] else False
+    
+    verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name)
 
     if len(AISITES) != 0:
         config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod)
