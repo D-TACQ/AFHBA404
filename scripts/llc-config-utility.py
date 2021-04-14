@@ -150,7 +150,6 @@ def config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
         # set it to zero. The reason we don't need this for SPAD is that we
         # encode some useful information in there.
         TCAN = 0
-    # If there are AISITES in the system then use port B for AO+DO. Else port A.
     XOCOMMS = 'A' if len(AISITES) == 0 else 'A'
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
