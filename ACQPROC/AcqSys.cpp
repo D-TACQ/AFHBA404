@@ -152,18 +152,10 @@ void ACQ::arm(int nsamples)
 	cerr << "placeholder: ARM unit " << getName() << " now" <<endl;
 }
 
-int get_int(json j, int default_value = 0)
-{
-	try {
-		return	j.get<int>();
-	} catch (std::exception& e){
-		return default_value;
-	}
-}
 
-HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo):
-		devnum(_uuts[0]->devnum&~0x3),
-		IO("HBA"+to_string(devnum), _vi, _vo),
+HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
+		devnum(_devnum),
+		IO("HBA"+to_string(_devnum), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
 {
 	for (auto uut: uuts){
@@ -325,6 +317,15 @@ bool strstr(string haystack, string needle)
 }
 
 
+int get_int(json j, int default_value = 0)
+{
+       try {
+               return  j.get<int>();
+       } catch (std::exception& e){
+               return default_value;
+       }
+}
+
 /** HBA::Create() factory function. */
 HBA& HBA::create(const char* json_def, int _maxsam)
 {
@@ -393,7 +394,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		++port;
 		++iuut;
 	}
-	the_hba = new HBA(uuts, VI_sys, VO_sys);
+	the_hba = new HBA(hba_devnum, uuts, VI_sys, VO_sys);
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }
