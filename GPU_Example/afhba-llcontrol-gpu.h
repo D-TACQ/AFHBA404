@@ -42,7 +42,7 @@
 #define HTS_MIN_BUFFER 4096
 #define NCHAN 16
 
-#define NSAMP     1000 // How many buffer loops to go through
+#define NSAMP     1000000 // How many buffer loops to go through
 #define NCHAN     16
 #define NSHORTS		2048
 #define VI_LEN 		(NSHORTS*sizeof(short))
