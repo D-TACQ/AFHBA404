@@ -258,4 +258,6 @@ static inline char aurora_id(struct AFHBA_DEV *adev)
 	return adev->sfp - SFP_A + 'A';
 }
 
+int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
+              phys_addr_t paddr, uint64_t size, unsigned prot);
 #endif /* AFHBA_STREAM_DRV_H_ */

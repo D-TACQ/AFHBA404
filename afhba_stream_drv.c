@@ -1068,13 +1068,13 @@ static void init_histo_buffers(struct AFHBA_STREAM_DEV* sdev)
 int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	struct HostBuffer *hb = sdev->hbx;
+	struct HostBuffer *hb;
 	int order = getOrder(buffer_len);
 	int ii = 0;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
-	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
+	hb = sdev->hbx = kzalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
 	INIT_LIST_HEAD(&sdev->bp_full.list);

@@ -11,8 +11,8 @@ CONFIG_MODULE_SIG=n
 EXTRA_CFLAGS += -DCONFIG_SPI
 
 # enable next two lines for GPU
-#EXTRA_CFLAGS += -DCONFIG_GPU
-#EXTRA_GPU = afhba_gpu.o
+EXTRA_CFLAGS += -DCONFIG_GPU
+EXTRA_GPU = afhba_gpu.o
 
 # default build is the local kernel.
 # build other kernels like this example:
