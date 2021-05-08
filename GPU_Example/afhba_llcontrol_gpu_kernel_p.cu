@@ -2,22 +2,25 @@
 
 // hello
 
-#define NSEC_PER_CLK  10		// SWAG
+#define NSEC_PER_CLK  1		// SWAG
 
 
 __device__ void nsleep(unsigned nsec) {
-	clock_t start_clock = clock();
-        clock_t clock_count = nsec/NSEC_PER_CLK;
-        while (clock() - start_clock  < clock_count) {
-		;
+	long long start_clock = clock64();
+        long long clock_count = nsec/NSEC_PER_CLK;
+//	printf("nsleep: nsec:%u clock_count:%llu\n", nsec, clock_count);
+	for (unsigned pollcat = 0; clock64() - start_clock  < clock_count; ) {
+		if (++pollcat&0x00ff == 0){
+			printf("nsleep pc:%u start:%llu now:%llu end:%llu\n", pollcat, start_clock, clock64() - start_clock,  clock_count);
+		}
         }
 }
 
 __device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
 {
 	unsigned tl;
-	for (int pollcat = 0; (tl = *tlp) == tl0; ){
-		if ((++pollcat&0xffff) == 0){
+	for (unsigned pollcat = 0; (tl = *tlp) == tl0; ){
+		if ((++pollcat&0xfff) == 0){
                 	printf("ii:%10d pollcat:%08x nothing to see at %p %08x %04x %04x %04x %04x\n",
                                         ii, pollcat, tlp, *tlp, pai0[0]&0xffff, pai0[1]&0xffff, pai0[2]&0xffff, pai0[3]&0xffff );
                 }else{
@@ -38,7 +41,7 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
   int proc_number = blockIdx.x*blockDim.x + threadIdx.x;
   bool proc0 = (proc_number==0);
 
-  printf("Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
+  printf("%d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
   unsigned tl0 = *tlatch;
   unsigned tl;

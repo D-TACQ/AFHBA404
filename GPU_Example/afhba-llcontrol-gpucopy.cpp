@@ -7,9 +7,6 @@
  *  A simple gpu example for a standard acq2106 LLC system.
  */
 
-// Don't include the gpu header file as there is PWM specific code in there.
-#include "afhba-llcontrol-gpu.h"
-
 #include "afhba-llcontrol-gpucopy.h"
 #include "afhba-llcontrol-common.h"
 
@@ -155,13 +152,13 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 
   printf("DEBUG 2: Pre-ioctl\n");
 
-	printf("%p \n", lock.addr_ai);
-	printf("%p \n", lock.size_ai);
-	printf("%p \n", lock.ind_ai);
+	printf("%lu \n", lock.addr_ai);
+	printf("%lu \n", lock.size_ai);
+	printf("%u \n", lock.ind_ai);
 
-	printf("%p \n", lock.addr_ao);
-	printf("%p \n", lock.size_ao);
-	printf("%p \n", lock.ind_ao);
+	printf("%lu \n", lock.addr_ao);
+	printf("%lu \n", lock.size_ao);
+	printf("%u \n", lock.ind_ao);
 
   res = ioctl(fd, AFHBA_GPUMEM_LOCK, &lock);
   if (res<0){
@@ -203,13 +200,13 @@ int setup() {
 	xllc_def_ai.len = samples_buffer * VI_LEN;
 
 
-	printf("%p \n", lock.addr_ai);
-	printf("%p \n", lock.size_ai);
-	printf("%p \n", lock.ind_ai);
+	printf("%lu \n", lock.addr_ai);
+	printf("%lu \n", lock.size_ai);
+	printf("%u \n", lock.ind_ai);
 
-	printf("%p \n", lock.addr_ao);
-	printf("%p \n", lock.size_ao);
-	printf("%p \n", lock.ind_ao);
+	printf("%lu \n", lock.addr_ao);
+	printf("%lu \n", lock.size_ao);
+	printf("%u \n", lock.ind_ao);
 
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ao)){
 			perror("ioctl AFHBA_START_AO_LLC");
@@ -229,7 +226,6 @@ int setup() {
 
 
 void prepare_gpu() { // Allocates memory for CPU-GPU communication
-  nsamples = NSAMP;
   // tdata is the total log of digitizer data, initialize as zeros
   tdata_size = NSHORTS*(nsamples+1)*sizeof(short);
   tdata_cpu = (short *)malloc(tdata_size);
@@ -254,8 +250,16 @@ int closedown(){
 }
 
 
+void ui(int argc, char *argv[])
+{
+	if (argc > 1){
+		nsamples = atoi(argv[1]);
+	}
+}
+
 int main(int argc, char *argv[]) {
 	printf("Starting now...\n");
+	ui(argc, argv);
 
 	printf("Starting setup now.\n");
 	setup();

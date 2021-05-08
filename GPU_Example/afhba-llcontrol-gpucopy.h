@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 
-#define NSAMP     1000000 // How many buffer loops to go through
 #define NCHAN     128
 #define AO_CHAN   32
 #define SPAD_LEN  32
