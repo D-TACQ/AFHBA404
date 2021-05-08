@@ -2,8 +2,30 @@
 
 // hello
 
-#define NSEC 200
+#define NSEC_PER_CLK  10		// SWAG
 
+
+__device__ void nsleep(unsigned nsec) {
+	clock_t start_clock = clock();
+        clock_t clock_count = nsec/NSEC_PER_CLK;
+        while (clock() - start_clock  < clock_count) {
+		;
+        }
+}
+
+__device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
+{
+	unsigned tl;
+	for (int pollcat = 0; (tl = *tlp) == tl0; ){
+		if ((++pollcat&0xffff) == 0){
+                	printf("ii:%10d pollcat:%08x nothing to see at %p %08x %04x %04x %04x %04x\n",
+                                        ii, pollcat, tlp, *tlp, pai0[0]&0xffff, pai0[1]&0xffff, pai0[2]&0xffff, pai0[3]&0xffff );
+                }else{
+			nsleep(1000);
+		}
+	}
+	return tl;
+}
 
 __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
                               unsigned * volatile ao_buffer_ptr,
@@ -13,8 +35,10 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
   short * pai0 = (short*)ai_buffer_ptr;
   unsigned * pvi = (unsigned*)ai_buffer_ptr;
   short * pao0 = (short*)ao_buffer_ptr;
+  int proc_number = blockIdx.x*blockDim.x + threadIdx.x;
+  bool proc0 = (proc_number==0);
 
-  printf("Starting data loop now! %d cycles NCHAN %d\n", nCycles, NCHAN);
+  printf("Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
   unsigned tl0 = *tlatch;
   unsigned tl;
@@ -25,27 +49,17 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
 #endif
 
   for (int ii = 0; ii < nCycles; ii++) {
-      int pollcat;
-      for (pollcat = 0; (tl = *tlatch) == tl0; ){
-	     	if ((++pollcat&0xfffff) == 0){
-			printf("ii:%10d pollcat:%08x nothing to see at %p %08x %04x %04x %04x %04x\n", 
-					ii, pollcat, tlatch, *tlatch, pai0[0]&0xffff, pai0[1]&0xffff, pai0[2]&0xffff, pai0[3]&0xffff );
-		}
-		{
-		clock_t start_clock = clock();
-		clock_t clock_offset = 0;
-		clock_t clock_count = NSEC/10;
-		while (clock_offset < clock_count) {
-			clock_offset = clock() - start_clock;
-	    	}
-		}
-      }
-      for (int ic = 0; ic < 32; ++ic){
-	pao0[ic] = *pai0;
-      }
-#if 0      
-      if (ii%10000 == 0){
-		printf("Cycle: %10d tl:%10u tl0 %10u pollcat:%d\n", ii, tl, tl0, pollcat);
+	if (proc0){
+		tl = wait_sample(ii, tlatch, tl0, pai0);
+	}
+      	pao0[0] = pai0[0] *.5 ;
+
+	for (int ic = 1; ic < 32; ++ic){
+		pao0[ic] = pai0[32+ic-1] * 1.02;
+	}
+#if 1      
+      if (ii%40000 == 0){
+		printf("Cycle: %10d tl:%10u tl0 %10u\n", ii, tl, tl0);
 	      	for (int iw = 0; iw < 80; ++iw){
 			printf("%08x%c", pvi[iw], iw%16==15? '\n': ' ');
 	      	}
