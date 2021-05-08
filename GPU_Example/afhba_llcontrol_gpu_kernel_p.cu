@@ -45,35 +45,31 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
 
   unsigned tl0 = *tlatch;
   unsigned tl;
-#if 0
-  for (int ii = 0; ii < 16; ii++) {
-      printf("ai[%d] %p 0x%04x\n", ii, pai0+ii, pai0[ii]);
-  }
-#endif
 
   for (int ii = 0; ii < nCycles; ii++) {
 	if (proc0){
 		tl = wait_sample(ii, tlatch, tl0, pai0);
 	}
-      	pao0[0] = pai0[0] *.5 ;
-
-	for (int ic = 1; ic < 32; ++ic){
-		pao0[ic] = pai0[32+ic-1] * 1.02;
+        __syncthreads();
+	if (proc0){
+	      	pao0[0] = pai0[0] *.5 ;
+	      	tl0 = tl;
+	}else{
+		pao0[proc_number] = pai0[32+proc_number-1] * 1.02;
 	}
 #if 1      
-      if (ii%40000 == 0){
+      if (proc0 && ii%40000 == 0){
 		printf("Cycle: %10d tl:%10u tl0 %10u\n", ii, tl, tl0);
 	      	for (int iw = 0; iw < 80; ++iw){
 			printf("%08x%c", pvi[iw], iw%16==15? '\n': ' ');
 	      	}
       }
-#endif      
-      tl0 = tl;
+#endif
+       __syncthreads();
   }
 
 
 
-  __syncthreads();
   return;
 }
 
@@ -88,6 +84,6 @@ void llcontrol_gpu_example_dummy(void * volatile ai_buffer_ptr,
                            short * total_data,
                            int nCycles){
   //Wrapper to call the CUDA kernel
-  llcontrol_gpu_dummy<<<1,1>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, nCycles);
+  llcontrol_gpu_dummy<<<1,32>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, nCycles);
   return;
 }
