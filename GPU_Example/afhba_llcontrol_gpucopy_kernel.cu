@@ -1,7 +1,5 @@
 #include "afhba-llcontrol-gpucopy.h"
 
-// hello
-
 #define NSEC_PER_CLK  1		// SWAG
 #define DEBUG_PERIODIC_STATUS 0
 
@@ -33,7 +31,7 @@ __device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
 				return 0;
 			}
 		}else{
-			nsleep(1000);
+			nsleep(SLEEP_NS);
 		}
 	}
 	if (tl0p1 != tl){
@@ -48,7 +46,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 		short * total_data,
 		float* AMX,
 		int nCycles){
-	unsigned * tlatch = &((unsigned*)ai_buffer_ptr)[NCHAN/2+1];
+	unsigned * tlatch = &((unsigned*)ai_buffer_ptr)[AI_CHAN/2+1];
 	short * pai0 = (short*)ai_buffer_ptr;
 	unsigned * pvi = (unsigned*)ai_buffer_ptr;
 	short * pao0 = (short*)ao_buffer_ptr;
@@ -56,7 +54,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	int ao_stride = blockDim.x;
 	bool proc0 = (proc_number==0);
 	
-	printf("%d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
+	printf("%2d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
 	unsigned tl0 = *tlatch;
 	volatile unsigned tl;
@@ -98,12 +96,6 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 
 	return;
 }
-
-//  if (proc0) printf("Terminating GPU Kernel.\n");
-//  return;
-//
-//}
-
 
 void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,

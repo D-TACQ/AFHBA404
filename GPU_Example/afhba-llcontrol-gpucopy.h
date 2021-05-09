@@ -34,6 +34,9 @@
 
 extern int AO_THREADS;
 
+// @@todo .. is this even necessary?
+#define SLEEP_NS	5
+
 void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
                            unsigned * volatile ao_buffer_ptr,
                            short * total_data,
