@@ -111,3 +111,8 @@ package: clean spi_clean
 	(cd ..;tar cvzf AFHBA/release/afhba-$(DC).tgz \
 		--exclude=release --exclude=SAFE AFHBA/* )
 
+viper:
+	rsync -va -t GPU_Example/ dt100@viper:PROJECTS/AFHBA404/GPU_Example
+	ssh dt100@viper 'cd PROJECTS/AFHBA404/GPU_Example; make'
+
+
