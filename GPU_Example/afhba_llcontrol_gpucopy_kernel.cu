@@ -38,7 +38,7 @@ __device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
 	return tl;
 }
 
-__global__ void llcontrol_gpu_Amatrix(void * volatile ai_buffer_ptr,
+__global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
 		float* AMX,
@@ -95,12 +95,12 @@ __global__ void llcontrol_gpu_Amatrix(void * volatile ai_buffer_ptr,
 //}
 
 
-void llcontrol_gpu_example_Amatrix(void * volatile ai_buffer_ptr,
+void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
 		float* AMX,
 		int nCycles){
 	//Wrapper to call the CUDA kernel
-	llcontrol_gpu_Amatrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
+	llcontrol_gpu_A_matrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
 	return;
 }

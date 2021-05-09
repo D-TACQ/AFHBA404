@@ -33,7 +33,7 @@
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
 
-void llcontrol_gpu_example_Amatrix(void * volatile ai_buffer_ptr,
+void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
                            unsigned * volatile ao_buffer_ptr,
                            short * total_data,
 			   float* AMX,

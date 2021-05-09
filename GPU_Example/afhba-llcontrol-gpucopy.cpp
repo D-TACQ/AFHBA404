@@ -274,7 +274,7 @@ void prepare_gpu() { // Allocates memory for CPU-GPU communication
 
 int run_llcontrol_gpu(){
 	prepare_gpu();
-	llcontrol_gpu_example_Amatrix((void *)lock.addr_ai, (unsigned *)lock.addr_ao, tdata_gpu, AMX_gpu, nsamples);
+	llcontrol_gpu_A_matrix_wrapper((void *)lock.addr_ai, (unsigned *)lock.addr_ao, tdata_gpu, AMX_gpu, nsamples);
 	unsigned int microseconds = 1000;
 	usleep(microseconds);
 	cudaDeviceSynchronize(); // Wait for kernel to finish
