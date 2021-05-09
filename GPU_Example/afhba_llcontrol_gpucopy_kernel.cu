@@ -54,6 +54,15 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	int ao_stride = blockDim.x;
 	bool proc0 = (proc_number==0);
 	
+	__shared__ float sAMX[AI_CHAN*AO_CHAN];
+	if (proc0){
+		for (int ii = 0; ii < AI_CHAN*AO_CHAN; ++ii){
+			sAMX[ii] = AMX[ii];
+		}
+	}
+
+	__shared__ float sAI[AI_CHAN];
+
 	printf("%2d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
 	unsigned tl0 = *tlatch;
@@ -64,6 +73,9 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 			tl = wait_sample(ii, tlatch, tl0, pai0);
 		}
 		__syncthreads();
+		for (int ai = proc_number; ai < AI_CHAN; ai += blockDim.x){
+			sAI[ai] = pai0[ai];
+		}
 		/* to the calculation here. IDEALLY, ao_stride==AO_CHAN ie one thread per AO, 		 
 		 * but plan to test with smaller #threads to prove GPU goodness
 		 */
@@ -71,7 +83,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 			int ao_result = 0;
 		
 			for (int ai = 0; ai < AI_CHAN; ++ai){
-				ao_result += AMX[ao*AI_CHAN+ai]*pai0[ai];
+				ao_result += sAMX[ao*AI_CHAN+ai]*sAI[ai];
 			}
 
 			if (ao_result > 0x7fff){
