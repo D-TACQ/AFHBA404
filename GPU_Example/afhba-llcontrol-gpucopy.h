@@ -32,6 +32,7 @@
 #define EOB(buf) (((volatile unsigned *)(buf))[VI_LONGS-1])
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
+extern int AO_THREADS;
 
 void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
                            unsigned * volatile ao_buffer_ptr,

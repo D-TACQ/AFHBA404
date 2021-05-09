@@ -263,6 +263,7 @@ int closedown(){
 	return 0;
 }
 
+int AO_THREADS = AO_CHAN;
 
 void ui(int argc, char *argv[])
 {
@@ -275,6 +276,9 @@ void ui(int argc, char *argv[])
 	/* 0: empty 1: diagnonal, 2: full house AO_CHAN, 3: full house */
 	if (const char* val = getenv("MX")){
 		MX = (enum MX)atoi(val);
+	}
+	if (const char* val = getenv("AO_THREADS")){
+		AO_THREADS = atoi(val);
 	}
 }
 

@@ -53,9 +53,9 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	unsigned * pvi = (unsigned*)ai_buffer_ptr;
 	short * pao0 = (short*)ao_buffer_ptr;
 	int proc_number = blockIdx.x*blockDim.x + threadIdx.x;
+	int ao_stride = blockDim.x;
 	bool proc0 = (proc_number==0);
-	int ao = proc_number;
-
+	
 	printf("%d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
 	unsigned tl0 = *tlatch;
@@ -66,18 +66,23 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 			tl = wait_sample(ii, tlatch, tl0, pai0);
 		}
 		__syncthreads();
-		int ao_result = 0;
+		/* to the calculation here. IDEALLY, ao_stride==AO_CHAN ie one thread per AO, 		 
+		 * but plan to test with smaller #threads to prove GPU goodness
+		 */
+		for (int ao = proc_number; ao < AO_CHAN; ao += ao_stride){
+			int ao_result = 0;
 		
-		for (int ai = 0; ai < AI_CHAN; ++ai){
-			ao_result += AMX[ao*AI_CHAN+ai]*pai0[ai];
-		}
+			for (int ai = 0; ai < AI_CHAN; ++ai){
+				ao_result += AMX[ao*AI_CHAN+ai]*pai0[ai];
+			}
 
-		if (ao_result > 0x7fff){
-			ao_result = 0x7fff;
-		}else if (ao_result < -0x7fff){
-			ao_result = -0x7fff;
+			if (ao_result > 0x7fff){
+				ao_result = 0x7fff;
+			}else if (ao_result < -0x7fff){
+				ao_result = -0x7fff;
+			}
+			pao0[ao] = (short)ao_result;
 		}
-		pao0[ao] = (short)ao_result;
 #if DEBUG_PERIODIC_STATUS     
 		if (proc0 && ii%40000 == 0){
 			printf("Cycle: %10d tl:%10u tl0 %10u\n", ii, tl, tl0);
@@ -106,6 +111,6 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 		float* AMX,
 		int nCycles){
 	//Wrapper to call the CUDA kernel
-	llcontrol_gpu_A_matrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
+	llcontrol_gpu_A_matrix<<<1,AO_THREADS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
 	return;
 }
