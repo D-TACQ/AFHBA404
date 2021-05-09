@@ -27,6 +27,11 @@ __device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
 		if ((++pollcat&0x0fffff) == 0){
 			printf("ii:%10d pollcat:%08x nothing to see at %p %08x %04x %04x %04x %04x\n",
 					ii, pollcat, tlp, *tlp, pai0[0]&0xffff, pai0[1]&0xffff, pai0[2]&0xffff, pai0[3]&0xffff );
+			if (ii > 0){
+				printf("QUITTING on data flow stop\n");
+				stop = 1;
+				return 0;
+			}
 		}else{
 			nsleep(1000);
 		}
