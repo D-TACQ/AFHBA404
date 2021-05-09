@@ -3,6 +3,7 @@
 // hello
 
 #define NSEC_PER_CLK  1		// SWAG
+#define DEBUG_PERIODIC_STATUS 0
 
 __device__ int stop;
 
@@ -53,7 +54,7 @@ __global__ void llcontrol_gpu_Amatrix(void * volatile ai_buffer_ptr,
 	printf("%d Starting data loop now! %d cycles NCHAN %d blk:%d dim:%d tid:%d\n", proc_number, nCycles, NCHAN, blockIdx.x, blockDim.x, threadIdx.x);
 
 	unsigned tl0 = *tlatch;
-	unsigned tl;
+	volatile unsigned tl;
 
 	for (int ii = 0; !stop && ii < nCycles; ii++) {
 		if (proc0){
@@ -72,7 +73,7 @@ __global__ void llcontrol_gpu_Amatrix(void * volatile ai_buffer_ptr,
 			ao_result = -0x7fff;
 		}
 		pao0[ao] = (short)ao_result;
-#if 0     
+#if DEBUG_PERIODIC_STATUS     
 		if (proc0 && ii%40000 == 0){
 			printf("Cycle: %10d tl:%10u tl0 %10u\n", ii, tl, tl0);
 			for (int iw = 0; iw < 80; ++iw){
