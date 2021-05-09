@@ -10,7 +10,7 @@ __device__ void nsleep(unsigned nsec) {
 	long long clock_count = nsec/NSEC_PER_CLK;
 	//	printf("nsleep: nsec:%u clock_count:%llu\n", nsec, clock_count);
 	for (unsigned pollcat = 0; clock64() - start_clock  < clock_count; ) {
-		if (++pollcat&0x00ff == 0){
+		if (++pollcat&0xffff == 0){
 			printf("nsleep pc:%u start:%llu now:%llu end:%llu\n", pollcat, start_clock, clock64() - start_clock,  clock_count);
 		}
 	}
@@ -20,17 +20,17 @@ __device__ int wait_sample(int ii, unsigned* tlp, unsigned tl0, short* pai0)
 {
 	unsigned tl;
 	for (unsigned pollcat = 0; (tl = *tlp) == tl0; ){
-		if ((++pollcat&0xfff) == 0){
+		if ((++pollcat&0x0fff) == 0){
 			printf("ii:%10d pollcat:%08x nothing to see at %p %08x %04x %04x %04x %04x\n",
 					ii, pollcat, tlp, *tlp, pai0[0]&0xffff, pai0[1]&0xffff, pai0[2]&0xffff, pai0[3]&0xffff );
 		}else{
 			nsleep(1000);
 		}
-	}
+	}	
 	return tl;
 }
 
-__global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
+__global__ void llcontrol_gpu_Amatrix(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
 		float* AMX,
@@ -54,9 +54,11 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
 		}
 		__syncthreads();
 		int ao_result = 0;
-		for (ai = 0; ai < AI_COUNT; ++ii){
-			ao_result += AMX[ao*AI_COUNT+ai]*pai0[ai];
+		
+		for (int ai = 0; ai < AI_CHAN; ++ai){
+			ao_result += AMX[ao*AI_CHAN+ai]*pai0[ai];
 		}
+
 		if (ao_result > 0x7fff){
 			ao_result = 0x7fff;
 		}else if (ao_result < -0x7fff){
@@ -85,11 +87,12 @@ __global__ void llcontrol_gpu_dummy(void * volatile ai_buffer_ptr,
 //}
 
 
-void llcontrol_gpu_example_dummy(void * volatile ai_buffer_ptr,
+void llcontrol_gpu_example_Amatrix(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
+		float* AMX,
 		int nCycles){
 	//Wrapper to call the CUDA kernel
-	llcontrol_gpu_dummy<<<1,32>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, nCycles);
+	llcontrol_gpu_Amatrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
 	return;
 }

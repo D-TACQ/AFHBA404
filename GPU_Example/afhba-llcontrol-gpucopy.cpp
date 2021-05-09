@@ -19,8 +19,12 @@ int fd;
 int devnum = 0;
 int samples_buffer = 1;
 int nsamples = 10000000;		/* 10s at 1MSPS */
+float GAIN = 1.0;
+enum MX { MX_EMPTY, MX_DIAGONAL, MX_FULL_AO, MX_FULL } MX = MX_DIAGONAL;
 short * tdata_cpu;
 short * tdata_gpu;
+float* AMX_host;
+float* AMX_gpu;
 int tdata_size;
 int verbose;
 
@@ -232,12 +236,45 @@ void prepare_gpu() { // Allocates memory for CPU-GPU communication
 	memset(tdata_cpu,0x00,tdata_size);
 	cudaMalloc((void **) &tdata_gpu, tdata_size);
 	cudaMemcpy(tdata_gpu,tdata_cpu,tdata_size,cudaMemcpyHostToDevice);
+
+	AMX_host = (float*)calloc(AI_CHAN*AO_CHAN, sizeof(float));
+
+	switch(MX){
+	case MX_DIAGONAL:
+		printf("load matrix MX_DIAGONAL %.2f\n", GAIN);
+		for (int ao = 0; ao < AO_CHAN; ++ao){
+			AMX_host[ao*AI_CHAN + ao] = GAIN;
+		}
+		break;
+	case MX_FULL_AO:
+		printf("load matrix MX_FULL_AO %.2f\n", GAIN);
+		for (int ao = 0; ao < AO_CHAN; ++ao){
+			for (int ai = 0; ai < AO_CHAN; ++ai){
+				AMX_host[ao*AI_CHAN + ai] = GAIN;
+			}
+		}
+		break;
+	case MX_FULL:
+		printf("load matrix MX_FULL %.2f\n", GAIN);
+		for (int ao = 0; ao < AO_CHAN; ++ao){
+			for (int ai = 0; ai < AI_CHAN; ++ai){
+				AMX_host[ao*AI_CHAN + ai] = GAIN;
+			}
+		}
+		break;
+	case MX_EMPTY:
+	default:
+		break;
+	}
+	// todo .. make it global
+	cudaMalloc((void **) &AMX_gpu, AI_CHAN*AO_CHAN*sizeof(float));
+	cudaMemcpy(AMX_gpu, AMX_host, AI_CHAN*AO_CHAN*sizeof(float), cudaMemcpyHostToDevice);
 }
 
 
 int run_llcontrol_gpu(){
 	prepare_gpu();
-	llcontrol_gpu_example_dummy((void *)lock.addr_ai, (unsigned *)lock.addr_ao, tdata_gpu, nsamples);
+	llcontrol_gpu_example_Amatrix((void *)lock.addr_ai, (unsigned *)lock.addr_ao, tdata_gpu, AMX_gpu, nsamples);
 	unsigned int microseconds = 1000;
 	usleep(microseconds);
 	cudaDeviceSynchronize(); // Wait for kernel to finish
@@ -254,6 +291,13 @@ void ui(int argc, char *argv[])
 {
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+	}
+	if (const char* val = getenv("GAIN")){
+		GAIN = atof(val);
+	}
+	/* 0: empty 1: diagnonal, 2: full house AO_CHAN, 3: full house */
+	if (const char* val = getenv("MX")){
+		MX = (enum MX)atoi(val);
 	}
 }
 

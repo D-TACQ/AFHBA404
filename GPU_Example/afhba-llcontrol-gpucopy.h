@@ -22,6 +22,7 @@
 
 
 #define NCHAN     128
+#define AI_CHAN	  128
 #define AO_CHAN   32
 #define SPAD_LEN  32
 #define NSHORTS   (NCHAN * 2) + SPAD_LEN
@@ -32,9 +33,10 @@
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
 
-void llcontrol_gpu_example_dummy(void * volatile ai_buffer_ptr,
+void llcontrol_gpu_example_Amatrix(void * volatile ai_buffer_ptr,
                            unsigned * volatile ao_buffer_ptr,
                            short * total_data,
+			   float* AMX,
                            int nCycles);
 
 
