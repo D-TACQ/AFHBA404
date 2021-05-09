@@ -29,128 +29,128 @@ int verbose;
 
 void checkError(CUresult status)
 {
-  if (status != CUDA_SUCCESS) {
-    const char *perrstr = 0;
-    CUresult ok = cuGetErrorString(status,&perrstr);
-    if(ok == CUDA_SUCCESS) {
-        if(perrstr) {
-            fprintf(stderr, "info: %s\n", perrstr);
-        } else {
-            fprintf(stderr, "info: unknown error\n");
-        }
-    }
-    exit(0);
-  }
+	if (status != CUDA_SUCCESS) {
+		const char *perrstr = 0;
+		CUresult ok = cuGetErrorString(status,&perrstr);
+		if(ok == CUDA_SUCCESS) {
+			if(perrstr) {
+				fprintf(stderr, "info: %s\n", perrstr);
+			} else {
+				fprintf(stderr, "info: unknown error\n");
+			}
+		}
+		exit(0);
+	}
 }
 
 bool wasError(CUresult status)
 {
-    if(status != CUDA_SUCCESS) {
-        const char *perrstr = 0;
-        CUresult ok = cuGetErrorString(status,&perrstr);
-        if(ok == CUDA_SUCCESS) {
-            if(perrstr) {
-                fprintf(stderr, "info: %s\n", perrstr);
-            } else {
-                fprintf(stderr, "info: unknown error\n");
-            }
-        }
-        return true;
-    }
-    return false;
+	if(status != CUDA_SUCCESS) {
+		const char *perrstr = 0;
+		CUresult ok = cuGetErrorString(status,&perrstr);
+		if(ok == CUDA_SUCCESS) {
+			if(perrstr) {
+				fprintf(stderr, "info: %s\n", perrstr);
+			} else {
+				fprintf(stderr, "info: unknown error\n");
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
 
 int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 
-  int res = -1;
-  unsigned int flag = 1;
-  CUresult status;
-  size_t size_ai;
-  size_t size_ao;
-  CUcontext  context;
+	int res = -1;
+	unsigned int flag = 1;
+	CUresult status;
+	size_t size_ai;
+	size_t size_ao;
+	CUcontext  context;
 
-  CUdeviceptr dptr_ai = 0;
-  CUdeviceptr dptr_ao = 0;
+	CUdeviceptr dptr_ai = 0;
+	CUdeviceptr dptr_ao = 0;
 
-  //Open the AFHBA404 device:
-  char fname[80];
-  sprintf(fname, HB_FILE, devnum);
+	//Open the AFHBA404 device:
+	char fname[80];
+	sprintf(fname, HB_FILE, devnum);
 
-  fd = open(fname, O_RDWR);
-  if (fd<0){
-    perror(fname);
-    exit(errno);
-  }
+	fd = open(fname, O_RDWR);
+	if (fd<0){
+		perror(fname);
+		exit(errno);
+	}
 
-  //Get and print information about the CUDA card being used:
-  checkError(cuInit(0));
+	//Get and print information about the CUDA card being used:
+	checkError(cuInit(0));
 
-  int  total = 0;
-  checkError(cuDeviceGetCount(&total));
-  fprintf(stderr,"Total CUDA devices: %d\n",total);
+	int  total = 0;
+	checkError(cuDeviceGetCount(&total));
+	fprintf(stderr,"Total CUDA devices: %d\n",total);
 
-  CUdevice device;
-  checkError(cuDeviceGet(&device,0));
+	CUdevice device;
+	checkError(cuDeviceGet(&device,0));
 
-  char name[256];
-  checkError(cuDeviceGetName(name,256,device));
-  fprintf(stderr,"Device 0 taken: %s\n",name);
+	char name[256];
+	checkError(cuDeviceGetName(name,256,device));
+	fprintf(stderr,"Device 0 taken: %s\n",name);
 
-  int major = 0, minor = 0;
-  cuDeviceGetAttribute(&major,CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR,device);
-  cuDeviceGetAttribute(&minor,CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR,device);
-  fprintf(stderr,"Compute capability: %d.%d\n",major,minor);
+	int major = 0, minor = 0;
+	cuDeviceGetAttribute(&major,CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR,device);
+	cuDeviceGetAttribute(&minor,CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR,device);
+	fprintf(stderr,"Compute capability: %d.%d\n",major,minor);
 
-  int clockRate = 0;
-  cuDeviceGetAttribute(&clockRate,CU_DEVICE_ATTRIBUTE_CLOCK_RATE,device);
-  fprintf(stderr,"Clock Rate (kHz) is: %d\n",clockRate);
+	int clockRate = 0;
+	cuDeviceGetAttribute(&clockRate,CU_DEVICE_ATTRIBUTE_CLOCK_RATE,device);
+	fprintf(stderr,"Clock Rate (kHz) is: %d\n",clockRate);
 
-  size_t global_mem = 0;
-  checkError( cuDeviceTotalMem(&global_mem, device));
-  fprintf(stderr, "Global memory: %llu MB\n", (unsigned long long)(global_mem >> 20));
-  if(global_mem > (unsigned long long)4*1024*1024*1024L)
-        fprintf(stderr, "64-bit Memory Address support\n");
+	size_t global_mem = 0;
+	checkError( cuDeviceTotalMem(&global_mem, device));
+	fprintf(stderr, "Global memory: %llu MB\n", (unsigned long long)(global_mem >> 20));
+	if(global_mem > (unsigned long long)4*1024*1024*1024L)
+		fprintf(stderr, "64-bit Memory Address support\n");
 
-  //Now get into the meat of things:
+	//Now get into the meat of things:
 
-  checkError(cuCtxCreate(&context,0,device));
-  size_ai = HB_LEN;
-  size_ao = HB_LEN; // This is 'over-allocating', but we have plenty of memory
+	checkError(cuCtxCreate(&context,0,device));
+	size_ai = HB_LEN;
+	size_ao = HB_LEN; // This is 'over-allocating', but we have plenty of memory
 
-  status = cuMemAlloc(&dptr_ai,size_ai);
-  if (wasError(status)){
-    return 1;
-  }
-  status = cuMemAlloc(&dptr_ao,size_ao);
-  if (wasError(status)){
-    return 1;
-  }
-  fprintf(stderr,"Allocate AI memory address: 0x%llx\n", (unsigned long long) dptr_ai);
-  fprintf(stderr,"Allocate AO memory address: 0x%llx\n", (unsigned long long) dptr_ao);
+	status = cuMemAlloc(&dptr_ai,size_ai);
+	if (wasError(status)){
+		return 1;
+	}
+	status = cuMemAlloc(&dptr_ao,size_ao);
+	if (wasError(status)){
+		return 1;
+	}
+	fprintf(stderr,"Allocate AI memory address: 0x%llx\n", (unsigned long long) dptr_ai);
+	fprintf(stderr,"Allocate AO memory address: 0x%llx\n", (unsigned long long) dptr_ao);
 
-  status = cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, dptr_ai);
-  if (wasError(status)){
-    cuMemFree(dptr_ai);
-    return 1;
-  }
-  status = cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, dptr_ao);
-  if (wasError(status)){
-    cuMemFree(dptr_ao);
-    return 1;
-  }
+	status = cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, dptr_ai);
+	if (wasError(status)){
+		cuMemFree(dptr_ai);
+		return 1;
+	}
+	status = cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, dptr_ao);
+	if (wasError(status)){
+		cuMemFree(dptr_ao);
+		return 1;
+	}
 
-  printf("DEBUG 1\n");
+	printf("DEBUG 1\n");
 
-  lock.addr_ai = dptr_ai;
-  lock.size_ai = size_ai;
-  lock.ind_ai = 0;
+	lock.addr_ai = dptr_ai;
+	lock.size_ai = size_ai;
+	lock.ind_ai = 0;
 
-  lock.addr_ao = dptr_ao;
-  lock.size_ao = size_ao;
-  lock.ind_ao = 1;
+	lock.addr_ao = dptr_ao;
+	lock.size_ao = size_ao;
+	lock.ind_ao = 1;
 
-  printf("DEBUG 2: Pre-ioctl\n");
+	printf("DEBUG 2: Pre-ioctl\n");
 
 	printf("%lu \n", lock.addr_ai);
 	printf("%lu \n", lock.size_ai);
@@ -160,27 +160,27 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 	printf("%lu \n", lock.size_ao);
 	printf("%u \n", lock.ind_ao);
 
-  res = ioctl(fd, AFHBA_GPUMEM_LOCK, &lock);
-  if (res<0){
-    fprintf(stderr,"Error in AFHBA_GPUMEM_LOCK.\n");
-    goto do_free_attr;
-  }
-  printf("DEBUG 3: Post-ioctl\n");
-  return 0;
+	res = ioctl(fd, AFHBA_GPUMEM_LOCK, &lock);
+	if (res<0){
+		fprintf(stderr,"Error in AFHBA_GPUMEM_LOCK.\n");
+		goto do_free_attr;
+	}
+	printf("DEBUG 3: Post-ioctl\n");
+	return 0;
 
-  do_free_attr:
-      flag = 0;
-      cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ai);
-      cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ao);
+	do_free_attr:
+	flag = 0;
+	cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ai);
+	cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ao);
 
-      cuMemFree(dptr_ai);
-      cuMemFree(dptr_ao);
+	cuMemFree(dptr_ai);
+	cuMemFree(dptr_ao);
 
-  do_free_context:
-    cuCtxDestroy(context);
+	do_free_context:
+	cuCtxDestroy(context);
 
-    close(fd);
-    return 1;
+	close(fd);
+	return 1;
 
 }
 
@@ -209,14 +209,14 @@ int setup() {
 	printf("%u \n", lock.ind_ao);
 
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ao)){
-			perror("ioctl AFHBA_START_AO_LLC");
-			exit(1);
-		}
+		perror("ioctl AFHBA_START_AO_LLC");
+		exit(1);
+	}
 
 	if (ioctl(fd, AFHBA_START_AI_LLC, &xllc_def_ai)){
-			perror("ioctl AFHBA_START_AI_LLC");
-			exit(1);
-		}
+		perror("ioctl AFHBA_START_AI_LLC");
+		exit(1);
+	}
 
 
 
@@ -226,12 +226,12 @@ int setup() {
 
 
 void prepare_gpu() { // Allocates memory for CPU-GPU communication
-  // tdata is the total log of digitizer data, initialize as zeros
-  tdata_size = NSHORTS*(nsamples+1)*sizeof(short);
-  tdata_cpu = (short *)malloc(tdata_size);
-  memset(tdata_cpu,0x00,tdata_size);
-  cudaMalloc((void **) &tdata_gpu, tdata_size);
-  cudaMemcpy(tdata_gpu,tdata_cpu,tdata_size,cudaMemcpyHostToDevice);
+	// tdata is the total log of digitizer data, initialize as zeros
+	tdata_size = NSHORTS*(nsamples+1)*sizeof(short);
+	tdata_cpu = (short *)malloc(tdata_size);
+	memset(tdata_cpu,0x00,tdata_size);
+	cudaMalloc((void **) &tdata_gpu, tdata_size);
+	cudaMemcpy(tdata_gpu,tdata_cpu,tdata_size,cudaMemcpyHostToDevice);
 }
 
 

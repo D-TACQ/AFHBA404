@@ -32,6 +32,7 @@ if [ -z "$ACQPROC_CONFIG" ]; then
     echo "ls ACQPROC/configs/*.json"
     exit
 fi
+shift
 
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
