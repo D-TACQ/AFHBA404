@@ -28,7 +28,7 @@
 #define NSHORTS   (NCHAN * 2) + SPAD_LEN
 #define VI_LEN 	    (NSHORTS*sizeof(short))
 #define VI_LONGS	(VI_LEN/sizeof(unsigned))
-#define VO_LEN  (32*sizeof(int))
+#define VO_LEN  (AO_CHAN*sizeof(int))
 #define EOB(buf) (((volatile unsigned *)(buf))[VI_LONGS-1])
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
