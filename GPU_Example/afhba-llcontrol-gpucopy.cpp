@@ -144,8 +144,6 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 		return 1;
 	}
 
-	printf("DEBUG 1\n");
-
 	lock.addr_ai = dptr_ai;
 	lock.size_ai = size_ai;
 	lock.ind_ai = 0;
@@ -154,25 +152,15 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 	lock.size_ao = size_ao;
 	lock.ind_ao = 1;
 
-	printf("DEBUG 2: Pre-ioctl\n");
-
-	printf("%lu \n", lock.addr_ai);
-	printf("%lu \n", lock.size_ai);
-	printf("%u \n", lock.ind_ai);
-
-	printf("%lu \n", lock.addr_ao);
-	printf("%lu \n", lock.size_ao);
-	printf("%u \n", lock.ind_ao);
-
 	res = ioctl(fd, AFHBA_GPUMEM_LOCK, &lock);
 	if (res<0){
 		fprintf(stderr,"Error in AFHBA_GPUMEM_LOCK.\n");
 		goto do_free_attr;
 	}
-	printf("DEBUG 3: Post-ioctl\n");
+
 	return 0;
 
-	do_free_attr:
+do_free_attr:
 	flag = 0;
 	cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ai);
 	cuPointerSetAttribute(&flag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,dptr_ao);
@@ -180,9 +168,8 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 	cuMemFree(dptr_ai);
 	cuMemFree(dptr_ao);
 
-	do_free_context:
+do_free_context:
 	cuCtxDestroy(context);
-
 	close(fd);
 	return 1;
 
@@ -193,24 +180,14 @@ int get_mapping_gpu(){ // Allocates memory for AFHBA404 datastream
 
 
 int setup() {
-	printf("Inside setup\n");
 	if (get_mapping_gpu()) {
 		printf("Error in get_mapping_gpu, exiting.\n");
 		return 1;
 	}
-	printf("Finished get_mapping_gpu");
+
 	get_shared_mapping(devnum, 0, &xllc_def_ai, 0);
 	get_shared_mapping(devnum, 1, &xllc_def_ao, 0);
 	xllc_def_ai.len = samples_buffer * VI_LEN;
-
-
-	printf("%lu \n", lock.addr_ai);
-	printf("%lu \n", lock.size_ai);
-	printf("%u \n", lock.ind_ai);
-
-	printf("%lu \n", lock.addr_ao);
-	printf("%lu \n", lock.size_ao);
-	printf("%u \n", lock.ind_ao);
 
 	if (ioctl(fd, AFHBA_START_AO_LLC, &xllc_def_ao)){
 		perror("ioctl AFHBA_START_AO_LLC");
