@@ -33,6 +33,7 @@
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
 extern int AO_THREADS;
+extern int PROFILE;
 
 // @@todo .. is this even necessary?
 #define SLEEP_NS	5

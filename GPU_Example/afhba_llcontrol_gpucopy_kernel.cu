@@ -45,7 +45,8 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
 		float* AMX,
-		int nCycles){
+		int nCycles,
+		int profile){
 	unsigned * tlatch = &((unsigned*)ai_buffer_ptr)[AI_CHAN/2+1];
 	short * pai0 = (short*)ai_buffer_ptr;
 	unsigned * pvi = (unsigned*)ai_buffer_ptr;
@@ -53,6 +54,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	int proc_number = blockIdx.x*blockDim.x + threadIdx.x;
 	int ao_stride = blockDim.x;
 	bool proc0 = (proc_number==0);
+	int wait = !profile && proc0;
 	
 	__shared__ float sAMX[AI_CHAN*AO_CHAN];
 	if (proc0){
@@ -69,7 +71,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	volatile unsigned tl;
 
 	for (int ii = 0; !stop && ii < nCycles; ii++) {
-		if (proc0){
+		if (wait){
 			tl = wait_sample(ii, tlatch, tl0, pai0);
 		}
 		__syncthreads();
@@ -115,6 +117,6 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 		float* AMX,
 		int nCycles){
 	//Wrapper to call the CUDA kernel
-	llcontrol_gpu_A_matrix<<<1,AO_THREADS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles);
+	llcontrol_gpu_A_matrix<<<1,AO_THREADS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 	return;
 }

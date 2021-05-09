@@ -264,6 +264,7 @@ int closedown(){
 }
 
 int AO_THREADS = AO_CHAN;
+int PROFILE = 0;
 
 void ui(int argc, char *argv[])
 {
@@ -279,6 +280,9 @@ void ui(int argc, char *argv[])
 	}
 	if (const char* val = getenv("AO_THREADS")){
 		AO_THREADS = atoi(val);
+	}
+	if (const char* val = getenv("PROFILE")){
+		PROFILE = atoi(val);
 	}
 }
 
