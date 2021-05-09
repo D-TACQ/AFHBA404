@@ -1,4 +1,3 @@
-obj-m := afhba.o
 
 SRC := $(shell pwd)
 
@@ -28,9 +27,10 @@ APPS := afhba-llcontrol-gpucopy
 apps: $(APPS)
 
 
-afhba-llcontrol-gpucopy: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o afhba_llcontrol_gpucopy_kernel.cu
+afhba-llcontrol-gpucopy: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o afhba_llcontrol_gpucopy_kernel.o
 	nvcc -arch=sm_61 -o $@ $^ $(LDLIB) 
 
+afhba-llcontrol-gpucopy.o afhba_llcontrol_gpucopy_kernel.o: afhba-llcontrol-gpucopy.h
 
 clean:
-	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS)
+	rm -f *.o $(APPS)
