@@ -23,7 +23,8 @@
 
 #define NCHAN     128
 #define AI_CHAN	  128
-#define AO_CHAN   32
+#define AO_CHAN   64
+#define MxN	  (AI_CHAN*AO_CHAN)
 #define SPAD_LEN  32
 #define NSHORTS   (NCHAN * 2) + SPAD_LEN
 #define VI_LEN 	    (NSHORTS*sizeof(short))

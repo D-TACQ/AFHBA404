@@ -20,7 +20,8 @@ int devnum = 0;
 int samples_buffer = 1;
 int nsamples = 10000000;		/* 10s at 1MSPS */
 float GAIN = 1.0;
-enum MX { MX_EMPTY, MX_DIAGONAL, MX_FULL_AO, MX_FULL } MX = MX_DIAGONAL;
+unsigned MX;
+enum MX { MX_EMPTY, MX_DIAGONAL, MX_COL0, MX_FULL0, MX_FULL1 } MX_BLOCKS = MX_DIAGONAL;
 short * tdata_cpu;
 short * tdata_gpu;
 float* AMX_host;
@@ -276,7 +277,7 @@ void ui(int argc, char *argv[])
 	}
 	/* 0: empty 1: diagnonal, 2: full house AO_CHAN, 3: full house */
 	if (const char* val = getenv("MX")){
-		MX = (enum MX)atoi(val);
+		MX = strtoul(val, 0, 16);
 	}
 	if (const char* val = getenv("AO_THREADS")){
 		AO_THREADS = atoi(val);
