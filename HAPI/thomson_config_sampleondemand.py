@@ -27,6 +27,7 @@ EXT_UCLK = int(os.getenv("EXT_UCLK", "0"))
 SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
+PULSE_EDGE = int(os.getenv("PULSE_EDGE", "0"))
 # Default thomson buffer length is 4096. Now user configurable.
 BUFLEN = int(os.getenv("BUFLEN", "4096"))
 
@@ -79,7 +80,7 @@ def set_delay(uut, args):
     stl = stl + "+{},{}\n".format(FLATTOP,0)
 
     uut.load_gpg(stl)
-    uut.s0.gpg_trg = '1,1,0'
+    uut.s0.gpg_trg = '1,1,{}'.format(PULSE_EDGE)
     uut.s0.gpg_clk = '1,1,1'
     uut.s0.SIG_CLK_MB_SET = '10000000'
     uut.s0.GPG_MODE = 'LOOPWAIT'
