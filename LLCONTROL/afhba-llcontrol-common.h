@@ -184,6 +184,20 @@ void goRealTime(void)
 	}
 }
 
+#define SCHED_NORMAL 0
+
+void goNormal(void)
+{
+	struct sched_param p = {};
+	p.sched_priority = 50;
+
+	int rc = sched_setscheduler(0, SCHED_NORMAL, &p);
+
+	if (rc){
+		perror("failed to set NORMAL priority");
+	}
+}
+
 FILE* fp_log;
 
 void write_action(void *data)

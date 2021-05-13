@@ -1,0 +1,6 @@
+
+# best viewed as watch watchdogwatcher
+# assumed 32AI shorts then 1 DO lword
+./mmap  -f /dev/rtm-t.0.data/hb00 -o 0x80000 | hexdump -ve '17/4 "%08x," "\n"' | head -n 1 | cut -d, -f17
+
+
