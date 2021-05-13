@@ -103,7 +103,7 @@ def init_ai(uut):
     uut.s0.bufferlen = lcm(ssb, 4096)
 
 
-def set_ext_uclk_counter(uuts):
+def set_ext_uclk_counter(uuts, enable):
     """
     Configure system to use an external clock source
     as the usec counter.
@@ -111,13 +111,12 @@ def set_ext_uclk_counter(uuts):
     for num, uut in enumerate(uuts):
 
         if num == 0:
-            uut.s0.SIG_SRC_SYNC_0 = 'GPG0'
-            uut.s0.SIG_SRC_CLK_0 = 'HDMI'
-        else:
-            uut.s0.SIG_SRC_SYNC_0 = 'HDMI'
-
-        uut.s1.sync = '1,0,1'
-        uut.s0.spad1_us_clk_src = 1
+            uut.s0.SIG_SRC_SYNC_0 = 'GPG0'    # delyed SOD clock source
+            uut.s0.SIG_SRC_CLK_0 = 'HDMI' if enable else 'INT01M'
+        
+        uut.s0.spad1_us_clk_src = 1           # always source us_clk from CLK.d1
+        
+        uut.s1.sync = '1,0,1'                 # SOD clk setup, pull CLK from SYNC.
         uut.s0.SIG_SYNC_OUT_SYNC_DX = 'd0'
         uut.s1.clk_from_sync = 1
 
@@ -136,10 +135,11 @@ def run_main(args):
         print("clear_counters() commented out (slow)")
     init_clks(uuts)
     set_delay(uutm, args)
+
     for uut in uuts:
         init_ai(uut)
-    if EXT_UCLK:
-        set_ext_uclk_counter(uuts)
+
+    set_ext_uclk_counter(uuts,EXT_UCLK)
 
 
 
