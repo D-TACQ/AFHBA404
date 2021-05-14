@@ -175,7 +175,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 #undef MY_AMX
 #endif
 
-#define REDCOLS		16
+#define REDCOLS		32
 
 /**
  * llcontrol_gpu_A_matrix_reduce() .. N way parallel kernel for matrix output
@@ -307,10 +307,15 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 	if (VERBOSE){
 		printf("VERBOSE=0x%x\n", VERBOSE);
 	}
-	if (REDUCE_ALGO){
+	if (REDUCE_ALGO){		
 		printf("NEW STUFF split AMX row into REDCOLS:%d\n", REDCOLS);
 		printf("AI:%d AO:%d THREADS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN*REDCOLS, USE_SHARED_R);
-		llcontrol_gpu_A_matrix_reduce<<<1,AO_CHAN*REDCOLS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
+		int B = 1, T = AO_CHAN*REDCOLS;
+		if (AO_CHAN*REDCOLS > 1024){
+			B = 1+ AO_CHAN*REDCOLS/1024;
+			T = 1024;
+		}
+		llcontrol_gpu_A_matrix_reduce<<<B,T>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 		//llcontrol_gpu_A_matrix_reduce<<<1,1>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 	}else{
 		printf("AI:%d AO:%d THREADS:%d COLS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN, COLS, USE_SHARED_A);
