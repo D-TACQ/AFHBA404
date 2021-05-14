@@ -2,7 +2,7 @@
 
 #define NSEC_PER_CLK  1		// SWAG
 #define DEBUG_PERIODIC_STATUS 		0
-#define MULVERBOSE			0x1c
+#define MULVERBOSE			0x0c
 #define REDVERBOSE			0x20
 #define VERBOSE 			0
 #define REPORT_MISSED_SAMPLE_ERROR	0   /* this is a VALUABLE feature, @@todo but it's firing bogusly */
@@ -175,7 +175,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 #undef MY_AMX
 #endif
 
-#define REDCOLS		2
+#define REDCOLS		4
 
 /**
  * llcontrol_gpu_A_matrix_reduce() .. N way parallel kernel for matrix output
@@ -241,19 +241,16 @@ __global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 			int ao = ii/REDCOLS;
 			int rc = ii%REDCOLS;
 			int ai = rc*AI_CHAN/REDCOLS;
-#if VERBOSE & 0x4			
-			printf("tid:%03d loo rc:%d ao:%d ai:%d\n", ii, rc, ao, ai);
-#endif
-
-#if VERBOSE & 0x8
+			
+			sAO[ao][rc] = MY_AMX[ao*AI_CHAN+ai]*sAI[ai];
+#if VERBOSE & 0x4		
 			printf("tid:%03d mul AO[%2d][%d]  = AMX[%2d][%3d] * AI[%3d]\n",
 						ii, ao, rc, ao, ai+0,        ai+0);
+			__syncthreads();
 #endif			
-			sAO[ao][rc] = MY_AMX[ao*AI_CHAN+ai]*sAI[ai];
-			
 			for (int jj = 1; jj < AI_CHAN/REDCOLS; ++jj){				
 				sAO[ao][rc] += MY_AMX[ao*AI_CHAN+ai+jj]*sAI[ai+jj];
-#if VERBOSE & 0x10
+#if VERBOSE & 0x8
 				printf("tid:%03d mac AO[%2d][%d] += AMX[%2d][%3d] * AI[%3d]\n",
 						ii, ao, rc, ao, ai+jj,        ai+jj);
 #endif				
@@ -308,7 +305,7 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 		printf("Reduced column count %d\n", COLS);
 	}
 	if (VERBOSE){
-		printf("VERBOSE=%d\n", VERBOSE);
+		printf("VERBOSE=0x%x\n", VERBOSE);
 	}
 	if (REDUCE_ALGO){
 		printf("NEW STUFF split AMX row into REDCOLS:%d\n", REDCOLS);
