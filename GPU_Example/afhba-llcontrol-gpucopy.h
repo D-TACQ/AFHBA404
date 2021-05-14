@@ -33,8 +33,8 @@
 #define EOB(buf) (((volatile unsigned *)(buf))[VI_LONGS-1])
 #define BOB(buf) (((volatile unsigned *)(buf))[0])
 
-extern int AO_THREADS;
 extern int PROFILE;
+extern int REDUCE_ALGO;
 
 // @@todo .. is this even necessary?
 #define SLEEP_NS	5

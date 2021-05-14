@@ -22,7 +22,7 @@ NVCCFLAGS += -rdc=true
 
 all: apps
 
-APPS := afhba-llcontrol-gpucopy afhba-llcontrol-gpucopy-aothreads
+APPS := afhba-llcontrol-gpucopy
 #APPS := afhba-llcontrol-gpucopy-aothreads
 
 apps: $(APPS)
@@ -31,14 +31,8 @@ apps: $(APPS)
 afhba-llcontrol-gpucopy: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o afhba_llcontrol_gpucopy_kernel.o
 	nvcc -arch=sm_61 -o $@ $^ $(LDLIB) 
 	
-afhba-llcontrol-gpucopy-aothreads: afhba-llcontrol-gpucopy.o afhba-get_shared_mapping.o afhba_llcontrol_gpucopy_kernel_aothreads.o
-	nvcc -arch=sm_61 -o $@ $^ $(LDLIB) 	
-
 afhba-llcontrol-gpucopy.o afhba_llcontrol_gpucopy_kernel.o: afhba-llcontrol-gpucopy.h
 
 
-afhba_llcontrol_gpucopy_kernel_aothreads.o : afhba_llcontrol_gpucopy_kernel.cu
-	$(NVCC) $(NVCCFLAGS) $(CFLAGS) -DMASSIVE_PARALLEL=0  -c -o $@ $<
-	
 clean:
 	rm -f *.o $(APPS)

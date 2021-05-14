@@ -209,12 +209,13 @@ int setup() {
 
 void prepare_gpu() { // Allocates memory for CPU-GPU communication
 	// tdata is the total log of digitizer data, initialize as zeros
+#if 0
 	tdata_size = NSHORTS*(nsamples+1)*sizeof(short);
 	tdata_cpu = (short *)malloc(tdata_size);
 	memset(tdata_cpu,0x00,tdata_size);
 	cudaMalloc((void **) &tdata_gpu, tdata_size);
 	cudaMemcpy(tdata_gpu,tdata_cpu,tdata_size,cudaMemcpyHostToDevice);
-
+#endif
 	AMX_host = (float*)calloc(AI_CHAN*AO_CHAN, sizeof(float));
 
 	switch(MX){
@@ -224,7 +225,7 @@ void prepare_gpu() { // Allocates memory for CPU-GPU communication
 			AMX_host[ao*AI_CHAN + ao] = GAIN;
 		}
 		break;
-	case MX_FULL_AO:
+	case MX_FULL0:
 		printf("load matrix MX_FULL_AO %.2f\n", GAIN);
 		for (int ao = 0; ao < AO_CHAN; ++ao){
 			for (int ai = 0; ai < AO_CHAN; ++ai){
@@ -232,7 +233,7 @@ void prepare_gpu() { // Allocates memory for CPU-GPU communication
 			}
 		}
 		break;
-	case MX_FULL:
+	case MX_FULL1:
 		printf("load matrix MX_FULL %.2f\n", GAIN);
 		for (int ao = 0; ao < AO_CHAN; ++ao){
 			for (int ai = 0; ai < AI_CHAN; ++ai){
@@ -264,8 +265,8 @@ int closedown(){
 	return 0;
 }
 
-int AO_THREADS = AO_CHAN;
 int PROFILE = 0;
+int REDUCE_ALGO = 0;		// REDuce Columns
 
 void ui(int argc, char *argv[])
 {
@@ -279,11 +280,11 @@ void ui(int argc, char *argv[])
 	if (const char* val = getenv("MX")){
 		MX = strtoul(val, 0, 16);
 	}
-	if (const char* val = getenv("AO_THREADS")){
-		AO_THREADS = atoi(val);
-	}
 	if (const char* val = getenv("PROFILE")){
 		PROFILE = atoi(val);
+	}
+	if (const char* val = getenv("REDUCE_ALGO")){
+		REDUCE_ALGO = atoi(val);
 	}
 }
 
