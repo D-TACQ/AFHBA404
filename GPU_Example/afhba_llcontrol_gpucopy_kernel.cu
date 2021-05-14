@@ -175,7 +175,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 #undef MY_AMX
 #endif
 
-#define REDCOLS		32
+#define REDCOLS		16
 
 /**
  * llcontrol_gpu_A_matrix_reduce() .. N way parallel kernel for matrix output
