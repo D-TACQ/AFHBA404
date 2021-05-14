@@ -8,7 +8,8 @@
 #define REPORT_MISSED_SAMPLE_ERROR	0   /* this is a VALUABLE feature, @@todo but it's firing bogusly */
 
 #define HAS_DO32			0
-#define USE_SHARED			1   /* shared is supposed to be faster, but for our low thread case, it's not ! */
+#define USE_SHARED_A			0   /* shared is supposed to be faster, but for our low thread case, it's not ! */
+#define USE_SHARED_R			1   /* R case HAS to use shared mem */
 
 //#define COLS				2		// fastest test
 
@@ -112,7 +113,7 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 	
 	__shared__ float sAI[AI_CHAN];
 
-#if USE_SHARED	
+#if USE_SHARED_A	
 	__shared__ float sAMX[AI_CHAN*AO_CHAN];		// local A matrix, init from global
 	
 	for (int ii = index; ii < AI_CHAN*AO_CHAN; ii += stride){
@@ -170,6 +171,10 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 
 
 
+#ifdef MY_AMX
+#undef MY_AMX
+#endif
+
 #define REDCOLS		2
 
 /**
@@ -197,7 +202,7 @@ __global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 	bool proc0 = (index==0);
 	int wait = !profile && proc0;
 
-#if USE_SHARED
+#if USE_SHARED_R
 	__shared__ float sAMX[AI_CHAN*AO_CHAN];		// local A matrix, init from global
 	
 	for (int ii = index; ii < AI_CHAN*AO_CHAN; ii += stride){
@@ -206,7 +211,9 @@ __global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 #endif		
 		sAMX[ii] = AMX[ii];
 	}
-/* MY_AMX already defined */
+#define MY_AMX sAMX
+#else
+#define MY_AMX AMX
 #endif	
 
 	__shared__ float sAI[AI_CHAN];			// local copy of AI data, init once
@@ -305,11 +312,11 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 	}
 	if (REDUCE_ALGO){
 		printf("NEW STUFF split AMX row into REDCOLS:%d\n", REDCOLS);
-		printf("AI:%d AO:%d THREADS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN*REDCOLS, USE_SHARED);
+		printf("AI:%d AO:%d THREADS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN*REDCOLS, USE_SHARED_R);
 		llcontrol_gpu_A_matrix_reduce<<<1,AO_CHAN*REDCOLS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 		//llcontrol_gpu_A_matrix_reduce<<<1,1>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 	}else{
-		printf("AI:%d AO:%d THREADS:%d COLS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN, COLS, USE_SHARED);
+		printf("AI:%d AO:%d THREADS:%d COLS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN, COLS, USE_SHARED_A);
 		llcontrol_gpu_A_matrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 	}
 	return;
