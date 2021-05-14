@@ -2,7 +2,9 @@
 
 #define NSEC_PER_CLK  1		// SWAG
 #define DEBUG_PERIODIC_STATUS 		0
-#define VERBOSE 			1
+#define MULVERBOSE			0x1c
+#define REDVERBOSE			0x20
+#define VERBOSE 			0
 #define REPORT_MISSED_SAMPLE_ERROR	0   /* this is a VALUABLE feature, @@todo but it's firing bogusly */
 
 #define HAS_DO32			0
@@ -168,20 +170,20 @@ __global__ void llcontrol_gpu_A_matrix(void * volatile ai_buffer_ptr,
 
 
 
-#define REDCOLS		4
+#define REDCOLS		2
 
 /**
- * llcontrol_gpu_A_matrix_p() .. N way parallel kernel for matrix output
+ * llcontrol_gpu_A_matrix_reduce() .. N way parallel kernel for matrix output
  * This didn't fit: too big for _shared_ memory:
  *    Assume AO_CHAN * AI_CHAN threads, single pass multiplication, then binary reduction for dot product.
  * So now we try to partition the matrix with >AI_CHAN threads, 
- * 	result is an output [REDCOLS][AO] that does fit in _shared_ memory, followed by a limited reduction to single column.
+ * 	result is an output [AO][REDCOLS] that does fit in _shared_ memory, followed by a limited reduction to single column.
  * 
  * AO[64] = A.AI[128]   
  * 
  * This works with <<<AI_CHAN>>> ie 8192 threads.
  */
-__global__ void llcontrol_gpu_A_matrix_p(void * volatile ai_buffer_ptr,
+__global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 		unsigned * volatile ao_buffer_ptr,
 		short * total_data,
 		float* AMX,
@@ -194,11 +196,14 @@ __global__ void llcontrol_gpu_A_matrix_p(void * volatile ai_buffer_ptr,
 	int stride = blockDim.x;
 	bool proc0 = (index==0);
 	int wait = !profile && proc0;
-	
+
 #if USE_SHARED
 	__shared__ float sAMX[AI_CHAN*AO_CHAN];		// local A matrix, init from global
 	
 	for (int ii = index; ii < AI_CHAN*AO_CHAN; ii += stride){
+#if VERBOSE & 0x1		
+		printf("init sAMX[%3d]\n", ii);
+#endif		
 		sAMX[ii] = AMX[ii];
 	}
 /* MY_AMX already defined */
@@ -215,29 +220,48 @@ __global__ void llcontrol_gpu_A_matrix_p(void * volatile ai_buffer_ptr,
 			tl = wait_sample(sam, tlatch, tl0, pai0);	// only index==0 need do this.
 		}
 		__syncthreads();
-		
+				
 		for (int ai = index; ai < AI_CHAN; ai += stride){
+#if VERBOSE & 0x2			
+			printf("tid:%03d ai:%d\n", ai, ai);
+#endif			
 			sAI[ai] = pai0[ai];				// cache AI from ACQ2106
 		}
+		__syncthreads();
 		
 		/* multiply */
-		for (int ii = index; ii < AO_CHAN*REDCOLS; ii += stride){	
-			for (int jj = 0; jj < AI_CHAN/REDCOLS; ++jj){
-				int ai = jj + ii/AO_CHAN*AI_CHAN/REDCOLS;
-				int ao = ii/REDCOLS;
-				sAO[ao][jj%REDCOLS] = MY_AMX[ao*AI_CHAN+ai]*sAI[ai];
-#if 0				
-				printf("AO[%d][%2d] = AMX[%3d][%2d] * AI[%3d]\n",
-								   jj%REDCOLS, ao,   ao, ai,        ai);
+		for (int ii = index; ii < AO_CHAN*REDCOLS; ii += stride){
+			int ao = ii/REDCOLS;
+			int rc = ii%REDCOLS;
+			int ai = rc*AI_CHAN/REDCOLS;
+#if VERBOSE & 0x4			
+			printf("tid:%03d loo rc:%d ao:%d ai:%d\n", ii, rc, ao, ai);
+#endif
+
+#if VERBOSE & 0x8
+			printf("tid:%03d mul AO[%2d][%d]  = AMX[%2d][%3d] * AI[%3d]\n",
+						ii, ao, rc, ao, ai+0,        ai+0);
+#endif			
+			sAO[ao][rc] = MY_AMX[ao*AI_CHAN+ai]*sAI[ai];
+			
+			for (int jj = 1; jj < AI_CHAN/REDCOLS; ++jj){				
+				sAO[ao][rc] += MY_AMX[ao*AI_CHAN+ai+jj]*sAI[ai+jj];
+#if VERBOSE & 0x10
+				printf("tid:%03d mac AO[%2d][%d] += AMX[%2d][%3d] * AI[%3d]\n",
+						ii, ao, rc, ao, ai+jj,        ai+jj);
 #endif				
 			}
 		}
-	
-		/* reduce */
-		int cols = REDCOLS/2;		
-		for (int ii = index; index < cols; cols /= 2){
-			for(int ao = 0; ao < AO_CHAN; ++ao){
-				sAO[ao][ii] += sAO[ao][cols-1-ii];
+		__syncthreads();
+		/* reduce */		
+		for(int ao = index; ao < AO_CHAN; ++ao){
+			for (int cols = REDCOLS/2; cols; cols /= 2){
+				for (int ii = 0; ii < cols; ++ii){	
+					sAO[ao][ii] += sAO[ao][cols*2-1-ii];
+#if VERBOSE & 0x20			
+					printf("tid:%03d red sAO[%2d][%d] += sAO[%2d][%d]\n", ao, ao, ii, ao, cols*2-1-ii);
+#endif					
+				}
 			}
 		}
 		
@@ -250,6 +274,9 @@ __global__ void llcontrol_gpu_A_matrix_p(void * volatile ai_buffer_ptr,
 				ao_result = -0x7fff;
 			}
 			pao0[ao] = (short)ao_result;
+#if VERBOSE & 0x40			
+			printf("tid:%03d out pAO[%2d] sAO[%2d][%d] %04x\n", ao, ao, ao, 0, (short)ao_result);
+#endif	
 		}
 		
 #if DEBUG_PERIODIC_STATUS     
@@ -273,10 +300,14 @@ void llcontrol_gpu_A_matrix_wrapper(void * volatile ai_buffer_ptr,
 	if (COLS < AO_CHAN){
 		printf("Reduced column count %d\n", COLS);
 	}
+	if (VERBOSE){
+		printf("VERBOSE=%d\n", VERBOSE);
+	}
 	if (REDUCE_ALGO){
-		printf("NEW STUFF\n");
+		printf("NEW STUFF split AMX row into REDCOLS:%d\n", REDCOLS);
 		printf("AI:%d AO:%d THREADS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN*REDCOLS, USE_SHARED);
-		llcontrol_gpu_A_matrix_p<<<1,AO_CHAN*REDCOLS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
+		llcontrol_gpu_A_matrix_reduce<<<1,AO_CHAN*REDCOLS>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
+		//llcontrol_gpu_A_matrix_reduce<<<1,1>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
 	}else{
 		printf("AI:%d AO:%d THREADS:%d COLS:%d USE_SHARED:%d\n", AI_CHAN, AO_CHAN, AO_CHAN, COLS, USE_SHARED);
 		llcontrol_gpu_A_matrix<<<1,AO_CHAN>>>(ai_buffer_ptr, ao_buffer_ptr, total_data, AMX, nCycles, PROFILE);
