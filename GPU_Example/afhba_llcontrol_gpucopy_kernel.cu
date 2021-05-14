@@ -258,7 +258,7 @@ __global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 		}
 		__syncthreads();
 		/* reduce */		
-		for(int ao = index; ao < AO_CHAN; ++ao){
+		for(int ao = index; ao < AO_CHAN; ao += stride){
 			for (int cols = REDCOLS/2; cols; cols /= 2){
 				for (int ii = 0; ii < cols; ++ii){	
 					sAO[ao][ii] += sAO[ao][cols*2-1-ii];
@@ -268,9 +268,9 @@ __global__ void llcontrol_gpu_A_matrix_reduce(void * volatile ai_buffer_ptr,
 				}
 			}
 		}
-		
+
 		/* output as saturated short */
-		for (int ao = index; ao < AO_CHAN; ++ao){
+		for (int ao = index; ao < AO_CHAN; ao += stride){
 			int ao_result = sAO[ao][0];
 			if (ao_result > 0x7fff){
 				ao_result = 0x7fff;
