@@ -1,0 +1,19 @@
+{
+    "AFHBA": {
+        "DEVNUM": 0,
+        "UUT": [
+             {
+                "name": "acq2106_130",
+                "type": "pcs",
+                "sync_role": "fpmaster",
+                "VI": {
+                    "AI16": 128,
+                    "SP32": 32
+                },
+                "VO": {
+                    "AO16": 64
+                }
+            }
+        ]
+    }
+}
