@@ -1,5 +1,5 @@
 
-CXXFLAGS+=-I. -std=c++11
+CXXFLAGS+=-I. -std=c++11 -O3
 
 APPS=acqproc acqproc_custom acqproc_broadcast_trigger
 
