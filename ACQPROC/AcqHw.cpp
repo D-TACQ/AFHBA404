@@ -90,6 +90,7 @@ protected:
 	int sample;
 	const int spix;
 	int pw32_double_buffer;   // for back-compatibility with old PWM code
+	bool zcopy;		  // hack "zero copy" mode for fastest possible update (AO==AI). "software out the loop"
 
 	ACQ_HW_BASE(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor) :
@@ -99,15 +100,24 @@ protected:
 				tl0(0xdeadbeef),
 				sample(0),
 				spix(vi_offsets.SP32/sizeof(unsigned)+SPIX::TLATCH),
-				pw32_double_buffer(Env::getenv("PW32_DOUBLE_BUFFER", 1))
+				pw32_double_buffer(Env::getenv("PW32_DOUBLE_BUFFER", 1)),
+				zcopy(::getenv("ZCOPY") && *::getenv("ZCOPY")=='y')
 	{
 		dev->host_buffer = (char*)get_mapping(dev->devnum, &dev->fd);
 		dev->xllc_def.pa = RTM_T_USE_HOSTBUF;
 		dev->xllc_def.len = G::samples_buffer*vi.len();
 		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam+2);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
-		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
-		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+		if (zcopy){
+			if (G::verbose){
+				printf("WARNING: ZCOPY selected\n");
+			}
+			dev->lbuf_vo.base = dev->lbuf_vi.base;
+			dev->lbuf_vo.cursor = dev->lbuf_vi.cursor;
+		}else{
+			dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
+			dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+		}
 	}
 	virtual ~ACQ_HW_BASE() {
 		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
@@ -161,19 +171,24 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	if (vo.len()){
 		struct XLLC_DEF xo_xllc_def;
 		if (vo.len()){
-			xo_xllc_def = dev->xllc_def;
-			xo_xllc_def.pa += AO_OFFSET;
-			xo_xllc_def.len = vo.hwlen();
+			if (!zcopy){
+				xo_xllc_def = dev->xllc_def;
+				xo_xllc_def.pa += AO_OFFSET;
+				xo_xllc_def.len = vo.hwlen();
 
-			if (vo.DO32){
-				int ll = xo_xllc_def.len/64;
-				xo_xllc_def.len = ++ll*64;
-				dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
+				if (vo.DO32){
+					int ll = xo_xllc_def.len/64;
+					xo_xllc_def.len = ++ll*64;
+					dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
+				}
+			}else{
+				xo_xllc_def= dev->xllc_def;
 			}
 			if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
 				perror("ioctl AFHBA_START_AO_LLC");
 				exit(1);
 			}
+
 			if (G::verbose){
 				printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
 			}
