@@ -5,6 +5,10 @@
  *
  *  Created on: 14 Mar 2020
  *      Author: pgm
+ *
+ *  Demo Modes: dup1, duplicate AI0
+ *      export SINGLE_THREAD_CONTROL=control_dup1
+ *
  */
 
 #include "AcqSys.h"
@@ -19,7 +23,9 @@ class DummySingleThreadControlSystemInterface: public SystemInterface {
 public:
 	DummySingleThreadControlSystemInterface(const HBA& hba) :
 		SystemInterface(hba)
-	{}
+	{
+		if (G::verbose) printf("%s::%s DUP1:%d\n", __FILE__, PFN, DUP1);
+	}
 	static int DUP1;
 
 	virtual void ringDoorbell(int sample){
