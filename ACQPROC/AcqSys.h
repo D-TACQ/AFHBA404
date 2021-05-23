@@ -121,7 +121,7 @@ struct Dev;
 /** Models a Host Bus Adapter like AFHBA404. */
 class HBA: public IO
 {
-	HBA(vector <ACQ*> _uuts, VI _vi, VO _vo);
+	HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo);
 	static HBA* the_hba;	/**< singleton, ugly interface. */
 public:
 	virtual ~HBA();

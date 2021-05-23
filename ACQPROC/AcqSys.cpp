@@ -395,7 +395,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		++port;
 		++iuut;
 	}
-	the_hba = new HBA(uuts, VI_sys, VO_sys);
+	the_hba = new HBA(hba_devnum, uuts, VI_sys, VO_sys);
 	store_config(j, json_def, *the_hba);
 	return *the_hba;
 }
