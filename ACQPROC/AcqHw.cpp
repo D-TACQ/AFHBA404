@@ -108,16 +108,8 @@ protected:
 		dev->xllc_def.len = G::samples_buffer*vi.len();
 		dev->lbuf_vi.base = (char*)calloc(vi.len(), HBA::maxsam+2);
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
-		if (zcopy){
-			if (G::verbose){
-				printf("WARNING: ZCOPY selected\n");
-			}
-			dev->lbuf_vo.base = dev->lbuf_vi.base;
-			dev->lbuf_vo.cursor = dev->lbuf_vi.cursor;
-		}else{
-			dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
-			dev->lbuf_vo.cursor = dev->lbuf_vo.base;
-		}
+		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
+		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
 	}
 	virtual ~ACQ_HW_BASE() {
 		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
@@ -183,6 +175,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 				}
 			}else{
 				xo_xllc_def= dev->xllc_def;
+				xo_xllc_def.len = vo.hwlen();
 			}
 			if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
 				perror("ioctl AFHBA_START_AO_LLC");
