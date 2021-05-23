@@ -8,7 +8,7 @@
                 "sync_role": "fpmaster",
                 "VI": {
                     "AI16": 128,
-                    "SP32": 32
+                    "SP32": 16
                 },
                 "VO": {
                     "AO16": 64

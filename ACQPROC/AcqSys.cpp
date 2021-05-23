@@ -153,9 +153,11 @@ void ACQ::arm(int nsamples)
 }
 
 
-HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
-		devnum(_devnum),
-		IO("HBA"+to_string(_devnum), _vi, _vo),
+#define HBA_DEVNUM(_u) ((_u)[0]->devnum&~0x3)
+
+HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo):
+		devnum(HBA_DEVNUM(_uuts)),
+		IO("HBA"+to_string(HBA_DEVNUM(_uuts)), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
 {
 	for (auto uut: uuts){
@@ -245,16 +247,16 @@ void add_si_lengths(json& jsys, HBA& hba)
 	json &jgl = jsys["GLOBAL_LEN"];
 	json &jlen_vi = jgl["VI"];
 	jlen_vi = {
-			{ "AI16", si.AI16_count() },
+		    { "AI16", si.AI16_count() },
 		    { "AI32", si.AI32_count() },
 		    { "DI32", si.DI32_count() },
 		    { "SP32", si.SP32_count() }
 		  };
 	json &jlen_vo = jgl["VO"];
 	jlen_vo = {
-			{ "AO16", si.AO16_count() },
+		    { "AO16", si.AO16_count() },
 		    { "DO32", si.DO32_count() },
-			{ "PW32", si.PW32_count() },
+		    { "PW32", si.PW32_count() },
 		    { "CC32", si.CC32_count() }
 		  };
 
