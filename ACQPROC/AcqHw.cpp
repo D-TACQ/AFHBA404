@@ -78,8 +78,9 @@ class ACQ_HW_BASE: public ACQ
 		if (fp == 0){
 			perror(fname);
 		}
-		fwrite(base, len, HBA::maxsam, fp);
+		int nw = fwrite(base, len, HBA::maxsam, fp);
 		fclose(fp);
+		fprintf(stderr, "stored %s, len=%d\n", fname, nw);
 	}
 
 protected:
@@ -111,10 +112,10 @@ protected:
 		dev->lbuf_vo.base = (char*)calloc(vo.len(), HBA::maxsam+2);
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
 	}
+
 	virtual ~ACQ_HW_BASE() {
 		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
 		raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
-
 		clear_mapping(dev->fd, dev->host_buffer);
 	}
 

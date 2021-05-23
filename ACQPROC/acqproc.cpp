@@ -12,6 +12,9 @@ extern "C" {
 extern int sched_fifo_priority;
 }
 
+#include <signal.h>
+
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -72,6 +75,26 @@ const char* ui(int argc, char* argv[])
 	return config_file;
 }
 
+bool closedown_request;
+
+/* user may ask for a VERY LONG capture, but we STILL want to store the log files on ctrl-c */
+void sigint_handler(int s)
+{
+	printf("<ctrl-c> :: cleanup, store logs\n");
+	closedown_request = true;
+}
+
+void configure_ctrl_c_closedown() {
+	struct sigaction sigIntHandler;
+
+	sigIntHandler.sa_handler = sigint_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+
+	sigaction(SIGINT, &sigIntHandler, NULL);
+}
+
+
 int main(int argc, char* argv[])
 {
 	const char* config_file = ui(argc, argv);
@@ -80,7 +103,7 @@ int main(int argc, char* argv[])
 
 
 	hba.dump_config();
-
+	configure_ctrl_c_closedown();
 
 	SystemInterface& si(SystemInterface::factory(hba));
 
@@ -89,7 +112,7 @@ int main(int argc, char* argv[])
 	si.trigger();
 
 	try {
-		for (int sample = 0; G::nsamples == 0 || sample < G::nsamples; ++sample){
+		for (int sample = 0; !closedown_request && (G::nsamples == 0 || sample < G::nsamples); ++sample){
 			hba.processSample(si, sample);
 		}
 	} catch (int error) {
