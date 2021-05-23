@@ -163,9 +163,9 @@ int get_int(json j, int default_value = 0)
 
 #define HBA_DEVNUM(_u) ((_u)[0]->devnum&~0x3)
 
-HBA::HBA(vector <ACQ*> _uuts, VI _vi, VO _vo):
-		devnum(HBA_DEVNUM(_uuts)),
-		IO("HBA"+to_string(HBA_DEVNUM(_uuts)), _vi, _vo),
+HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
+		devnum(_devnum),
+		IO("HBA"+to_string(_devnum), _vi, _vo),
 		uuts(_uuts), vi(_vi), vo(_vo)
 {
 	for (auto uut: uuts){
