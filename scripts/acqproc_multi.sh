@@ -22,9 +22,9 @@
 # Please note:
 # - This script should be run as root if the user wishes to use RPPRIO and AFFINITY
 # - The script does not have to be run as root if taskset is not to be used.
-# - run ./ACQPROC/acqproc all ACQPROC_CONFIG directly to review configuration
+# - run ./ACQPROC/acqproc $ACQPROC_CONFIG directly to review configuration
 
-ACQPROC_CONFIG=${2:-$ACQPROC_CONFIG}
+ACQPROC_CONFIG=$1 #{ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
 if [ -z "$ACQPROC_CONFIG" ]; then
 	echo "Script argument should be a configuration file (json)."
 	echo "This argument is required. Example files are included in:"
@@ -32,6 +32,7 @@ if [ -z "$ACQPROC_CONFIG" ]; then
 	echo "ls ACQPROC/configs/*.json"
 	exit 1
 fi
+shift
 
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)

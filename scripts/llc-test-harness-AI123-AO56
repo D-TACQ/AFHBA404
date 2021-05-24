@@ -167,7 +167,15 @@ user_prompt() {
 	done
 }
 
-init_2106
-[ "$USER_PROMPT" = "y" ] && user_prompt
-start_stream
+if [ "x$*" = "x" ]; then
+	echo NO args, do everything
+	init_2106
+	[ "$USER_PROMPT" = "y" ] && user_prompt
+	start_stream
+else
+	for arg in $*; do
+		echo RUN $arg
+		eval $arg
+	done
+fi
 
