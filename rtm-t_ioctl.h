@@ -22,6 +22,7 @@
 
 #ifndef __RTM_T_IOCTL_H__
 #define __RTM_T_IOCTL_H__
+#include <stdint.h>
 #include <linux/ioctl.h>
 struct LLC_DEF			/**< arg for ioctl RTM_T_START_LLC */
 {

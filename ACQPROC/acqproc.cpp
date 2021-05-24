@@ -80,8 +80,13 @@ bool closedown_request;
 /* user may ask for a VERY LONG capture, but we STILL want to store the log files on ctrl-c */
 void sigint_handler(int s)
 {
+	static int ctrl_c_count;
 	printf("<ctrl-c> :: cleanup, store logs\n");
 	closedown_request = true;
+	if (++ctrl_c_count >= 3){
+		printf("<ctrl-c> :: third call, just drop out\n");
+		exit(1);
+	}
 }
 
 void configure_ctrl_c_closedown() {
