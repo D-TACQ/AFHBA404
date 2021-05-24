@@ -22,7 +22,7 @@
 
 #ifndef __RTM_T_IOCTL_H__
 #define __RTM_T_IOCTL_H__
-
+#include <stdint.h>
 #include <linux/ioctl.h>
 
 
