@@ -204,6 +204,7 @@ int main( int argc, const char* argv[] )
 	unsigned length = 0x100000;
 	int rc;
 	unsigned fill_value = 0xdeadbeef;
+	int ramp = 0;
 	enum MODE { M_READ, M_WRITE, M_FILL, M_TEST, M_NOP } mode = M_READ;
 
 	struct poptOption opt_table[] = {
@@ -217,6 +218,7 @@ int main( int argc, const char* argv[] )
 		{ "length", 'l', POPT_ARG_INT,    &length, 'l' },
 		{ "value",  'v', POPT_ARG_INT,    &fill_value, 0 },
 		{ "regstest", 'T', POPT_ARG_NONE,	0, 'T' },
+		{ "ramp",   'p', POPT_ARG_INT,    &ramp, 0 },
 		{ "verbose", 'V', POPT_ARG_INT,   &acq200_debug, 0 },
 		{ }
 	};
@@ -249,6 +251,11 @@ int main( int argc, const char* argv[] )
 			mmap_mode = PROT_READ|PROT_WRITE;
 			mode = M_FILL;
 			break;
+		case 'p':
+			open_mode = O_RDWR;
+			mmap_mode = PROT_READ|PROT_WRITE;
+			fill_value = 0;
+			mode = M_FILL;
 		case 'T':
 			mode = M_TEST;
 			break;
@@ -284,6 +291,7 @@ int main( int argc, const char* argv[] )
 
 		for ( iwrite = 0; iwrite != imax; ++iwrite ){
 			praw[iwrite] = fill_value;
+			fill_value += ramp;
 		}
 		break;
 	}
