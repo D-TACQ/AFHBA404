@@ -32,7 +32,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-#include <stdint.h>
+
 #define REVID	"R101"
 
 /* Kludge alert */

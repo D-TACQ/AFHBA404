@@ -152,14 +152,6 @@ void ACQ::arm(int nsamples)
 	cerr << "placeholder: ARM unit " << getName() << " now" <<endl;
 }
 
-int get_int(json j, int default_value = 0)
-{
-	try {
-		return	j.get<int>();
-	} catch (std::exception& e){
-		return default_value;
-	}
-}
 
 #define HBA_DEVNUM(_u) ((_u)[0]->devnum&~0x3)
 
@@ -326,6 +318,15 @@ bool strstr(string haystack, string needle)
 	return haystack.find(needle) != string::npos;
 }
 
+
+int get_int(json j, int default_value = 0)
+{
+       try {
+               return  j.get<int>();
+       } catch (std::exception& e){
+               return default_value;
+       }
+}
 
 /** HBA::Create() factory function. */
 HBA& HBA::create(const char* json_def, int _maxsam)

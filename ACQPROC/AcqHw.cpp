@@ -8,7 +8,6 @@
  */
 
 extern "C" {
-#include <stdint.h>
 #include "../local.h"
 #include "../rtm-t_ioctl.h"
 #include "afhba-llcontrol.h"
@@ -22,6 +21,7 @@ extern "C" {
 #include <fstream>
 #include <sstream>
 #include <string.h>
+
 #include <stdio.h>		// because sprintf()
 
 #include <assert.h>

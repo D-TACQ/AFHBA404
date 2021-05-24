@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdint.h>
+
 #include <assert.h>
 
 #include "afhba-get_shared_mapping.h"

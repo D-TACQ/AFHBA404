@@ -138,6 +138,8 @@ void control_dup1(short *ao, short *ai)
          }
 }
 
+int maxshots = 1;
+
 void ui(int argc, char* argv[])
 {
 	if (getenv("DEVMAX")){
@@ -160,6 +162,9 @@ void ui(int argc, char* argv[])
 		if (getenv("BOLOLEN")) {
 			bololen = atoi(getenv("BOLOLEN"));
 		}
+	}
+	if (getenv("MAXSHOTS")){
+		maxshots = atoi(getenv("MAXSHOTS"));
 	}
 
 
@@ -236,15 +241,29 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 		}
 	}
 }
+
+void _disconnect(struct Dev* dev)
+{
+	free(dev->lbuf);
+	munmap(dev->host_buffer, HB_LEN);
+	close(dev->fd);
+}
 void get_connected()
 {
 	FORALL {
 		_get_connected(&devs[id], IS_BOLO? bololen: VI_LEN);
 	}
 }
+
+void disconnect()
+{
+	FORALL {
+		_disconnect(&devs[id]);
+	}
+}
 void setup()
 {
-	setup_logging(devnum);
+
 	get_connected();
 	goRealTime();
 }
@@ -261,6 +280,7 @@ void dio_watchdog(short *ao)
         unsigned* dox = (unsigned *)ao;
 
 	dox[DO_IX] ^= WD_BIT;
+        ao[0] ^= WD_BIT;
 }
 
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
@@ -307,16 +327,39 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 }
 
 void closedown(void) {
-	munmap(host_buffer, HB_LEN);
-	close(fd);
-	fclose(fp_log);
+	disconnect();
+	goNormal();
+}
+
+void capture(int enable)
+/** @@remove me .. this is too crude .. single uut, hard coded ..*/
+{
+	char buf[256];
+	sprintf(buf, "echo CONTINUOUS=%d | nc acq2106_130 4220", enable);
+	system(buf);
 }
 int main(int argc, char* argv[])
 {
+	int shot = 0;
 	ui(argc, argv);
-	setup();
-	printf("ready for data\n");
-	run(G_control, G_action);
-	printf("finished\n");
-	closedown();
+	setup_logging(devnum);
+
+	if (maxshots == 1){
+		setup();
+		printf("ready for data\n");
+		run(G_control, G_action);
+		printf("finished\n");
+		closedown();
+	}else{
+		for (shot = 0; shot < maxshots; ++shot){
+			capture(1);
+			setup();
+			printf("ready for data\n");
+			run(G_control, G_action);
+			printf("finished\n");
+			closedown();
+			capture(0);
+			sleep(4);
+		}
+	}
 }

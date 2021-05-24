@@ -39,7 +39,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-#include <stdint.h>
+
 #include "afhba-get_shared_mapping.h"
 
 
@@ -181,6 +181,20 @@ void goRealTime(void)
 
 	if (rc){
 		perror("failed to set RT priority");
+	}
+}
+
+#define SCHED_NORMAL 0
+
+void goNormal(void)
+{
+	struct sched_param p = {};
+	p.sched_priority = 50;
+
+	int rc = sched_setscheduler(0, SCHED_NORMAL, &p);
+
+	if (rc){
+		perror("failed to set NORMAL priority");
 	}
 }
 

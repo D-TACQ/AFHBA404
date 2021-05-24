@@ -22,17 +22,16 @@
 # Please note:
 # - This script should be run as root if the user wishes to use RPPRIO and AFFINITY
 # - The script does not have to be run as root if taskset is not to be used.
-# - run ./ACQPROC/acqproc $ACQPROC_CONFIG directly to review configuration
+# - run ./ACQPROC/acqproc all ACQPROC_CONFIG directly to review configuration
 
-ACQPROC_CONFIG=$1 #{ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
+ACQPROC_CONFIG=${2:-$ACQPROC_CONFIG}
 if [ -z "$ACQPROC_CONFIG" ]; then
-    echo "Script argument should be a configuration file (json)."
-    echo "This argument is required. Example files are included in:"
-    echo "ACQPROC/configs/"
-    echo "ls ACQPROC/configs/*.json"
-    exit
+	echo "Script argument should be a configuration file (json)."
+	echo "This argument is required. Example files are included in:"
+	echo "ACQPROC/configs/"
+	echo "ls ACQPROC/configs/*.json"
+	exit 1
 fi
-shift
 
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
@@ -43,13 +42,13 @@ echo UUT2 $UUT2
 echo UUTS $UUTS
 echo DEVMAX $DEVMAX
 
-#CAPTURE_UUTS=${CAPTURE_UUTS:-$UUTS}
+LLC_CALLBACKS=${LLC_CALLBACKS:-0}
 CAPTURE_UUTS=$(python3 scripts/list_capture_uuts.py --json_file=${ACQPROC_CONFIG})
-POST=${POST:-40000} 	# Number of samples to capture
-CLK=${CLK:-100000} 		# Set desired clock speed here.
+POST=${POST:-1000000} 	# Number of samples to capture
+CLK=${CLK:-50000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-0}
 SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
-AFFINITY=${AFFINITY:-2}        # cpu affinity. 0=none, 1=use cpu0 2=use cpu1, for example
+AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -60,22 +59,25 @@ HAPI_DIR=$TOP/acq400_hapi/
 AFHBA404_DIR=$TOP/AFHBA404/
 MDS_DIR=$TOP/ACQ400_MDSplus/
 
-ANALYSIS=false # Whether or not to run the analysis scripts.
-TRANSIENT=true # Take a transient capture if true, else stream
+ANALYSIS=${ANALYSIS:-true} # Whether or not to run the analysis scripts.
+if [ $LLC_CALLBACKS -eq 0 ]; then
+    TRANSIENT=${TRANSIENT:-false} # Take a transient capture if true, else stream
+fi
 
 PYTHON="python3"
 # comment out if NOT using MDSplus
-USE_MDSPLUS=0
+USE_MDSPLUS=${USE_MDSPLUS:-0}
+
+if [ $USE_MDSPLUS -ne 0 ]; then
+	MDSPLUS_SERVER=${MDSPLUS_SERVER:-andros}
+fi
 
 export PYTHONPATH=/home/$USER/PROJECTS/acq400_hapi
 
 if [ "$USE_MDSPLUS" = "1" ]; then
-# Below is the UUT_path for MDSplus. The server is set to andros as this
-# is the internal D-TACQ MDSplus server. Please change this to the name of
-# your MDSplus server if you wish to use MDSplus. Ignore if not using MDSplus
-for uut in $UUTS;do
-    export $uut'_path=andros:://home/dt100/TREES/'$uut
-done
+	for uut in $UUTS;do
+        	export $uut'_path=${MDSPLUS_SERVER}:://home/dt100/TREES/'$uut
+    	done
 
 mdsplus_upload() {
     # An optional function that uploads the scratchpad data to MDSplus.
@@ -92,111 +94,147 @@ mdsplus_upload() {
     cd $AFHBA404_DIR
 
 }
+
 fi
 
 
 
 check_uut() {
-    for UUT in $UUTS; do
-
-        ping -c 1 $UUT &>/dev/null
-        if ! [ $? -eq 0 ]; then
-            echo "Cannot ping $UUT1, please check UUT is available."
-            exit 1
-        fi
-    done
+	for UUT in $UUTS; do
+        	ping -c 1 $UUT &>/dev/null
+		if ! [ $? -eq 0 ]; then
+			echo "Cannot ping $UUT1, please check UUT is available."
+			exit 1
+	        fi
+	done
 }
 
 
 analysis() {
-    echo ""
-    echo "Running analysis now."
-    echo "--------------------"
-    cd $AFHBA404_DIR
-    # Change the json_src path here if the json file is not located in 
-    # ~/PROJECTS/AFHBA404/runtime.json
-    $PYTHON scripts/acqproc_analysis.py --ones=1 --json=1 --json_src="./runtime.json" --src="$AFHBA404_DIR"
+	echo ""
+	echo "Running analysis now."
+	echo "--------------------"
+	cd $AFHBA404_DIR
+# Change the json_src path here if the json file is not located in 
+# ~/PROJECTS/AFHBA404/runtime.json
+	$PYTHON scripts/acqproc_analysis.py --ones=1 --json=1 --json_src="./runtime.json" --src="$AFHBA404_DIR"
 }
 
 
 control_program() {
-    # Run the control program here
-    cd $AFHBA404_DIR
-    cat - > control_program.env <<EOF
-    export DEVMAX=$DEVMAX
-    export VERBOSE=$VERBOSE
-    export HW=1
-    export RTPRIO=10
-    export AFFINITY=$AFFINITY
-    export SINGLE_THREAD_CONTROL=control_dup1
+	# Run the control program here
+	cd $AFHBA404_DIR
+	cat - > control_program.env <<EOF
+	export DEVMAX=$DEVMAX
+	export VERBOSE=$VERBOSE
+	export HW=1
+	export RTPRIO=10
+	export AFFINITY=$AFFINITY
+	export SINGLE_THREAD_CONTROL=control_dup1
 EOF
-    sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
-    echo "Finished"
-    [ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
+	sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
+	echo "Control Program Finished"
+	[ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
 
 
 control_script() {
-
-    cd $HAPI_DIR
-    if $TRANSIENT; then
-        $PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
-    else
-        $PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
-    fi
-
+	cd $HAPI_DIR
+	if $TRANSIENT; then
+		$PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
+	else
+		$PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
+	fi
 }
 
 
 configure_uut() {
-    # Setup is done here.
+	# Setup is done here.
 
-    cd $HAPI_DIR
-    case $SYNC_ROLE_MODE in
-    n*)
-	    echo "WARNING: omit sync_role";;
-    p*)
-        INDEX=0
-        uuts=($uuts)
-        SYNC_ROLES=($SYNC_ROLES)
-        for uut in $UUTS; do
-            TOPROLE=${SYNC_ROLES[$INDEX]}
-            if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
-            echo "$TOPROLE"
-            $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
-            TOPROLE=slave
-            ((INDEX++))
-        done
-        for uut in $UUTS; do
-            wait
-        done;;
-    *)
-        $PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
-    esac 
+	cd $HAPI_DIR
+	case $SYNC_ROLE_MODE in
+	n*)
+		echo "WARNING: omit sync_role";;
+	p*)
+        	INDEX=0
+	        uuts=($uuts)
+        	SYNC_ROLES=($SYNC_ROLES)
+	        for uut in $UUTS; do
+        		TOPROLE=${SYNC_ROLES[$INDEX]}
+            		if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
+			echo "$TOPROLE"
+			$PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
+			TOPROLE=slave
+			((INDEX++))
+		done
+		for uut in $UUTS; do
+			wait
+		done;;
+	*)
+        	$PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
+	esac 
 
-    cd $AFHBA404_DIR
-    $PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS
-
+	cd $AFHBA404_DIR
+	$PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS
 }
 
+PID_CP=0
+trap ctrl_c INT
+
+ctrl_c() {
+	echo "Trapped CTRL-C"
+	if [ $PID_CP -ne 0 ]; then
+		echo kill $PID_CP
+		kill -9 $PID_CP
+	fi
+	exit
+}
+
+control_program_with_analysis() {
+        control_program 
+        if $ANALYSIS; then
+            analysis
+        else
+            sleep 2
+	fi
+}
+control_program_loop() {
+	shot=0
+	while [ $shot -lt $1 ]; do
+		echo control_program_loop SHOT $shot / $1
+		control_program_with_analysis
+		((shot++))
+	done
+}
 
 case "x$1" in
 xconfigure_uut)
-    configure_uut;;
+	configure_uut;;
 xcontrol_program)
-    control_program;;
+	control_program_with_analysis;;
+xcontrol_program_loop*)
+	maxshot=${1#*=}
+	control_program_loop ${maxshot:-10};;
+xlooptest*)
+	maxshot=${1#*=}
+	control_program_loop ${maxshot:-10};;
 xcontrol_script)
-    control_script;;
-*)
-    # Execution starts here.
-    check_uut
-    configure_uut
+	control_script;;
+all|*)
+	# Execution starts here.
+	check_uut
+	configure_uut
+	if [ $LLC_CALLBACKS -ne 0 ]; then
+		control_program_with_analysis
+	else
+		control_program & PID_CP=$!
+        	control_script
+		wait $PID_CP
+	fi
 
-    control_program &
-    control_script
-
-    if $ANALYSIS; then
-        analysis
-    fi
-    ;;
+	if $ANALYSIS; then
+		analysis
+	fi;;
 esac
+
+

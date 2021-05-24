@@ -70,6 +70,7 @@ public:
 	const VO vo;
 
 	IO(string _name, VI _vi, VO _vo);
+
 	virtual ~IO();
 	virtual string toString();
 	string getName() {
