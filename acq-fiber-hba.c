@@ -30,7 +30,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1114";
+char afhba__driver_version[] = "B1113";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -328,8 +328,8 @@ struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
 {
 	static int idx;
 	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
+
 	static u64 dma_mask = DMA_BIT_MASK(32);
-	pci_set_dma_mask(dev,dma_mask);
 
 	adev->pci_dev = dev;
 	adev->idx = idx++;
