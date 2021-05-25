@@ -15,6 +15,8 @@ ifeq ($(GPU),1)
 # enable next two lines for GPU
 EXTRA_CFLAGS += -DCONFIG_GPU
 EXTRA_GPU = afhba_gpu.o
+GPU_APPS = gpu_apps
+GPU_APPS_CLEAN = gpu_apps_clean
 endif
 
 
@@ -55,7 +57,7 @@ gdb-cmd:
 	@echo "add-symbol-file afhba.ko $$(sudo cat /sys/module/afhba/sections/.text)"
 
 APPS := mmap xiloader
-apps: $(APPS) stream functional_tests llc_support acqproc
+apps: $(APPS) stream functional_tests llc_support acqproc $(GPU_APPS)
 
 
 flasherase:
@@ -74,8 +76,8 @@ llc_support:
 acqproc:
 	cd ACQPROC && $(MAKE)
 
-acqproc_clean:
-	cd ACQPROC && $(MAKE) clean
+gpu_apps:
+	cd GPU_Example && $(MAKE)
 
 stream:
 	cd STREAM && $(MAKE)
@@ -103,10 +105,17 @@ llc_clean:
 stream_clean:
 	cd STREAM && $(MAKE) clean
 
+acqproc_clean:
+	cd ACQPROC && $(MAKE) clean
+
+
 functional_tests_clean:
 	cd FUNCTIONAL_TESTS && $(MAKE) clean
 
-clean: llc_clean stream_clean functional_tests_clean acqproc_clean
+gpu_apps_clean:
+	cd GPU_Example && $(MAKE) clean
+
+clean: llc_clean stream_clean functional_tests_clean acqproc_clean $(GPU_APPS_CLEAN)
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
