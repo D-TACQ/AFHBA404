@@ -67,8 +67,6 @@ struct AB 			/** Define two buffers A, B for ping/pong        */
 #define GPU_BOUND_OFFSET (GPU_BOUND_SIZE-1)
 #define GPU_BOUND_MASK (~GPU_BOUND_OFFSET)
 
-//-----------------------------------------------------------------------------
-
 struct gpudma_lock_t {
     void*    handle;
 
@@ -83,6 +81,14 @@ struct gpudma_lock_t {
     int      ind_ao;
 };
 
+struct gpudma_unlock_t {
+    void*    handle;
+};
+
+//-----------------------------------------------------------------------------
+
+
+
 struct ABN 			/** Define N buffers.   */
 {
 	int ndesc;
@@ -91,20 +97,9 @@ struct ABN 			/** Define N buffers.   */
 };
 
 #define MAX_AO_BUF		4
-
 #define AO_BURST_ID		0xA0B55555
-struct gpudma_unlock_t {
-    void*    handle;
-};
 
 //-----------------------------------------------------------------------------
-
-struct gpudma_state_t {
-    void*       handle;
-    size_t      page_count;
-    size_t      page_size;
-    uint64_t    pages[1];
-};
 
 struct AO_BURST {
 	unsigned id;
@@ -142,9 +137,6 @@ struct AO_BURST {
  * streaming rules: 4K boundary, 1K size modulus
  */
 
-#define AFHBA_GPUMEM_LOCK	_IOWR(DMAGIC,	8, struct gpudma_lock_t)
-/* Pins address of GPU memory to use */
-
 #define AFHBA_START_AI_ABN	_IOWR(DMAGIC, 8, struct ABN)
 /**< **ioctl** AFHBA_START_AI_ABN LLC, multiple buffers, INPUT */
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
@@ -153,12 +145,15 @@ struct AO_BURST {
 #define AFHBA_AO_BURST_INIT		 _IOWR(DMAGIC, 10, struct AO_BURST)
 /**< **ioctl** define an AO_BURST setup */
 
+#define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
+/**< **ioctl** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
+
 #define AFHBA_AO_BURST_SETBUF  	_IOWR(DMAGIC, 12, u32)
 /**< **ioctl** define current buffer id */
 
 
-#define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
-/**< **ioctl** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
+#define AFHBA_GPUMEM_LOCK	_IOWR(DMAGIC,	13, struct gpudma_lock_t)
+/* Pins address of GPU memory to use */
 
 struct StreamBufferDef {
 	u32 ibuf;
