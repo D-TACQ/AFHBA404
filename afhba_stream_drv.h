@@ -83,9 +83,6 @@ struct AFHBA_STREAM_DEV {
 	int buffer_len;
 	struct HostBuffer *hbx;		/* streaming host buffers [nbuffers] */
 
-
-	struct proc_dir_entry *proc_dir_root;
-
 	struct JOB {
 		unsigned buffers_demand;
 		unsigned buffers_queued;
@@ -261,4 +258,6 @@ static inline char aurora_id(struct AFHBA_DEV *adev)
 	return adev->sfp - SFP_A + 'A';
 }
 
+int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
+              phys_addr_t paddr, uint64_t size, unsigned prot);
 #endif /* AFHBA_STREAM_DRV_H_ */

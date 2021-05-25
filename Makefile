@@ -1,13 +1,33 @@
+# Makefile for afhba404
+# supports both host llc (default, most users) and gpu llc (special!)
+# to build everything for host: make
+# to clean everything for host: make clean
+#
+# to build everything for gpu: GPU=1 make
+# to clean everything for gpu: GPU=1 make clean
+#
+
 obj-m += afhba.o
 #obj-m += afhbaspi.o
 #obj-m += afhbasfp.o
 
 SRC := $(shell pwd)
 LDRV:= $(SRC)/linux/drivers
-
+EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
+KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
 CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
+
+
+ifeq ($(GPU),1)
+# enable next two lines for GPU
+EXTRA_CFLAGS += -DCONFIG_GPU
+EXTRA_GPU = afhba_gpu.o
+GPU_APPS = gpu_apps
+GPU_APPS_CLEAN = gpu_apps_clean
+endif
+
 
 # default build is the local kernel.
 # build other kernels like this example:
@@ -28,7 +48,7 @@ KHEADERS := /lib/modules/$(KRNL)/build
 
 afhba-objs = acq-fiber-hba.o \
 	afhba_devman.o afhba_debugfs.o afhba_stream_drv.o afhba_sysfs.o \
-	afhba_core.o  \
+	afhba_core.o  $(EXTRA_GPU) \
 	afs_procfs.o
 
 afhbaspi-objs = afhba_spi.o afhba_core.o
@@ -46,7 +66,7 @@ gdb-cmd:
 	@echo "add-symbol-file afhba.ko $$(sudo cat /sys/module/afhba/sections/.text)"
 
 APPS := mmap xiloader
-apps: $(APPS) stream functional_tests llc_support acqproc
+apps: $(APPS) stream functional_tests llc_support acqproc $(GPU_APPS)
 
 
 flasherase:
@@ -65,8 +85,8 @@ llc_support:
 acqproc:
 	cd ACQPROC && $(MAKE)
 
-acqproc_clean:
-	cd ACQPROC && $(MAKE) clean
+gpu_apps:
+	cd GPU_Example && $(MAKE)
 
 stream:
 	cd STREAM && $(MAKE)
@@ -94,10 +114,17 @@ llc_clean:
 stream_clean:
 	cd STREAM && $(MAKE) clean
 
+acqproc_clean:
+	cd ACQPROC && $(MAKE) clean
+
+
 functional_tests_clean:
 	cd FUNCTIONAL_TESTS && $(MAKE) clean
 
-clean: llc_clean stream_clean functional_tests_clean acqproc_clean
+gpu_apps_clean:
+	cd GPU_Example && $(MAKE) clean
+
+clean: llc_clean stream_clean functional_tests_clean acqproc_clean $(GPU_APPS_CLEAN)
 	rm -f *.mod* *.o *.ko modules.order Module.symvers $(APPS) .*.o.cmd
 
 DC := $(shell date +%y%m%d%H%M)
@@ -105,4 +132,10 @@ package: clean spi_clean
 	git tag $(DC)
 	(cd ..;tar cvzf AFHBA/release/afhba-$(DC).tgz \
 		--exclude=release --exclude=SAFE AFHBA/* )
+
+# example remote build
+viper:
+	rsync -va -t GPU_Example/ dt100@viper:PROJECTS/AFHBA404/GPU_Example
+	ssh dt100@viper 'cd PROJECTS/AFHBA404/GPU_Example; make'
+
 

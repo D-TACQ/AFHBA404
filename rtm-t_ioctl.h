@@ -22,11 +22,16 @@
 
 #ifndef __RTM_T_IOCTL_H__
 #define __RTM_T_IOCTL_H__
+
+#ifdef __KERNEL__
+typedef unsigned long long uint64_t;
+#else
 #include <stdint.h>
+#endif
 #include <linux/ioctl.h>
 
 
-struct LLC_DEF			/** arg for ioctl RTM_T_START_LLC */
+struct LLC_DEF			/**< arg for ioctl RTM_T_START_LLC */
 {
 	u8 clk_div;		/**< 1..255: ECM value 1..255 usec with 1MHz EXTCLK */
 	u8 fill;
@@ -55,6 +60,34 @@ struct AB 			/** Define two buffers A, B for ping/pong        */
 };
 
 #define MAXABN	256
+//----GPU-related-definitions--------------------------------------------------
+// for boundary alignment requirement
+#define GPU_BOUND_SHIFT 16
+#define GPU_BOUND_SIZE ((u64)1 << GPU_BOUND_SHIFT)
+#define GPU_BOUND_OFFSET (GPU_BOUND_SIZE-1)
+#define GPU_BOUND_MASK (~GPU_BOUND_OFFSET)
+
+struct gpudma_lock_t {
+    void*    handle;
+
+    uint64_t addr_ai;
+    uint64_t size_ai;
+    size_t   page_count_ai;
+    int      ind_ai;
+
+    uint64_t addr_ao;
+    uint64_t size_ao;
+    size_t   page_count_ao;
+    int      ind_ao;
+};
+
+struct gpudma_unlock_t {
+    void*    handle;
+};
+
+//-----------------------------------------------------------------------------
+
+
 
 struct ABN 			/** Define N buffers.   */
 {
@@ -64,8 +97,9 @@ struct ABN 			/** Define N buffers.   */
 };
 
 #define MAX_AO_BUF		4
-
 #define AO_BURST_ID		0xA0B55555
+
+//-----------------------------------------------------------------------------
 
 struct AO_BURST {
 	unsigned id;
@@ -103,22 +137,23 @@ struct AO_BURST {
  * streaming rules: 4K boundary, 1K size modulus
  */
 
-
 #define AFHBA_START_AI_ABN	_IOWR(DMAGIC, 8, struct ABN)
 /**< **ioctl** AFHBA_START_AI_ABN LLC, multiple buffers, INPUT */
 #define AFHBA_START_AO_ABN	_IOWR(DMAGIC, 9, struct ABN)
 /**< **ioctl** AFHBA_START_AO_ABN LLC, multiple buffers, OUTPUT */
 
-
 #define AFHBA_AO_BURST_INIT		 _IOWR(DMAGIC, 10, struct AO_BURST)
 /**< **ioctl** define an AO_BURST setup */
+
+#define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
+/**< **ioctl** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
 
 #define AFHBA_AO_BURST_SETBUF  	_IOWR(DMAGIC, 12, u32)
 /**< **ioctl** define current buffer id */
 
 
-#define RTM_T_START_STREAM_AO _IO(DMAGIC,   11)
-/**< **ioctl** RTM_T_START_STREAM_AO appears in stub app code, but not in driver .. */
+#define AFHBA_GPUMEM_LOCK	_IOWR(DMAGIC,	13, struct gpudma_lock_t)
+/* Pins address of GPU memory to use */
 
 struct StreamBufferDef {
 	u32 ibuf;

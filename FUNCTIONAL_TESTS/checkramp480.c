@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 			if (xx[ichan] != xx1 + 1){
 				if (errors == 0 || ii1 && ii - ii1 != wrapcount){
 					if (++error_report < 10 || verbose > 1){
-	printf("%012llx [%d] +[%d] 0x%08x 0x%08x ** ERROR **\n",
+	printf("%012llx [%lld] +[%lld] 0x%08x 0x%08x ** ERROR **\n",
 		bytes, ii, ii1? ii-ii1: 0, xx1, xx[ichan]);
 					}
 					++errors;
@@ -80,8 +80,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (verbose && ii % 0x40000 == 0){
-			printf("%012llx  %08x %08x  %d errors\n",
-			       ii, xx0, xx, errors);
+			printf("%012llx  %08x %08x  %d errors\n", ii, xx0, *xx, errors);
 		}
 		bytes += nchan*sizeof(short);
 	}	

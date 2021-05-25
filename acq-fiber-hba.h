@@ -45,6 +45,10 @@
 #include <linux/uaccess.h>  /* VERIFY_READ|WRITE */
 #include <linux/version.h>
 
+#ifdef CONFIG_GPU
+#include "gpumemdrv.h"
+#endif
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
 #include <uapi/linux/sched/types.h>
 #endif
@@ -109,6 +113,15 @@ struct HostBuffer {
 
 struct AFHBA_STREAM_DEV;
 
+struct iommu_mapping {
+	struct iommu_domain *iom_dom;
+        struct list_head list;
+        unsigned long iova;
+        phys_addr_t paddr;
+        size_t size;
+        int prot;
+};
+
 struct AFHBA_DEV {
 	char name[16];
 	char mon_name[16];
@@ -149,6 +162,13 @@ struct AFHBA_DEV {
 	int link_up;
 	int aurora_error_count;
 	int aurora_status_read_count;
+
+#ifdef CONFIG_GPU
+	//For GPU functionality
+	struct gpumem gpumem;
+#endif
+	struct iommu_domain *iommu_dom;
+	struct list_head iommu_map_list;
 };
 
 #define SZM1(field)	(sizeof(field)-1)
@@ -402,5 +422,16 @@ static inline u32 read_astatus2(struct AFHBA_DEV *adev)
 {
 	return afhba_read_reg(adev, AURORA_STATUS2_REG(adev->sfp));
 }
+
+#ifdef CONFIG_GPU
+extern void gpumem_init(struct AFHBA_DEV *adev);
+extern int iommu_init(struct AFHBA_DEV *adev);
+extern void afhba_free_iommu(struct AFHBA_DEV *adev);
+extern void afhba_free_gpumem(struct AFHBA_DEV *adev);
+extern long afhba_gpumem_lock(struct AFHBA_DEV *adev, unsigned long arg);
+extern long afhba_gpumem_unlock(struct AFHBA_DEV *adev, unsigned long arg);
+extern int addIommuMapProcFile(struct AFHBA_DEV *adev);
+extern int addGpuMemProcFile(struct AFHBA_DEV *adev);
+#endif
 
 #endif /* ACQ_FIBER_HBA_H_ */

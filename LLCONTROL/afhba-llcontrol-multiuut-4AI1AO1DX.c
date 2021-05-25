@@ -335,8 +335,9 @@ void capture(int enable)
 /** @@remove me .. this is too crude .. single uut, hard coded ..*/
 {
 	char buf[256];
+	volatile int rc;
 	sprintf(buf, "echo CONTINUOUS=%d | nc acq2106_130 4220", enable);
-	system(buf);
+	rc = system(buf);
 }
 int main(int argc, char* argv[])
 {

@@ -40,9 +40,10 @@
 
 #include <linux/poll.h>
 #include <linux/version.h>
+#include <linux/dma-mapping.h>
+#include <linux/iommu.h>
 
-
-#define REVID	"R1072"
+#define REVID	"R1073"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -127,10 +128,35 @@ module_param(max_empty_backlog_check, int , 0644);
 MODULE_PARM_DESC(max_empty_backlog_check, "set to one to look only at top of deck, set to two to check skips");
 
 
+int max_coherent = 2;
+module_param(max_coherent, int , 0644);
+MODULE_PARM_DESC(max_coherent, "allocate this many coherent DMA buffers");
 
 int use_llc_multi = 0;
 module_param(use_llc_multi, int, 0644);
 MODULE_PARM_DESC(use_llc_multi, "use LLC for multi descriptor transfer");
+
+// trying to test regular x86 transfer with intel_iommu=1
+int host_llc_use_iommu_map;
+module_param(host_llc_use_iommu_map, int, 0644);
+MODULE_PARM_DESC(host_llc_use_iommu_map, "if IOMMU is present, try a 1:1 mapping for HOST transfer");
+
+#if 0
+#define IOMMU_READ	(1 << 0)
+#define IOMMU_WRITE	(1 << 1)
+#define IOMMU_CACHE	(1 << 2) /* DMA cache coherency */
+#define IOMMU_NOEXEC	(1 << 3)
+#define IOMMU_MMIO	(1 << 4) /* e.g. things like MSI doorbells */
+#endif
+
+int vi_perms = IOMMU_WRITE;
+module_param(vi_perms, int, 0644);
+MODULE_PARM_DESC(vi_perms, "VI permissions: 2: WRITE 4:SNOOP");
+
+int vo_perms = IOMMU_READ;
+module_param(vo_perms, int, 0644);
+MODULE_PARM_DESC(vo_perms, "VI permissions: 1: READ 4:SNOOP");
+
 
 static int getOrder(int len)
 {
@@ -238,6 +264,46 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 		return -1;
 	}
 }
+
+
+int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
+              phys_addr_t paddr, uint64_t size, unsigned prot)
+{
+        if (iommu_map(adev->iommu_dom, iova, paddr, size, prot)){
+                dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
+                return -EFAULT;
+        }else{
+                struct iommu_mapping *saved_mapping =
+                                (struct iommu_mapping*)kzalloc(sizeof(struct iommu_mapping), GFP_KERNEL);
+
+                INIT_LIST_HEAD(&saved_mapping->list);
+                saved_mapping->iova = iova;
+                saved_mapping->paddr = paddr;
+                saved_mapping->size = size;
+                saved_mapping->prot = prot;
+                list_add_tail(&saved_mapping->list, &adev->iommu_map_list);
+                return 0;
+        }
+}
+
+
+void afhba_free_iommu(struct AFHBA_DEV *adev)
+{
+        struct iommu_mapping *saved_mapping;
+        struct iommu_mapping *cursor;
+        list_for_each_entry_safe(saved_mapping, cursor, &adev->iommu_map_list, list){
+                size_t rc = iommu_unmap(adev->iommu_dom, saved_mapping->iova, saved_mapping->size);
+                if (rc >= 0){
+                        dev_info(pdev(adev), "%s(): iommu_unmap() - OK!\n", __FUNCTION__);
+                }else{
+                        dev_err(pdev(adev), "%s(): iommu_unmap FAIL \n", __FUNCTION__);
+                }
+
+                list_del(&saved_mapping->list);
+                kfree(saved_mapping);
+        }
+}
+
 
 static int validate_dma_descriptor_ram(
 		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id, int phase)
@@ -1004,11 +1070,11 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	struct HostBuffer *hb;
 	int order = getOrder(buffer_len);
-	int ii;
+	int ii = 0;
 
 	dev_dbg(pdev(adev), "afs_init_buffers() 01 order=%d", order);
 
-	sdev->hbx = kzalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
+	hb = sdev->hbx = kzalloc(sizeof(struct HostBuffer)*nbuffers, GFP_KERNEL);
         INIT_LIST_HEAD(&sdev->bp_empties.list);
 	INIT_LIST_HEAD(&sdev->bp_filling.list);
 	INIT_LIST_HEAD(&sdev->bp_full.list);
@@ -1021,7 +1087,42 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	dev_dbg(pdev(adev), "allocating %d buffers size:%d order:%d dev.dma_mask:%08llx",
 			nbuffers, buffer_len, order, *adev->pci_dev->dev.dma_mask);
 
-	for (hb = sdev->hbx, ii = 0; ii < nbuffers; ++ii, ++hb){
+	for (; ii < max_coherent; ++ii, ++hb){
+		dma_addr_t dma_handle;
+
+		hb->va = (void*)dma_alloc_coherent(
+				&adev->pci_dev->dev,  buffer_len, &dma_handle,
+				GFP_KERNEL|GFP_DMA32);
+
+		if (!hb->va){
+			dev_err(pdev(adev), "failed to allocate buffer %d", ii);
+			break;
+		}
+
+
+		dev_dbg(pdev(adev), "buffer %2d allocated at %p, map it", ii, hb->va);
+
+		hb->ibuf = ii;
+		hb->pa = dma_handle;
+		hb->len = buffer_len;
+
+		dev_dbg(pdev(adev), "buffer %2d allocated, map done", ii);
+
+		if ((hb->pa & (AFDMAC_PAGE-1)) != 0){
+			dev_err(pdev(adev), "HB NOT PAGE ALIGNED");
+			WARN_ON(true);
+			return -1;
+		}
+
+		hb->descr = hb->pa | 0 | AFDMAC_DESC_EOT | (ii&AFDMAC_DESC_ID_MASK);
+		hb->bstate = BS_EMPTY;
+
+		dev_info(pdev(adev), "COHERENT [%d] %p %08x %d %08x",
+		    ii, hb->va, hb->pa, hb->len, hb->descr);
+		list_add_tail(&hb->list, &sdev->bp_empties.list);
+	}
+
+	for (; ii < nbuffers; ++ii, ++hb){
 		void *buf = (void*)__get_free_pages(GFP_KERNEL|GFP_DMA32, order);
 
 		if (!buf){
@@ -1033,7 +1134,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		hb->ibuf = ii;
 		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				buffer_len, PCI_DMA_FROMDEVICE);
+				buffer_len, PCI_DMA_BIDIRECTIONAL);
 		hb->va = buf;
 		hb->len = buffer_len;
 
@@ -1069,7 +1170,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	return 0;
 }
 
-static irqreturn_t afs_cos_isr(int irq, void *data)
+irqreturn_t afs_cos_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
@@ -1080,23 +1181,67 @@ static irqreturn_t afs_cos_isr(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+irqreturn_t afs_null_isr(int irq, void* data)
+{
+	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
+	dev_info(pdev(adev), "afs_null_isr %d", irq);
+	return IRQ_HANDLED;
+}
+
+// static int hook_interrupts(struct AFHBA_DEV* adev)
+// {
+// 	int rc = pci_enable_msi(adev->pci_dev);
+// 	if (rc < 0){
+// 		dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", 1);
+// 		return rc;
+// 	}
+// 	rc = request_irq(adev->pci_dev->irq, afs_cos_isr, IRQF_SHARED, "afhba", adev);
+// 	if (rc < 0) {
+// 		pr_warn("afhba.%d: request_irq =%d failed!\n",
+// 				adev->idx, adev->pci_dev->irq);
+// 		pci_disable_msi(adev->pci_dev);
+// 		return rc;
+// 	}
+// 	return rc;
+// }
+// //#endif
 
 static int hook_interrupts(struct AFHBA_DEV* adev)
 {
-	int rc = pci_enable_msi(adev->pci_dev);
-	if (rc < 0){
-		dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", 1);
-		return rc;
+#ifdef INTERRUPTS_WORK_OK
+	/* non peer case must happen first */
+	if (adev->peer == 0){
+		struct pci_dev *dev = adev->pci_dev;
+		int nvec = 4;
+		int rc;
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
+		rc = pci_enable_msi_block(dev, nvec = 4);
+		if (rc < 0){
+			dev_warn(pdev(adev), "pci_enable_msi_block() returned %d", rc);
+			rc = pci_enable_msi(dev);
+			nvec = 1;
+			if (rc < 0){
+				dev_warn(pdev(adev), "pci_enable_msi() failed");
+			}
+			return rc;
+		}
+#else
+		rc = pci_enable_msi_exact(dev, nvec);
+#endif
+		if (rc < 0){
+			dev_err(pdev(adev), "pci_enable_msi_exact(%d) FAILED", nvec);
+			return rc;
+		}
+
+		return port_request_irq(adev, 0);
+	}else{
+		return port_request_irq(adev, 1);
 	}
-	rc = request_irq(adev->pci_dev->irq, afs_cos_isr, IRQF_SHARED, "afhba", adev);
-	if (rc < 0) {
-		pr_warn("afhba.%d: request_irq =%d failed!\n",
-				adev->idx, adev->pci_dev->irq);
-		pci_disable_msi(adev->pci_dev);
-		return rc;
-	}
+#else
 	return 0;
+#endif
 }
 
 
@@ -1471,6 +1616,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
 
+
 	spin_lock(&sdev->job_lock);
 	job->please_stop = PS_OFF;
 	spin_unlock(&sdev->job_lock);
@@ -1479,6 +1625,23 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
+
+	if (adev->iommu_dom && host_llc_use_iommu_map){
+		int rc;
+		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
+
+		/* IOMMU_WRITE is DMA_FROM_DEVICE */
+		/* https://elixir.bootlin.com/linux/latest/source/arch/arm/mm/dma-mapping.c#L1087 ..
+		 * well, it is for ARM anyway ..
+		 */
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, vi_perms)) != 0){
+			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
+		}else{
+			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
+								__FUNCTION__, xllc_def->pa, rc);
+		}
+	}
+
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
 	spin_lock(&sdev->job_lock);
@@ -1488,6 +1651,9 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	spin_unlock(&sdev->job_lock);
 	return 0;
 }
+
+
+
 long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1498,10 +1664,77 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
+// trying to test regular x86 transfer with intel_iommu=1
+	if (host_llc_use_iommu_map && adev->iommu_dom){
+		int rc;
+		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
+
+		if ((rc = afhba_iommu_map(adev, xllc_def->pa, xllc_def->pa, size, vo_perms)) != 0){
+		/* IOMMU_READ is DMA_TO_DEVICE */
+			dev_warn(pdev(adev), "iommu_map failed %d\n", rc);
+		}else{
+			dev_info(pdev(adev), "%s iommu_map SUCCESS %08x %d\n",
+					__FUNCTION__, xllc_def->pa, rc);
+		}
+	}
 	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
 }
+
+
+
+/**
+ * iommu_init()
+ *  lazy init : will return quickly if not required or already done.
+ * MUST be AFTER buffer allocation.
+ */
+int iommu_init(struct AFHBA_DEV *adev)
+{
+        int rc = 0;
+
+        if (!iommu_present(&pci_bus_type)){
+                return 0;
+        }else if (adev->iommu_dom){
+        	return 0;
+        }
+
+
+
+        adev->iommu_dom = iommu_domain_alloc(&pci_bus_type);
+        if (!adev->iommu_dom){
+                dev_err(pdev(adev), "iommu_domain_alloc() fail %p",
+                                                adev->pci_dev->dev.bus->iommu_ops);
+                return -1;
+        }
+        dev_info(pdev(adev), "%s iommu_domain_geometry 0x%08llx 0x%08llx force:%d",
+                        __FUNCTION__,
+                        adev->iommu_dom->geometry.aperture_start,
+                        adev->iommu_dom->geometry.aperture_end,
+                        adev->iommu_dom->geometry.force_aperture
+                        );
+#if 0
+        rc = iommu_domain_window_enable(adev->iommu_dom, 0, 0, 1ULL << 36,
+        					 IOMMU_READ | IOMMU_WRITE);
+        if (rc < 0) {
+        	dev_err(pdev(adev), "%s(): iommu_domain_window_enable() = %d",
+        		__func__, rc);
+
+        }else{
+		dev_info(pdev(adev), "%s iommu_domain_window_enable() SUCCESS", __FUNCTION__);
+	}
+
+#endif
+        if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
+                dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
+                                __FUNCTION__,__LINE__, rc);
+                dev_err(pdev(adev), "iommu_attach_device failed --aborting.\n");
+                return -rc;
+        }
+        dev_info(pdev(adev), "%s iommu_attach_device() SUCCESS", __FUNCTION__);
+        return rc;
+}
+
 
 int afs_dma_open(struct inode *inode, struct file *file)
 {
@@ -1510,6 +1743,8 @@ int afs_dma_open(struct inode *inode, struct file *file)
 
 	int ii;
 
+
+	iommu_init(adev);
 	dev_dbg(pdev(adev), "45: DMA open");
 
 	/** @@todo protect with lock ? */
@@ -1542,6 +1777,7 @@ int afs_dma_open(struct inode *inode, struct file *file)
 	dev_dbg(pdev(adev), "99");
 	return 0;
 }
+
 
 int afs_dma_release(struct inode *inode, struct file *file)
 {
@@ -1587,6 +1823,12 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	sdev->pid = 0;
 	if (sdev->user) kfree(sdev->user);
 
+	if (adev->iommu_dom){
+		afhba_free_iommu(adev);
+	}
+#ifdef CONFIG_GPU
+	afhba_free_gpumem(adev);
+#endif
 	return afhba_release(inode, file);
 }
 
@@ -1909,10 +2151,10 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	if (dma_sel&DMA_PULL_SEL){
 		sdev->onStopPull = afs_stop_llc_pull;
 	}
-
+/*
 	dev_dbg(pdev(adev), "%s descriptors:%d %s", __FUNCTION__, abn->ndesc,
 			abn->buffers[0].pa == RTM_T_USE_HOSTBUF? "RTM_T_USE_HOSTBUF": "USER_ADDR");
-
+*/
 	if (abn->buffers[0].pa == RTM_T_USE_HOSTBUF){
 		abn->buffers[0].pa = sdev->hbx[0].pa;
 
@@ -1922,7 +2164,7 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 	}
 
 	for (ib = 0; ib < abn->ndesc; ++ib){
-		dev_dbg(pdev(adev), "%s [%2d] pa:%08x len:%d", 
+		dev_dbg(pdev(adev), "%s [%2d] pa:%08x len:%d",
 				__FUNCTION__, ib, abn->buffers[ib].pa, abn->buffers[ib].len);
 	}
 
@@ -2018,6 +2260,15 @@ long afs_dma_ioctl(struct file *file,
 		afs_load_pull_descriptor(adev, srcix);
 		return 0;
 	}
+#ifdef 	CONFIG_GPU
+	case AFHBA_GPUMEM_LOCK: { // Sets up gpu memory mapping for DMA_PUSH
+		long rc;
+		printk(KERN_ALERT "DEBUG: %s %d \n",__FUNCTION__,__LINE__);
+		rc = afhba_gpumem_lock(adev,arg);
+		printk(KERN_ALERT "DEBUG: %s %d %s\n",__FUNCTION__,__LINE__, rc==0? "PASSED": "FAILED");
+		return rc;
+	}
+#endif
 	default:
 		return -ENOTTY;
 	}
@@ -2233,8 +2484,13 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d", REVID, adev->name, adev->idx);
+	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d GPU", REVID, adev->name, adev->idx);
 
+#ifdef CONFIG_GPU
+#warning CONFIG_GPU set
+	gpumem_init(adev);
+#endif
+	INIT_LIST_HEAD(&adev->iommu_map_list);
 	afs_init_buffers(adev);
 
 	if (cos_interrupt_ok && adev->peer == 0){
@@ -2244,6 +2500,8 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	adev->stream_fops = &afs_fops;
 	afs_init_procfs(adev);
 	afs_create_sysfs(adev);
+
+
 	return 0;
 }
 int afhba_stream_drv_del(struct AFHBA_DEV* adev)
