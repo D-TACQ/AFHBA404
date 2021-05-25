@@ -186,8 +186,14 @@ def config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
     else:
         signal2 = signal = acq400_hapi.sigsel()
 
-    for site in AOSITES:
+    for idx, site in enumerate(AOSITES):
         uut.modules[site].lotide = 256
+        if idx ==0:
+            if len(AISITES):
+                uut.modules[site].clk = signal
+                uut.modules[site].CLKDIV = 1
+            
+                
         signal = signal2
 
     for site in DIOSITES:
@@ -214,7 +220,7 @@ def enum_sites(uut, uut_json=None):
     AOSITES = []
     DIOSITES = []
     PWMSITES = []
-    for site in uut.modules:
+    for site in sorted(uut.modules):
         try:
             module_name = uut.modules[site].get_knob('module_name')
             if module_name.startswith('acq'):
