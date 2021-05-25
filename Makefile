@@ -1,3 +1,12 @@
+# Makefile for afhba404
+# supports both host llc (default, most users) and gpu llc (special!)
+# to build everything for host: make
+# to clean everything for host: make clean
+#
+# to build everything for gpu: GPU=1 make
+# to clean everything for gpu: GPU=1 make clean
+#
+
 obj-m += afhba.o
 #obj-m += afhbaspi.o
 #obj-m += afhbasfp.o
