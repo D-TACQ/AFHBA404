@@ -22,8 +22,15 @@
 
 #ifndef __RTM_T_IOCTL_H__
 #define __RTM_T_IOCTL_H__
+
+#ifdef __KERNEL__
+typedef unsigned long long uint64_t;
+#else
 #include <stdint.h>
+#endif
 #include <linux/ioctl.h>
+
+
 struct LLC_DEF			/**< arg for ioctl RTM_T_START_LLC */
 {
 	u8 clk_div;		/**< 1..255: ECM value 1..255 usec with 1MHz EXTCLK */

@@ -10,9 +10,13 @@ CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
 
+
+ifeq ($(GPU),1)
 # enable next two lines for GPU
 EXTRA_CFLAGS += -DCONFIG_GPU
 EXTRA_GPU = afhba_gpu.o
+endif
+
 
 # default build is the local kernel.
 # build other kernels like this example:
@@ -111,6 +115,7 @@ package: clean spi_clean
 	(cd ..;tar cvzf AFHBA/release/afhba-$(DC).tgz \
 		--exclude=release --exclude=SAFE AFHBA/* )
 
+# example remote build
 viper:
 	rsync -va -t GPU_Example/ dt100@viper:PROJECTS/AFHBA404/GPU_Example
 	ssh dt100@viper 'cd PROJECTS/AFHBA404/GPU_Example; make'
