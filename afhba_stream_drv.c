@@ -2480,11 +2480,18 @@ void afs_create_sysfs(struct AFHBA_DEV *adev)
 }
 
 
+#ifdef CONFIG_GPU
+#define FLAVOUR "GPU"
+#else
+#define FLAVOUR "HOST"
+#endif
+
 int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d GPU", REVID, adev->name, adev->idx);
+	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d %s", 
+		REVID, adev->name, adev->idx, FLAVOUR);
 
 #ifdef CONFIG_GPU
 #warning CONFIG_GPU set
