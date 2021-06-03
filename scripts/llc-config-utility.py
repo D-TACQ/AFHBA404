@@ -38,6 +38,7 @@ import numpy
 import acq400_hapi
 import argparse
 import json
+import re
 
 
 def get_devnum(args, uut):
@@ -79,7 +80,7 @@ def calculate_tcan(xo_vector_length):
     return _calculate_padding(xo_vector_length)
 
 
-def calculate_vector_length(uut, SITES, DIOSITES, PWMSITES):
+def calculate_vector_length(uut, SITES, DIOSITES, PWMSITES=None):
     vector_length = 0
     for site in SITES:
         nchan = int(uut.modules[site].get_knob('NCHAN'))
@@ -109,21 +110,16 @@ def config_sync_clk(uut):
     return None
 
 
-def config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES):
+def config_aggregator(args, uut, AISITES, DISITES, COMMS):
     # This function calculates the ai vector size from the number of channels
     # and word size of the AISITES argument provided to it and then sets the
     # spad, aggregator and NCHAN parameters accordingly.
-    if args.include_dio_in_aggregator:
-        TOTAL_SITES = (AISITES + DIOSITES)
-    else:
-        TOTAL_SITES = AISITES
-        DIOSITES = None
-
+    TOTAL_SITES = (AISITES + DISITES)
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
     print(TOTAL_SITES)
 
-    ai_vector_length = calculate_vector_length(uut, AISITES, DIOSITES, PWMSITES)
+    ai_vector_length = calculate_vector_length(uut, AISITES, DISITES)
 
     # now check if we need a spad
     spad = calculate_spad(ai_vector_length)
@@ -134,34 +130,34 @@ def config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES):
 
     print('Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad))
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
-    uut.cA.aggregator = 'sites={}'.format(TOTAL_SITES)
+    uut.svc['c{}'.format(COMMS)].aggregator = 'sites={}'.format(TOTAL_SITES)    
     # uut.cB.aggregator = AISITES commented out because this is NOT always true.
     uut.s0.run0 = TOTAL_SITES
     return None
 
 
-def config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
-    TOTAL_SITES = (AOSITES + DIOSITES + PWMSITES)
-    ao_vector = calculate_vector_length(uut, AOSITES, DIOSITES, PWMSITES)
+def config_distributor(args, uut, AOSITES, DOSITES, PWMSITES, COMMS):
+    TOTAL_SITES = (AOSITES + DOSITES + PWMSITES)
+    ao_vector = calculate_vector_length(uut, AOSITES, DOSITES, PWMSITES)
     TCAN = calculate_tcan(ao_vector)
     if TCAN == 16:
         # If the TCAN is 16 then we're just taking up space for no reason, so
         # set it to zero. The reason we don't need this for SPAD is that we
         # encode some useful information in there.
         TCAN = 0
-    XOCOMMS = 'A' if len(AISITES) == 0 else 'A'
+    
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
     print(TOTAL_SITES)
     print('Distributor settings: sites={} pad={} comms={} on'.format(
-        TOTAL_SITES, TCAN, XOCOMMS))
+        TOTAL_SITES, TCAN, COMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
-        TOTAL_SITES, TCAN, XOCOMMS)
+        TOTAL_SITES, TCAN, COMMS)
 
     return None
 
 
-def config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod=False):
+def config_VI(args, uut, AISITES, DISITES, sod=False, COMMS='A'):
     uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
     if args.us == 1:
         trg = uut.s1.trg.split(" ")[0].split("=")[1]
@@ -173,12 +169,12 @@ def config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod=False):
     if sod:
         for site in AISITES:
             uut.modules[site].sod = 1
-    config_aggregator(args, uut, AISITES, DIOSITES, PWMSITES)
+    config_aggregator(args, uut, AISITES, DISITES, COMMS)
 
 
-def config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
-    if len(AISITES):
-        signal = acq400_hapi.sigsel(site=AISITES[0])
+def config_VO(args, uut, AOSITES, DOSITES, PWMSITES, MSITES, COMMS='A'):
+    if len(MSITES):
+        signal = acq400_hapi.sigsel(site=int(MSITES[0]))
         signal2 = signal
     elif len(AOSITES):
         signal = acq400_hapi.sigsel()
@@ -189,24 +185,24 @@ def config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES):
     for idx, site in enumerate(AOSITES):
         uut.modules[site].lotide = 256
         if idx ==0:
-            if len(AISITES):
+            if len(MSITES):
                 uut.modules[site].clk = signal
                 uut.modules[site].CLKDIV = 1
             
                 
         signal = signal2
 
-    for site in DIOSITES:
+    for site in DOSITES:
         uut.modules[site].mode = '0'
         uut.modules[site].lotide = '256'
-        uut.modules[site].byte_is_output = '1,1,0,0'
+        uut.modules[site].byte_is_output = '1,1,0,0'  # @@todo should be json configured.
         uut.modules[site].mode = '1'
         signal = signal2
 
     for site in PWMSITES:
         uut.modules[site].pwm_clkdiv = '%x' % 1000
 
-    config_distributor(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES)
+    config_distributor(args, uut, AOSITES, DOSITES, PWMSITES, COMMS)
 
 
 def load_json(json_file):
@@ -215,10 +211,13 @@ def load_json(json_file):
     return json_data
 
 
-def enum_sites(uut, uut_json=None):
+# @@todo ... this is all backwards. Here we build the model from the ACTUAL UUT, but the goal is to build the model from the DATAFILE, then validate the actual HW.
+# temp fix: assume ALL DIO32 are DI if DI32 specified, assume ALL DIO32 are DO if DO32 specified.
+def enum_sites(uut, uut_json):
     AISITES = []
+    DISITES = []
     AOSITES = []
-    DIOSITES = []
+    DOSITES = []
     PWMSITES = []
     for site in sorted(uut.modules):
         try:
@@ -230,7 +229,12 @@ def enum_sites(uut, uut_json=None):
             elif module_name.startswith('dio'):
 
                 if uut.modules[site].get_knob('module_type') == '61':
-                    DIOSITES.append(site)
+                    if 'DI32' in uut_json['VI'].keys() or args.include_dio_in_aggregator:
+                        if not 'DI32' in uut_json['VI'].keys():
+                            print("WARNING: deprecated DI32 requested but DI32 not in config file")
+                        DISITES.append(site)
+                    if 'DO32' in uut_json['VI'].keys():
+                        DOSITES.append(site)
                 if uut.modules[site].get_knob('module_type') == '6B':
                     module_variant = int(
                         uut.modules[site].get_knob('module_variant'))
@@ -248,7 +252,7 @@ def enum_sites(uut, uut_json=None):
         except Exception as err:
             print("ERROR: ", err)
             continue
-    return AISITES, AOSITES, DIOSITES, PWMSITES
+    return AISITES, DISITES, AOSITES, DOSITES, PWMSITES
 
 
 def get_json_vo_len(uut_json):
@@ -273,14 +277,19 @@ def get_json_vi_len(uut_json):
         SP += uut_json['VI']['SP32'] * 4
     return AI + DI + SP
 
+def get_comms(uut_json):
+    if 'COMMS' in uut_json.keys():
+        return uut_json['COMMS']
+    else:
+        return 'A'
 
-def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name):
+def verify_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_json, uut, uut_name):
     CRED = "\x1b[1;31m"
     CEND = "\33[0m"
-    agg_vector = calculate_vector_length(uut, AISITES, DIOSITES, PWMSITES)
+    agg_vector = calculate_vector_length(uut, AISITES, DISITES, PWMSITES)
     spad = calculate_spad(agg_vector)
     total_agg_vector = agg_vector + (spad * 4)
-    dist_vector = calculate_vector_length(uut, AOSITES, DIOSITES, PWMSITES)
+    dist_vector = calculate_vector_length(uut, AOSITES, DOSITES, PWMSITES)
 
     json_agg_vector = get_json_vi_len(uut_json)
     json_dist_vector = get_json_vo_len(uut_json)
@@ -294,34 +303,53 @@ def verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_na
     return None
 
 
-def config_auto(args, uut, uut_json=None):
+def read_knob(k):
+    with open(k) as fp:
+        return fp.read().replace('\n', '')
+
+def check_link(uut_def, dev_num):
+    uut_name = uut_def['name']
+    link_uut = read_knob("/dev/rtm-t.{}.ctrl/acq_ident".format(dev_num))
+    if link_uut == uut_name:
+        link_port = read_knob("/dev/rtm-t.{}.ctrl/acq_port".format(dev_num))
+        if link_port != get_comms(uut_def):            
+            print("WARNING: json specifies uut {} port {}, we have {}, going with it".
+                                        format(uut_name, get_comms(uut_def), link_port))
+        return link_port
+    else:
+        print("ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut))
     
-    uut_name = uut
-    uut = acq400_hapi.Acq2106(uut)
+     
+    sys.exit(1)      
 
-    AISITES, AOSITES, DIOSITES, PWMSITES = enum_sites(uut, uut_json)
-    sod = True if 'sod' in uut_json['type'] else False
+def config_auto(args, uut_def, dev_num):
+    comms = check_link(uut_def, dev_num)
     
-    verify_json_file(AISITES, AOSITES, DIOSITES, PWMSITES, uut_json, uut, uut_name)
+    uut_name = uut_def['name']
+    
+    
+    uut = acq400_hapi.Acq2106(uut_name)
 
-    if len(AISITES) != 0:
-        config_VI(args, uut, AISITES, DIOSITES, PWMSITES, sod)
+    AISITES, DISITES, AOSITES, DOSITES, PWMSITES = enum_sites(uut, uut_def)
+    sod = True if 'sod' in uut_def['type'] else False
+    
+    verify_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_def, uut, uut_name)
 
-    if len(DIOSITES) != 0 or len(AOSITES) != 0:
-        config_VO(args, uut, DIOSITES, AOSITES, AISITES, PWMSITES)
+    if len(AISITES) != 0 or len(DISITES) != 0:
+        config_VI(args, uut, AISITES, DISITES, sod, comms)
+
+    if len(DOSITES) != 0 or len(AOSITES) != 0 or len(PWMSITES) != 0:
+        config_VO(args, uut, AOSITES, DOSITES, PWMSITES, AISITES, comms)
 
     return None
 
 
-def run_main():
+def get_args():
     parser = argparse.ArgumentParser(description='Auto LLC config tool.')
 
     parser.add_argument('--include_dio_in_aggregator', type=int, default=0,
                         help='Since DIO cards can be used as input or output we can decide whether'
                         'or not to include them in the aggregator set.')
-
-    parser.add_argument('--auto', type=int, default=1,
-                        help='Whether or not to automatically configure the UUTs.')
 
     parser.add_argument('--us', type=int, default=1,
                         help='Whether or not to set the microsecond counter.')
@@ -332,18 +360,42 @@ def run_main():
     parser.add_argument('--fp_sync_clk', type=int, default=0,
                         help="sync clock output to FP for monitoring")
 
-    parser.add_argument('--json_file', type=str, default='./test.json',
+    parser.add_argument('--json_file', type=str, default=None,
                         help='Where to load the json file from.')
 
-    parser.add_argument('uuts', nargs='+', help="uuts")
+    parser.add_argument('jsfile', help="configuraton file")
 
     args = parser.parse_args()
-    if args.auto == 1:
-        json = load_json(args.json_file)
-        uut_json = [uut for uut in json['AFHBA']['UUT']]
+    if not args.json_file:
+        args.json_file = args.jsfile
+    
+    if args.include_dio_in_aggregator:
+        print("DEPRECATED: please define DI32 in config file instead")
+        
+    return args 
+
+def update_dev_num(dev_num, uut_def): 
+    try:
+        dev_num = int(uut_def['DEVNUM'])
+    except:
+        pass
+
+    return dev_num
+      
+def run_main():
+    args = get_args()
+        
+    json = load_json(args.json_file)
+    
+    dev_num = update_dev_num(0, json)                   # maybe global dev_num, else 0
+            
+    uut_json = [uut for uut in json['AFHBA']['UUT']]
+    
         #print("DEBUG: {}".format(uut_json))
-        for index, uut in enumerate(args.uuts):
-            config_auto(args, uut, uut_json[index])
+    for uut in uut_json:
+        dev_num = update_dev_num(dev_num, uut)          # maybe uut specific dev num, else current
+        config_auto(args, uut, dev_num)
+        dev_num += 1                                    # increment dev_num default
     return None
 
 

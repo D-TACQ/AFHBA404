@@ -66,6 +66,13 @@ if [ $LLC_CALLBACKS -eq 0 ]; then
 fi
 
 PYTHON="python3"
+
+PYTHON() {
+	echo python3 $*
+	python3 $*
+	echo python3 $1 done $?
+}
+
 # comment out if NOT using MDSplus
 USE_MDSPLUS=${USE_MDSPLUS:-0}
 
@@ -118,7 +125,7 @@ analysis() {
 	cd $AFHBA404_DIR
 # Change the json_src path here if the json file is not located in 
 # ~/PROJECTS/AFHBA404/runtime.json
-	$PYTHON scripts/acqproc_analysis.py --ones=1 --json=1 --json_src="./runtime.json" --src="$AFHBA404_DIR"
+	PYTHON scripts/acqproc_analysis.py --ones=1 --json=1 --json_src="./runtime.json" --src="$AFHBA404_DIR"
 }
 
 
@@ -142,9 +149,9 @@ EOF
 control_script() {
 	cd $HAPI_DIR
 	if $TRANSIENT; then
-		$PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
+		PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
 	else
-		$PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
+		PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
 	fi
 }
 
@@ -164,7 +171,7 @@ configure_uut() {
         		TOPROLE=${SYNC_ROLES[$INDEX]}
             		if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
 			echo "$TOPROLE"
-			$PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
+			PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
 			TOPROLE=slave
 			((INDEX++))
 		done
@@ -172,11 +179,11 @@ configure_uut() {
 			wait
 		done;;
 	*)
-        	$PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
+        	PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
 	esac 
 
 	cd $AFHBA404_DIR
-	$PYTHON scripts/llc-config-utility.py --include_dio_in_aggregator=1 --json_file=$ACQPROC_CONFIG $UUTS
+	PYTHON scripts/llc-config-utility.py $ACQPROC_CONFIG
 }
 
 PID_CP=0
