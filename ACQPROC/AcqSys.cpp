@@ -153,8 +153,6 @@ void ACQ::arm(int nsamples)
 }
 
 
-#define HBA_DEVNUM(_u) ((_u)[0]->devnum&~0x3)
-
 HBA::HBA(int _devnum, vector <ACQ*> _uuts, VI _vi, VO _vo):
 		devnum(_devnum),
 		IO("HBA"+to_string(_devnum), _vi, _vo),
