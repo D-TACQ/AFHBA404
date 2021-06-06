@@ -13,6 +13,7 @@
 - For a NEW PCS:
   - Define the config file
   - Subclass the shared memory interface SystemInterface to connect to your system.
+  
 ```C++
 struct SystemInterface {
 
@@ -36,8 +37,10 @@ public:
 	SystemInterface(const HBA& _hba);
 
 	virtual void ringDoorbell(int sample)
-	/**< alert PCS that there is new data .. implement by subclass. */
+	/* alert PCS that there is new data .. implement by subclass. */
+
 ```
+
   - In a Single Thread implementation:
      - Inputs, Outputs are created from simple heap allocations
      - method ringDoorbell() is called when there is new data.
@@ -66,6 +69,16 @@ public:
 - AFHBA404: Host Bus Adapter with 4 fiber link ports, supporting up to 4UUT's.
 - acqproc: compile once, configuration driven data handling engine supporting 4UUT's as the IO processor for a PCS
 
+### Json definition
+ - AFHBA: root of the data. Represents an AFHBA404 (or multiple AFHBA404s)
+ - UUT: represents one ACQ2106 on one AFHBA404 port
+ - DEVNUM: device number of the AFHBA link port. The numbers are global to the OS, so for example 
+  - DEVNUM=0 : PortA on first AFHBA404 card
+  - DEVNUM=4 : PortB on second AFHBA404 card
+  - DEVNUM defaults to 0 and by default counts up once per entry. System designer can insert a DEVNUM field in any UUT declaration.
+ - type: pcs, bolo [other specialized types]
+ - sync_role: fpmaster, slave 
+  - represents the clocking configuration 
 ### Vectors
 - VI : Vector Input: UUT sends a sample every clock, this is the VI, comprised of AI16, AI32, DI32, SP32
 - VO : Vector Output: UUT fetches an output sample every clock, this is the VO, comprising AO16, DO32, CP32
@@ -79,23 +92,96 @@ public:
 - DO32 : Digital Output, 32 bit, (eg DI423ELF)
 - CP32 : Calc Value, 32 bit, an intermediate calc result from the PCS. This is NOT sent to the UUT, but is stored in the raw output.
 
+
+
 ## sample config file, pcs1.json
 ```json
 {
     "AFHBA": {
         "UUT": [
 ...
-           	{ 	"name" : "acq2106_555",  
-			"type": "bolo",
-              		"VI" : {
+           	{ 	
+           	    "name" : "acq2106_555",  
+			    "type": "bolo",
+              	"VI" : {
                   		"AI32" : 48,  
-				"SP32" : 16
-                         }
-            	}
+				        "SP32" : 16
+               }
+            }
         ]
     }
 }
 ```
+## special customization. ***OPTIONAL***, system will use sensible defaults:
+- COMMS : global to the UUT definition, specify COMMS A or B
+- AISITES : local to the VI definition, specify exact AI modules in set.
+- DISITES : local to the VI definition, specify exact DI modules in set.
+  - for when inbound data is farmed to different HOSTS, and the HOST doesn't need to see ALL the data (unusual)
+- AOSITES : local to the VO definition, specify exact AO module in set.
+- DOSITES : local to the VO definition, specify exact AO modules in set.
+  - for when outbound data is sources from different HOSTS. (more likely, for spreading processing load among hosts)
+  
+```json
+{
+    "AFHBA": {
+        "DEVNUM": 0,
+        "UUT": [
+             {
+                "name": "acq2106_130",
+                "type": "pcs",
+                "sync_role": "fpmaster",
+				"COMMS": "B",
+                "VI": {
+                    "AI16": 128,
+                    "SP32": 16					
+                },
+                "VO": {
+                    "AO16": 32,
+					"AOSITES": [6]
+                }
+            }
+        ]
+    }
+}
+
+```
+ 
+- DO_BYTE_IS_OUTPUT : array of output definitions, one per DO module.
+
+```json
+{
+    "AFHBA": {
+        "UUT": [
+                {
+                "name" : "acq2106_276",
+                "type": "pcs",
+                "VI" : {
+                    "AI16" : 192,
+                    "SP32" : 16
+                    },
+                "VO": {
+                    "AO16" : 0
+                }
+                },
+                {
+                "name": "acq2106_277",
+                "type": "pcs,nowait,pwm",
+                "VI": {
+                    "AI16" : 0
+                },
+                "VO": {
+                    "AO16": 128,
+                    "DO32": 1,
+					"DO_BYTE_IS_OUTPUT" : [ "1,1,1,0" ],
+					"PW32": 1
+                    }
+                }
+            ]
+        }
+}
+
+```
+
 ## Typical Dummy Run:
 ```
 [pgm@hoy5 AFHBA404]$ sudo ./ACQPROC/acqproc ./ACQPROC/configs/pcs1.json 

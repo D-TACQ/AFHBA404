@@ -190,10 +190,10 @@ def config_VO(args, uut, MSITES, COMMS='A'):
                 
         signal = signal2
 
-    for site in uut.DOSITES:
+    for idx, site in enumerate(uut.DOSITES):
         uut.modules[site].mode = '0'
         uut.modules[site].lotide = '256'
-        uut.modules[site].byte_is_output = '1,1,0,0'  # @@todo should be json configured.
+        uut.modules[site].byte_is_output = uut.DO_BYTE_IS_OUTPUT
         uut.modules[site].mode = '1'
         signal = signal2
 
@@ -209,6 +209,9 @@ def load_json(json_file):
     return json_data
 
 
+# default DO output config 16DO, 16DI
+
+DO_BYTE_IS_OUTPUT_DEFAULT = '1,1,0,0'
 # @@todo ... this is all backwards. Here we build the model from the ACTUAL UUT, but the goal is to build the model from the DATAFILE, then validate the actual HW.
 # temp fix: assume ALL DIO32 are DI if DI32 specified, assume ALL DIO32 are DO if DO32 specified.
 def enum_sites(uut, uut_def):
@@ -216,6 +219,7 @@ def enum_sites(uut, uut_def):
     uut.DISITES = []
     uut.AOSITES = []
     uut.DOSITES = []
+    uut.DO_BYTE_IS_OUTPUT = []
     uut.PWMSITES = []
     for site in sorted(uut.modules):
         try:
@@ -233,6 +237,7 @@ def enum_sites(uut, uut_def):
                         uut.DISITES.append(site)
                     if 'DO32' in uut_def['VI'].keys():
                         uut.DOSITES.append(site)
+                        uut.DO_BYTE_IS_OUTPUT.append(DO_BYTE_IS_OUTPUT_DEFAULT)
                 if uut.modules[site].get_knob('module_type') == '6B':
                     module_variant = int(
                         uut.modules[site].get_knob('module_variant'))
@@ -249,7 +254,8 @@ def enum_sites(uut, uut_def):
                                 "Warning: PWM included in json configuration but site is NOT a PWM.")
         except Exception as err:
             print("ERROR: ", err)
-            continue    
+            continue 
+           
 
 
 json_word_sizes = {
@@ -309,7 +315,15 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
     else:
         print(CRED, "ERROR: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
         sys.exit(1)
-    
+   
+def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
+    try:
+        if do_dir_def in uut_def['VO']['DO_BYTE_IS_OUTPUT']:
+            for idx, module_dir in enumerate(do_dir_def):
+                uut.DO_BYTE_IS_OUTPUT[idx] = module_dir
+    except NameError:
+        pass
+            
 def matchup_json_file(uut, uut_def, uut_name):
 
     agg_vector = calculate_vector_length(uut, ASITES=uut.AISITES, DSITES=uut.DISITES)
@@ -331,6 +345,7 @@ def matchup_json_file(uut, uut_def, uut_name):
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DOSITES')               
 
+    customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
     return None
 
 
