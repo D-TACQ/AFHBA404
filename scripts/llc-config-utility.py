@@ -289,6 +289,8 @@ def get_comms(uut_json):
         return 'A'
 
 CRED = "\x1b[1;31m"
+CBLU = "\x1b[1;34m"
+CMAG = "\x1b[1;35m"
 CEND = "\33[0m"
 
 def json_override_actual(uut_json, uut_name, sites, vx, st):
@@ -301,12 +303,12 @@ def json_override_actual(uut_json, uut_name, sites, vx, st):
         if set(jsites).issubset(set(sites)):
             sites.clear()
             sites.extend(jsites)
-            print("INFO: UUT: {} using subset of available {} sites {}".format(uut_name, st, sites))
+            print(CBLU, "INFO: UUT: {} using subset of available {} sites {}".format(uut_name, st, sites), CEND)
         else:
-            print(CRED, "Problem found: UUT: {} JSON {} not in actual set.".format(uut_name, st), CEND)
+            print(CRED, "ERROR: UUT: {} JSON {} not in actual set.".format(uut_name, st), CEND)
             sys.exit(1)
     else:
-        print(CRED, "Problem found: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
+        print(CRED, "ERROR: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
         sys.exit(1)
     
 def matchup_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_json, uut, uut_name):
@@ -320,7 +322,7 @@ def matchup_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_json, uu
     json_dist_vector = get_json_vx_len(uut_json, 'VO')
 
     if json_agg_vector > total_agg_vector:
-        print(CRED, "Problem found: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector), CEND)
+        print(CRED, "ERROR: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector), CEND)
         sys.exit(1)
     if total_agg_vector != json_agg_vector:
         json_override_actual(uut_json, uut_name, AISITES, 'VI', 'AISITES')       
@@ -343,11 +345,11 @@ def check_link(uut_def, dev_num):
     if link_uut == uut_name:
         link_port = read_knob("/dev/rtm-t.{}.ctrl/acq_port".format(dev_num))
         if link_port != get_comms(uut_def):            
-            print("WARNING: json specifies uut {} port {}, we have {}, going with it".
-                                        format(uut_name, get_comms(uut_def), link_port))
+            print(CMAG, "WARNING: json specifies uut {} port {}, we have {}, going with it".
+                                        format(uut_name, get_comms(uut_def), link_port), CEND)
         return link_port
     else:
-        print("ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut))
+        print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CREND)
     
      
     sys.exit(1)      
