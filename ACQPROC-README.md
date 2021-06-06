@@ -78,7 +78,7 @@ public:
   - DEVNUM defaults to 0 and by default counts up once per entry. System designer can insert a DEVNUM field in any UUT declaration.
 - type: pcs, bolo [other specialized types]
 - sync_role: fpmaster, slave 
- - represents the clocking configuration 
+  - represents the clocking configuration 
 ### Vectors
 - VI : Vector Input: UUT sends a sample every clock, this is the VI, comprised of AI16, AI32, DI32, SP32
 - VO : Vector Output: UUT fetches an output sample every clock, this is the VO, comprising AO16, DO32, CP32
@@ -137,7 +137,7 @@ public:
                 },
                 "VO": {
                     "AO16": 32,
-					"AOSITES": [6]
+                    "AOSITES": [6]
                 }
             }
         ]
@@ -172,8 +172,8 @@ public:
                 "VO": {
                     "AO16": 128,
                     "DO32": 1,
-					"DO_BYTE_IS_OUTPUT" : [ "1,1,1,0" ],
-					"PW32": 1
+                    "DO_BYTE_IS_OUTPUT" : [ "1,1,1,0" ],
+                    "PW32": 1
                     }
                 }
             ]
