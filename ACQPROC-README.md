@@ -114,7 +114,8 @@ public:
 ```
 ## special customization. ***OPTIONAL***, system will use sensible defaults:
 - COMMS : global to the UUT definition, specify COMMS A or B
-- WD_BUT : global to the UUT definition, selects Watchdog Bit in DO vector. (assumes DO present)
+- WD_BIT : global to the UUT definition, selects Watchdog Bit in DO vector. (assumes DO present)
+  - example: configs/pcs1.json https://github.com/D-TACQ/AFHBA404/blob/master/ACQPROC/configs/pcs1.json
 - AISITES : local to the VI definition, specify exact AI modules in set.
 - DISITES : local to the VI definition, specify exact DI modules in set.
   - for when inbound data is farmed to different HOSTS, and the HOST doesn't need to see ALL the data (unusual)
