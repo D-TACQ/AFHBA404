@@ -70,15 +70,15 @@ public:
 - acqproc: compile once, configuration driven data handling engine supporting 4UUT's as the IO processor for a PCS
 
 ### Json definition
- - AFHBA: root of the data. Represents an AFHBA404 (or multiple AFHBA404s)
- - UUT: represents one ACQ2106 on one AFHBA404 port
- - DEVNUM: device number of the AFHBA link port. The numbers are global to the OS, so for example 
+- AFHBA: root of the data. Represents an AFHBA404 (or multiple AFHBA404s)
+- UUT: represents one ACQ2106 on one AFHBA404 port
+- DEVNUM: device number of the AFHBA link port. The numbers are global to the OS, so for example 
   - DEVNUM=0 : PortA on first AFHBA404 card
   - DEVNUM=4 : PortB on second AFHBA404 card
   - DEVNUM defaults to 0 and by default counts up once per entry. System designer can insert a DEVNUM field in any UUT declaration.
- - type: pcs, bolo [other specialized types]
- - sync_role: fpmaster, slave 
-  - represents the clocking configuration 
+- type: pcs, bolo [other specialized types]
+- sync_role: fpmaster, slave 
+ - represents the clocking configuration 
 ### Vectors
 - VI : Vector Input: UUT sends a sample every clock, this is the VI, comprised of AI16, AI32, DI32, SP32
 - VO : Vector Output: UUT fetches an output sample every clock, this is the VO, comprising AO16, DO32, CP32
