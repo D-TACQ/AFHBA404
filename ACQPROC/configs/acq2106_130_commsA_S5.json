@@ -6,13 +6,15 @@
                 "name": "acq2106_130",
                 "type": "pcs",
                 "sync_role": "fpmaster",
-				"COMMS": "B",
+				"COMMS": "A",
                 "VI": {
                     "AI16": 128,
-                    "SP32": 16					
+                    "SP32": 16
+					
                 },
                 "VO": {
-                    "AO16": 64
+                    "AO16": 32,
+					"AOSITES": [5]
                 }
             }
         ]

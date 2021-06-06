@@ -80,22 +80,20 @@ def calculate_tcan(xo_vector_length):
     return _calculate_padding(xo_vector_length)
 
 
-def calculate_vector_length(uut, SITES, DIOSITES, PWMSITES=None):
+def calculate_vector_length(uut, ASITES=None, DSITES=None, PWMSITES=None):
     vector_length = 0
-    for site in SITES:
-        nchan = int(uut.modules[site].get_knob('NCHAN'))
-        data32 = int(uut.modules[site].get_knob('data32'))
-        if data32:
-            vector_length += (nchan * 4)
-        else:
-            vector_length += (nchan * 2)
+    if ASITES:
+        for site in ASITES:
+            nchan = int(uut.modules[site].get_knob('NCHAN'))
+            data32 = int(uut.modules[site].get_knob('data32'))
+            vector_length += (nchan * (4 if data32 else 2))        
 
-    if DIOSITES:
-        for site in DIOSITES:
+    if DSITES:
+        for site in DSITES:
             vector_length += 4
 
     if PWMSITES:
-        for site in DIOSITES:
+        for site in PWMSITES:
             vector_length += 64
 
     return vector_length
@@ -119,7 +117,7 @@ def config_aggregator(args, uut, AISITES, DISITES, COMMS):
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
     print(TOTAL_SITES)
 
-    ai_vector_length = calculate_vector_length(uut, AISITES, DISITES)
+    ai_vector_length = calculate_vector_length(uut, ASITES=AISITES, DSITES=DISITES)
 
     # now check if we need a spad
     spad = calculate_spad(ai_vector_length)
@@ -138,7 +136,7 @@ def config_aggregator(args, uut, AISITES, DISITES, COMMS):
 
 def config_distributor(args, uut, AOSITES, DOSITES, PWMSITES, COMMS):
     TOTAL_SITES = (AOSITES + DOSITES + PWMSITES)
-    ao_vector = calculate_vector_length(uut, AOSITES, DOSITES, PWMSITES)
+    ao_vector = calculate_vector_length(uut, ASITES=AOSITES, DSITES=DOSITES, PWMSITES=PWMSITES)
     TCAN = calculate_tcan(ao_vector)
     if TCAN == 16:
         # If the TCAN is 16 then we're just taking up space for no reason, so
@@ -255,51 +253,83 @@ def enum_sites(uut, uut_json):
     return AISITES, DISITES, AOSITES, DOSITES, PWMSITES
 
 
-def get_json_vo_len(uut_json):
-    AO = 0
-    DO = 0
-    if 'AO16' in uut_json['VO'].keys():
-        AO += uut_json['VO']['AO16'] * 2
-    if 'DO32' in uut_json['VO'].keys():
-        DO += uut_json['VO']['DO32'] * 4
-    return AO + DO
+json_word_sizes = {
+    'AI16': 2, 'AO16': 2,
+    'AI32': 4, 'AO20': 4,
+    'DI32': 4, 'DO32': 4,
+    'PWM' : 64,
+    'SP32': 4   
+}
+def get_json_len(uut_json, vx, mt):
+    if mt in uut_json[vx].keys():
+        return uut_json[vx][mt] * json_word_sizes[mt]
+    else:
+        return 0
+    
+def get_json_vx_len(uut_json, vx):
+    vx_len = 0
+    for mt in list(json_word_sizes):        
+        vx_len += get_json_len(uut_json, vx, mt)
+    return vx_len
+
+def get_json_sites(uut_json, vx, xsite):
+    if xsite in uut_json[vx].keys():
+        return uut_json[vx][xsite]
+    else:
+        return None
 
 
-def get_json_vi_len(uut_json):
-    AI = 0
-    DI = 0
-    SP = 0
-    if 'AI16' in uut_json['VI'].keys():
-        AI += uut_json['VI']['AI16'] * 2
-    if 'DI32' in uut_json['VI'].keys():
-        DI += uut_json['VI']['DI32'] * 4
-    if 'SP32' in uut_json['VI'].keys():
-        SP += uut_json['VI']['SP32'] * 4
-    return AI + DI + SP
+        
 
 def get_comms(uut_json):
+    print(uut_json.keys())
     if 'COMMS' in uut_json.keys():
         return uut_json['COMMS']
     else:
         return 'A'
 
-def verify_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_json, uut, uut_name):
-    CRED = "\x1b[1;31m"
-    CEND = "\33[0m"
-    agg_vector = calculate_vector_length(uut, AISITES, DISITES, PWMSITES)
+CRED = "\x1b[1;31m"
+CEND = "\33[0m"
+
+def json_override_actual(uut_json, uut_name, sites, vx, st):
+    if len(sites) == 0:
+        return
+    
+    jsites = get_json_sites(uut_json, vx, st)
+        
+    if jsites:
+        if set(jsites).issubset(set(sites)):
+            sites.clear()
+            sites.extend(jsites)
+            print("INFO: UUT: {} using subset of available {} sites {}".format(uut_name, st, sites))
+        else:
+            print(CRED, "Problem found: UUT: {} JSON {} not in actual set.".format(uut_name, st), CEND)
+            sys.exit(1)
+    else:
+        print(CRED, "Problem found: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
+        sys.exit(1)
+    
+def matchup_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_json, uut, uut_name):
+
+    agg_vector = calculate_vector_length(uut, ASITES=AISITES, DSITES=DISITES)
     spad = calculate_spad(agg_vector)
     total_agg_vector = agg_vector + (spad * 4)
-    dist_vector = calculate_vector_length(uut, AOSITES, DOSITES, PWMSITES)
+    dist_vector = calculate_vector_length(uut, ASITES=AOSITES, DSITES=DOSITES, PWMSITES=PWMSITES)
 
-    json_agg_vector = get_json_vi_len(uut_json)
-    json_dist_vector = get_json_vo_len(uut_json)
+    json_agg_vector = get_json_vx_len(uut_json, 'VI')
+    json_dist_vector = get_json_vx_len(uut_json, 'VO')
 
+    if json_agg_vector > total_agg_vector:
+        print(CRED, "Problem found: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector), CEND)
+        sys.exit(1)
     if total_agg_vector != json_agg_vector:
-        print(CRED, "Problem found: UUT: {} aggregator different from JSON. Please check JSON.".format(uut_name), CEND)
-        print(CRED, "Aggregator vector: {}, json aggregator vector: {}".format(total_agg_vector, json_agg_vector), CEND)
+        json_override_actual(uut_json, uut_name, AISITES, 'VI', 'AISITES')       
+        json_override_actual(uut_json, uut_name, DISITES, 'VI', 'DISITES')         
+ 
     if dist_vector != json_dist_vector:
-        print(CRED, "Problem found: UUT distributor different from JSON. Please check JSON.", CEND)
-        print(CRED, "Distributor vector: {}, json distributor vector: {}".format(dist_vector, json_dist_vector), CEND)
+        json_override_actual(uut_json, uut_name, AOSITES, 'VO', 'AOSITES')
+        json_override_actual(uut_json, uut_name, DOSITES, 'VO', 'DOSITES')               
+
     return None
 
 
@@ -333,7 +363,7 @@ def config_auto(args, uut_def, dev_num):
     AISITES, DISITES, AOSITES, DOSITES, PWMSITES = enum_sites(uut, uut_def)
     sod = True if 'sod' in uut_def['type'] else False
     
-    verify_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_def, uut, uut_name)
+    matchup_json_file(AISITES, AOSITES, DISITES, DOSITES, PWMSITES, uut_def, uut, uut_name)
 
     if len(AISITES) != 0 or len(DISITES) != 0:
         config_VI(args, uut, AISITES, DISITES, sod, comms)
