@@ -114,6 +114,7 @@ public:
 ```
 ## special customization. ***OPTIONAL***, system will use sensible defaults:
 - COMMS : global to the UUT definition, specify COMMS A or B
+- WD_BUT : global to the UUT definition, selects Watchdog Bit in DO vector. (assumes DO present)
 - AISITES : local to the VI definition, specify exact AI modules in set.
 - DISITES : local to the VI definition, specify exact DI modules in set.
   - for when inbound data is farmed to different HOSTS, and the HOST doesn't need to see ALL the data (unusual)
@@ -206,6 +207,10 @@ HBA0 VI:1216 VO:204
 ```
 
 ## runtime.json : computed system configuration
+
+acqproc outputs an augmented version of the configuration file.
+This includes all intermediate calculations performed on the vectors (counts, offsets)
+This is firstly to let a human check that the file has been interpreted in a way that meets expectation, and secondly, could be a machine-readable input for the PCS algorithm, rather than relying on manually defined offsets and counts.
 
 ### AFHBA
 First, a reflection of the original config file:
