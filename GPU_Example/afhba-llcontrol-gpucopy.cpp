@@ -172,6 +172,7 @@ do_free_attr:
 do_free_context:
 	cuCtxDestroy(context);
 	close(fd);
+	exit(1);
 	return 1;
 
 }
