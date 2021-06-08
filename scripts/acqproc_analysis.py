@@ -54,9 +54,11 @@ def collect_dtimes(t_latch):
                 histo[diff] = 1
 
             t_latch = t_latch[pos:]
-            ideal = np.arange(t_latch[0], t_latch.shape[-1]+t_latch[0])
-
-            if t_latch.shape[-1] == 0:
+            try:
+                ideal = np.arange(t_latch[0], t_latch.shape[-1]+t_latch[0])
+                if t_latch.shape[-1] == 0:
+                    break
+            except:
                 break
 
     return histo
