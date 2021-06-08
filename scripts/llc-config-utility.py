@@ -266,9 +266,9 @@ json_word_sizes = {
     'SP32': 4   
 }
 def get_json_len(uut_def, vx, mt):
-    if mt in uut_def[vx].keys():
+    try:
         return uut_def[vx][mt] * json_word_sizes[mt]
-    else:
+    except:
         return 0
     
 def get_json_vx_len(uut_def, vx):
