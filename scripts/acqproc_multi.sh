@@ -55,8 +55,8 @@ AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
 TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
 
-TOP=${TOP:-/home/dt100/PROJECTS/}
-HAPI_DIR=$TOP/acq400_hapi/
+TOP=${TOP:-/home/dt100/PROJECTS}
+HAPI_DIR=$TOP/acq400_hapi
 AFHBA404_DIR=$TOP/AFHBA404/
 MDS_DIR=$TOP/ACQ400_MDSplus/
 
@@ -147,11 +147,10 @@ EOF
 
 
 control_script() {
-	cd $HAPI_DIR
 	if $TRANSIENT; then
-		PYTHON user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
+		PYTHON $HAPI_DIR/user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
 	else
-		PYTHON user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
+		PYTHON $HAPI_DIR/user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
 	fi
 }
 
@@ -159,7 +158,6 @@ control_script() {
 configure_uut() {
 	# Setup is done here.
 
-	cd $HAPI_DIR
 	case $SYNC_ROLE_MODE in
 	n*)
 		echo "WARNING: omit sync_role";;
@@ -171,7 +169,7 @@ configure_uut() {
         		TOPROLE=${SYNC_ROLES[$INDEX]}
             		if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
 			echo "$TOPROLE"
-			PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
+			PYTHON $HAPI_DIR/user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
 			TOPROLE=slave
 			((INDEX++))
 		done
@@ -179,10 +177,9 @@ configure_uut() {
 			wait
 		done;;
 	*)
-        	PYTHON user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
+        	PYTHON $HAPI_DIR/user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
 	esac 
 
-	cd $AFHBA404_DIR
 	PYTHON scripts/llc-config-utility.py $ACQPROC_CONFIG
 }
 
@@ -236,7 +233,7 @@ all|*)
 		control_program_with_analysis
 	else
 		control_program & PID_CP=$!
-        	control_script
+        	control_script 
 		wait $PID_CP
 	fi
 
