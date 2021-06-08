@@ -144,6 +144,29 @@ def get_json(path):
         jdata = json.load(f)
     return jdata
 
+def show_hexdump(uut):
+    name = uut['name']
+    if 'VI' in uut.keys():
+        command = "hexdump -ve \'"
+        try:
+            command += '{}/4 "%08x," '.format(uut['VI']['AI32'])
+        except:
+            pass
+        try:
+            command += '{}/2 "%04x," '.format(uut['VI']['AI16'])
+        except:
+            pass
+        try:
+            command += '{}/4 "%08x," '.format(uut['VI']['DI32'])
+        except:
+            pass
+        try:
+            command += '{}/4 "%08x," '.format(uut['VI']['SP32'])
+        except:
+            pass
+        command += '"\\n"\' {}_VI.dat '.format(name)
+        print(command)
+
 
 def run_analysis(args):
 
@@ -160,6 +183,7 @@ def run_analysis(args):
             if "VI" not in uut.keys():
                 continue
             print("Running analysis for UUT: {}".format(args.name))
+            show_hexdump(uut)
             try:
                 args.dix_len = uut['VI']['DI32']
             except KeyError:
