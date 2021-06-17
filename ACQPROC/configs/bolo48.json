@@ -1,6 +1,6 @@
 {
     "AFHBA": {
-        "//" : "bolo48.json .. example 48channel bolo setup
+        "//" : "bolo48.json .. example 48channel bolo setup"
         "UUT": [
                 {
 	           "name" : "acq2106_123",  
