@@ -169,17 +169,17 @@ void setup()
 	ab_def.buffers[1].len = VI_LEN;
 	bufferAB[0] = host_buffer;
 	bufferAB[1] = host_buffer+BUFFER_AB_OFFSET;
-	printf("AI buf pa: %c 0x%08x len %d\n", 'A',
+	printf("%16s AI buf pa: %c 0x%08x len %d\n", "before ioctl()", 'A',
 			ab_def.buffers[0].pa, ab_def.buffers[0].len);
-	printf("AI buf pa: %c 0x%08x len %d\n", 'B',
+	printf("%16s AI buf pa: %c 0x%08x len %d\n", "before ioctl()", 'B',
 			ab_def.buffers[1].pa, ab_def.buffers[1].len);
 	if (ioctl(fd, AFHBA_START_AI_AB, &ab_def)){
 		perror("ioctl AFHBA_START_AI_AB");
 		exit(1);
 	}
-	printf("AI buf pa: %c 0x%08x len %d\n", 'A',
+	printf("%16s AI buf pa: %c 0x%08x len %d\n", "after ioctl()", 'A',
 			ab_def.buffers[0].pa, ab_def.buffers[0].len);
-	printf("AI buf pa: %c 0x%08x len %d\n", 'B',
+	printf("%16s AI buf pa: %c 0x%08x len %d\n", "after ioctl()", 'B',
 			ab_def.buffers[1].pa, ab_def.buffers[1].len);
 }
 
