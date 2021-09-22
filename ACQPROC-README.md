@@ -9,10 +9,16 @@ eg
   - it could be 2 boxes each 96AI, 64AO or one box with 192AI and another with 128AO.
 .. and the same algorithm will work with both
  it's assumed that the PCS is another process on other cores that interacts with the SHM.
-- acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
+
 - logic to handle special cases - eg 
   - BOLO8 (data not in phase), 
   - WATCHDOG (a pulse output before trigger).
+  
+- acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
+
+- scripted tools (usually python) use the config file to configure the units via Ethernet, other tools use the input config file and in particular the output config file to drive data analysis.
+
+- the config file is a common configuration interface between pre-shot configuration (python), in-shot realtime (C++, CUDA) and post-shot analysis (python).
 
 - For a NEW PCS:
   - Define the config file
