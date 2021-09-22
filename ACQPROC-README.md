@@ -17,11 +17,11 @@ eg
 - For a NEW PCS:
   - Define the config file
   - Subclass the shared memory interface SystemInterface to connect to your system.
-   - Users can create a custom subclass to implement shared memory, comms
-   - in particular, overload SystemInterface::ringDoorBell();
-    - in ringDoorBell():
-     - all latest inputs are in IN.*, use them and
-     - leave outputs in OUT.* ..
+    - Users can create a custom subclass to implement shared memory, comms
+    - in particular, overload SystemInterface::ringDoorBell();
+      - in ringDoorBell():
+        - all latest inputs are in IN.*, use them and
+        - leave outputs in OUT.* ..
     - the framework will take care of the rest.
 
   
