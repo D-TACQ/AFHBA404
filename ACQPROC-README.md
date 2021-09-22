@@ -3,7 +3,11 @@
 ## ACQPROC:
 - a single compile-once executable supports any number (4 per AFHBA404) UUT's (ACQ2106), any payload.
 - the system is defined by a config file (json), and the system autoconfigures itself.
-- we're using a SHM to gather all IO data from the UUT's in a single AI,DI,AO,DO vectors,
+- we're using a SHM to gather all IO data from the UUT's in a single AI,DI,AO,DO vectors, so that the PCS algorithm is independent of the actual set of hardware in use. 
+eg 
+ - it could be 4 boxes with 32AI each, or one box with 32AI
+ - it could be 2 boxes each 96AI, 64AO or one box with 192AI and another with 128AO.
+.. and the same algorithm will work with both
  it's assumed that the PCS is another process on other cores that interacts with the SHM.
 - acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
 - logic to handle special cases - eg 
@@ -13,6 +17,13 @@
 - For a NEW PCS:
   - Define the config file
   - Subclass the shared memory interface SystemInterface to connect to your system.
+   - Users can create a custom subclass to implement shared memory, comms
+   - in particular, overload SystemInterface::ringDoorBell();
+    - in ringDoorBell():
+     - all latest inputs are in IN.*, use them and
+     - leave outputs in OUT.* ..
+    - the framework will take care of the rest.
+
   
 ```C++
 struct SystemInterface {

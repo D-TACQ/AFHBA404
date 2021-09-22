@@ -157,7 +157,11 @@ namespace G {
 };
 
 /** Models interface with external PCS.
- * Users can create a custom subclass to implement shared memory, comms
+ *  Users can create a custom subclass to implement shared memory, comms
+ *  in particular, overload ringDoorBell();
+ *   in ringDoorBell():
+ *   all latest inputs are in IN.*,
+ *   leave outputs in OUT.* and the framework will take care of the rest.
  */
 struct SystemInterface {
 private:
