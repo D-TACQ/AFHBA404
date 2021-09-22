@@ -1,6 +1,6 @@
 # ACQPROC-README
 
-## ACQPROC : Low Latency Control configred by data file, any number of UUT's, any combination of IO:
+### ACQPROC : Low Latency Control configured by data file, any number of UUT's, any IO combo:
 - a single compile-once executable supports any number (4 per AFHBA404) UUT's (ACQ2106), any payload.
 - the system is defined by a config file (json), and the system autoconfigures itself.
 - we're using a SHM to gather all IO data from the UUT's in a single AI,DI,AO,DO vectors, so that the PCS algorithm is independent of the actual set of hardware in use. 
