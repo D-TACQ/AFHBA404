@@ -172,19 +172,19 @@ static int hbd_proc_open(struct inode *inode, struct file *file)
 
 static int addHostBufferProcFiles(struct AFHBA_DEV *adev)
 {
-	static struct file_operations hb_proc_fops = {
-		.owner = THIS_MODULE,
-		.open = hb_proc_open,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = seq_release
+	static struct proc_ops hb_proc_fops = {
+//		.owner = THIS_MODULE,
+		.proc_open = hb_proc_open,
+		.proc_read = seq_read,
+		.proc_lseek = seq_lseek,
+		.proc_release = seq_release
 	};
-	static struct file_operations hbd_proc_fops = {
-		.owner = THIS_MODULE,
-		.open = hbd_proc_open,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = seq_release
+	static struct proc_ops hbd_proc_fops = {
+//		.proc_owner = THIS_MODULE,
+		.proc_open = hbd_proc_open,
+		.proc_read = seq_read,
+		.proc_lseek = seq_lseek,
+		.proc_release = seq_release
 	};
 
 	struct proc_dir_entry *hb_entry =
@@ -216,12 +216,13 @@ static int ab_proc_open(struct inode *inode, struct file *file)
 
 static int addAppBufferProcFiles(struct AFHBA_DEV *adev)
 {
-	static struct file_operations ab_proc_fops = {
-		.owner = THIS_MODULE,
-		.open = ab_proc_open,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = seq_release
+//	static struct file_operations ab_proc_fops = {
+        static struct proc_ops ab_proc_fops = {
+//		.owner = THIS_MODULE,
+		.proc_open = ab_proc_open,
+		.proc_read = seq_read,
+		.proc_lseek = seq_lseek,
+		.proc_release = seq_release
 	};
 	struct proc_dir_entry *ab_entry =
 		proc_create_data("AppBuffers", S_IRUGO,
@@ -283,12 +284,13 @@ static int job_proc_open(struct inode *inode, struct file *file)
 }
 static int addJobProcFile(struct AFHBA_DEV *adev)
 {
-	static struct file_operations job_proc_fops = {
-		.owner = THIS_MODULE,
-		.open = job_proc_open,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = single_release
+	const struct proc_ops job_proc_fops = {
+//	static struct file_operations job_proc_fops = {
+//		.owner = THIS_MODULE,
+		.proc_open = job_proc_open,
+		.proc_read = seq_read,
+		.proc_lseek = seq_lseek,
+		.proc_release = single_release
 	};
 	if (proc_create_data("Job", S_IRUGO,
 			adev->proc_dir_root, &job_proc_fops, adev) != 0){
@@ -323,12 +325,12 @@ static int iommu_proc_open(struct inode *inode, struct file *file)
 
 int addIommuMapProcFile(struct AFHBA_DEV *adev)
 {
-        static struct file_operations iommu_proc_fops = {
-                        .owner = THIS_MODULE,
-                        .open = iommu_proc_open,
-                        .read = seq_read,
-                        .llseek = seq_lseek,
-                        .release = single_release
+        static struct proc_ops iommu_proc_fops = {
+//                        .owner = THIS_MODULE,
+                        .proc_open = iommu_proc_open,
+                        .proc_read = seq_read,
+                        .proc_lseek = seq_lseek,
+                        .proc_release = single_release
         };
         if (proc_create_data("IOMMU_maps", S_IRUGO,
                         adev->proc_dir_root, &iommu_proc_fops, adev) != 0){
