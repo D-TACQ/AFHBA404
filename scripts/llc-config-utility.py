@@ -39,6 +39,7 @@ import acq400_hapi
 import argparse
 import json
 import re
+import sys
 
 
 def get_devnum(args, uut):
@@ -363,7 +364,7 @@ def check_link(uut_def, dev_num):
                                         format(uut_name, get_comms(uut_def), link_port), CEND)
         return link_port
     else:
-        print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CREND)
+        print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CEND)
     
      
     sys.exit(1)      
