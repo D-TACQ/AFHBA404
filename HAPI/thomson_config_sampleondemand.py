@@ -28,6 +28,7 @@ SIMULATE = os.getenv("SIMULATE", "")
 AISITES = os.getenv("AISITES", "1,2,3,4,5,6")
 XOCOMMS = os.getenv("XOCOMMS", "A")
 PULSE_EDGE = int(os.getenv("PULSE_EDGE", "0"))
+TRG_EDGE   = int(os.getenv("TRG_EDGE", "0"))
 # Default thomson buffer length is 4096. Now user configurable.
 BUFLEN = int(os.getenv("BUFLEN", "4096"))
 
@@ -53,7 +54,7 @@ def init_clks(uuts):
         print("shot trigger role:{} value:{}".format(role, uut.s0.SIG_SRC_TRG_0))
         uut.s0.SIG_SYNC_OUT_TRG = 'TRG'
         uut.s0.SIG_SYNC_OUT_TRG_DX = 'd0'
-        uut.s0.spad1_us = '1,0,1'
+        uut.s0.spad1_us = '1,0,{}'.format(TRG_EDGE)
 
         if role=="master":
             uut.s0.SIG_SRC_TRG_1 = 'FP_SYNC'
