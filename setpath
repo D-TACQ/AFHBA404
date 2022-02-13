@@ -1,0 +1,2 @@
+pushd ../acq400_hapi/; source ./setpath; popd
+
