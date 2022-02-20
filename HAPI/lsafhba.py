@@ -7,6 +7,7 @@ Created on 18 Feb 2022
 
 import argparse
 import acq400_hapi
+import json
 
 
 def mtype(mod):
@@ -22,7 +23,7 @@ def mtype(mod):
         mt = "UN"
     return "{}{}".format(mt, 32 if mod.data32=='1' else 16)
 
-def save_VI(cfg, indent, uut):
+def save_VI(cfg, uut):
     NC = { 'AI16': 0, 'AI32': 0, 'DI32': 0, 'SP32': 0 }
     for s in [int(s) for s in uut.sites]:
         mod = uut.modules[s]
@@ -42,12 +43,12 @@ def save_VI(cfg, indent, uut):
     for key, value in NC.items():
         if value > 0:
             len_vi += value * (2 if key == "AI16" else 4)
-            cfg.write('{}"{}": {},\n'.format(indent, key, value))
+            cfg.write('"{}": {},\n'.format(key, value))
             
     sp32 = (16*4 - len_vi%64) // 4
-    cfg.write('{}"{}": {}\n'.format(indent, "SP32", sp32))
+    cfg.write('"{}": {}\n'.format("SP32", sp32))
     
-def save_VO(cfg, indent, uut):
+def save_VO(cfg, uut):
     NC = { 'AO16': 0, 'AO32': 0, 'DO32': 0 }
     
     for s in [int(s) for s in uut.sites]:
@@ -69,53 +70,41 @@ def save_VO(cfg, indent, uut):
     for key, value in NC.items():
         if value > 0:
             len_vo += value * (2 if key == "AO16" else 4)
-            cfg.write('{}"{}": {},\n'.format(indent, key, value))
+            cfg.write('"{}": {},\n'.format(key, value))
     aosites = uut.get_site_types()['AOSITES']
     if len(aosites) > 0:
-        cfg.write('{}"{}": {},\n'.format(indent, 'AOSITES', aosites))
-    cfg.write('{}"{}": {}\n'.format(indent, "PAD32", 0))
+        cfg.write('"{}": {},\n'.format('AOSITES', aosites))
+    cfg.write('"{}": {}\n'.format("PAD32", 0))
     
     
-def save_config_skel(args, cfile, conns, uuts):
-    indent = ''
+def save_config(args, cfile, conns, uuts):
     with open(cfile, "w") as cfg:
-        cfg.write('{}{}\n'.format(indent, '{'))
-        indent += '\t'
-        cfg.write('{}"AFHBA": {}\n'.format(indent, '{'))
-        indent += '\t'
-        cfg.write('{}"UUT": [\n'.format(indent))
-        indent += '\t'
+        cfg.write('{\n')
+        cfg.write('"AFHBA": {\n')
+        cfg.write('"UUT": [\n')
         ii = 0
         for key, value in conns.items():
-            cfg.write('{}{}\n'.format(indent, '{'))
-            indent += '\t'          
-            cfg.write('{}"DEVNUM": {},\n'.format(indent, value.dev))
-            cfg.write('{}"name": "{}",\n'.format(indent, value.uut))
-            cfg.write('{}"type": "pcs",\n'.format(indent))
-            cfg.write('{}"sync_role": "{}",\n'.format(indent, "master" if ii==0 else "slave"))
-            cfg.write('{}"COMMS": "{}",\n'.format(indent, value.cx))
+            cfg.write('{\n')          
+            cfg.write('"DEVNUM": {},\n'.format(value.dev))
+            cfg.write('"name": "{}",\n'.format(value.uut))
+            cfg.write('"type": "pcs",\n')
+            cfg.write('"sync_role": "{}",\n'.format("master" if ii==0 else "slave"))
+            cfg.write('"COMMS": "{}",\n'.format(value.cx))
             
-            cfg.write('{}"VI": {}\n'.format(indent, '{'))
-            indent += '\t'
-            save_VI(cfg, indent, uuts[ii])            
-            indent = indent[:-1]
-            cfg.write('{}{}\n'.format(indent, '},'))
-            cfg.write('{}"VO": {}\n'.format(indent, '{'))
-            indent += '\t'
-            save_VO(cfg, indent, uuts[ii]) 
-            indent = indent[:-1]
-            cfg.write('{}{}\n'.format(indent, '}'))            
+            cfg.write('"VI": {\n')
+            save_VI(cfg, uuts[ii])            
+            cfg.write('},\n')
             
-            indent = indent[:-1]
-            cfg.write('{}{}{}\n'.format(indent, '}', ',' if ii < len(uuts)-1 else ''))
+            cfg.write('"VO": {\n')
+            save_VO(cfg, uuts[ii]) 
+            cfg.write('}\n')            
+
+            cfg.write('{}{}\n'.format('}', ',' if ii < len(uuts)-1 else ''))
             ii += 1
             
-        indent = indent[:-1]
-        cfg.write('{}]\n'.format(indent))
-        indent = indent[:-1]
-        cfg.write('{}{}\n'.format(indent, '}'))
-        indent = indent[:-1]
-        cfg.write('{}{}\n'.format(indent, '}'))
+        cfg.write(']\n')
+        cfg.write('}\n')
+        cfg.write('}\n')
             
             
             
@@ -137,13 +126,19 @@ def lsafhba(args):
                  s, uut.modules[s].MODEL.split(" ")[0], \
                  mtype(uut.modules[s]), uut.modules[s].NCHAN))
             
-    if args.save_config_skel:
-        save_config_skel(args, args.save_config_skel, conns, uuts)
+    if args.save_config:
+        rawfile = "{}.r".format(args.save_config)
+        save_config(args, rawfile, conns, uuts)
+        
+        with open(rawfile, 'r') as fr:
+            data = json.load(fr)
+            with open(args.save_config, "w") as fp:
+                fp.write(json.dumps(data, indent=4))
 
     
 def run_main():
     parser = argparse.ArgumentParser(description='list all attached acq2x06 devices')
-    parser.add_argument('--save_config_skel', default=None, help='save configuration skeleton')
+    parser.add_argument('--save_config', default=None, help='save configuration skeleton')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     
     lsafhba(parser.parse_args())
