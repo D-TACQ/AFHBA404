@@ -24,31 +24,13 @@ A single common shot config script could run on either of HOSTA or HOSTB
 import argparse
 import acq400_hapi
 
-import subprocess
-from collections import namedtuple
-
-def get_connections():
-    conns = {}
-    p = subprocess.Popen(["./scripts/get-ident-all", ""], \
-             stdout=subprocess.PIPE, stderr=subprocess.PIPE, \
-             universal_newlines=True)
-    output, errors = p.communicate()
-    fields = "host", "dev", "uut", "cx"
-    HostComms = namedtuple('HostComms', " ".join(fields))
-    for ii, ln in enumerate(output.split('\n')):
-        lns = ln.split(' ')
-        if len(lns) == 4:
-            record = HostComms(**dict(zip(fields, ln.split(' '))))
-            conns[ii] = record
-    return conns
-
 def take_the_wheel(uuts, cx):
     for uutname in uuts:
         uut = acq400_hapi.factory(uutname)
         uut.s0.distributor = "comms={}".format(cx)
 
 def run_main(args):
-    conns = get_connections()
+    conns = acq400_hapi.afhba404.get_connections()
     cx = None
     uuts = []
 
