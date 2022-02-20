@@ -42,32 +42,6 @@ import re
 import sys
 
 
-def get_devnum(args, uut):
-    import subprocess
-    hostname = uut.s0.HN
-
-    try:
-        pwd = subprocess.check_output(['pwd'])
-        if pwd.decode("utf-8").split("/")[-1] == "AFHBA404\n":
-            ident = subprocess.check_output(
-                ['./scripts/get-ident-all']).decode("utf-8").split("\n")
-            for item in ident:
-                if hostname in item:
-                    devnum = item.split(" ")[1]
-                    break
-                elif item == ident[-1]:
-                    # if we have not matched by the last entry error out.
-                    print(
-                        "No AFHBA404 port populated by {}. Please check connections.".format(hostname))
-                    exit(1)
-        else:
-            devnum = 0
-    except Exception:
-        print("Not in AFHBA404 directory. Defaulting to devnum = 0")
-        devnum = 0
-    return devnum
-
-
 def _calculate_padding(vlen):
     number_of_bytes_in_a_long = 4
     return 16 - (vlen//number_of_bytes_in_a_long) % 16
@@ -116,21 +90,21 @@ def config_aggregator(args, uut, COMMS):
     TOTAL_SITES = (uut.AISITES + uut.DISITES)
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print(TOTAL_SITES)
+#    print("config_aggregator({}) sites={}".format(uut.uut, TOTAL_SITES))
 
     ai_vector_length = calculate_vector_length(uut, ASITES=uut.AISITES, DSITES=uut.DISITES)
 
     # now check if we need a spad
-    spad = calculate_spad(ai_vector_length)
-    if spad != 0:
-        uut.s0.spad = '1,{},0'.format(spad)
-        uut.cA.spad = 1
-        # uut.cB.spad = 1 commented out because this is NOT always true.
+    spadlen = calculate_spad(ai_vector_length)
+    spad_en = 1 if spadlen > 0 else 0
 
-    print('Aggregator settings: sites={} spad={}'.format(TOTAL_SITES, spad))
+    print('{} Aggregator settings: sites={} (spad={}) (comms={})'.format(uut.uut, TOTAL_SITES, spadlen, COMMS))
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
+    uut.s0.spad = '{},{},0'.format(spad_en, spadlen)
+
     uut.svc['c{}'.format(COMMS)].aggregator = 'sites={}'.format(TOTAL_SITES)    
-    # uut.cB.aggregator = AISITES commented out because this is NOT always true.
+    uut.svc['c{}'.format(COMMS)].spad = spad_en
+
     uut.s0.run0 = TOTAL_SITES
     return None
 
@@ -147,9 +121,9 @@ def config_distributor(args, uut, COMMS):
     
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
-    print(TOTAL_SITES)
-    print('Distributor settings: sites={} pad={} comms={} on'.format(
-        TOTAL_SITES, TCAN, COMMS))
+#    print("config_distributor({}) sites={}".format(uut.uut, TOTAL_SITES))
+    print('{} Distributor settings: sites={} pad={} comms={} on'.format(
+       uut.uut, TOTAL_SITES, TCAN, COMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
         TOTAL_SITES, TCAN, COMMS)
 
@@ -236,7 +210,7 @@ def enum_sites(uut, uut_def):
                         if not 'DI32' in uut_def['VI'].keys():
                             print("WARNING: deprecated DI32 requested but DI32 not in config file")
                         uut.DISITES.append(site)
-                    if 'DO32' in uut_def['VI'].keys():
+                    if 'DO32' in uut_def['VO'].keys():
                         uut.DOSITES.append(site)
                         uut.DO_BYTE_IS_OUTPUT.append(DO_BYTE_IS_OUTPUT_DEFAULT)
                 if uut.modules[site].get_knob('module_type') == '6B':
@@ -288,7 +262,6 @@ def get_json_sites(uut_def, vx, xsite):
         
 
 def get_comms(uut_def):
-    print(uut_def.keys())
     if 'COMMS' in uut_def.keys():
         return uut_def['COMMS']
     else:
@@ -300,13 +273,19 @@ CMAG = "\x1b[1;35m"
 CEND = "\33[0m"
 
 def json_override_actual(uut_def, uut_name, sites, vx, st):
+    print("json_override_actual( {} {} {} {})".format(uut_name, sites, vx, st))
     if len(sites) == 0:
         return
     
     jsites = get_json_sites(uut_def, vx, st)
         
     if jsites:
-        if set(jsites).issubset(set(sites)):
+        sj = set(jsites)
+        su = set(sites)
+
+        if sj == su:
+            pass
+        elif sj.issubset(su):
             sites.clear()
             sites.extend(jsites)
             print(CBLU, "INFO: UUT: {} using subset of available {} sites {}".format(uut_name, st, sites), CEND)
@@ -326,7 +305,6 @@ def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
         pass
             
 def matchup_json_file(uut, uut_def, uut_name):
-
     agg_vector = calculate_vector_length(uut, ASITES=uut.AISITES, DSITES=uut.DISITES)
     spad = calculate_spad(agg_vector)
     total_agg_vector = agg_vector + (spad * 4)
@@ -341,7 +319,7 @@ def matchup_json_file(uut, uut_def, uut_name):
     if total_agg_vector != json_agg_vector:
         json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')       
         json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DISITES')         
- 
+
     if dist_vector != json_dist_vector:
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DOSITES')               
@@ -410,7 +388,7 @@ def get_args():
     parser.add_argument('--json_file', type=str, default=None,
                         help='Where to load the json file from.')
 
-    parser.add_argument('jsfile', help="configuraton file")
+    parser.add_argument('jsfile', help="configuration file")
 
     args = parser.parse_args()
     if not args.json_file:
