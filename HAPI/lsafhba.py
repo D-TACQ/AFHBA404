@@ -70,7 +70,9 @@ def save_VO(cfg, indent, uut):
         if value > 0:
             len_vo += value * (2 if key == "AO16" else 4)
             cfg.write('{}"{}": {},\n'.format(indent, key, value))
-
+    aosites = uut.get_site_types()['AOSITES']
+    if len(aosites) > 0:
+        cfg.write('{}"{}": {},\n'.format(indent, 'AOSITES', aosites))
     cfg.write('{}"{}": {}\n'.format(indent, "PAD32", 0))
     
     
@@ -91,6 +93,7 @@ def save_config_skel(args, cfile, conns, uuts):
             cfg.write('{}"name": "{}",\n'.format(indent, value.uut))
             cfg.write('{}"type": "pcs",\n'.format(indent))
             cfg.write('{}"sync_role": "{}",\n'.format(indent, "master" if ii==0 else "slave"))
+            cfg.write('{}"COMMS": "{}",\n'.format(indent, value.cx))
             
             cfg.write('{}"VI": {}\n'.format(indent, '{'))
             indent += '\t'
