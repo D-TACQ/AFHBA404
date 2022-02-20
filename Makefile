@@ -34,7 +34,7 @@ endif
 # make KRNL=2.6.20-1.2948.fc6-i686 ARCH=i386
 # make KRNL=2.6.18-194.26.1.el5 ARCH=i386
 
-all: modules apps
+all: modules apps install
 #llc_support
 
 flash: spi_support
@@ -117,6 +117,12 @@ stream_clean:
 acqproc_clean:
 	cd ACQPROC && $(MAKE) clean
 
+$(HOME)/bin/get-ident-all: 
+	mkdir -p $(HOME)/bin
+	cp scripts/get-ident-all scripts/get-afhba-serial $(HOME)/bin
+	xget-ident-all || echo WARNING: please check $(HOME)/bin is in PATH
+
+install: $(HOME)/bin/get-ident-all
 
 functional_tests_clean:
 	cd FUNCTIONAL_TESTS && $(MAKE) clean
