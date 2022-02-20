@@ -121,11 +121,11 @@ def lsafhba(args):
     
     for key, value in conns.items():
        print("{} {}".format(key, value))
-       if args.verbose == 0:
-           continue
        uut = acq400_hapi.factory(value.uut)
        uuts.append(uut)                 
        sites = uut.sites
+       if args.verbose == 0:
+           continue
        print("\tpayload:{}".format(sites))
        for s in [int(s) for s in sites]:
             print("\t\tsite:{} MODULE {} {} {}".format(\
