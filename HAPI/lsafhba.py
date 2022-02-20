@@ -42,7 +42,7 @@ def save_VI(cfg, indent, uut):
     for key, value in NC.items():
         if value > 0:
             len_vi += value * (2 if key == "AI16" else 4)
-            cfg.write('{}"{}": {}\n'.format(indent, key, value))
+            cfg.write('{}"{}": {},\n'.format(indent, key, value))
             
     sp32 = (16*4 - len_vi%64) // 4
     cfg.write('{}"{}": {}\n'.format(indent, "SP32", sp32))
@@ -69,7 +69,9 @@ def save_VO(cfg, indent, uut):
     for key, value in NC.items():
         if value > 0:
             len_vo += value * (2 if key == "AO16" else 4)
-            cfg.write('{}"{}": {}\n'.format(indent, key, value))
+            cfg.write('{}"{}": {},\n'.format(indent, key, value))
+
+    cfg.write('{}"{}": {}\n'.format(indent, "PAD32", 0))
     
     
 def save_config_skel(args, cfile, conns, uuts):
@@ -86,7 +88,7 @@ def save_config_skel(args, cfile, conns, uuts):
             cfg.write('{}{}\n'.format(indent, '{'))
             indent += '\t'          
             cfg.write('{}"DEVNUM": {},\n'.format(indent, value.dev))
-            cfg.write('{}"name": "{}"\n'.format(indent, value.uut))
+            cfg.write('{}"name": "{}",\n'.format(indent, value.uut))
             cfg.write('{}"type": "pcs",\n'.format(indent))
             cfg.write('{}"sync_role": "{}",\n'.format(indent, "master" if ii==0 else "slave"))
             
