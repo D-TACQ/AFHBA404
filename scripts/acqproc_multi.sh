@@ -48,7 +48,7 @@ CAPTURE_UUTS=$(python3 scripts/list_capture_uuts.py --json_file=${ACQPROC_CONFIG
 POST=${POST:-1000000} 	# Number of samples to capture
 CLK=${CLK:-50000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-0}
-SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
+#SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 
 # UUT1 is the master in clock/trigger terms.
