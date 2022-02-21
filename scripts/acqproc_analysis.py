@@ -23,6 +23,9 @@ import threading
 import concurrent.futures
 import json
 
+import matplotlib
+
+matplotlib.use("TKAgg")
 
 def plot_histogram(histo, args):
     plt.bar(histo.keys(), histo.values(), 1)
