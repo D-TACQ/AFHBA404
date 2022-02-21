@@ -225,6 +225,8 @@ xlooptest*)
 	control_program_loop ${maxshot:-10};;
 xcontrol_script)
 	control_script;;
+xanalysis)
+	analysis;;
 all|*)
 	# Execution starts here.
 	check_uut
