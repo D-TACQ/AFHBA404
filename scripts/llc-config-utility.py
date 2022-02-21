@@ -118,12 +118,12 @@ def config_distributor(args, uut, COMMS):
         # set it to zero. The reason we don't need this for SPAD is that we
         # encode some useful information in there.
         TCAN = 0
-    
+
     TOTAL_SITES.sort()
     TOTAL_SITES = ','.join(map(str, TOTAL_SITES))
 #    print("config_distributor({}) sites={}".format(uut.uut, TOTAL_SITES))
     print('{} Distributor settings: sites={} pad={} comms={} on'.format(
-       uut.uut, TOTAL_SITES, TCAN, COMMS))
+        uut.uut, TOTAL_SITES, TCAN, COMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
         TOTAL_SITES, TCAN, COMMS)
 
@@ -132,8 +132,13 @@ def config_distributor(args, uut, COMMS):
 
 def config_VI(args, uut, sod=False, COMMS='A'):
     uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
+    vis = []
+    vis.extend(uut.AISITES)
+    vis.extend(uut.DISITES)
+    uut.VISITES = sorted(vis)
+
     if args.us == 1:
-        trg = uut.s1.trg.split(" ")[0].split("=")[1]
+        trg = uut.modules[uut.VISITES[0]].trg.split(" ")[0].split("=")[1]
         uut.s0.spad1_us = trg  # set the usec counter to the same as trg.
     if args.lat == 1:
         uut.s0.LLC_instrument_latency = 1
@@ -161,8 +166,8 @@ def config_VO(args, uut, MSITES, COMMS='A'):
             if len(MSITES):
                 uut.modules[site].clk = signal
                 uut.modules[site].CLKDIV = 1
-            
-                
+
+
         signal = signal2
 
     for idx, site in enumerate(uut.DOSITES):
@@ -230,7 +235,7 @@ def enum_sites(uut, uut_def):
         except Exception as err:
             print("ERROR: ", err)
             continue 
-           
+
 
 
 json_word_sizes = {
@@ -245,7 +250,7 @@ def get_json_len(uut_def, vx, mt):
         return uut_def[vx][mt] * json_word_sizes[mt]
     except:
         return 0
-    
+
 def get_json_vx_len(uut_def, vx):
     vx_len = 0
     for mt in list(json_word_sizes):        
@@ -259,7 +264,7 @@ def get_json_sites(uut_def, vx, xsite):
         return None
 
 
-        
+
 
 def get_comms(uut_def):
     if 'COMMS' in uut_def.keys():
@@ -276,9 +281,9 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
     print("json_override_actual( {} {} {} {})".format(uut_name, sites, vx, st))
     if len(sites) == 0:
         return
-    
+
     jsites = get_json_sites(uut_def, vx, st)
-        
+
     if jsites:
         sj = set(jsites)
         su = set(sites)
@@ -295,7 +300,7 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
     else:
         print(CRED, "ERROR: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
         sys.exit(1)
-   
+
 def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
     try:
         if do_dir_def in uut_def['VO']['DO_BYTE_IS_OUTPUT']:
@@ -303,7 +308,7 @@ def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
                 uut.DO_BYTE_IS_OUTPUT[idx] = module_dir
     except NameError:
         pass
-            
+
 def matchup_json_file(uut, uut_def, uut_name):
     agg_vector = calculate_vector_length(uut, ASITES=uut.AISITES, DSITES=uut.DISITES)
     spad = calculate_spad(agg_vector)
@@ -343,21 +348,21 @@ def check_link(uut_def, dev_num):
         return link_port
     else:
         print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CEND)
-    
-     
+
+
     sys.exit(1)      
 
 def config_auto(args, uut_def, dev_num):
     comms = check_link(uut_def, dev_num)
-    
+
     uut_name = uut_def['name']
-    
-    
+
+
     uut = acq400_hapi.Acq2106(uut_name)
 
     enum_sites(uut, uut_def)
     sod = True if 'sod' in uut_def['type'] else False
-    
+
     matchup_json_file(uut, uut_def, uut_name)
 
     if len(uut.AISITES) != 0 or len(uut.DISITES) != 0:
@@ -393,10 +398,10 @@ def get_args():
     args = parser.parse_args()
     if not args.json_file:
         args.json_file = args.jsfile
-    
+
     if args.include_dio_in_aggregator:
         print("DEPRECATED: please define DI32 in config file instead")
-        
+
     return args 
 
 def update_dev_num(dev_num, uut_def): 
@@ -406,16 +411,16 @@ def update_dev_num(dev_num, uut_def):
         pass
 
     return dev_num
-      
+
 def run_main():
     args = get_args()
-        
+
     json = load_json(args.json_file)
-    
+
     dev_num = update_dev_num(0, json)                   # maybe global dev_num, else 0
-            
+
     uut_def = [uut for uut in json['AFHBA']['UUT']]
-    
+
         #print("DEBUG: {}".format(uut_def))
     for uut in uut_def:
         dev_num = update_dev_num(dev_num, uut)          # maybe uut specific dev num, else current
