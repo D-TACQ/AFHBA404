@@ -25,7 +25,7 @@
 # - run ./ACQPROC/acqproc $ACQPROC_CONFIG directly to review configuration
 
 ACQPROC_CONFIG=$1 #{ACQPROC_CONFIG:-./ACQPROC/configs/pcs1.json}
-if [ -z "$ACQPROC_CONFIG" ]; then
+if [ -z "$ACQPROC_CONFIG" ] || [ ! -e $ACQPROC_CONFIG ]; then
 	echo "Script argument should be a configuration file (json)."
 	echo "This argument is required. Example files are included in:"
 	echo "ACQPROC/configs/"
@@ -148,7 +148,7 @@ EOF
 
 control_script() {
 	if $TRANSIENT; then
-		PYTHON $HAPI_DIR/user_apps/acq400/acq400_capture.py --transient="POST=${POST}" $CAPTURE_UUTS
+		PYTHON $HAPI_DIR/user_apps/acq400/acq400_capture.py --transient="PRE=0 POST=${POST}" $CAPTURE_UUTS
 	else
 		PYTHON $HAPI_DIR/user_apps/acq400/acq400_streamtonowhere.py --samples=$POST $CAPTURE_UUTS
 	fi
@@ -161,21 +161,6 @@ configure_uut() {
 	case $SYNC_ROLE_MODE in
 	n*)
 		echo "WARNING: omit sync_role";;
-	p*)
-        	INDEX=0
-	        uuts=($uuts)
-        	SYNC_ROLES=($SYNC_ROLES)
-	        for uut in $UUTS; do
-        		TOPROLE=${SYNC_ROLES[$INDEX]}
-            		if [ "$TOPROLE" = "notouch" ] ; then continue ; fi
-			echo "$TOPROLE"
-			PYTHON $HAPI_DIR/user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $uut &
-			TOPROLE=slave
-			((INDEX++))
-		done
-		for uut in $UUTS; do
-			wait
-		done;;
 	*)
         	PYTHON $HAPI_DIR/user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
 	esac 
@@ -227,7 +212,10 @@ xcontrol_script)
 	control_script;;
 xanalysis)
 	analysis;;
-all|*)
+xhelp)
+	echo "USAGE: acqproc_multi.sh CONFIG [ops]"
+	echo "[ops] : configure_uut control_program control_script analysis default:all";;
+xall|*)
 	# Execution starts here.
 	check_uut
 	configure_uut
