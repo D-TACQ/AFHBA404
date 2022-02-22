@@ -33,13 +33,21 @@ except:
 
 
 
-def plot_histogram(histo, args):
+def plot_histogram(args, histo):
     plt.bar(histo.keys(), histo.values(), 1)
-    plt.title("Histogram of T_LATCH values. N > 1 means N-1 samples were missed.")
+    plt.title("Histogram of T_LATCH values uut:{}\nN > 1 means N-1 samples were missed.".format(args.name))
     plt.ylabel("Number of occurrences on a log scale.")
     plt.xlabel("T_LATCH differences.")
     plt.yscale("log")
-    plt.show()
+    if args.plot != 0:
+        plt.show()
+#    if args.save_plot in ("pdf", "png"):
+# saved plots get strangely munged with the latency hist.. drop them for now.
+    if False:
+       plotfile = "{}_tlatch.{}".format(args.name, args.save_plot)
+       plt.savefig(plotfile)
+       print("latency histogram saved as: {}".format(plotfile))
+
     return None
 
 
@@ -130,9 +138,8 @@ def run_spad_analysis(args, data):
     print("len diffs = {}".format(len(diff_locations)))
     print("max data = {}".format(max_data))
     hist_bins = np.histogram_bin_edges(max_data, bins='doane')
-    axs.hist(max_data, bins=hist_bins, label="A histogram of the maximum latency data")
-
-    axs.title.set_text("histogram of max data on a log scale (n = {})".format(len(max_data)))
+    axs.hist(max_data, bins=hist_bins, label="max data (n= {}) [log scale]".format(len(max_data)))
+    axs.title.set_text("Maximum latency Histogram for uut:{}".format(args.name))
     axs.set_xlabel('Time in microseconds.')
     axs.set_ylabel('Frequency')
     axs.set_yscale('log', nonposy='clip')
@@ -146,7 +153,13 @@ def run_spad_analysis(args, data):
     fig.set_figwidth(9.5)
     axs.legend(loc=9)
 
-    plt.show()
+    if args.plot != 0:
+        plt.show()
+    if args.save_plot in ("pdf", "png"):
+       plotfile = "{}_latency.{}".format(args.name, args.save_plot)
+       plt.savefig(plotfile)
+       print("latency plot saved as {}".format(plotfile))
+    
     return None
 
 
@@ -228,7 +241,7 @@ def run_analysis(args):
 
         for key in histo:
             print("T_LATCH differences: ", key, ", happened: ", histo[key], " times")
-        plot_histogram(histo, args)
+        plot_histogram(args, histo)
 
         if args.ao_len > 0:
             run_spad_analysis(args, data)
@@ -247,6 +260,8 @@ def run_main():
     parser.add_argument('--spad_len', default=16, type=int, help="How long the scratchpad is. Default is 16 long words")
     parser.add_argument('--verbose', default=0, type=int, help='Prints status messages as the stream is running')
     parser.add_argument('--json_src', default="default", type=str, help="Location to read json from.")
+    parser.add_argument('--plot', default=0, type=int, help="1: plot the graph, 0: don't plot (still saves print)")
+    parser.add_argument('--save_plot', default="png", help="pdf: save as pdf, png: save as png else no save")
     run_analysis(parser.parse_args())
 
 
