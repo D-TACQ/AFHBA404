@@ -174,52 +174,50 @@ def show_hexdump(uut):
 
 
 def run_analysis(args):
+    if args.json_src == "default":
+        home = expanduser("~")
+        jdata = get_json(home + '/PROJECTS/AFHBA404/runtime.json')
 
-    if args.json == 1:
-        if args.json_src == "default":
-            home = expanduser("~")
-            jdata = get_json(home + '/PROJECTS/AFHBA404/runtime.json')
+    else:
+        jdata = get_json(args.json_src)
 
+    for uut in jdata['AFHBA']['UUT']:
+        args.name = uut['name']
+        if "VI" not in uut.keys():
+            continue
+        print("Running analysis for UUT: {}".format(args.name))
+        show_hexdump(uut)
+        try:
+            args.dix_len = uut['VI']['DI32']
+        except KeyError:
+            args.dix_len = 0
+        args.nchan = uut['VI']['AI16'] + 2 * args.dix_len
+        args.spad_len = uut['VI']['SP32']
+        try:
+            args.ao_len = uut['VO']['AO16']
+        except KeyError:
+            args.ao_len = 0
+
+        tlatch, data = collect_tlatch(args)
+        t_latch_split = np.array_split(tlatch, 8)
+        histo = {}
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            results = executor.map(collect_dtimes, t_latch_split)
+            for result in results:
+                for key in result:
+                    if key in histo:
+                        histo[key] += result[key]
+                    else:
+                        histo[key] = result[key]
+
+        for key in histo:
+            print("T_LATCH differences: ", key, ", happened: ", histo[key], " times")
+        plot_histogram(histo, args)
+
+        if args.ao_len > 0:
+            run_spad_analysis(args, data)
         else:
-            jdata = get_json(args.json_src)
-
-        for uut in jdata['AFHBA']['UUT']:
-            args.name = uut['name']
-            if "VI" not in uut.keys():
-                continue
-            print("Running analysis for UUT: {}".format(args.name))
-            show_hexdump(uut)
-            try:
-                args.dix_len = uut['VI']['DI32']
-            except KeyError:
-                args.dix_len = 0
-            args.nchan = uut['VI']['AI16'] + 2 * args.dix_len
-            args.spad_len = uut['VI']['SP32']
-            try:
-                args.ao_len = uut['VO']['AO16']
-            except KeyError:
-                args.ao_len = 0
-
-            tlatch, data = collect_tlatch(args)
-            t_latch_split = np.array_split(tlatch, 8)
-            histo = {}
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                results = executor.map(collect_dtimes, t_latch_split)
-                for result in results:
-                    for key in result:
-                        if key in histo:
-                            histo[key] += result[key]
-                        else:
-                            histo[key] = result[key]
-
-            for key in histo:
-                print("T_LATCH differences: ", key, ", happened: ", histo[key], " times")
-            plot_histogram(histo, args)
-
-            if args.ao_len > 0:
-                run_spad_analysis(args, data)
-            else:
-                print("Cannot run latency analysis for this UUT.")
+            print("Cannot run latency analysis for this UUT.")
 
 
 def run_main():
@@ -232,9 +230,7 @@ def run_main():
     parser.add_argument('--nchan', default=128, type=int, help="How many physical channels are contained in the data EXCLUDING SCRATCHPAD.")
     parser.add_argument('--spad_len', default=16, type=int, help="How long the scratchpad is. Default is 16 long words")
     parser.add_argument('--verbose', default=0, type=int, help='Prints status messages as the stream is running')
-    parser.add_argument('--json', default=0, type=int, help='If True load config from json file.')
     parser.add_argument('--json_src', default="default", type=str, help="Location to read json from.")
-    # parser.add_argument('uuts', nargs='+', help="uuts")
     run_analysis(parser.parse_args())
 
 
