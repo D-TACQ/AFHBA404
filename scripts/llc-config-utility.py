@@ -101,6 +101,9 @@ def config_aggregator(args, uut, COMMS):
     print('{} Aggregator settings: sites={} (spad={}) (comms={})'.format(uut.uut, TOTAL_SITES, spadlen, COMMS))
     uut.s0.aggregator = 'sites={}'.format(TOTAL_SITES)
     uut.s0.spad = '{},{},0'.format(spad_en, spadlen)
+    if spadlen > 6:
+        uut.s0.spad6 = COMMS + '0000' + uut.uut.split('_')[1]
+        uut.s0.spad7 = '77777777'
 
     uut.svc['c{}'.format(COMMS)].aggregator = 'sites={}'.format(TOTAL_SITES)    
     uut.svc['c{}'.format(COMMS)].spad = spad_en
