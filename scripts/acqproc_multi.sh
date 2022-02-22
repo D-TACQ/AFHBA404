@@ -140,7 +140,7 @@ control_program() {
 	export AFFINITY=$AFFINITY
 	export SINGLE_THREAD_CONTROL=control_dup1
 EOF
-	sudo bash -c 'source control_program.env; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
+	sudo bash -c 'source control_program.env; rm -f *.dat; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
 	echo "Control Program Finished"
 	[ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }
