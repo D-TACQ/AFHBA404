@@ -19,13 +19,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from os.path import expanduser
 import os
+import subprocess
 import threading
 import concurrent.futures
 import json
 
 import matplotlib
 
-matplotlib.use("TKAgg")
+try:
+    matplotlib.use("TKAgg")
+except:
+    print("TKAgg not available for matplot")
+
+
 
 def plot_histogram(histo, args):
     plt.bar(histo.keys(), histo.values(), 1)
@@ -152,16 +158,20 @@ def get_json(path):
 def show_hexdump(uut):
     name = uut['name']
     if 'VI' in uut.keys():
+        fields = 1
         command = "hexdump -ve \'"
         try:
+            fields += uut['VI']['AI32']
             command += '{}/4 "%08x," '.format(uut['VI']['AI32'])
         except:
             pass
         try:
+            fields += uut['VI']['AI16']
             command += '{}/2 "%04x," '.format(uut['VI']['AI16'])
         except:
             pass
         try:
+            fields += uut['VI']['DI32']
             command += '{}/4 "%08x," '.format(uut['VI']['DI32'])
         except:
             pass
@@ -170,6 +180,12 @@ def show_hexdump(uut):
         except:
             pass
         command += '"\\n"\' {}_VI.dat '.format(name)
+        show_spad = command + " | cut -d, -f{}-{} | head -n 4".format(fields, fields+7)
+        print("show SPAD: {}".format(show_spad))
+#        cp = subprocess.run(show_spad, capture_output=True, shell=True)
+        cp = subprocess.run(show_spad, shell=True)
+        #print(cp.stdout)
+        print("show whole VI like this:")   
         print(command)
 
 
@@ -224,8 +240,8 @@ def run_main():
     parser = argparse.ArgumentParser(description='acqproc_analysis')
     parser.add_argument('--ones', default=0, type=int, help="The ones argument allows the user to plot the instances "
                                                             "where the calculated t_latch difference is equal to one. "
-                                                            "This is the default case and so this will dwarf the other "
-                                                            "numbers in the histogram.")
+                                                            "This is the default case and so since it would dwarf the other "
+                                                            "numbers in the histogram, we default OFF.")
     parser.add_argument('--src', default="default", type=str, help="Location to pull data from for analysis. Note that this is just the path to AFHBA404.")
     parser.add_argument('--nchan', default=128, type=int, help="How many physical channels are contained in the data EXCLUDING SCRATCHPAD.")
     parser.add_argument('--spad_len', default=16, type=int, help="How long the scratchpad is. Default is 16 long words")
