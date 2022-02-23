@@ -129,6 +129,7 @@ def config_distributor(args, uut, COMMS):
         uut.uut, TOTAL_SITES, TCAN, COMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
         TOTAL_SITES, TCAN, COMMS)
+    uut.s0.dssb = ao_vector + TCAN*4
 
     return None
 
