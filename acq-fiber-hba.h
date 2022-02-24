@@ -55,7 +55,7 @@
 #define SCHEDULE_FIFO do { \
 		struct sched_param param = { .sched_priority = 10 }; \
 		sched_setscheduler(current, SCHED_FIFO, &param); \
-} done
+} while(0)
 #endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
