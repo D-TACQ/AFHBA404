@@ -1373,9 +1373,7 @@ static int afs_isr_work(void *arg)
 	unsigned last_amon_jiffies = 0;
 
 	/* this is going to be the top RT process */
-	struct sched_param param = { .sched_priority = 10 };
-
-	sched_setscheduler(current, SCHED_FIFO, &param);
+	SCHEDULE_FIFO;
 
 	afs_comms_init(adev);
 

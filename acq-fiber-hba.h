@@ -49,6 +49,15 @@
 #include "gpumemdrv.h"
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0)
+#define SCHEDULE_FIFO	sched_set_fifo_low(current)
+#else
+#define SCHEDULE_FIFO do { \
+		struct sched_param param = { .sched_priority = 10 }; \
+		sched_setscheduler(current, SCHED_FIFO, &param); \
+} done
+#endif
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
 #include <uapi/linux/sched/types.h>
 #endif
