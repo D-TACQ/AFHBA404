@@ -1367,14 +1367,16 @@ static int afs_isr_work(void *arg)
 	struct JOB* job = &sdev->job;
 
 	int loop_count = 0;
-/* this is going to be the top RT process */
-	struct sched_param param = { .sched_priority = 10 };
 	int please_check_fifo = 0;
 	int job_is_go_but_aurora_is_down = 0;
 	unsigned loop_jiffies = 0;
 	unsigned last_amon_jiffies = 0;
 
+	/* this is going to be the top RT process */
+	struct sched_param param = { .sched_priority = 10 };
+
 	sched_setscheduler(current, SCHED_FIFO, &param);
+
 	afs_comms_init(adev);
 
 	for ( ; !kthread_should_stop(); ++loop_count, loop_jiffies += WORK_TO){
