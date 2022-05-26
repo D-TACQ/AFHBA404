@@ -18,8 +18,7 @@ CB=12
 
 
 # MUST set remote ip-address
-REMIP=${REMIP:-acq2106_003}
-[ "x$1" != "x" ] && REMIP=$1            # override env with argument
+REMIP=${1:-${REMIP:-acq2106_003}}       # use arg1 if set, else env, else default. Users might want to just set the default locally
 USER_PROMPT=${USER_PROMPT:-y}		# y forces break between init and run
 INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
