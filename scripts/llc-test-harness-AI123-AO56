@@ -18,7 +18,7 @@ CB=12
 
 
 # MUST set remote ip-address
-REMIP=${1:-acq2106_003}
+REMIP=${REMIP:-acq2106_003}
 USER_PROMPT=${USER_PROMPT:-y}		# y forces break between init and run
 INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
