@@ -34,12 +34,12 @@ TRANSIENT=${TRANSIENT:-2000000}
 
 
 AISITES=${AISITES:-1,2,3}
-# pick off the first AI site as M
+# pick off the last AI site as M
 AI=${AISITES%,*}
 
 
 AOSITES=${AOSITES:-5,6}
-# pick off the first AO site as M.
+# pick off the last AO site as M.
 AO=${AOSITES%,*}
 
 # DO assume ALL OUTPUTS. 
