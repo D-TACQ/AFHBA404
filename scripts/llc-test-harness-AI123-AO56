@@ -16,9 +16,16 @@ SC=0
 CA=13
 CB=12
 
+FUNCLIST="init_comms init_2106 start_stream cleanup user_prompt"
 
 # MUST set remote ip-address
-REMIP=${1:-${REMIP:-acq2106_003}}       # use arg1 if set, else env, else default. Users might want to just set the default locally
+if [[ ! ${FUNCLIST} =~ ${!#} ]] && [ $# != 0 ]; then
+    REMIP=${!#:-${REMIP:-acq2106_003}}
+    set -- "${@:1:$#-1}"
+else
+    REMIP=${REMIP:-acq2106_003}     
+fi
+
 USER_PROMPT=${USER_PROMPT:-y}		# y forces break between init and run
 INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
@@ -173,7 +180,7 @@ if [ "x$*" = "x" ]; then
 	[ "$USER_PROMPT" = "y" ] && user_prompt
 	start_stream
 else
-	for arg in $*; do
+	for arg in $@; do
 		echo RUN $arg
 		eval $arg
 	done
