@@ -18,7 +18,8 @@ CB=12
 
 
 # MUST set remote ip-address
-REMIP=${1:-acq2106_003}
+REMIP=${REMIP:-acq2106_003}
+[ "x$1" != "x" ] && REMIP=$1            # override env with argument
 USER_PROMPT=${USER_PROMPT:-y}		# y forces break between init and run
 INTCLKDIV=${INTCLKDIV:-10000}		# 100M/100 = 100kHz
 EXTCLKDIV=${EXTCLKDIV:-10}		# 1M/10 = 100kHz
@@ -35,12 +36,12 @@ TRANSIENT=${TRANSIENT:-2000000}
 
 AISITES=${AISITES:-1,2,3}
 # pick off the first AI site as M
-AI=${AISITES%,*}
+AI=${AISITES%%,*}
 
 
 AOSITES=${AOSITES:-5,6}
 # pick off the first AO site as M.
-AO=${AOSITES%,*}
+AO=${AOSITES%%,*}
 
 # DO assume ALL OUTPUTS. 
 DOSITES=${DOSITES:-""}
