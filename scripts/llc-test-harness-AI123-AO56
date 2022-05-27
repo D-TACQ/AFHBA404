@@ -35,6 +35,7 @@ LLC_CLK=${LLC_CLK:-ext}
 # next run the CONTROL PROGRAM
 # THEN trigger (eg ext trigger, or run soft_trigger command on box
 SOFT_TRIGGER=${SOFT_TRIGGER:-0}
+LLC_TRG=${LLC_TRG:-ext}
 
 # default transient mode, set # samples.  "no": run continuous mode
 TRANSIENT=${TRANSIENT:-2000000}
