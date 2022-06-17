@@ -399,7 +399,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	return *the_hba;
 }
 
-int HBA::store_clear(int shot)
+void HBA::store_clear(int shot)
 {
 	for (auto uut : uuts){
 		uut->store_clear(shot);
