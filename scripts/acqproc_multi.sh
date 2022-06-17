@@ -50,6 +50,7 @@ CLK=${CLK:-50000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-0}
 #SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
+LOOP_FOREVER=${LOOP_FOREVER:-0} # set to one to loop forever
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -139,6 +140,7 @@ control_program() {
 	export RTPRIO=10
 	export AFFINITY=$AFFINITY
 	export SINGLE_THREAD_CONTROL=control_dup1
+	export LOOP_FOREVER=$LOOP_FOREVER
 EOF
 	sudo bash -c 'source control_program.env; rm -f *.dat; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
 	echo "Control Program Finished"
