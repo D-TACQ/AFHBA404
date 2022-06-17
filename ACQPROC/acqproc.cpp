@@ -36,10 +36,11 @@ int getenv(const char* key, int def, int (*cvt)(const char* key))
 namespace G {
 	int verbose = ::getenv("VERBOSE", 0);
 	int dummy_first_loop= ::getenv("DUMMY_FIRST_LOOP", 0);		/**< possible speed up by filling cache first loop */
-	int MAXLOG = ::getenv("MAXLOG", 1000000); 					/**< avoid oom */
-	int samples_buffer = 1;										/**< number of samples in each VI buffer (default:1) */
-	int nsamples = 2;											/**< samples to capture (default:2, typ 200000) */
+	int MAXLOG = ::getenv("MAXLOG", 1000000); 			/**< avoid oom */
+	int samples_buffer = 1;						/**< number of samples in each VI buffer (default:1) */
+	int nsamples = 2;						/**< samples to capture (default:2, typ 200000) */
 	int maxpoll = 0;
+	int loop_forever;
 };
 
 
@@ -49,15 +50,18 @@ const char* ui(int argc, char* argv[])
 	const char* config_file;
 	const char* key;
 
-    if ((key = getenv("RTPRIO"))){
+	if ((key = getenv("RTPRIO"))){
 		sched_fifo_priority = atoi(key);
-    }
-    if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
-                setAffinity(strtol(key, 0, 0));
-    }
-    if ((key = getenv("MAXPOLL")) && strtol(key, 0, 0) != 0){
-                G::maxpoll = strtol(key, 0, 0);
-    }
+	}
+	if ((key = getenv("AFFINITY")) && strtol(key, 0, 0) != 0){
+		setAffinity(strtol(key, 0, 0));
+	}
+	if ((key = getenv("MAXPOLL")) && strtol(key, 0, 0) != 0){
+		G::maxpoll = strtol(key, 0, 0);
+	}
+	if ((key = getenv("LOOP_FOREVER")) && strtol(key, 0, 0) != 0){
+		G::loop_forever = strtol(key, 0, 0);
+	}
 
 	if (argc > 1){
 		config_file = argv[1];
@@ -99,7 +103,29 @@ void configure_ctrl_c_closedown() {
 	sigaction(SIGINT, &sigIntHandler, NULL);
 }
 
+void run_shot(HBA& hba, SystemInterface& si){
+	hba.start_shot();
 
+	si.trigger();
+
+	try {
+		for (int sample = 0; !closedown_request && (G::nsamples == 0 || sample < G::nsamples); ++sample){
+			hba.processSample(si, sample);
+		}
+	} catch (int error) {
+		fprintf(stderr, "ERROR:%d\n", error);
+	}
+}
+
+void loop_forever(HBA& hba, SystemInterface& si) {
+	int shot = 0;
+	while(1){
+		fprintf(stderr, "loop_forever: shot:%d\n", ++shot);
+		run_shot(hba, si);
+		fprintf(stderr, "shot complete, <CR> to continue");
+		getchar();
+	}
+}
 int main(int argc, char* argv[])
 {
 	const char* config_file = ui(argc, argv);
@@ -112,16 +138,10 @@ int main(int argc, char* argv[])
 
 	SystemInterface& si(SystemInterface::factory(hba));
 
-	hba.start_shot();
-
-	si.trigger();
-
-	try {
-		for (int sample = 0; !closedown_request && (G::nsamples == 0 || sample < G::nsamples); ++sample){
-			hba.processSample(si, sample);
-		}
-	} catch (int error) {
-		fprintf(stderr, "ERROR:%d\n", error);
+	if (G::loop_forever){
+		loop_forever(hba, si);
+	}else{
+		run_shot(hba, si);
 	}
 }
 
