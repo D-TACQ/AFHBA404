@@ -79,6 +79,8 @@ public:
 };
 
 
+#define NOSHOT -1
+
 /** abstract model of an ACQ2106 box. */
 class ACQ: public IO
 {
@@ -108,7 +110,9 @@ public:
 	/**< returns latest tlatch from lbuf */
 	virtual void arm(int nsamples);
 	/**< prepare to run a shot nsamples long, arm the UUT. */
-    static ACQ* factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
+	virtual void store_clear(int shot = NOSHOT) {};
+	/**< store data f(shot) and clear buffers for new run */
+	static ACQ* factory(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
     		VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
 
     friend class HBA;
@@ -146,6 +150,8 @@ public:
 	/**< output raw data for each ACQ */
 
 	virtual string toString();
+
+	void store_clear(int shot = NOSHOT);
 };
 
 namespace G {

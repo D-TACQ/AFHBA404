@@ -399,6 +399,13 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 	return *the_hba;
 }
 
+int HBA::store_clear(int shot)
+{
+	for (auto uut : uuts){
+		uut->store_clear(shot);
+	}
+}
+
 SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 /* make a gash SI to allow simulated operation. The real shm is customer specific */
 {

@@ -68,21 +68,38 @@ void HBA::start_shot()
 }
 
 
+
 /** concrete model of ACQ2106 box. */
 class ACQ_HW_BASE: public ACQ
 {
 	/** store raw data to file. */
-	static void raw_store(const char* fname, const char* base, int len)
+	void raw_store(const char* fname, Dev::LBUF& lbuf)
 	{
+		if (lbuf.cursor == lbuf.base) {
+			return;
+		}
 		FILE *fp = fopen(fname, "w");
 		if (fp == 0){
 			perror(fname);
 		}
-		int nw = fwrite(base, len, HBA::maxsam, fp);
+		int nw = fwrite(lbuf.base, 1, lbuf.cursor-lbuf.base, fp);
 		fclose(fp);
 		fprintf(stderr, "stored %s, len=%d\n", fname, nw);
 	}
 
+	virtual void store_clear(int shot) {
+		char _shot[20];
+		if (shot != NOSHOT){
+			snprintf(_shot, 20, "_%d", shot);
+		}else{
+			_shot[0] = '\0';
+		}
+		raw_store((getName()+_shot+"_VI.dat").c_str(), dev->lbuf_vi);
+		raw_store((getName()+_shot+"_VO.dat").c_str(), dev->lbuf_vo);
+
+		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
+		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+	}
 protected:
 	Dev* dev;
 	unsigned tl0;
@@ -114,10 +131,11 @@ protected:
 	}
 
 	virtual ~ACQ_HW_BASE() {
-		raw_store((getName()+"_VI.dat").c_str(), dev->lbuf_vi.base, vi.len());
-		raw_store((getName()+"_VO.dat").c_str(), dev->lbuf_vo.base, vo.len());
+		store_clear(NOSHOT);
 		clear_mapping(dev->fd, dev->host_buffer);
 	}
+
+
 
 	virtual void arm(int nsamples);
 	/**< prepare to run a shot nsamples long, arm the UUT. */

@@ -122,8 +122,13 @@ void loop_forever(HBA& hba, SystemInterface& si) {
 	while(1){
 		fprintf(stderr, "loop_forever: shot:%d\n", ++shot);
 		run_shot(hba, si);
+		hba.store_clear(shot);
 		fprintf(stderr, "shot complete, <CR> to continue");
-		getchar();
+		switch(getchar()){
+		case 'Q':
+		case 'q':
+			return;
+		}
 	}
 }
 int main(int argc, char* argv[])
