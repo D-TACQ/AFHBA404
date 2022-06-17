@@ -99,6 +99,7 @@ class ACQ_HW_BASE: public ACQ
 
 		dev->lbuf_vi.cursor = dev->lbuf_vi.base;
 		dev->lbuf_vo.cursor = dev->lbuf_vo.base;
+		sample = 0;
 	}
 protected:
 	Dev* dev;
