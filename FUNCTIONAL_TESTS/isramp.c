@@ -44,7 +44,11 @@ int main(int argc, char *argv[]) {
     
     while(1) {
 
-      fread(buffer, sizeof(unsigned), maxcols, stdin); // read 104 channels of data.
+      int nread = fread(buffer, sizeof(unsigned), maxcols, stdin); // read 104 channels of data.
+
+      if (nread != maxcols){
+          printf("nread != maxcols %d %d\n", nread, maxcols);	
+      }
       aa = buffer[countcol];
 
       if (aa == xx1 + step) {
