@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
 			xx1 = xx;
 		}
 
-		if (verbose && ii % 0x400000 == 0){
-			printf("%012llx  %08x %08x  %d errors\n",
+		if (verbose && ii % 0x10000000 == 0){
+			printf("\n%012llx  %08x %08x  %d errors\n",
 			       ii, xx0, xx, errors);
 		}
 		if (lwstride>1){
