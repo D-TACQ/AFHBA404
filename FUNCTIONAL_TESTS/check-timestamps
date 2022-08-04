@@ -1,0 +1,16 @@
+#!/bin/bash
+
+files=0
+errfiles=0
+
+for file in event*; do 
+    isramp -c 96 -m 100 -i1 $file
+    if [ $? -ne 0 ]; then
+	errfiles=$((errfiles+1))
+    fi
+    files=$((files+1))
+done
+
+echo Files with errors: $errfiles out of $files
+
+
