@@ -10,6 +10,7 @@ if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-echo stream to /mnt/afhba.$DN 
-NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=/mnt/afhba.$DN ./STREAM/rtm-t-stream-disk
+outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.0.ctrl/acq_ident)
+echo stream to $outroot
+CONCAT=1 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot ./STREAM/rtm-t-stream-disk
 
