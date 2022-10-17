@@ -11,6 +11,7 @@ if [ $? -ne 0 ];then
 	exit 1
 fi
 outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.0.ctrl/acq_ident)
+mkdir -p $outroot
 echo stream to $outroot
-CONCAT=1 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot ./STREAM/rtm-t-stream-disk
+CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot ./STREAM/rtm-t-stream-disk
 
