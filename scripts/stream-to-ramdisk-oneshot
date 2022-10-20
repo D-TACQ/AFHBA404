@@ -5,12 +5,12 @@ NB=${2:-1024}
 
 mkdir -p /mnt/afhba.$DN
 echo checking aurora is up ..
-grep +LANE_UP /dev/rtm-t.0.ctrl/aurora
+grep +LANE_UP /dev/rtm-t.${DN}.ctrl/aurora
 if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
-outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.0.ctrl/acq_ident)
+outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 mkdir -p $outroot
 echo stream to $outroot
 CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot ./STREAM/rtm-t-stream-disk
