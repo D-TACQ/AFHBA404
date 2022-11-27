@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 A script that configures the aggregator and/or distributor depending on what
@@ -30,6 +30,10 @@ On the ACQ2106 :
 
 The AGGREGATOR collects a single sample VI comprising AI,DI,SPAD ("spad" control on the aggregator)
 The DISTRIBUTOR farms out a single sample VO comprising AO,DO,TCAN ("pad" control on the distributor)
+
+
+TCAN: because the UUT DISTRIBUTOR simply dumps the padding (needed for %64 byte alignment. 
+NEW: pad data can become "HUDP RELAY" for onward transmission on UDP.
 
 """
 
@@ -246,7 +250,8 @@ json_word_sizes = {
     'AI16': 2, 'AO16': 2,
     'AI32': 4, 'AO20': 4,
     'DI32': 4, 'DO32': 4,
-    'PWM' : 64,
+    'HP32': 4,
+    'PWM' : 64, 
     'SP32': 4   
 }
 def get_json_len(uut_def, vx, mt):
@@ -286,7 +291,9 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
     if len(sites) == 0:
         return
 
+    
     jsites = get_json_sites(uut_def, vx, st)
+    print("json_override_actual jsites:{}".format(jsites))
 
     if jsites:
         sj = set(jsites)
@@ -331,7 +338,7 @@ def matchup_json_file(uut, uut_def, uut_name):
 
     if dist_vector != json_dist_vector:
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
-        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DOSITES')               
+        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')               
 
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
     return None
