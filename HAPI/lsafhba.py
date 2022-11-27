@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 '''
 lsafhba : list all afhba connections
+--save_config SYSNAME  :: save an auto-generator ACQPROC config file
 Created on 18 Feb 2022
 
 @author: pgm
@@ -46,7 +48,15 @@ def save_VI(cfg, uut):
             cfg.write('"{}": {},\n'.format(key, value))
             
     sp32 = (16*4 - len_vi%64) // 4
-    cfg.write('"{}": {}\n'.format("SP32", sp32))
+    cfg.write('"{}": {},\n'.format("SP32", sp32))
+    
+    xi_sites = 0
+    for site_cat in ('AISITES', 'DIOSITES'):
+        sc = uut.get_site_types()[site_cat]
+        if len(sc) > 0:            
+            cfg.write('"{}": {},\n'.format(site_cat, sc))
+            xi_sites += len(sc)  
+    cfg.write('"{}": {}\n'.format('NXI', xi_sites))        
     
 def save_VO(cfg, uut):
     NC = { 'AO16': 0, 'AO32': 0, 'DO32': 0 }
@@ -71,10 +81,15 @@ def save_VO(cfg, uut):
         if value > 0:
             len_vo += value * (2 if key == "AO16" else 4)
             cfg.write('"{}": {},\n'.format(key, value))
-    aosites = uut.get_site_types()['AOSITES']
-    if len(aosites) > 0:
-        cfg.write('"{}": {},\n'.format('AOSITES', aosites))
-    cfg.write('"{}": {}\n'.format("PAD32", 0))
+    
+    
+    xo_sites = 0
+    for site_cat in ('AOSITES', 'DIOSITES'):
+        sc = uut.get_site_types()[site_cat]
+        if len(sc) > 0:            
+            cfg.write('"{}": {},\n'.format(site_cat, sc))
+            xo_sites += len(sc) 
+    cfg.write('"{}": {}\n'.format('NXO', xo_sites))    
     
     
 def save_config(args, cfile, conns, uuts):
