@@ -119,7 +119,7 @@ def config_aggregator(args, uut, COMMS):
 def config_distributor(args, uut, COMMS):
     TOTAL_SITES = (uut.AOSITES + uut.DOSITES + uut.PWMSITES)
     ao_vector = calculate_vector_length(uut, ASITES=uut.AOSITES, DSITES=uut.DOSITES, PWMSITES=uut.PWMSITES)
-    TCAN = calculate_tcan(ao_vector)
+    TCAN = calculate_tcan(ao_vector) + uut.HP32
     if TCAN == 16:
         # If the TCAN is 16 then we're just taking up space for no reason, so
         # set it to zero. The reason we don't need this for SPAD is that we
@@ -312,6 +312,12 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
         print(CRED, "ERROR: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
         sys.exit(1)
 
+def customize_HP32(uut, uut_def):
+    hp32 = 0
+    if 'HP32' in uut_def['VO'].keys():
+        hp32 = int(uut_def['VO']['HP32'])
+    uut.HP32 = hp32
+    
 def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
     try:
         if do_dir_def in uut_def['VO']['DO_BYTE_IS_OUTPUT']:
@@ -340,6 +346,7 @@ def matchup_json_file(uut, uut_def, uut_name):
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')               
 
+    customize_HP32(uut, uut_def)
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
     return None
 
