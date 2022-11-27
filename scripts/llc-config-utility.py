@@ -120,7 +120,7 @@ def config_distributor(args, uut, COMMS):
     TOTAL_SITES = (uut.AOSITES + uut.DOSITES + uut.PWMSITES)
     ao_vector = calculate_vector_length(uut, ASITES=uut.AOSITES, DSITES=uut.DOSITES, PWMSITES=uut.PWMSITES)
     TCAN = calculate_tcan(ao_vector) + uut.HP32
-    if TCAN == 16:
+    if TCAN == 16 and uut.HP32 == 0:
         # If the TCAN is 16 then we're just taking up space for no reason, so
         # set it to zero. The reason we don't need this for SPAD is that we
         # encode some useful information in there.
@@ -134,6 +134,10 @@ def config_distributor(args, uut, COMMS):
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
         TOTAL_SITES, TCAN, COMMS)
     uut.s0.dssb = ao_vector + TCAN*4
+    
+    if uut.HP32:
+        uut.s10.slice_off = ao_vector
+        uut.s10.slice_len = uut.HP32*4
 
     return None
 
@@ -374,9 +378,7 @@ def config_auto(args, uut_def, dev_num):
     comms = check_link(uut_def, dev_num)
 
     uut_name = uut_def['name']
-
-
-    uut = acq400_hapi.Acq2106(uut_name)
+    uut = acq400_hapi.factory(uut_name)
 
     enum_sites(uut, uut_def)
     sod = True if 'sod' in uut_def['type'] else False
@@ -437,7 +439,7 @@ def run_main():
 
     dev_num = update_dev_num(0, json)                   # maybe global dev_num, else 0
 
-    uut_def = [uut for uut in json['AFHBA']['UUT']]
+    uut_def = [uut for uut in json['AFHBA']['UUT']]     # uut_def : uut top node in config tree
 
         #print("DEBUG: {}".format(uut_def))
     for uut in uut_def:
