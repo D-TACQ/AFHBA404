@@ -57,6 +57,7 @@ VO& VO::operator += (const VO& right) {
 	this->AO16 += right.AO16;
 	this->DO32 += right.DO32;
 	this->PW32 += right.PW32;
+	this->HP32 += right.HP32;
 	this->CC32 += right.CC32;
 	return *this;
 }
@@ -64,16 +65,18 @@ VO& VO::operator += (const VO& right) {
 VO VO::offsets(void) const
 {
 	VO voff;
-	voff.AO16 = 0;
-	voff.DO32 = AO16*sizeof(short);
-	voff.PW32 = voff.DO32 + DO32*sizeof(unsigned);
-	voff.CC32 = voff.PW32 + PW32*sizeof(PW32V);
+	unsigned offset = 0;
+	voff.AO16 = offset; offset += AO16*sizeof(short);
+	voff.DO32 = offset; offset += DO32*sizeof(unsigned);
+	voff.PW32 = offset; offset += PW32*sizeof(PW32V);
+	voff.HP32 = offset; offset += HP32*sizeof(unsigned);
+	voff.CC32 = offset;
 	return voff;
 }
 
 
 int VO::hwlen(void) const {
-	return AO16*2 + DO32*4 + PW32*sizeof(PW32V);
+	return AO16*2 + DO32*4 + PW32*sizeof(PW32V) + HP32*sizeof(unsigned);
 }
 
 int VO::len(void) const {
@@ -255,6 +258,7 @@ void add_si_lengths(json& jsys, HBA& hba)
 		    { "AO16", si.AO16_count() },
 		    { "DO32", si.DO32_count() },
 		    { "PW32", si.PW32_count() },
+		    { "HP32", si.HP32_count() },
 		    { "CC32", si.CC32_count() }
 		  };
 
@@ -282,6 +286,7 @@ void store_config(json j, string fname, HBA& hba)
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, AO16);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, DO32);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, PW32);
+		INSERT_IF(vo_offsets_map, vo, vo_offsets, HP32);
 		INSERT_IF(vo_offsets_map, vo, vo_offsets, CC32);
 		jlo["VO_OFFSETS"] = vo_offsets_map;
 
@@ -297,6 +302,7 @@ void store_config(json j, string fname, HBA& hba)
 		INSERT_IF(vo_map, vo, vo_cursor, AO16);
 		INSERT_IF(vo_map, vo, vo_cursor, DO32);
 		INSERT_IF(vo_map, vo, vo_cursor, PW32);
+		INSERT_IF(vo_map, vo, vo_cursor, HP32);
 		INSERT_IF(vo_map, vo, vo_cursor, CC32);
 		jix["VO"] = vo_map;
 	}
@@ -362,6 +368,7 @@ HBA& HBA::create(const char* json_def, int _maxsam)
 		vo.DO32 = get_int(uut["VO"]["DO32"]);
 		vo.PW32 = get_int(uut["VO"]["PW32"]);
 		vo.CC32 = get_int(uut["VO"]["CC32"]);
+		vo.HP32 = get_int(uut["VO"]["HP32"]);
 
 		ACQ *acq = ACQ::factory(hba_devnum+port, uut["name"], vi, vo, vi.offsets(), vo.offsets(), VI_sys, VO_sys);
 
@@ -418,6 +425,7 @@ SystemInterface::SystemInterface(const HBA& _hba) : hba(_hba)
 	OUT.DO32 = new_zarray<unsigned>(DO32_count());
 	OUT.PW32 = new_zarray<PW32V>(PW32_count());
 	OUT.CC32 = new_zarray<unsigned>(CC32_count());
+	OUT.HP32 = new_zarray<unsigned>(HP32_count());
 }
 SystemInterface::~SystemInterface()
 {
@@ -429,9 +437,6 @@ SystemInterface::~SystemInterface()
 	delete [] OUT.DO32;
 	delete [] OUT.PW32;
 	delete [] OUT.CC32;
+	delete [] OUT.HP32;
 }
-
-
-
-
 

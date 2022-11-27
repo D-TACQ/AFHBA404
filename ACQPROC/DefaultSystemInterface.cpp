@@ -44,6 +44,16 @@ public:
 				OUT.PW32[ii][cc] = PWM_MAGIC;
 			}
 		}
+		/* HP32 HudP relay. First 4 elems are SPAD[0-3], not for ext hardware but for Wireshark
+		 * Subsequent elements could go to AO16, but only odd values, even values are packet index for debug
+		 * nb: this is all DEMO/DEBUG aid, a real system will be different!
+		 */
+		for (int ii = 0; ii < HP32_count() && ii < 4; ++ii){
+			OUT.HP32[ii] = IN.SP32[ii];			/* distinctive HudP pattern: AI->AO (assumed), first 4 SPAD elements */
+		}
+		for (int ii = 4; ii < HP32_count(); ++ii){
+			OUT.HP32[ii] = xx + (ii<<16);			/* distinctive HudP pattern: AI->AO (assumed), ii: "channel index number" */
+		}
 	}
 };
 

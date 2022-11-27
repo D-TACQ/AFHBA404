@@ -264,11 +264,13 @@ void ACQ_HW_BASE::action2(SystemInterface& systemInterface) {
 	SITOVO(AO16);
 	SITOVO(DO32);
 	if (pw32_double_buffer) SITOVO(PW32);
+	SITOVO(HP32);
 
 	SITOVO2(AO16);
 	SITOVO2(DO32);
 	SITOVO2(PW32);
 	SITOVO2(CC32);
+	SITOVO2(HP32);
 	if (++sample < HBA::maxsam){
 		dev->lbuf_vi.cursor += vi.len();
 		dev->lbuf_vo.cursor += vo.len();

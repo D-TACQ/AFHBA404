@@ -17,7 +17,6 @@ using namespace std;
 
 int getenv(const char* key, int def, int (*cvt)(const char* key) = atoi);
 
-
 /** Models Vector Input.
  * Vector Input is a single sample input data set, pushed to DRAM by single DMA from ACQ
  */
@@ -53,7 +52,8 @@ struct VO {
 	int AO16;		/**< #AO16 values from the algorithm. OUTPUT to HW */
 	int DO32;		/**< #DO32 values from the algorithm. OUTPUT to HW */
 	int PW32;		/**< #PW32 values from the algorithm. OUTPUT to HW */
-	int CC32;		/**< #CALC values from the algorithm. NOT OUTPUT to HW */
+	int HP32;               /**< #HudP values from the algorithm. FOR REMOTE output on HUDP ONLY */
+	int CC32;		/**< #CALC values from the algorithm. NOT OUTPUT to HW, must be last */
 	VO();
 };
 
@@ -190,6 +190,7 @@ public:
 		unsigned *DO32;
 		PW32V *PW32;			/**< 32 demand values packed into shorts */
 		unsigned *CC32;			/**< calc values from PCS .. NOT outputs. */
+		unsigned *HP32;			/**< HudP RELAY values from PCS to remote XO */
 	} OUT;
 
 	SystemInterface(const HBA& _hba);
@@ -229,6 +230,9 @@ public:
 	}
 	unsigned CC32_count() const {
 		return hba.vo.CC32;
+	}
+	unsigned HP32_count() const {
+		return hba.vo.HP32;
 	}
 };
 

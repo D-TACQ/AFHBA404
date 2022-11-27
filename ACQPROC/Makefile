@@ -12,6 +12,8 @@ clean:
 doxygen:
 	doxygen
 
+acqproc.o: AcqSys.h
+
 acqproc: acqproc.o AcqSys.o AcqHw.o DefaultSystemInterface.o afhba-llcontrol.o Env.o
 	$(CXX) -O3 -o $@ $^	
 

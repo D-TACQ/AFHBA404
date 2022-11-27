@@ -16,6 +16,14 @@ eg
   
 - acqproc outputs the aggregate configuration as a config file (json), this publishes indices into shared memory vectors that we expect would be useful for the PCS and offsets of salient fields in the individual VI, VO vectors of each UUT, used by our post-shot analysis tools - the goal is that post-shot analysis is automatic, rather than depending on large numbers of command line constants. 
 
+- a skeleton config file can be autocreated on any given system, this will give an instant working system, and is the recommended way to proceed
+
+```
+pushd ../acq400_hapi; source ./setpath; popd
+
+./HAPI/lsafhba --save_config=myexperiment.json
+```
+
 - scripted tools (usually python) use the config file to configure the units via Ethernet, other tools use the input config file and in particular the output config file to drive data analysis.
 
 - the config file is a common configuration interface between pre-shot configuration (python), in-shot realtime (C++, CUDA) and post-shot analysis (python).
@@ -108,6 +116,7 @@ public:
 - AO16 : Analog Output, 16 bit, (eg AO424ELF-32)
 - DO32 : Digital Output, 32 bit, (eg DI423ELF)
 - CP32 : Calc Value, 32 bit, an intermediate calc result from the PCS. This is NOT sent to the UUT, but is stored in the raw output.
+- HP32 : HudP remote XO values, 32 bit
 
 
 
