@@ -185,7 +185,7 @@ def config_VO(args, uut, MSITES, COMMS='A'):
     for idx, site in enumerate(uut.DOSITES):
         uut.modules[site].mode = '0'
         uut.modules[site].lotide = '256'
-        uut.modules[site].byte_is_output = uut.DO_BYTE_IS_OUTPUT
+        uut.modules[site].byte_is_output = uut.DO_BYTE_IS_OUTPUT[idx]
         uut.modules[site].mode = '1'
         signal = signal2
 
@@ -322,12 +322,13 @@ def customize_HP32(uut, uut_def):
         hp32 = int(uut_def['VO']['HP32'])
     uut.HP32 = hp32
     
-def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
+def customize_DO_BYTE_IS_OUTPUT(uut, uut_def): 
     try:
-        if do_dir_def in uut_def['VO']['DO_BYTE_IS_OUTPUT']:
-            for idx, module_dir in enumerate(do_dir_def):
-                uut.DO_BYTE_IS_OUTPUT[idx] = module_dir
+        do_dir_def = uut_def['VO']['DO_BYTE_IS_OUTPUT']
+        for idx, module_dir in enumerate(do_dir_def):
+            uut.DO_BYTE_IS_OUTPUT[idx] = module_dir
     except NameError:
+        print("No custom DO_BYTE_IS_OUTPUT found, using default")
         pass
 
 def matchup_json_file(uut, uut_def, uut_name):
