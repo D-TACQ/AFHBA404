@@ -93,7 +93,7 @@ static DEVICE_ATTR(desc_fifo_stat_##DIR, (S_IRUSR|S_IRGRP), show_desc_fifo_stat_
 DESC_FIFO_STAT(pull, DMA_CTRL_PULL_SHL);
 DESC_FIFO_STAT(push, DMA_CTRL_PUSH_SHL);
 
-static char* getDmaCtrl(u32 stat, char buf[], int maxbuf)
+static char* getDmaCtrl(u32 stat, char buf[], int maxbuf, int SHL)
 {
 	int cursor = 0;
 	buf[0] = '\0';
@@ -110,6 +110,13 @@ static char* getDmaCtrl(u32 stat, char buf[], int maxbuf)
 	if ((stat & DMA_CTRL_RECYCLE) != 0){
 		cursor += sprintf(buf+cursor, "RECYCLE ");
 	}
+	if (SHL==DMA_CTRL_PULL_SHL && (stat & DMA_CTRL_HOST_TRIGGER) != 0){
+		cursor += sprintf(buf+cursor, "HOST_TRIGGER ");
+	}
+	if (SHL==DMA_CTRL_PUSH_SHL && (stat & DMA_CTRL_HOST_TRIGGER) != 0){
+		cursor += sprintf(buf+cursor, "RAM ");
+	}
+
 	strcat(buf, "\n");
 	assert(cursor < maxbuf);
 	return buf;
@@ -124,7 +131,7 @@ static ssize_t show_dma_ctrl_##DIR(					\
 	char flags[80];							\
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);			\
 	u32 stat = (DMA_CTRL_RD(adev) >> SHL)&0xffff;			\
-	getDmaCtrl(stat, flags, 80);					\
+	getDmaCtrl(stat, flags, 80, SHL);					\
 	return sprintf(buf, "0x%04x %s\n", stat, flags);		\
 }									\
 									\
@@ -132,6 +139,7 @@ static DEVICE_ATTR(dma_ctrl_##DIR, (S_IRUSR|S_IRGRP), show_dma_ctrl_##DIR, 0)
 
 DMA_CTRL(pull, DMA_CTRL_PULL_SHL);
 DMA_CTRL(push, DMA_CTRL_PUSH_SHL);
+
 
 static char* getDesc(u32 descr, char buf[], int maxbuf)
 {

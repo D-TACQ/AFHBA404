@@ -43,7 +43,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
 
-#define REVID	"R1073"
+#define REVID	"R1074"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -2452,9 +2452,67 @@ static ssize_t store_com_trg(
 
 static DEVICE_ATTR(com_trg, (S_IWUSR|S_IWGRP), 0, store_com_trg);
 
+static ssize_t store_pull_host_trigger(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned tv;
+
+	if (sscanf(buf, "%x", &tv) == 1){
+		_afs_write_comreg(adev, COM_SOFT_TRIGGER, COM_HOST_DOOR_BELL_RING);
+		afhba_write_reg(adev, HOST_TEST_REG, tv);   /* forces 1usec high time */
+		afhba_read_reg(adev, HOST_TEST_REG);
+		_afs_write_comreg(adev, COM_SOFT_TRIGGER, ~COM_HOST_DOOR_BELL_RING);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static DEVICE_ATTR(pull_host_trigger, (S_IWUSR), 0, store_pull_host_trigger);
+
+static ssize_t show_select_pull_host_trigger(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	u32 stat = DMA_CTRL_RD(adev);
+
+	return sprintf(buf, "%d\n", (stat&(DMA_CTRL_HOST_TRIGGER<<DMA_CTRL_PULL_SHL)) != 0);
+}
+
+static ssize_t store_select_pull_host_trigger(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	unsigned tv;
+
+	if (sscanf(buf, "%x", &tv) == 1){
+		u32 stat = DMA_CTRL_RD(adev);
+		if (tv){
+			stat |= (DMA_CTRL_HOST_TRIGGER<<DMA_CTRL_PULL_SHL);
+		}else{
+			stat &= ~(DMA_CTRL_HOST_TRIGGER<<DMA_CTRL_PULL_SHL);
+		}
+		DMA_CTRL_WR(adev, stat);
+		return strlen(buf);
+	}else{
+		return -1;
+	}
+}
+
+static DEVICE_ATTR(select_pull_host_trigger, (S_IWUSR|S_IWGRP), show_select_pull_host_trigger, store_select_pull_host_trigger);
+
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_com_trg.attr,		/* must be first */
+	&dev_attr_pull_host_trigger.attr,
+	&dev_attr_select_pull_host_trigger.attr,
 	&dev_attr_z_mod_id.attr,
 	&dev_attr_z_ident.attr,
 	&dev_attr_acq_model.attr,

@@ -369,7 +369,8 @@ inline static const char*  sDMA_SEL(enum DMA_SEL dma_sel)
 #define DMA_CTRL_FIFO_RST		0x0010
 #define DMA_CTRL_LOW_LAT		0x0020
 #define DMA_CTRL_RECYCLE		0x0040
-#define DMA_CTRL_RAM			0x8000
+#define DMA_CTRL_RAM			0x8000		/* PUSH */
+#define DMA_CTRL_HOST_TRIGGER		0x8000		/* PULL */
 
 #define DMA_DESCR_ADDR			0xfffffc00
 #define DMA_DESCR_INTEN			0x00000100
@@ -426,6 +427,7 @@ enum COMMON_REGS {
 };
 
 #define COM_SOFT_TRIGGER_EN		0x0001
+#define COM_HOST_DOOR_BELL_RING		0x0080
 
 static inline u32 read_astatus2(struct AFHBA_DEV *adev)
 {
