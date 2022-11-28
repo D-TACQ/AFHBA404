@@ -220,7 +220,7 @@ xhelp)
 xall|*)
 	# Execution starts here.
 	check_uut
-	configure_uut
+	[ $NOCONFIGURE -eq 0 ] && configure_uut
 	if [ $LLC_CALLBACKS -ne 0 ]; then
 		control_program_with_analysis
 	else
