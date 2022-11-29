@@ -10,6 +10,8 @@
  */
 
 #include "AcqSys.h"
+#include "Knob.h"
+#include <stdio.h>
 #include <string.h>
 
 
@@ -20,22 +22,30 @@ public:
 
 	}
 };
-
+/*
+[root@brotto AFHBA404]# echo 1 > /dev/rtm-t.0.ctrl/select_pull_host_trigger
+[root@brotto AFHBA404]# echo 1 > echo 1 > /dev/rtm-t.0.ctrl/pull_host_trigger
+*/
 class PullHostTrigger: public Actor {
-	char trigger_knob[80];
-	PullHostTrigger(const HBA& hba) {
+	Knob trigger_knob;
 
+	PullHostTrigger(const char* _tk, const char* _tsk): trigger_knob(_tk) {
+		Knob tsk(_tsk);
+		tsk.set(1);
 	}
 
 public:
-
 	void action(void){
-		;
+		trigger_knob.set(1);
 	}
 
 	static Actor& factory(const HBA& hba, int host_pull_trigger) {
 		if (host_pull_trigger){
-			return * new PullHostTrigger(hba);
+			char tsk[80];
+			char tk[80];
+			snprintf(tsk, 80, "/dev/rtm-t.%d.ctrl/select_pull_host_trigger", hba.devnum);
+			snprintf(tk, 80, "/dev/rtm-t.%d.ctrl/pull_host_trigger", hba.devnum);
+			return * new PullHostTrigger(tk, tsk);
 		}else{
 			return * new Actor();
 		}

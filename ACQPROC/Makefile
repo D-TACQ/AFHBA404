@@ -28,6 +28,6 @@ acqproc_network: acqproc.o AcqSys.o AcqHw.o NetworkSystemInterface.o afhba-llcon
 	$(CXX) -O3 -o $@ $^	
 	
 
-acqproc_hpr: acqproc.o AcqSys.o AcqHw.o HudpRelaySystemInterface.o afhba-llcontrol.o Env.o
+acqproc_hpr: acqproc.o AcqSys.o AcqHw.o HudpRelaySystemInterface.o afhba-llcontrol.o Env.o knobs.o
 	$(CXX) -O3 -o $@ $^
 	
