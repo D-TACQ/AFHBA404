@@ -40,15 +40,18 @@ public:
 		if (++cycle&1) trigger_knob.set(1);
 	}
 	static Actor& factory(const HBA& hba, int host_pull_trigger) {
+		char _tsk[80];
+		snprintf(_tsk, 80, "/dev/rtm-t.%d.ctrl/select_pull_host_trigger", hba.devnum);
+
 		if (host_pull_trigger){
-			char tsk[80];
-			char tk[80];
-			snprintf(tsk, 80, "/dev/rtm-t.%d.ctrl/select_pull_host_trigger", hba.devnum);
-			snprintf(tk, 80, "/dev/rtm-t.%d.ctrl/pull_host_trigger", hba.devnum);
+			char _tk[80];
+			snprintf(_tk, 80, "/dev/rtm-t.%d.ctrl/pull_host_trigger", hba.devnum);
 
 			printf("PullHostTrigger::factory create PullHostTrigger\n");
-			return * new PullHostTrigger(tk, tsk);
+			return * new PullHostTrigger(_tk, _tsk);
 		}else{
+			Knob tsk(_tsk);
+			tsk.set(0);
 			return * new Actor();
 		}
 	}
