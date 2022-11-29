@@ -133,7 +133,8 @@ dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py --save_config ACQPROC/configs/mast_ra
 
 - We then copy and modify the file to add the site specific features:
   - DO32 are ALL OUTPUTS
-  - We specify a HUDP_RELAY section of 12 * u32
+  - We specify a HUDP_RELAY section of 12 * u32 (ie 6xAO420, 4x16 bit)
+    - NB: the PAD section cannot current exceed 64b, and already includes 3*u32 from 3*DIO
   
 ```
 diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
@@ -221,7 +222,7 @@ nc -ul 10.12.198.254 53676 | pv > hudp.raw
   - on HOST
   
 ```bash
-NOCONFIGURE=1 SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_hudp_32lw.json
+NOCONFIGURE=1 SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
 ```
 
 - Analysis
@@ -234,10 +235,11 @@ hexdump blah blah
 - Host Pull Trigger Action
 
 ```bash
-NOCONFIGURE=1 SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_hudp_32lw.json
+NOCONFIGURE=1 SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
 
 ```
 
+- Queries? Please contact peter.milne@d-tacq.com
 
 
  
