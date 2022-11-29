@@ -36,10 +36,9 @@ class PullHostTrigger: public Actor {
 	}
 
 public:
-	void action(void){
+	virtual void operator() (void) {
 		if (++cycle&1) trigger_knob.set(1);
 	}
-
 	static Actor& factory(const HBA& hba, int host_pull_trigger) {
 		if (host_pull_trigger){
 			char tsk[80];

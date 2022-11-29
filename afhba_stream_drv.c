@@ -141,6 +141,11 @@ int host_llc_use_iommu_map;
 module_param(host_llc_use_iommu_map, int, 0644);
 MODULE_PARM_DESC(host_llc_use_iommu_map, "if IOMMU is present, try a 1:1 mapping for HOST transfer");
 
+int oldschool = 0;
+module_param(oldschool,int,0644);
+MODULE_PARM_DESC(oldschool, "set 1 to force DOORBELL clear");
+
+
 #if 0
 #define IOMMU_READ	(1 << 0)
 #define IOMMU_WRITE	(1 << 1)
@@ -2462,11 +2467,11 @@ static ssize_t store_pull_host_trigger(
 
 	if (sscanf(buf, "%x", &tv) == 1){
 		_afs_write_comreg(adev, COM_SOFT_TRIGGER, COM_HOST_DOOR_BELL_RING);
-#if 0
-		afhba_write_reg(adev, HOST_TEST_REG, tv);   /* forces 1usec high time */
-		afhba_read_reg(adev, HOST_TEST_REG);
-		_afs_write_comreg(adev, COM_SOFT_TRIGGER, 0);
-#endif
+		if (oldschool){
+			afhba_write_reg(adev, HOST_TEST_REG, tv);   /* forces 1usec high time */
+			afhba_read_reg(adev, HOST_TEST_REG);
+			_afs_write_comreg(adev, COM_SOFT_TRIGGER, 0);
+		}
 		return strlen(buf);
 	}else{
 		return -1;
