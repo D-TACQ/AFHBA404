@@ -28,15 +28,16 @@ public:
 */
 class PullHostTrigger: public Actor {
 	Knob trigger_knob;
+	int cycle;
 
-	PullHostTrigger(const char* _tk, const char* _tsk): trigger_knob(_tk) {
+	PullHostTrigger(const char* _tk, const char* _tsk): trigger_knob(_tk), cycle(0) {
 		Knob tsk(_tsk);
 		tsk.set(1);
 	}
 
 public:
 	void action(void){
-		trigger_knob.set(1);
+		if (++cycle&1) trigger_knob.set(1);
 	}
 
 	static Actor& factory(const HBA& hba, int host_pull_trigger) {
@@ -45,6 +46,8 @@ public:
 			char tk[80];
 			snprintf(tsk, 80, "/dev/rtm-t.%d.ctrl/select_pull_host_trigger", hba.devnum);
 			snprintf(tk, 80, "/dev/rtm-t.%d.ctrl/pull_host_trigger", hba.devnum);
+
+			printf("PullHostTrigger::factory create PullHostTrigger\n");
 			return * new PullHostTrigger(tk, tsk);
 		}else{
 			return * new Actor();
@@ -93,7 +96,7 @@ public:
 
 SystemInterface& SystemInterface::factory(const HBA& hba)
 {
-	if (G::verbose) printf("%s::%s\n", __FILE__, PFN);
+	/* if (G::verbose) */ printf("%s::%s\n", __FILE__, PFN);
 
 	char* key = getenv("SINGLE_THREAD_CONTROL");
 	if (key){
@@ -101,7 +104,7 @@ SystemInterface& SystemInterface::factory(const HBA& hba)
 		int host_pull_trigger = 0;
 		if (sscanf(key, "host_pull_trigger=%d,%d", &host_pull_trigger, &dup1) >= 1 ||
 		    strcmp(key, "control_dup1") == 0){                                          // previous default, just go with it
-			return * new HudpRelaySingleThreadControlSystemInterface(hba, dup1, host_pull_trigger);
+			return * new HudpRelaySingleThreadControlSystemInterface(hba, host_pull_trigger, dup1);
 		}
 
 	}
