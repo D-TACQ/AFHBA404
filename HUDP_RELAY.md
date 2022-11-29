@@ -18,11 +18,14 @@
   - On the clock, the UUT "pulls" VO from the HOST, and the DISTRIBUTOR scatters data to the outputs.
   
 - In a PULL_HOST_TRIGGER system, a software action on the HOSTP triggers the VO fetch.
+  - in our toy example, we hit the pull_host_trigger every second sample so that there's a clear distinction between regular clocked output and host trigger.
+  
+- In the text below, HOST and PCSHOST refer to the PCIe computer with AFHBA404, and RXHOST is the remote UDP receiver.
 
 
 ## Installation
 
-### Fetch D-TACQ Sofware
+### System
 
 - we assume that your HOST computer has kernel-devel, g++, python3 installed
  - in our examples, the HOST is "brotto":
@@ -37,18 +40,19 @@ model name	: Intel(R) Xeon(R) CPU E3-1220 v5 @ 3.00GHz
 model name	: Intel(R) Xeon(R) CPU E3-1220 v5 @ 3.00GHz
 model name	: Intel(R) Xeon(R) CPU E3-1220 v5 @ 3.00GHz
 model name	: Intel(R) Xeon(R) CPU E3-1220 v5 @ 3.00GHz
- 
  ```
-  
+ 
+### Fetch D-TACQ Sofware
+ 
 - we assume a user with sudo privileges. In our examples, nominally this user is "dt100"
+
 ```
 cd ~; mkdir PROJECTS; cd PROJECTS;
 git clone https://www.d-tacq.com/D-TACQ/acq400_hapi
 git clone https://www.d-tacq.com/D-TACQ/AFHBA404
-
 ```
 
-- in our testing, we have a private (Ethernet 1000LX network to another computer "naboo" as the data receiver
+- in our testing, we have a private (Ethernet 1000LX network to another computer "naboo" as the data receiver RXHOSTE
   - naboo: 10.12.198.254 
   - UUT:  10.12.198.100    on HUDP port on MGTD
 
@@ -133,7 +137,7 @@ dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py --save_config ACQPROC/configs/mast_ra
 
 - We then copy and modify the file to add the site specific features:
   - DO32 are ALL OUTPUTS
-  - We specify a HUDP_RELAY section of 12 * u32 (ie 6xAO420, 4x16 bit)
+  - We specify a HUDP_RELAY section "HP32" of 12 * u32 (ie 6xAO420, 4x16 bit)
     - NB: the PAD section cannot current exceed 64b, and already includes 3*u32 from 3*DIO
   
 ```
@@ -225,7 +229,8 @@ diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
 ```bash
 cd ~/PROJECTS/AFHBA404; pushd ../acq400_hapi; source ./setpath; popd
 SITECLIENT_TRACE=1 CLK=10000 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json configure_uut
-SITECLIENT_TRACE=1 ./user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_ip 10.12.198.100 --run0='notouch' --play0='notouch' --hudp_relay=140 acq2106_354 none
+SITECLIENT_TRACE=1 ../acq400_hapi/user_apps/acq2106/hudp_setup.py \
+--rx_ip=10.12.198.254 --tx_ip 10.12.198.100 --run0='notouch' --play0='notouch' --hudp_relay=140 acq2106_354 none
 ```
 
 - Per Shot action, run the shot:
@@ -239,7 +244,7 @@ nc -ul 10.12.198.254 53676 | pv > hudp.raw
   
 ```bash
 NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POST=10000 \
-./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
+SINGLE_THREAD_CONTROL=host_pull_trigger=0,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
 ```
 - During the shot, on Rx Host
 
@@ -248,20 +253,7 @@ NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POS
 29.8MiB 0:11:04 [ 508kiB/s] [                                                     <=>
 ```
 
-- During the shot, on PCSHOST
-
-```
-[dt100@brotto AFHBA404]$ SITECLIENT_TRACE=1 ../acq400_hapi/user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_ip 10.12.198.100 --run0='notouch' --play0='notouch' --hudp_relay=140 acq2106_354 none
-Siteclient(acq2106_354, 4220) >MODEL
-Siteclient(acq2106_354, 4220) <acq2106sfp
-Siteclient(acq2106_354, 4220) >is_tiga
-Siteclient(acq2106_354, 4220) <none
-Siteclient(acq2106_354, 4220) >has_mgt
-Siteclient(acq2106_354, 4220) <12 13
-
-```
-
-- Analysis
+- Analysis at remote UDP Rx
 
 ```bash
 [dt100@naboo ~]$ hexdump -e '13/4 "%08x," "\n"' hudp.raw  | more
@@ -282,13 +274,265 @@ Siteclient(acq2106_354, 4220) <12 13
 ```bash
 NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POST=10000 \
 SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
-
 ```
 
-  - @@WORTODO: we fixed the HPT to be half the rate, but the rate is still the same, looks like we still have CLOCK selected.
+  - The Control Program chooses to trigger on alternate incoming samples, as shown below in UDP Rx analysis (SPAD[0] in column 0)
   
+```
+[dt100@naboo ~]$ hexdump -e '13/4 "%08x," "\n"' hudp.raw  | more
+00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,
+*
+00000002,00000075,22222222,33333333,000424c9,000524c9,000624c9,000724c9,000824c9,000924c9,000a24c9,000b24c9,00000000,
+00000004,0000013d,22222222,33333333,00042320,00052320,00062320,00072320,00082320,00092320,000a2320,000b2320,00000000,
+00000006,00000205,22222222,33333333,0004216d,0005216d,0006216d,0007216d,0008216d,0009216d,000a216d,000b216d,00000000,
+00000008,000002cd,22222222,33333333,00041fb7,00051fb7,00061fb7,00071fb7,00081fb7,00091fb7,000a1fb7,000b1fb7,00000000,
+0000000a,00000395,22222222,33333333,00041df3,00051df3,00061df3,00071df3,00081df3,00091df3,000a1df3,000b1df3,00000000,
 
+```
+  - for broadcast, include --broadcast=1 in the hudp_setup
+  
+```bash
+../acq400_hapi/user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_ip 10.12.198.100 \
+	--run0='notouch' --play0='notouch' --hudp_relay=140 --broadcast=1 acq2106_354 none
+```
+- comment on PAD size. 
+  - As stated above. The maximum PAD size is 64b - space needed for DO. 
+    - in the example system, that makes 12xu32, or enough for 6 AO420FMC, Quad 16 bit DAC.
+    - in our contrived example, we used up the first 4 columns with a "SPAD RELAY", this was helpful for instrumentation.
+    - We'd actually recommend to keep the SPAD info in the UDP packet, it is helpful.
+    - @@WORKTODO: do we need a bigger PAD/TCAN. 64b was logical for padding to next 64b TLP, but with this new function it's clear a longer PAD would be useful. However, it's also difficult to implement.
+    - @@WORKTDO: to clear host_pull_trigger before reverting to regular clocked mode, run this from the command line:
+  
+```bash
+[root@brotto dt100]# echo 0 > /dev/rtm-t.0.ctrl/select_pull_host_trigger
+```
+  
 - Queries? Please contact peter.milne@d-tacq.com
 
+- APPENDIX: sample output log, during the shot, on PCSHOST. A successful shot is followed by an analysis of the short data acquired via PCIe.
 
+```
+[dt100@brotto AFHBA404]$ NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POST=10000 SINGLE_THREAD_CONTROL=host_pull_trigger=0,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
+UUT1 acq2106_354
+UUT2
+UUTS acq2106_354
+DEVMAX 2
+python3 /home/dt100/PROJECTS/acq400_hapi/user_apps/acq400/acq400_streamtonowhere.py --samples=10000 acq2106_354
+nsamples set 10000
+HBA0 VI:128 VO:188 devs=0
+	[0] dev:0 acq2106_354 VI:128 VO:188 Offset of SPAD IN VI :76
+ System Interface Indices 0,0
+HudpRelaySystemInterface.cpp::static SystemInterface& SystemInterface::factory(const HBA&)
+Siteclient(acq2106_354, 4220) >SITELIST
+Siteclient(acq2106_354, 4220) <216,1=423,2=ao,3=ao,4=dio,5=dio,6=dio
+Siteclient(acq2106_354, 4222) >module_name
+Siteclient(acq2106_354, 4223) >module_name
+Siteclient(acq2106_354, 4221) >module_name
+Siteclient(acq2106_354, 4224) >module_name
+Siteclient(acq2106_354, 4225) >module_name
+Siteclient(acq2106_354, 4222) <ao424elf
+Siteclient(acq2106_354, 4223) <ao424elf
+Siteclient(acq2106_354, 4221) <acq423elf
+Siteclient(acq2106_354, 4224) <dio432
+Siteclient(acq2106_354, 4225) <dio432
+Siteclient(acq2106_354, 4220) >state
+Siteclient(acq2106_354, 4220) <0 0 0 0 0
+Siteclient(acq2106_354, 4220) >streamtonowhered=stop
+Siteclient(acq2106_354, 4220) <
+Siteclient(acq2106_354, 4221) >SIG:sample_count:RESET=1
+Siteclient(acq2106_354, 4221) <
+Siteclient(acq2106_354, 4221) >SIG:sample_count:RESET=0
+Siteclient(acq2106_354, 4221) <
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Arming systems now - please wait. Do not trigger yet.
+Siteclient(acq2106_354, 4220) >streamtonowhered=start
+Siteclient(acq2106_354, 4220) <
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE IDLE
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE ARM
+Siteclient(acq2106_354, 4220) >SIG:SRC:TRG:0=EXT
+Siteclient(acq2106_354, 4220) <
+Siteclient(acq2106_354, 4220) >SIG:SRC:TRG:1=STRIG
+stored acq2106_354_VI.dat, len=1279872
+stored acq2106_354_VO.dat, len=1879812
+Control Program Finished
+Siteclient(acq2106_354, 4220) <
+All UUTs are armed and ready for trigger.
+Siteclient(acq2106_354, 4220) >CONTINUOUS:STATE
+Siteclient(acq2106_354, 4220) <CONTINUOUS:STATE RUN
+Streamed 0 of 10000 samples
+Siteclient(acq2106_354, 4221) >sample_count
+Siteclient(acq2106_354, 4221) <16865
+Streamed 16865 of 10000 samples
+Siteclient(acq2106_354, 4221) >sample_count
+Siteclient(acq2106_354, 4221) <26870
+
+Stream finished.
+Siteclient(acq2106_354, 4220) >streamtonowhered=stop
+Siteclient(acq2106_354, 4220) <
+python3 /home/dt100/PROJECTS/acq400_hapi/user_apps/acq400/acq400_streamtonowhere.py done 0
+
+Running analysis now.
+--------------------
+python3 scripts/acqproc_analysis.py --ones=1 --json=1 --json_src=./runtime.json --src=/home/dt100/PROJECTS/AFHBA404/
+TKAgg not available for matplot
+Running analysis for UUT: acq2106_354
+show SPAD: hexdump -ve '32/2 "%04x," 3/4 "%08x," 13/4 "%08x," "\n"' acq2106_354_VI.dat  | cut -d, -f36-43 | head -n 4
+00000001,0000003d,22222222,33333333,dead0005,dead0005,0369e282,a7777354
+00000002,000000a1,22222222,33333333,dead0005,dead0005,0369e282,a7777354
+00000003,00000105,22222222,33333333,dead0005,dead0005,0369e283,a7777354
+00000004,00000169,22222222,33333333,dead0005,dead0005,0369e283,a7777354
+show whole VI like this:
+hexdump -ve '32/2 "%04x," 3/4 "%08x," 13/4 "%08x," "\n"' acq2106_354_VI.dat 
+Finished collecting data
+T_LATCH differences:  1 , happened:  51  times
+T_LATCH differences:  2 , happened:  9  times
+T_LATCH differences:  3 , happened:  0  times
+(639936,)
+data end: 37
+spad_len:  13
+64
+len diffs = 1007
+max data = [855.075 855.075 855.075 ... 855.075 855.075 855.075]
+latency plot saved as acq2106_354_latency.png
+
+..
+```
+
+- Appendix: runtime.json, view of ACQPROC's model of the system
+
+  - AFHBA: the original config file
+  - SYS : the ACQPROC Model, comprising
+    - please see machine inserted comments at the end.
+
+```json
+{
+    "AFHBA": {
+        "DEVNUM": null,
+        "UUT": [
+            {
+                "COMMS": "A",
+                "DEVNUM": 0,
+                "VI": {
+                    "AI16": 32,
+                    "AISITES": [
+                        1
+                    ],
+                    "DI32": 3,
+                    "DIOSITES": [
+                        4,
+                        5,
+                        6
+                    ],
+                    "NXI": 4,
+                    "SP32": 13
+                },
+                "VO": {
+                    "AO16": 64,
+                    "AOSITES": [
+                        2,
+                        3
+                    ],
+                    "DIOSITES": [
+                        4,
+                        5,
+                        6
+                    ],
+                    "DO32": 3,
+                    "DO_BYTE_IS_OUTPUT": [
+                        "1,1,1,1",
+                        "1,1,1,1",
+                        "1,1,1,1"
+                    ],
+                    "HP32": 12,
+                    "NXO": 5
+                },
+                "name": "acq2106_354",
+                "sync_role": "master",
+                "type": "pcs"
+            }
+        ]
+    },
+    "SYS": {
+        "GLOBAL_LEN": {
+            "VI": {
+                "AI16": 32,
+                "AI32": 0,
+                "DI32": 3,
+                "SP32": 13
+            },
+            "VO": {
+                "AO16": 64,
+                "CC32": 0,
+                "DO32": 3,
+                "HP32": 12,
+                "PW32": 0
+            }
+        },
+        "SPIX": {
+            "POLLCOUNT": 2,
+            "TLATCH": 0,
+            "USECS": 1
+        },
+        "UUT": {
+            "GLOBAL_INDICES": [
+                {
+                    "VI": {
+                        "AI16": 0,
+                        "DI32": 0,
+                        "SP32": 0
+                    },
+                    "VO": {
+                        "AO16": 0,
+                        "DO32": 0,
+                        "HP32": 0
+                    }
+                }
+           ],
+            "LOCAL": [
+                {
+                    "VI_OFFSETS": {
+                        "AI16": 0,
+                        "DI32": 64,
+                        "SP32": 76
+                    },
+                    "VO_OFFSETS": {
+                        "AO16": 0,
+                        "DO32": 128,
+                        "HP32": 140
+                    },
+                    "VX_LEN": {
+                        "VI": 128,
+                        "VO": 188
+                    }
+                }
+            ]
+        },
+        "__comment1__": "created from ACQPROC/configs/mast_HP32_12.json",
+        "__comment2__": "LOCAL VI_OFFSETS: field offset VI in bytes",
+        "__comment3__": "LOCAL VO_OFFSETS: field offset VO in bytes",
+        "__comment4__": "LOCAL VX_LEN: length of VI|VO in bytes",
+        "__comment5__": "GLOBAL_LEN: total length of each type in SystemInterface",
+        "__comment6__": "GLOBAL_INDICES: index of field in type-specific array in SI",
+        "__comment7__": "SPIX: Scratch Pad Index, index of field in SP32"
+    }
+}
+
+```
  
