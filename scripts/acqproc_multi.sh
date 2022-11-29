@@ -51,6 +51,8 @@ VERBOSE=${VERBOSE:-0}
 #SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 LOOP_FOREVER=${LOOP_FOREVER:-0} # set to one to loop forever
+THE_ACQPROC=${THE_ACQPROC:-./ACQPROC/acqproc}  # selects ACQPROC variant.
+SINGLE_THREAD_CONTROL=${SINGLE_THREAD_CONTROL:-control_dup1}
 
 # UUT1 is the master in clock/trigger terms.
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
@@ -131,7 +133,7 @@ analysis() {
 
 
 control_program() {
-	# Run the control program here
+	# Run the control program here. We have to pass environment through the sudo barrier.
 	cd $AFHBA404_DIR
 	cat - > control_program.env <<EOF
 	export DEVMAX=$DEVMAX
@@ -141,8 +143,9 @@ control_program() {
 	export AFFINITY=$AFFINITY
 	export SINGLE_THREAD_CONTROL=control_dup1
 	export LOOP_FOREVER=$LOOP_FOREVER
+	export THE_ACQPROC=$THE_ACQPROC
 EOF
-	sudo bash -c 'source control_program.env; rm -f *.dat; ./ACQPROC/acqproc '${ACQPROC_CONFIG}' '$POST''
+	sudo bash -c 'source control_program.env; rm -f *.dat; ${THE_ACQPROC} '${ACQPROC_CONFIG}' '$POST''
 	echo "Control Program Finished"
 	[ "$USE_MDSPLUS" = "1" ] && mdsplus_upload
 }

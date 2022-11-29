@@ -13,6 +13,12 @@
 - With HUDP_RELAY, VO is deliberately extended using PAD to include additional "Relay" data.
 - The HUDP Hardware UDP processing unit is set to relay a slice of VO to remote client[s]
 
+- In "Normal" LLC, all processes are driven by the sample clock
+  - On the clock, the ADC array samples simultaneously, the AGGREGATOR gathers  data to VI and sends VI to the host
+  - On the clock, the UUT "pulls" VO from the HOST, and the DISTRIBUTOR scatters data to the outputs.
+  
+- In a PULL_HOST_TRIGGER system, a software action on the HOSTP triggers the VO fetch.
+
 
 ## Installation
 
@@ -34,7 +40,7 @@ model name	: Intel(R) Xeon(R) CPU E3-1220 v5 @ 3.00GHz
  
  ```
   
-- we assume a user with sudo privaleges. In our examples, nominally this user is "dt100"
+- we assume a user with sudo privileges. In our examples, nominally this user is "dt100"
 ```
 cd ~; mkdir PROJECTS; cd PROJECTS;
 git clone https://www.d-tacq.com/D-TACQ/acq400_hapi
@@ -207,22 +213,30 @@ SITECLIENT_TRACE=1 ./user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_
 
 - Per Shot action, run the shot:
   - on UDP Rx (naboo)
+  
 ```bash
 nc -ul 10.12.198.254 53676 | pv > hudp.raw
 ```
   
   - on HOST
+  
 ```bash
-NOCONFIGURE=1 SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/ukaea_hudp_32lw.json
+NOCONFIGURE=1 SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_hudp_32lw.json
 ```
 
 - Analysis
+
 ```bash
 hexdump blah blah
 ```
 
 
+- Host Pull Trigger Action
 
+```bash
+NOCONFIGURE=1 SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_hudp_32lw.json
+
+```
 
 
 

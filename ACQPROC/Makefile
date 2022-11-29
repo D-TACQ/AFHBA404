@@ -1,7 +1,7 @@
 
 CXXFLAGS+=-I. -std=c++11 -O3
 
-APPS=acqproc acqproc_custom acqproc_broadcast_trigger acqproc_network
+APPS=acqproc acqproc_custom acqproc_broadcast_trigger acqproc_network acqproc_hpr
 
 all: $(APPS)
 #	acqproc_custom
@@ -26,4 +26,8 @@ acqproc_broadcast_trigger: acqproc.o AcqSys.o AcqHw.o BroadcastSystemInterface.o
 	
 acqproc_network: acqproc.o AcqSys.o AcqHw.o NetworkSystemInterface.o afhba-llcontrol.o Env.o
 	$(CXX) -O3 -o $@ $^	
+	
+
+acqproc_hpr: acqproc.o AcqSys.o AcqHw.o HudpRelaySystemInterface.o afhba-llcontrol.o Env.o
+	$(CXX) -O3 -o $@ $^
 	
