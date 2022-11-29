@@ -138,7 +138,7 @@ dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py --save_config ACQPROC/configs/mast_ra
 - We then copy and modify the file to add the site specific features:
   - DO32 are ALL OUTPUTS
   - We specify a HUDP_RELAY section "HP32" of 12 * u32 (ie 6xAO420, 4x16 bit)
-    - NB: the PAD section cannot current exceed 64b, and already includes 3*u32 from 3*DIO
+    - NB: the PAD section cannot current exceed 64b, and already includes 3 * u32 from 3 * DIO
   
 ```
 diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
@@ -223,7 +223,7 @@ diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
                     },
 ```
 
- - the HP32 slice is at byte offset 140 in the VO vector. use as the argument for hudp_relay below ..
+ - the HP32 slice is at byte offset 140 in the VO vector. We want the UDP slice off the data to start there, so use this as the argument for hudp_relay below ..
  - we set CLK to 10k to keep the speed down..
 
 ```bash
@@ -247,6 +247,9 @@ NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POS
 SINGLE_THREAD_CONTROL=host_pull_trigger=0,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
 ```
 - During the shot, on Rx Host
+  - NB: Packets will be sent steadily on clock _before_ the trigger. This is a reflection of how the LLC system output works.
+  - It's the PCS's responsibility to load the VO vector source in host memory with sensible values BEFORE starting the process.
+  - The continuous update is used to implement things like DIO_WATCHDOG.
 
 ```
 [dt100@naboo ~]$ nc -ul 10.12.198.254 53676 | pv > hudp.raw
@@ -271,12 +274,22 @@ SINGLE_THREAD_CONTROL=host_pull_trigger=0,0 ./scripts/acqproc_multi.sh ACQPROC/c
 
 - Host Pull Trigger Action
 
+  - run the UDP Rx again:
+ 
+```
+[dt100@naboo ~]$ nc -ul 10.12.198.254 53676 | pv > hudp.raw
+0MiB 0:11:04 [ 0kiB/s] [                                                 <=>
+```
+
 ```bash
 NOCONFIGURE=1 SITECLIENT_TRACE=1 THE_ACQPROC=./ACQPROC/acqproc_hpr CLK=10000 POST=10000 \
 SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json
 ```
 
   - The Control Program chooses to trigger on alternate incoming samples, as shown below in UDP Rx analysis (SPAD[0] in column 0)
+  - Note two differences on the UDP Rx
+    - A single packet is sent initially, with no more packets until the system is triggered.
+    - The data rate is lower.
   
 ```
 [dt100@naboo ~]$ hexdump -e '13/4 "%08x," "\n"' hudp.raw  | more
@@ -295,6 +308,11 @@ SINGLE_THREAD_CONTROL=host_pull_trigger=1,0 ./scripts/acqproc_multi.sh ACQPROC/c
 ../acq400_hapi/user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_ip 10.12.198.100 \
 	--run0='notouch' --play0='notouch' --hudp_relay=140 --broadcast=1 acq2106_354 none
 ```
+    - on UDP Rx..
+```
+[dt100@naboo ~]$ nc -ul 10.12.198.255 53676 | pv > hudp.raw
+```
+
 - comment on PAD size. 
   - As stated above. The maximum PAD size is 64b - space needed for DO. 
     - in the example system, that makes 12xu32, or enough for 6 AO420FMC, Quad 16 bit DAC.
