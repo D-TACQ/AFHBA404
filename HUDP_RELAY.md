@@ -42,6 +42,11 @@ git clone https://www.d-tacq.com/D-TACQ/AFHBA404
 
 ```
 
+- in our testing, we have a private (Ethernet 1000LX network to another computer "naboo" as the data receiver
+  - naboo: 10.12.198.254 
+  - UUT:  10.12.198.100    on HUDP port on MGTD
+
+
 ### Build AFHBA404 support
 
 Follow instructions in INSTALL
@@ -63,7 +68,7 @@ sudo ./scripts/get-ident-all
 pushd ../acq400_hapi; source ./setpath; popd
 ```
 
-### ACQPROC
+### ACQPROC Configuration
 
 - ACQPROC is a framework for running LLC, it features data-driven configuration.
 - The easiest way to get a system-specific config file is to auto-create it, eg
@@ -73,10 +78,9 @@ dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py --save_config ACQPROC/configs/mast_ra
 0 HostComms(host='brotto', dev='0', uut='acq2106_354', cx='A')
 ```
 
-- the raw config file looks like this:
+- the raw config file ACQPROC/configs/mast_raw.json looks like this:
 
-```
-[dt100@brotto AFHBA404]$ cat ACQPROC/configs/mast_raw.json
+```json
 {
     "AFHBA": {
         "UUT": [
@@ -141,10 +145,9 @@ diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
 
 ```
 
-- creating a new file 
+- creating a new config file ACQPROC/configs/mast_HP32_12.json
 
 ```json
-[pgm@hoy5 AFHBA404]$ cat ACQPROC/configs/mast_HP32_12.json
 {
     "AFHBA": {
         "UUT": [
@@ -190,4 +193,37 @@ diff -urN ACQPROC/configs/mast_raw.json ACQPROC/configs/mast_HP32_12.json
 }
 
 ```
+
+## Running the system
+
+- First Time Action:
+  -
+
+```bash
+cd ACQPROC; pushd ../acq400_hapi; source ./setpath; popd
+SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/mast_HP32_12.json configure_uut
+SITECLIENT_TRACE=1 ./user_apps/acq2106/hudp_setup.py --rx_ip=10.12.198.254 --tx_ip 10.12.198.100 --run0='notouch' --play0='notouch' --hudp_relay=140 acq2106_354 none
+```
+
+- Per Shot action, run the shot:
+  - on UDP Rx (naboo)
+```bash
+nc -ul 10.12.198.254 53676 | pv > hudp.raw
+```
+  
+  - on HOST
+```bash
+NOCONFIGURE=1 SITECLIENT_TRACE=1 ./scripts/acqproc_multi.sh ACQPROC/configs/ukaea_hudp_32lw.json
+```
+
+- Analysis
+```bash
+hexdump blah blah
+```
+
+
+
+
+
+
  
