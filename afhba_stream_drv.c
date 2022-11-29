@@ -2462,9 +2462,11 @@ static ssize_t store_pull_host_trigger(
 
 	if (sscanf(buf, "%x", &tv) == 1){
 		_afs_write_comreg(adev, COM_SOFT_TRIGGER, COM_HOST_DOOR_BELL_RING);
+#if 0
 		afhba_write_reg(adev, HOST_TEST_REG, tv);   /* forces 1usec high time */
 		afhba_read_reg(adev, HOST_TEST_REG);
-		_afs_write_comreg(adev, COM_SOFT_TRIGGER, ~COM_HOST_DOOR_BELL_RING);
+		_afs_write_comreg(adev, COM_SOFT_TRIGGER, 0);
+#endif
 		return strlen(buf);
 	}else{
 		return -1;
