@@ -58,6 +58,12 @@ git clone https://www.d-tacq.com/D-TACQ/AFHBA404
   - naboo: 10.12.198.254 
   - UUT:  10.12.198.100    on HUDP port on MGTD
 
+- Strongly Recommended: Use cs-studio to monitor status https://github.com/D-TACQ/ACQ400CSS/blob/master/README.md#acq400css
+  - Clocktree OPI: shows Clock Status, including clock frequencies
+  - Capture OPI: shows Capture Status, including data flow rates.
+  - HUDP OPI : shows HUDP status, including live data rates.
+  - MGT OPI : shows MGT (PCIe DMA status, including live data rates)
+
 
 ### Build AFHBA404 support
 
