@@ -65,9 +65,65 @@ pushd ../acq400_hapi; source ./setpath; popd
 
 ### ACQPROC
 
-- ACQPROC uis a framework for running LLC, it features data-driven configuration.
+- ACQPROC is a framework for running LLC, it features data-driven configuration.
 - The easiest way to get a system-specific config file is to auto-create it, eg
 
 ```
-dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py 
+dt100@brotto AFHBA404]$  ./HAPI/lsafhba.py --save_config ACQPROC/configs/mast_raw.json
 0 HostComms(host='brotto', dev='0', uut='acq2106_354', cx='A')
+```
+
+- the raw config file looks like this:
+
+```
+[dt100@brotto AFHBA404]$ cat ACQPROC/configs/mast_raw.json
+{
+    "AFHBA": {
+        "UUT": [
+            {
+                "DEVNUM": 0,
+                "name": "acq2106_354",
+                "type": "pcs",
+                "sync_role": "master",
+                "COMMS": "A",
+                "VI": {
+                    "AI16": 32,
+                    "DI32": 3,
+                    "SP32": 13,
+                    "AISITES": [
+                        1
+                    ],
+                    "DIOSITES": [
+                        4,
+                        5,
+                        6
+                    ],
+                    "NXI": 4
+                },
+                "VO": {
+                    "AO16": 64,
+                    "DO32": 3,
+                    "AOSITES": [
+                        2,
+                        3
+                    ],
+                    "DIOSITES": [
+                        4,
+                        5,
+                        6
+                    ],
+                    "NXO": 5
+                }
+            }
+        ]
+    }
+}
+
+```
+
+- We then copy and modify the file to add the site specific features:
+ - DO32 are ALL OUTPUTS
+ - We specify a HUDP_RELAY section of 12 * u32
+ 
+ 
+ 
