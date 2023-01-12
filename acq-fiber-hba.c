@@ -376,6 +376,10 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 
 	int rc;
 
+	if (adev->idx >= MAXDEV){
+		dev_err(pdev(adev), "MAXDEV %d name limit reached. We need more names", MAXDEV);
+		return -1;
+	}
 	snprintf(adev->name, SZM1(adev->name), "afhba.%d", adev->idx);
 	afhba_devnames[adev->idx] = adev->name;
 	snprintf(adev->mon_name, SZM1(adev->name), "afhba-mon.%d", adev->idx);
