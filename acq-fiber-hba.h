@@ -76,8 +76,10 @@
 #endif
 
 
-#define MAXDEV	(8*4)	/* maximum expected devices .. (one device per port) */
-
+#define MAXBOARDS 8     /* surely enough! */
+#define MAXPORTS  4
+/** maximum expected devices .. (one device per port). Almost all installations now AFHBA404, 4 port */
+#define MAXDEV	(MAXBOARDS*MAXPORTS)
 
 struct AFHBA_DEV;
 
