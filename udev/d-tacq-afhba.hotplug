@@ -1,16 +1,16 @@
 #!/bin/bash
 
 DN=$1
-DEVPATH=/sys/$2
+DEVPATH=/sys$2
 DEVICE=$DEVPATH/device
-DATADIR=/dev/rtm-t.$DN.data
-
-echo rtm-t-makenodes $1 $2
+DATADIR=/dev/rtm-t.${DN}.data
 
 if [ "$2" = "" ]; then
 	echo USAGES $0 DN PATH
 	exit 1;
 fi
+
+echo rtm-t-makenodes $1 $2
 
 mm=$(cat $DEVPATH/dev)
 MAJOR=${mm%:*}
@@ -36,7 +36,8 @@ else
 fi
 
 #ln -s $DEVICE /dev/rtm-t.$DN.ctrl
-ln -s /sys/class/afhba/afhba.$DN/ /dev/rtm-t.$DN.ctrl
+ln -s /sys/class/afhba/afhba.${DN}/ /dev/rtm-t.${DN}.ctrl
+
 mkdir -p $DATADIR
 
 ACQTYPE=ACQ196
@@ -74,6 +75,4 @@ done
 
 chown -R ${DT100_UID}.${DT100_GID} /dev/rtm-t.${DN}*
 chmod -R ug+rw /dev/rtm-t.${DN}*
-
-
 
