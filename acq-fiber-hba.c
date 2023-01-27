@@ -539,6 +539,9 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	case PCI_SUBDID_HBA_KMCU2:
 		dev_info(pdev(adev), "KMCU2 detected");
 		return afhba_mtca_probe(adev);
+	case PCI_SUBDID_HBA_Z7IO:
+		dev_info(pdev(adev), "DAMCZ7IO detected");
+		return afhba_mtca_probe(adev);
 	default:
 		return -ENODEV;
 	}

@@ -21,6 +21,7 @@
 #define PCI_SUBDID_FHBA_4G4	0x4104	/* AFHBA404 */
 #define PCI_SUBDID_HBA_KMCU	0x4105	/* KMCU #1 Z7035 using one lane of 4 */
 #define PCI_SUBDID_HBA_KMCU2	0x4106	/* KMCU #2 Z7030 single lane */
+#define PCI_SUBDID_HBA_Z7IO	0x4107	/* KMCU #2 Z7030 single lane */
 
 #define PCI_SUBDID_CPSC		0x4110
 #define PCI_SUBDID_RTMT_AO	0x4080
