@@ -2,8 +2,9 @@
 
 DN=${1:-0}
 NB=${2:-1024}
+RCL=${3:-1}
 
-mkdir -p /mnt/afhba.$DN
+mkdir -p /mnt/afhba.$DN -m 0777
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.${DN}.ctrl/aurora
 if [ $? -ne 0 ];then
@@ -11,7 +12,7 @@ if [ $? -ne 0 ];then
 	exit 1
 fi
 outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
-mkdir -p $outroot
+mkdir -p $outroot -m 0777
 echo stream to $outroot
-CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot ./STREAM/rtm-t-stream-disk
+RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk
 
