@@ -1101,7 +1101,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		if (!hb->va){
 			dev_err(pdev(adev), "failed to allocate buffer %d", ii);
-			break;
+			return -1;
 		}
 
 
@@ -2553,6 +2553,7 @@ void afs_create_sysfs(struct AFHBA_DEV *adev)
 
 int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 {
+	int rc;
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
 	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d %s", 
@@ -2563,7 +2564,11 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	gpumem_init(adev);
 #endif
 	INIT_LIST_HEAD(&adev->iommu_map_list);
-	afs_init_buffers(adev);
+	rc = afs_init_buffers(adev);
+	if (rc != 0){
+		dev_err(pdev(adev), "FAILED TO ALLOCATE buffers. Device is UNUSABLE. Please reboot and try again with smaller nbuffers");
+		return rc;
+	}
 
 	if (cos_interrupt_ok && adev->peer == 0){
 		hook_interrupts(adev);
