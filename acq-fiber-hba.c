@@ -76,9 +76,11 @@ static int MAP2BAR(struct AFHBA_DEV *adev, int imap)
 static int minor2bar(struct AFHBA_DEV *adev, int iminor)
 {
 	switch(iminor){
-	default:
-		dev_err(pdev(adev), "bad call minor2bar %d", iminor); /* fallthru */
 	case MINOR_REGREAD:
+	default:
+		if (iminor != MINOR_REGREAD){
+			dev_err(pdev(adev), "bad call minor2bar %d", iminor); /* fallthru */
+		}
 		return REGS_BAR;
 	case MINOR_REMOTE:
 		return REMOTE_BAR;
