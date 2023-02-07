@@ -2405,8 +2405,14 @@ static ssize_t show_acq_model(
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned model = _afs_read_zynqreg(adev, Z_IDENT) >> 16;
-	model = model&0x2106;
-	return sprintf(buf, "acq%04x\n", model);
+	unsigned z_mod_id = _afs_read_zynqreg(adev, Z_MOD_ID);
+
+	if (z_mod_id>>24 == 0x93){
+		return sprintf(buf, "z7io");
+	}else{
+		model = model&0x2106;
+		return sprintf(buf, "acq%04x\n", model);
+	}
 }
 
 static DEVICE_ATTR(acq_model, S_IRUGO, show_acq_model, 0);
@@ -2431,10 +2437,15 @@ static ssize_t show_acq_ident(
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT);
+	unsigned z_mod_id = _afs_read_zynqreg(adev, Z_MOD_ID);
 	unsigned ident = z_ident&0x0ffff;
-	unsigned model = (z_ident >> 16) & 0x2106;
 
-	return sprintf(buf, "acq%04x_%03d\n", model, ident);
+	if (z_mod_id>>24 == 0x93){
+		return sprintf(buf, "z7io_%03d", ident);
+	}else{
+		unsigned model = (z_ident >> 16) & 0x2106;
+		return sprintf(buf, "acq%04x_%03d\n", model, ident);
+	}
 }
 
 static DEVICE_ATTR(acq_ident, S_IRUGO, show_acq_ident, 0);
