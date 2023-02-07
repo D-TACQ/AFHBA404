@@ -713,13 +713,15 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
 		return 1;
 	}else if ((z_ident&0xe4330000) == 0xe4330000){
-        snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
+		snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
                         z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
-        return 1;
+		return 1;
 	}else if ((z_ident&0x43000000) == 0x43000000){
-        snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
+		snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
                         z_ident&0x0ffff, 0);
-        return 1;
+		return 1;
+	}else if ((z_ident&0x93710000) == 0x93710000){
+		snprintf(buf, maxbuf, "z7io_%03d.commsC", z_ident&0x0ffff);
 	}else{
 		return 0;
 	}
