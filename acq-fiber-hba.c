@@ -581,6 +581,8 @@ static struct pci_device_id afhba_pci_tbl[] = {
 		PCI_SUBVID_DTACQ, PCI_SUBDID_HBA_KMCU, 0 },
 	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
 		PCI_SUBVID_DTACQ, PCI_SUBDID_HBA_KMCU2, 0 },
+	{ PCI_VENDOR_ID_XILINX, PCI_DEVICE_ID_DTACQ_PCIE,
+		PCI_SUBVID_DTACQ, PCI_SUBDID_HBA_Z7IO, 0 },
         { }
 };
 static struct pci_driver afhba_driver = {
