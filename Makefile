@@ -13,8 +13,6 @@ obj-m += afhba.o
 
 SRC := $(shell pwd)
 LDRV:= $(SRC)/linux/drivers
-EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
-KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
 CONFIG_MODULE_SIG=n
 
 EXTRA_CFLAGS += -DCONFIG_SPI
@@ -22,6 +20,8 @@ EXTRA_CFLAGS += -DCONFIG_SPI
 
 ifeq ($(GPU),1)
 # enable next two lines for GPU
+EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
+KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
 EXTRA_CFLAGS += -DCONFIG_GPU
 EXTRA_GPU = afhba_gpu.o
 GPU_APPS = gpu_apps
