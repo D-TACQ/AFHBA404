@@ -9,14 +9,18 @@
  * This file takes input from nc as below:
  * nc acq2106_112 4210 | pv | ./isramp
  */
+
+namespace G {
+	int maxcols = 104; // Number of columns of data
+	int countcol = 96; // Column where the ramp is
+	int step = 1; // Default step. For sample counter in spad step = 1
+	int bigendian = 0;
+	int maxerrs = 0;
+	int ignore_first_entry = 0;
+};
 int main(int argc, char *argv[]) {
 
-    int maxcols = 104; // Number of columns of data
-    int countcol = 96; // Column where the ramp is
-    int step = 1; // Default step. For sample counter in spad step = 1
-    int bigendian = 0;
-    int maxerrs = 0;
-    int ignore_first_entry = 0;
+
     FILE* fp = stdin;
     char* fname = 0;
 
@@ -24,23 +28,23 @@ int main(int argc, char *argv[]) {
     while((opt = getopt(argc, argv, "b:m:c:s:i:E:")) != -1) {
         switch(opt) {
         case 'm':
-            maxcols = atoi(optarg);
+            G::maxcols = atoi(optarg);
             break;
         case 'c':
-            countcol = atoi(optarg);
+            G::countcol = atoi(optarg);
             break;
         case 'b':
-            bigendian = atoi(optarg);
-            if (bigendian) printf("Hello Moto\n");
+            G::bigendian = atoi(optarg);
+            if (G::bigendian) printf("Hello Moto\n");
         case 's':
-            step = atoi(optarg);
+            G::step = atoi(optarg);
             printf("%i\n", atoi(optarg));
             break;
         case 'i':
-            ignore_first_entry = atoi(optarg);
+            G::ignore_first_entry = atoi(optarg);
 	    break;
         case 'E':
-            maxerrs = atoi(optarg);
+            G::maxerrs = atoi(optarg);
             break;
         default:
             fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS\n");
@@ -60,24 +64,24 @@ int main(int argc, char *argv[]) {
     unsigned error_report = 0;
 
     for (unsigned xx, xx1 = 0; ; ++ii, xx1 = xx){    
-        unsigned buffer[maxcols];
-        int nread = fread(buffer, sizeof(unsigned), maxcols, fp); // read  maxcols channels of data.
+        unsigned buffer[G::maxcols];
+        int nread = fread(buffer, sizeof(unsigned), G::maxcols, fp); // read  G::maxcols channels of data.
 
-        if (nread != maxcols){
+        if (nread != G::maxcols){
 	    break;
         }
-        xx = buffer[countcol];
+        xx = buffer[G::countcol];
 
-        if (bigendian){
+        if (G::bigendian){
 	    xx = ntohl(xx);
         } 
-        if (xx == xx1 + step) {
+        if (xx == xx1 + G::step) {
             error_report = 0;
-        } else if (ignore_first_entry && ii==0){
+        } else if (G::ignore_first_entry && ii==0){
            ;
         } else {
             ++errors;
-            if (maxerrs && errors >= maxerrs){				// mv file out the way, FAST
+            if (G::maxerrs && errors >= G::maxerrs){				// mv file out the way, FAST
              	char fname_err[80];
              	snprintf(fname_err, 80, "%s.err", fname);
              	rename(fname, fname_err);
@@ -87,11 +91,11 @@ int main(int argc, char *argv[]) {
                 printf("%s: %lld: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10d bytes. Interval: %8lu, %10lu bytes\n",
                 fname,
                 error_report,
-            	ii, xx1, xx, xx - xx1, (xx-xx1)*maxcols*sizeof(unsigned), 
-		ii-previous_error, (ii-previous_error)*maxcols*sizeof(unsigned));
+            	ii, xx1, xx, xx - xx1, (xx-xx1)*G::maxcols*sizeof(unsigned),
+		ii-previous_error, (ii-previous_error)*G::maxcols*sizeof(unsigned));
 		previous_error = ii;
             }
-            if (maxerrs && errors >= maxerrs){
+            if (G::maxerrs && errors >= G::maxerrs){
         	    return 1;
             }
         }
