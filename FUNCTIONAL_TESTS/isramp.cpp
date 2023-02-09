@@ -17,46 +17,58 @@ namespace G {
 	int bigendian = 0;
 	int maxerrs = 0;
 	int ignore_first_entry = 0;
+	const char* fname = "-";
 };
-int main(int argc, char *argv[]) {
+
+void get_args(int argc, char* const argv[]){
+    int opt;
+    while((opt = getopt(argc, argv, "b:m:c:s:i:E:")) != -1) {
+	switch(opt) {
+	case 'm':
+	    G::maxcols = atoi(optarg);
+	    break;
+	case 'c':
+	    G::countcol = atoi(optarg);
+	    break;
+	case 'b':
+	    G::bigendian = atoi(optarg);
+	    if (G::bigendian) printf("Hello Moto\n");
+	case 's':
+	    G::step = atoi(optarg);
+	    printf("%i\n", atoi(optarg));
+	    break;
+	case 'i':
+	    G::ignore_first_entry = atoi(optarg);
+	    break;
+	case 'E':
+	    G::maxerrs = atoi(optarg);
+	    break;
+	default:
+	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS\n");
+	    exit(1);
+	}
+    }
+    if (optind < argc){
+	G::fname = argv[optind];
+    }
+}
+
+
+int main(int argc, char* const argv[]) {
+	get_args(argc, argv);
 
 
     FILE* fp = stdin;
     char* fname = 0;
 
-    int opt;
-    while((opt = getopt(argc, argv, "b:m:c:s:i:E:")) != -1) {
-        switch(opt) {
-        case 'm':
-            G::maxcols = atoi(optarg);
-            break;
-        case 'c':
-            G::countcol = atoi(optarg);
-            break;
-        case 'b':
-            G::bigendian = atoi(optarg);
-            if (G::bigendian) printf("Hello Moto\n");
-        case 's':
-            G::step = atoi(optarg);
-            printf("%i\n", atoi(optarg));
-            break;
-        case 'i':
-            G::ignore_first_entry = atoi(optarg);
-	    break;
-        case 'E':
-            G::maxerrs = atoi(optarg);
-            break;
-        default:
-            fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS\n");
-            return 1; 
-        }
-    }
-    if (optind < argc){
-        fp = fopen(fname = argv[optind], "r");
-        if (fp == 0){
-            fprintf(stderr, "ERROR: failed to open \"%s\"\n", fname);
-            return 1;
-        }
+    if (strcmp(G::fname, "-") != 0){
+	    fp = fopen(G::fname, "r");
+	    if (fp == 0){
+		    fprintf(stderr, "ERROR: failed to open \"%s\"\n", G::fname);
+		    return 1;
+	    }
+    }else{
+	    fp = stdin;
     }
     unsigned long long ii = 0;
     unsigned long long previous_error = 0;
@@ -83,8 +95,8 @@ int main(int argc, char *argv[]) {
             ++errors;
             if (G::maxerrs && errors >= G::maxerrs){				// mv file out the way, FAST
              	char fname_err[80];
-             	snprintf(fname_err, 80, "%s.err", fname);
-             	rename(fname, fname_err);
+             	snprintf(fname_err, 80, "%s.err", G::fname);
+             	rename(G::fname, fname_err);
             }
             if (++error_report < 5){
 
