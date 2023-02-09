@@ -69,11 +69,12 @@ struct Calcs {
 	unsigned long long previous_error = 0;
 	unsigned errors = 0;
 	unsigned error_report = 0;
+	unsigned xx1;
 };
 
 int isramp(FILE* fp, Calcs& calcs){
 	int file_ec = 0;
-	for (unsigned xx, xx1 = 0; ; ++calcs.ii, xx1 = xx){
+	for (unsigned xx; ; ++calcs.ii, calcs.xx1 = xx){
 		unsigned buffer[G::maxcols];
 		int nread = fread(buffer, sizeof(unsigned), G::maxcols, fp); // read  G::maxcols channels of data.
 
@@ -85,7 +86,7 @@ int isramp(FILE* fp, Calcs& calcs){
 		if (G::bigendian){
 			xx = ntohl(xx);
 		}
-		if (xx == xx1 + G::step) {
+		if (xx == calcs.xx1 + G::step) {
 			calcs.error_report = 0;
 		} else if (G::ignore_first_entry && calcs.ii==0){
 			;
@@ -102,7 +103,7 @@ int isramp(FILE* fp, Calcs& calcs){
 				printf("%s: %lld: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10d bytes. Interval: %8lu, %10lu bytes\n",
 						G::fname,
 						calcs.error_report,
-						calcs.ii, xx1, xx, xx - xx1, (xx-xx1)*G::maxcols*sizeof(unsigned),
+						calcs.ii, calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned),
 						calcs.ii-calcs.previous_error, (calcs.ii-calcs.previous_error)*G::maxcols*sizeof(unsigned));
 				calcs.previous_error = calcs.ii;
 			}
