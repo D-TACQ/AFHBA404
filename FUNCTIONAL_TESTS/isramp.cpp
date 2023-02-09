@@ -152,11 +152,12 @@ int main(int argc, char* const argv[]) {
 		}
 	}else{
 		char fname[132];
+		G::fname = fname;                   // for isramp error report
 		while(fgets(fname, 132, stdin)){
 			int len = strlen(fname);
 			if (len > 1){
 				fname[len-1] = '\0';
-				fp = fopen_read_or_die(G::fname);
+				fp = fopen_read_or_die(fname);
 				file_ec = isramp(fp, calcs);
 				fclose(fp);
 				if (G::verbose){
