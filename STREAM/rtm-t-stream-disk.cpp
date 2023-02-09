@@ -388,7 +388,7 @@ static int stream()
 					return -1;
 				}
 				if (NBUFS && nbuf >= NBUFS){
-					printf("NBUFS %d reached, quitting now\n", NBUFS);
+					fprintf(stderr, "NBUFS %d reached, quitting now\n", NBUFS);
 					goto all_done;
 				}
 			}
