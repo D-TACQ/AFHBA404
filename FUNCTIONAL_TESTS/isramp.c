@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     for (unsigned xx, xx1 = 0; ; ++ii, xx1 = xx){    
         unsigned buffer[maxcols];
-        int nread = fread(buffer, sizeof(unsigned), maxcols, fp); // read 104 channels of data.
+        int nread = fread(buffer, sizeof(unsigned), maxcols, fp); // read  maxcols channels of data.
 
         if (nread != maxcols){
 	    break;
