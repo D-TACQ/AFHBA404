@@ -22,11 +22,12 @@ namespace G {
 	const char* fname = "-";
 	bool stdin_is_list_of_fnames;
 	int verbose = 0;
+	char *logname = NULL;
 };
 
 void get_args(int argc, char* const argv[]){
     int opt;
-    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:")) != -1) {
+    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:L:")) != -1) {
 	switch(opt) {
 	case 'm':
 		G::maxcols = atoi(optarg);
@@ -53,8 +54,11 @@ void get_args(int argc, char* const argv[]){
 	case 'v':
 		G::verbose = atoi(optarg);
 		break;
+	case 'L':
+		G::logname = optarg;
+		break;
 	default:
-	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE\n");
+	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE -L LOGNAME\n");
 	    exit(1);
 	}
     }
@@ -131,9 +135,24 @@ void print_report(const char* fname, int file_ec, Calcs& calcs)
 			fname, file_ec? "ERR": "OK", samples, calcs.errors, 100.0*calcs.errors/samples);
 }
 
+void write_log(Calcs& calcs){
+	unsigned long long samples = calcs.ii/G::step;
+        static FILE *fp;
+        if (fp == 0){
+                char filename[300];
+		printf("log file: %s \n", G::logname);
+		fp = fopen(G::logname, "w");
+                if (fp == 0){
+                        fprintf(stderr, "ERROR failed to open log file\n");
+                        exit(1);
+                }
+        }
+        fseek(fp, 0, SEEK_SET);
+        fprintf(fp, "Total: %lld Errors %u \n", samples, calcs.errors);
+}
+
 int main(int argc, char* const argv[]) {
 	get_args(argc, argv);
-
 
 	FILE* fp = stdin;
 
@@ -163,6 +182,9 @@ int main(int argc, char* const argv[]) {
 				fclose(fp);
 				if (G::verbose){
 					print_report(fname, file_ec, calcs);
+				}
+				if (G::logname){
+					write_log(calcs);
 				}
 				if (file_ec < 0){
 					exit(1);
