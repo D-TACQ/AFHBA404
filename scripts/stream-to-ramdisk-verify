@@ -1,19 +1,11 @@
 #!/bin/bash
 
-DN=${1:-0}		#device number
+DN=${1:-0}			#device number
 NB=${2:-1024}		#total buffers
-RCL=${3:-1}		#recycle 0 = No, >0 = how many cycles until recycle
+RCL=${3:-1}			#recycle 0 = No, >0 = how many cycles until recycle
 SPAD=${4:-8}		#total spad items
 SPAD_START=${5:-8}	#index of first spad item
 
-ident=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
-stream_dir="/mnt/afhba.${DN}" 
-logfile="${stream_dir}/ramp_${DN}.log"
-outroot="/mnt/afhba.${DN}/${ident}"
-cnum=$(($SPAD + $SPAD_START))
-
-mkdir -p $stream_dir -m 0777
-touch $logfile
 echo checking aurora is up ..
 grep +LANE_UP /dev/rtm-t.${DN}.ctrl/aurora
 
@@ -21,11 +13,18 @@ if [ $? -ne 0 ];then
 	echo aurora lane NOT up, quit
 	exit 1
 fi
+
+ident=$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
+stream_dir="/mnt/afhba.${DN}"
+logfile="${stream_dir}/ramp_${DN}.log"
+outroot="/mnt/afhba.${DN}/${ident}"
+cnum=$(($SPAD + $SPAD_START))
+
 echo "Logfile: ${logfile}"
 echo "Columns: ${cnum}"
+umask 000
+mkdir -p $stream_dir
+mkdir -p $outroot
+echo "Waiting" >  $logfile
 
-mkdir -p $stream_dir -m 0777
-mkdir -p $outroot -m 0777
-touch $logfile
-
-RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk | FUNCTIONAL_TESTS/isramp -N1 -m $cnum -c $SPAD -i 1 -L $logfile
+RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk | ./FUNCTIONAL_TESTS/isramp -N1 -m $cnum -c $SPAD_START -i 1 -L $logfile
