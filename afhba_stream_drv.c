@@ -720,7 +720,7 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 		snprintf(buf, maxbuf, "kmcu_%03d.comms%x",
                         z_ident&0x0ffff, 0);
 		return 1;
-	}else if ((z_ident&0x93710000) == 0x93710000){
+	}else if ((z_ident&0x93c10000) == 0x93c10000){
 		snprintf(buf, maxbuf, "z7io_%03d.commsC", z_ident&0x0ffff);
 		return 1;
 	}else{
