@@ -22,6 +22,10 @@ cnum=$(($SPAD + $SPAD_START))
 
 echo "Logfile: ${logfile}"
 echo "Columns: ${cnum}"
+umask 000
+mkdir -p $stream_dir
+mkdir -p $outroot
+echo "Waiting" >  $logfile
 
 mkdir -p $stream_dir -m 0777
 mkdir -p $outroot -m 0777

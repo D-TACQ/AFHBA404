@@ -103,13 +103,14 @@ int isramp(FILE* fp, Calcs& calcs){
 				rename(G::fname, fname_err);
 			}
 			if (++calcs.error_report < 5){
-
-				printf("%s: %lld: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10d bytes. Interval: %8lu, %10lu bytes\n",
-						G::fname,
-						calcs.error_report,
-						calcs.ii, calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned),
-						calcs.ii-calcs.previous_error, (calcs.ii-calcs.previous_error)*G::maxcols*sizeof(unsigned));
-				calcs.previous_error = calcs.ii;
+				if (!G::logname){
+					printf("%s: %lld: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10d bytes. Interval: %8lu, %10lu bytes\n",
+							G::fname,
+							calcs.error_report,
+							calcs.ii, calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned),
+							calcs.ii-calcs.previous_error, (calcs.ii-calcs.previous_error)*G::maxcols*sizeof(unsigned));
+					calcs.previous_error = calcs.ii;
+				}
 			}
 			if (G::maxerrs && calcs.errors >= G::maxerrs){
 				return -file_ec;
