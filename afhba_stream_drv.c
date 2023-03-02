@@ -43,7 +43,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
 
-#define REVID	"R1074"
+#define REVID	"R1075"
 
 #define DEF_BUFFER_LEN 0x100000
 
