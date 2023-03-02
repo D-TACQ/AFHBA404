@@ -2,7 +2,7 @@
 
 DN=${1:-0}
 NB=${2:-1024}
-RCL=${3:-1}
+RCL=${3:-0}
 
 mkdir -p /mnt/afhba.$DN -m 0777
 echo checking aurora is up ..
