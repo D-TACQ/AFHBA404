@@ -43,7 +43,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
 
-#define REVID	"R1075"
+#define REVID	"R1076"
 
 #define DEF_BUFFER_LEN 0x100000
 
@@ -2441,14 +2441,17 @@ static ssize_t show_acq_ident(
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT);
-	unsigned z_mod_id = _afs_read_zynqreg(adev, Z_MOD_ID);
-	unsigned ident = z_ident&0x0ffff;
 
-	if (z_mod_id>>24 == 0x93){
-		return sprintf(buf, "z7io_%03d", ident);
+	if (is_valid_z_ident(z_ident, buf, 80)){
+		char *ip = strchr(buf, '.');
+		if (ip){
+			*ip = '\0';
+		}
+		return strlen(buf);
 	}else{
 		unsigned model = (z_ident >> 16) & 0x2106;
-		return sprintf(buf, "acq%04x_%03d\n", model, ident);
+		unsigned sn = z_ident&0x0ffff;
+		return sprintf(buf, "acq%04x_%03d\n", model, sn);
 	}
 }
 
