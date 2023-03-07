@@ -227,7 +227,7 @@ static ssize_t show_buffer_len(
 	return strlen(buf);
 }
 
-static DEVICE_ATTR(buffer_len, (S_IRUSR|S_IRGRP)|(S_IWUSR|S_IWGRP), show_buffer_len, store_buffer_len);
+static DEVICE_ATTR(buffer_len, (S_IRUGO|S_IWUSR|S_IWGRP), show_buffer_len, store_buffer_len);
 
 
 char* getFlags(u32 stat, char buf[], int maxbuf)
