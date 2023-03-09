@@ -233,32 +233,16 @@ static DEVICE_ATTR(buffer_len, (S_IRUGO|S_IWUSR|S_IWGRP), show_buffer_len, store
 char* getFlags(u32 stat, char buf[], int maxbuf)
 {
 	int cursor = 0;
+#define STRCAT(lbl, value)  	cursor += snprintf(buf+cursor, maxbuf-cursor, "%s=%d ", (lbl), (value))
 
-	cursor += sprintf(buf+cursor, "%c%s ",
-		(stat & AFHBA_AURORA_STAT_SFP_PRESENTn)? '-': '+',
-				"PRESENT");
-	if ((stat & AFHBA_AURORA_STAT_SFP_LOS) != 0){
-		cursor += sprintf(buf+cursor, "LOS ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_SFP_TX_FAULT) != 0){
-		cursor += sprintf(buf+cursor, "TX_FAULT ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_HARD_ERR) != 0){
-		cursor += sprintf(buf+cursor, "HARD_ERR ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_SOFT_ERR) != 0){
-		cursor += sprintf(buf+cursor, "SOFT_ERR ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_FRAME_ERR) != 0){
-		cursor += sprintf(buf+cursor, "FRAME_ERR ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_CHANNEL_UP) != 0){
-		cursor += sprintf(buf+cursor, "+CHANNEL_UP ");
-	}
-	if ((stat & AFHBA_AURORA_STAT_LANE_UP) != 0){
-		cursor += sprintf(buf+cursor, "+LANE_UP ");
-	}
-	assert(cursor < maxbuf);
+	STRCAT("PRESENT", 	(stat & AFHBA_AURORA_STAT_SFP_PRESENTn)==0);
+	STRCAT("LOS", 	  	(stat & AFHBA_AURORA_STAT_SFP_LOS) != 0);
+	STRCAT("TX_FAULT", 	(stat & AFHBA_AURORA_STAT_SFP_LOS) != 0);
+	STRCAT("HARD_ERR", 	(stat & AFHBA_AURORA_STAT_HARD_ERR) != 0);
+	STRCAT("SOFT_ERR",	(stat & AFHBA_AURORA_STAT_SOFT_ERR) != 0);
+	STRCAT("FRAME_ERR",	(stat & AFHBA_AURORA_STAT_FRAME_ERR) != 0);
+	STRCAT("CHANNEL_UP",	(stat & AFHBA_AURORA_STAT_FRAME_ERR) != 0);
+	STRCAT("LANE_UP",	(stat & AFHBA_AURORA_STAT_LANE_UP) != 0);
 	return buf;
 }
 
@@ -283,9 +267,8 @@ static ssize_t show_aurora(
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
 	int sr_off = AURORA_STATUS_REG(adev->sfp);
 	int cr_off = AURORA_CONTROL_REG(adev->sfp);
-	char flags[80];
+	char flags[128];
 	int pcie_init = 0;
-	static const char* rpcie_status[2] = { "RPCIE_RESET", "RPCIE_INIT+" };
 
 	u32 stat = afhba_read_reg(adev, sr_off);
 
@@ -300,13 +283,15 @@ static ssize_t show_aurora(
         if (stat&AFHBA_AURORA_STAT_LANE_UP){
         	unsigned pcie_ctrl = readl(REM_PCIE_CNTRL(adev));
 
-        	dev_warn(pdev(adev), "%s REM_PCIE_CNTRL(adev): %p", __FUNCTION__, REM_PCIE_CNTRL(adev));
-        	if (pcie_ctrl != 0){
+        	dev_dbg(pdev(adev), "%s 0x%08x", __FUNCTION__, pcie_ctrl);
+        	if (pcie_ctrl == 0xdeadc0de){
+        		dev_warn(pdev(adev), "%s 0x%08x this shouldn't happen here", __FUNCTION__, pcie_ctrl);
+        		pcie_init = -1;
+        	}else if (pcie_ctrl != 0){
         		pcie_init = 1;
         	}
-        	dev_dbg(pdev(adev), "%s pcie_ctrl 0x%08x %s", __FUNCTION__, pcie_ctrl, rpcie_status[pcie_init]);
         }
-        return sprintf(buf, "0x%08x %s %s\n", stat, getFlags(stat, flags, 80), rpcie_status[pcie_init]);
+        return sprintf(buf, "stat=0x%08x %s RPCIE_INIT=%d\n", stat, getFlags(stat, flags, 128), pcie_init);
 }
 
 

@@ -74,11 +74,12 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	}
 	rembase = 1;
 	for (ireg = 0; ireg <= 32; ++ireg){
-		if (ireg == 1)
-			dev_info(pdev(adev), "%s idx:%d rb:%d ir:%d REM:%p reg:0x%04lx va:%p",
-			__FUNCTION__, adev->idx, rembase, ireg,
-			REM(adev), rembase*0x1000+ireg*sizeof(u32),
-			REM(adev)+rembase*0x1000+ireg*sizeof(u32));
+		if (ireg == 1){
+			dev_dbg(pdev(adev), "%s idx:%d rb:%d ir:%d REM:%p reg:0x%04lx va:%p",
+					__FUNCTION__, adev->idx, rembase, ireg,
+					REM(adev), rembase*0x1000+ireg*sizeof(u32),
+					REM(adev)+rembase*0x1000+ireg*sizeof(u32));
+		}
 
 		NUM_REG_CREATE(rem, REM(adev), rembase*0x1000+ireg*sizeof(u32));
 	}
@@ -90,11 +91,12 @@ void afhba_createDebugfs(struct AFHBA_DEV* adev)
 	}
 	rembase = 2;
 	for (ireg = 0; ireg <= 32; ++ireg){
-		if (ireg == 1)
-		dev_info(pdev(adev), "%s idx:%d rb:%d ir:%d REM:%p reg:0x%04lx va:%p",
-			__FUNCTION__, adev->idx, rembase, ireg,
-			REM(adev), rembase*0x1000+ireg*sizeof(u32),
-			REM(adev)+rembase*0x1000+ireg*sizeof(u32));
+		if (ireg == 1){
+			dev_dbg(pdev(adev), "%s idx:%d rb:%d ir:%d REM:%p reg:0x%04lx va:%p",
+					__FUNCTION__, adev->idx, rembase, ireg,
+					REM(adev), rembase*0x1000+ireg*sizeof(u32),
+					REM(adev)+rembase*0x1000+ireg*sizeof(u32));
+		}
 		NUM_REG_CREATE(rem, REM(adev), rembase*0x1000+ireg*sizeof(u32));
 	}
 
