@@ -258,7 +258,6 @@ char* getFlags(u32 stat, char buf[], int maxbuf)
 	if ((stat & AFHBA_AURORA_STAT_LANE_UP) != 0){
 		cursor += sprintf(buf+cursor, "+LANE_UP ");
 	}
-	strcat(buf, "\n");
 	assert(cursor < maxbuf);
 	return buf;
 }
@@ -285,15 +284,29 @@ static ssize_t show_aurora(
 	int sr_off = AURORA_STATUS_REG(adev->sfp);
 	int cr_off = AURORA_CONTROL_REG(adev->sfp);
 	char flags[80];
+	int pcie_init = 0;
+	static const char* rpcie_status[2] = { "RPCIE_RESET", "RPCIE_INIT+" };
 
 	u32 stat = afhba_read_reg(adev, sr_off);
 
-       if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
+	if ((stat&AFHBA_AURORA_STAT_ERR) != 0){
                 u32 ctrl = afhba_read_reg(adev, cr_off);
                 afhba_write_reg(adev, cr_off, ctrl|AFHBA_AURORA_CTRL_CLR);
                 afhba_write_reg(adev, cr_off, ctrl);
         }
-        return sprintf(buf, "0x%08x %s\n", stat, getFlags(stat, flags, 80)); \
+
+	dev_warn(pdev(adev), "%s REM_PCIE_CNTRL(adev): %p", __FUNCTION__, REM_PCIE_CNTRL(adev));
+
+        if (stat&AFHBA_AURORA_STAT_LANE_UP){
+        	unsigned pcie_ctrl = readl(REM_PCIE_CNTRL(adev));
+
+        	dev_warn(pdev(adev), "%s REM_PCIE_CNTRL(adev): %p", __FUNCTION__, REM_PCIE_CNTRL(adev));
+        	if (pcie_ctrl != 0){
+        		pcie_init = 1;
+        	}
+        	dev_dbg(pdev(adev), "%s pcie_ctrl 0x%08x %s", __FUNCTION__, pcie_ctrl, rpcie_status[pcie_init]);
+        }
+        return sprintf(buf, "0x%08x %s %s\n", stat, getFlags(stat, flags, 80), rpcie_status[pcie_init]);
 }
 
 

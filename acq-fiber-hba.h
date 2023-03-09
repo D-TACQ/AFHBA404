@@ -324,6 +324,8 @@ enum PCIE_REGS {
 	PCIE_BUFFER_CTRL
 };
 
+#define REM_PCIE_CNTRL(adev)		(REM(adev)+ PCIE_BASE + PCIE_CNTRL*sizeof(u32))
+
 #define PCIE_CONF_AF_PORT_SHL		16
 
 #define DMA_BASE			0x2000
