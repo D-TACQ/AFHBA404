@@ -14,5 +14,5 @@ fi
 outroot=/mnt/afhba.$DN/$(cat /dev/rtm-t.${DN}.ctrl/acq_ident)
 mkdir -p $outroot -m 0777
 echo stream to $outroot
-RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk
+sudo RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk
 
