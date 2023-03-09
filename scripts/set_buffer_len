@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+LEN=${1:-2097192}
+for u in /dev/rtm-t.?.ctrl; do echo $LEN > $u/buffer_len; done
