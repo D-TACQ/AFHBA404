@@ -356,13 +356,26 @@ static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 		}
 	}
 }
-u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
+
+u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
 {
 	u32* dma_regs = (u32*)(adev->remote + ZYNQ_BASE);
 	void* va = &dma_regs[regoff];
 	u32 value = readl(va);
 	DEV_DBG(pdev(adev), "%04lx = %08x", va-adev->remote, value);
+	assert(regoff < MAX_RegCache);
+	adev->rc_zynq.rv[regoff] = value;
 	return adev->stream_dev->dma_regs[regoff] = value;
+}
+u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
+{
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	if (sdev->pid == 0){
+		return _afs_read_zynqreg_raw(adev, regoff);
+	}else{
+		assert(regoff < MAX_RegCache);
+		return adev->rc_zynq.rv[regoff];
+	}
 }
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)

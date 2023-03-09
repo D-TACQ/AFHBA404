@@ -133,6 +133,8 @@ struct iommu_mapping {
         int prot;
 };
 
+#define MAX_RegCache 32
+
 struct AFHBA_DEV {
 	char name[16];
 	char mon_name[16];
@@ -180,6 +182,10 @@ struct AFHBA_DEV {
 #endif
 	struct iommu_domain *iommu_dom;
 	struct list_head iommu_map_list;
+
+	struct RegCache {
+		u32 rv[MAX_RegCache];
+	} rc_zynq;
 };
 
 #define SZM1(field)	(sizeof(field)-1)
