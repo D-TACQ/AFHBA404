@@ -17,6 +17,6 @@ echo 9 > /proc/sys/kernel/printk
 	eot_interrupt=0 WORK_TO=1 \
         dma_descriptor_ram=1 assume_stuck_buffers_are_ok=1
 
-./scripts/mount.ramdisk
+./scripts/mount-ramdisk
 
 
