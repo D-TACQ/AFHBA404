@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo updating /lib/udev
 cp ./udev/d-tacq-afhba.hotplug /lib/udev
+echo updating /etc/udev/rules.d
 cp ./udev/20-afhba.rules /etc/udev/rules.d
+
+echo copy get-ident-all to /usr/local/bin
+cp ./scripts/get-ident-all /usr/local/bin
 
