@@ -36,6 +36,7 @@ char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 struct class* afhba_device_class;
 
+
 LIST_HEAD(afhba_devices);
 
 

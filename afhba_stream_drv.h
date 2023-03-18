@@ -61,6 +61,15 @@ enum { PS_OFF, PS_PLEASE_STOP, PS_STOP_DONE };
 #define DEV_DBG 	dev_dbg
 #endif
 
+struct GLOCK {
+	spinlock_t g_lock;
+	int active_pid_count;
+};
+
+extern struct GLOCK afhba_glock;
+
+int afhba_onOpenAction(struct AFHBA_DEV* adev);
+int afhba_onCloseAction(struct AFHBA_DEV* adev);
 
 
 struct AFHBA_STREAM_DEV {

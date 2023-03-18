@@ -163,6 +163,8 @@ module_param(vo_perms, int, 0644);
 MODULE_PARM_DESC(vo_perms, "VI permissions: 1: READ 4:SNOOP");
 
 
+struct GLOCK afhba_glock;
+
 static int getOrder(int len)
 {
 	int order;
@@ -357,6 +359,37 @@ static void write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc)
 	}
 }
 
+int afhba_onOpenAction(struct AFHBA_DEV* adev) {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	int rc = 0;
+	spin_lock(&afhba_glock.g_lock);
+
+	if (sdev->pid == 0){
+		sdev->pid = current->pid;
+		afhba_glock.active_pid_count++;
+	}
+	if (sdev->pid != current->pid){
+		rc = -EBUSY;
+	}
+	spin_unlock(&afhba_glock.g_lock);
+	return rc;
+}
+int afhba_onCloseAction(struct AFHBA_DEV* adev) {
+	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
+	int rc = 0;
+	spin_lock(&afhba_glock.g_lock);
+	if (unlikely(afhba_glock.active_pid_count <= 0)){
+		dev_err(pdev(adev), "%s active_pid_count <= 0 before close", __FUNCTION__);
+		afhba_glock.active_pid_count = 0;
+		rc = -1;
+	}else{
+		afhba_glock.active_pid_count--;
+	}
+	sdev->pid = 0;
+	spin_unlock(&afhba_glock.g_lock);
+	return rc;
+}
+
 u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
 {
 	u32* dma_regs = (u32*)(adev->remote + ZYNQ_BASE);
@@ -367,15 +400,26 @@ u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
 	adev->rc_zynq.rv[regoff] = value;
 	return adev->stream_dev->dma_regs[regoff] = value;
 }
-u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff)
+
+#define FROM_CACHE_NOCHECK 0
+u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff, int* from_cache)
 {
-	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-	if (sdev->pid == 0){
-		return _afs_read_zynqreg_raw(adev, regoff);
+	int _from_cache = 0;
+	u32 rv;
+
+	spin_lock(&afhba_glock.g_lock);
+	if (afhba_glock.active_pid_count == 0){
+		rv = _afs_read_zynqreg_raw(adev, regoff);
 	}else{
 		assert(regoff < MAX_RegCache);
-		return adev->rc_zynq.rv[regoff];
+		rv = adev->rc_zynq.rv[regoff];
+		_from_cache = 1;
 	}
+	spin_unlock(&afhba_glock.g_lock);
+	if (from_cache != FROM_CACHE_NOCHECK){
+		*from_cache = _from_cache;
+	}
+	return rv;
 }
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)
@@ -745,11 +789,13 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 	}
 }
 
+
 static int _afs_check_read(struct AFHBA_DEV *adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
-	unsigned z_ident1 = _afs_read_zynqreg(adev, Z_IDENT);
-	unsigned z_ident2 = _afs_read_zynqreg(adev, Z_IDENT);
+
+	unsigned z_ident1 = _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK);
+	unsigned z_ident2 = _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK);
 
 	if (z_ident2 == 0xffffffff || (z_ident2&~0x0ffff) == 0xdead0000){
 		dev_err(pdev(adev), "ERROR reading Z_IDENT %08x, please reboot now", z_ident2);
@@ -1765,19 +1811,15 @@ int afs_dma_open(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
-
+	int rc = 0;
 	int ii;
 
 
 	iommu_init(adev);
 	dev_dbg(pdev(adev), "45: DMA open");
 
-	/** @@todo protect with lock ? */
-	if (sdev->pid == 0){
-		sdev->pid = current->pid;
-	}
-
-	if (sdev->pid != current->pid){
+	rc = afhba_onOpenAction(adev);
+	if (rc != 0){
 		return -EBUSY;
 	}
 
@@ -1800,7 +1842,7 @@ int afs_dma_open(struct inode *inode, struct file *file)
 	}
 
 	dev_dbg(pdev(adev), "99");
-	return 0;
+	return rc;
 }
 
 
@@ -1845,7 +1887,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 		sdev->onStopPush(adev);
 		sdev->onStopPush = 0;
 	}
-	sdev->pid = 0;
+
 	if (sdev->user) kfree(sdev->user);
 
 	if (adev->iommu_dom){
@@ -1854,6 +1896,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 #ifdef CONFIG_GPU
 	afhba_free_gpumem(adev);
 #endif
+	afhba_onCloseAction(adev);
 	return afhba_release(inode, file);
 }
 
@@ -2399,7 +2442,7 @@ static ssize_t show_zmod_id(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_MOD_ID));
+	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_MOD_ID, FROM_CACHE_NOCHECK));
 }
 
 static DEVICE_ATTR(z_mod_id, S_IRUGO, show_zmod_id, 0);
@@ -2410,7 +2453,7 @@ static ssize_t show_z_ident(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_IDENT));
+	return sprintf(buf, "0x%08x\n", _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK));
 }
 
 static DEVICE_ATTR(z_ident, S_IRUGO, show_z_ident, 0);
@@ -2421,8 +2464,8 @@ static ssize_t show_acq_model(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	unsigned model = _afs_read_zynqreg(adev, Z_IDENT) >> 16;
-	unsigned z_mod_id = _afs_read_zynqreg(adev, Z_MOD_ID);
+	unsigned model = _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK) >> 16;
+	unsigned z_mod_id = _afs_read_zynqreg(adev, Z_MOD_ID,FROM_CACHE_NOCHECK);
 
 	if (z_mod_id>>24 == 0x93){
 		return sprintf(buf, "z7io");
@@ -2440,7 +2483,7 @@ static ssize_t show_acq_port(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	unsigned comms = _afs_read_zynqreg(adev, Z_IDENT) >> 20;
+	unsigned comms = _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK) >> 20;
 	comms = comms&0xf;
 	return sprintf(buf, "%X\n", comms);
 }
@@ -2453,7 +2496,7 @@ static ssize_t show_acq_ident(
 		char * buf)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
-	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT);
+	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT, FROM_CACHE_NOCHECK);
 
 	if (is_valid_z_ident(z_ident, buf, 80)){
 		char *ip = strchr(buf, '.');
@@ -2469,6 +2512,35 @@ static ssize_t show_acq_ident(
 }
 
 static DEVICE_ATTR(acq_ident, S_IRUGO, show_acq_ident, 0);
+
+
+static ssize_t show_acq_ident_port(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	int from_cache = 0;
+	unsigned z_ident = _afs_read_zynqreg(adev, Z_IDENT, &from_cache);
+	int len;
+
+	if (is_valid_z_ident(z_ident, buf, 80)){
+		char *ip = strchr(buf, '.');
+		if (ip){
+			*ip = '\0';
+		}
+		len = strlen(buf);
+	}else{
+		unsigned model = (z_ident >> 16) & 0x2106;
+		unsigned sn = z_ident&0x0ffff;
+		len = sprintf(buf, "acq%04x_%03d", model, sn);
+	}
+
+	len += sprintf(buf+len, " %X %c\n", (z_ident>>20)&0xf, from_cache? '-': '+');
+	return len;
+}
+
+static DEVICE_ATTR(acq_ident_port, S_IRUGO, show_acq_ident_port, 0);
 
 static ssize_t store_com_trg(
 	struct device * dev,
@@ -2549,6 +2621,14 @@ static ssize_t store_select_pull_host_trigger(
 
 static DEVICE_ATTR(select_pull_host_trigger, (S_IWUSR|S_IWGRP), show_select_pull_host_trigger, store_select_pull_host_trigger);
 
+static ssize_t show_active_pid_count(
+		struct device * dev,
+		struct device_attribute *attr,
+		char * buf)
+{
+	return sprintf(buf, "%d\n", afhba_glock.active_pid_count);
+}
+static DEVICE_ATTR(active_pid_count, S_IRUGO, show_active_pid_count, 0);
 
 static const struct attribute *dev_attrs[] = {
 	&dev_attr_com_trg.attr,		/* must be first */
@@ -2559,6 +2639,8 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_acq_model.attr,
 	&dev_attr_acq_port.attr,
 	&dev_attr_acq_ident.attr,
+	&dev_attr_acq_ident_port.attr,
+	&dev_attr_active_pid_count.attr,
 	NULL
 };
 

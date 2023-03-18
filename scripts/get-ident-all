@@ -11,16 +11,22 @@ PORTS=(A B C D)
 for d in /dev/rtm-t.*.ctrl; do
 	d1=${d%*.ctrl}
 	DN=${d1#*.}
-	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident ]; then
-		ID=$(cat /dev/rtm-t.$DN.ctrl/acq_ident)
+	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident_port ]; then
+                read -ra IDP <<< $(cat /dev/rtm-t.$DN.ctrl/acq_ident_port)
+                ID=${IDP[0]}
 		if [ "x$ID" != "x" ] &&
 		   [ "$ID" != "acq2106_65535" ] && 
 		   [ "$ID" != "${ID#acq2106_*}" ] || [ "$ID" != "${ID#acq2206_*}" ] || [ "$ID" != "${ID#z7io_*}" ]; then
-			PORT=$(cat /dev/rtm-t.$DN.ctrl/acq_port)
 			if [ $verbose -eq 0 ]; then
-				echo "$(hostname) $DN $ID $PORT"
+				echo "$(hostname) $DN ${IDP[@]}"
 			else
-				echo "host=$(hostname) hdev=afhba.$DN hport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID uport=$PORT"
+				PORT=${IDP[1]}
+                                case ${IDP[2]} in
+				+)	READ=REG;;
+                                -)      READ=CACHE;;
+                                *)      READ=ERR;;
+				esac
+				echo "host=$(hostname) hdev=afhba.$DN hport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID uport=$PORT read=$READ"
 			fi
 		fi
 	fi
