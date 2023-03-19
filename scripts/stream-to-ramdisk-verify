@@ -5,6 +5,7 @@ NB=${2:-1024}		#total buffers
 RCL=${3:-1}			#recycle 0 = No, >0 = how many cycles until recycle
 SPAD=${4:-8}		#total spad items
 SPAD_START=${5:-8}	#index of first spad item
+STEP=${6:-1}
 
 echo checking aurora is up ..
 grep LANE_UP=1 /dev/rtm-t.${DN}.ctrl/aurora
@@ -31,4 +32,4 @@ mkdir -p $stream_dir -m 0777
 mkdir -p $outroot -m 0777
 touch $logfile
 
-RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk | ./FUNCTIONAL_TESTS/isramp -N1 -m $cnum -c $SPAD_START -i 1 -L $logfile
+RECYCLE=$RCL CONCAT=0 NBUFS=$NB RTM_DEVNUM=$DN OUTROOT=$outroot  ./STREAM/rtm-t-stream-disk | ./FUNCTIONAL_TESTS/isramp -N1 -m $cnum -c $SPAD_START -s $STEP -i 1 -L $logfile
