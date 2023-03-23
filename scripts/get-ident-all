@@ -8,7 +8,7 @@ fi
 
 PORTS=(A B C D)
 
-for d in /dev/rtm-t.*.ctrl; do
+for d in /dev/rtm-t.?.ctrl /dev/rtm-t.1?.ctrl; do
 	d1=${d%*.ctrl}
 	DN=${d1#*.}
 	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident_port ]; then
