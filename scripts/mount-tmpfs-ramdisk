@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Mount a tmpfs ramdisk of a specified size (e.g. `8G` for 8 GiB) at /mnt. Requires sudo.
+# The benefit compared to a normal ramdisk is that it cannot expand indefinitely and is
+# less likely to crash the system by using up all RAM
+
+SIZE=${1:-8G}
+
+mount -o size=$SIZE -t tmpfs ramdisk /mnt
