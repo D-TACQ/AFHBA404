@@ -4,6 +4,19 @@
 # The benefit compared to a normal ramdisk is that it cannot expand indefinitely and is
 # less likely to crash the system by using up all RAM
 
-SIZE=${1:-8G}
+# pick a maximum size based on availablememory, always leave OSSHARE GB for the OS..
+# examples:
+# [pgm@hoy5 AFHBA404]$  ./scripts/mount-tmpfs-ramdisk
+# mount -o size=23G -t tmpfs ramdisk /mnt
+# [pgm@hoy5 AFHBA404]$  ./scripts/mount-tmpfs-ramdisk 4G
+#  mount -o size=4G -t tmpfs ramdisk /mnt
+# [pgm@hoy5 AFHBA404]$ OSSHARE=10G ./scripts/mount-tmpfs-ramdisk
+# mount -o size=21G -t tmpfs ramdisk /mnt
 
-mount -o size=$SIZE -t tmpfs ramdisk /mnt
+OSSHARE=${OSSHARE:-8G}
+OSSHARE=${OSSHARE%*G}
+
+MAX_SIZE=$(grep  MemTotal /proc/meminfo | awk "{ print int(\$2/1048576)-$OSSHARE }")G
+SIZE=${1:-${MAX_SIZE}}
+
+echo mount -o size=$SIZE -t tmpfs ramdisk /mnt
