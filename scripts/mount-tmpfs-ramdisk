@@ -6,4 +6,4 @@
 
 SIZE=${1:-8G}
 
-mount -o size=$SIZE -t tmpfs none /mnt
+mount -o size=$SIZE -t tmpfs ramdisk /mnt
