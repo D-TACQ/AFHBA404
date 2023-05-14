@@ -104,7 +104,7 @@ int isramp(FILE* fp, Calcs& calcs){
 			}
 			if (++calcs.error_report < 5){
 				if (!G::logname){
-					printf("%s: %lld: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10d bytes. Interval: %8lu, %10lu bytes\n",
+					printf("%s: %d: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10ld bytes. Interval: %8llu, %10llu bytes\n",
 							G::fname,
 							calcs.error_report,
 							calcs.ii, calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned),
