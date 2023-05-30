@@ -10,7 +10,7 @@ Usage:
 
 Definitions:
 
-VI : Vector Input [to HOST] :: AI + DI + SPAD     
+VI : Vector Input [to HOST] :: AI + DI + SPAD
 VO : Vector Output [from HOST} :: AO + DO + TCAN
 
 Where:
@@ -32,7 +32,7 @@ The AGGREGATOR collects a single sample VI comprising AI,DI,SPAD ("spad" control
 The DISTRIBUTOR farms out a single sample VO comprising AO,DO,TCAN ("pad" control on the distributor)
 
 
-TCAN: because the UUT DISTRIBUTOR simply dumps the padding (needed for %64 byte alignment. 
+TCAN: because the UUT DISTRIBUTOR simply dumps the padding (needed for %64 byte alignment.
 NEW: pad data can become "HUDP RELAY" for onward transmission on UDP.
 
 """
@@ -40,6 +40,8 @@ NEW: pad data can become "HUDP RELAY" for onward transmission on UDP.
 from __future__ import print_function
 import numpy
 import acq400_hapi
+from acq400_hapi import afhba404
+import time
 import argparse
 import json
 import re
@@ -65,7 +67,7 @@ def calculate_vector_length(uut, ASITES=None, DSITES=None, PWMSITES=None):
         for site in ASITES:
             nchan = int(uut.modules[site].get_knob('NCHAN'))
             data32 = int(uut.modules[site].get_knob('data32'))
-            vector_length += (nchan * (4 if data32 else 2))        
+            vector_length += (nchan * (4 if data32 else 2))
 
     if DSITES:
         for site in DSITES:
@@ -109,7 +111,7 @@ def config_aggregator(args, uut, COMMS):
         uut.s0.spad6 = COMMS + '6666' + uut.uut.split('_')[1]
         uut.s0.spad7 = COMMS + '7777' + uut.uut.split('_')[1]
 
-    uut.svc['c{}'.format(COMMS)].aggregator = 'sites={}'.format(TOTAL_SITES)    
+    uut.svc['c{}'.format(COMMS)].aggregator = 'sites={}'.format(TOTAL_SITES)
     uut.svc['c{}'.format(COMMS)].spad = spad_en
 
     uut.s0.run0 = TOTAL_SITES
@@ -138,7 +140,7 @@ def config_distributor(args, uut, COMMS):
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
         TOTAL_SITES, TCAN, COMMS)
     uut.s0.dssb = ao_vector + TCAN*4
-    
+
     if uut.HP32:
         uut.s10.slice_off = ao_vector
         uut.s10.slice_len = uut.HP32*4
@@ -250,7 +252,7 @@ def enum_sites(uut, uut_def):
                                 "Warning: PWM included in json configuration but site is NOT a PWM.")
         except Exception as err:
             print("ERROR: ", err)
-            continue 
+            continue
 
 
 
@@ -259,8 +261,8 @@ json_word_sizes = {
     'AI32': 4, 'AO20': 4,
     'DI32': 4, 'DO32': 4,
     'HP32': 4,
-    'PWM' : 64, 
-    'SP32': 4   
+    'PWM' : 64,
+    'SP32': 4
 }
 def get_json_len(uut_def, vx, mt):
     try:
@@ -270,7 +272,7 @@ def get_json_len(uut_def, vx, mt):
 
 def get_json_vx_len(uut_def, vx):
     vx_len = 0
-    for mt in list(json_word_sizes):        
+    for mt in list(json_word_sizes):
         vx_len += get_json_len(uut_def, vx, mt)
     return vx_len
 
@@ -299,7 +301,7 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
     if len(sites) == 0:
         return
 
-    
+
     jsites = get_json_sites(uut_def, vx, st)
     print("json_override_actual jsites:{}".format(jsites))
 
@@ -325,8 +327,8 @@ def customize_HP32(uut, uut_def):
     if 'HP32' in uut_def['VO'].keys():
         hp32 = int(uut_def['VO']['HP32'])
     uut.HP32 = hp32
-    
-def customize_DO_BYTE_IS_OUTPUT(uut, uut_def): 
+
+def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
     try:
         do_dir_def = uut_def['VO']['DO_BYTE_IS_OUTPUT']
         for idx, module_dir in enumerate(do_dir_def):
@@ -348,12 +350,12 @@ def matchup_json_file(uut, uut_def, uut_name):
         print(CRED, "ERROR: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector), CEND)
         sys.exit(1)
     if total_agg_vector != json_agg_vector:
-        json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')       
-        json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DISITES')         
+        json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')
+        json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DISITES')
 
     if dist_vector != json_dist_vector:
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
-        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')               
+        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
 
     customize_HP32(uut, uut_def)
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
@@ -364,12 +366,40 @@ def read_knob(k):
     with open(k) as fp:
         return fp.read().replace('\n', '')
 
+def check_lane_status(uut, lport):
+    link_state = afhba404.get_link_state(lport)
+
+    if link_state.LANE_UP and link_state.RPCIE_INIT:
+        print('Link Good')
+        return
+
+    print(f"Error: LANE_UP={link_state.LANE_UP} RPCIE_INIT={link_state.RPCIE_INIT}")
+    with open(f"/dev/rtm-t.{lport}.ctrl/acq_port") as f:
+        rport = f.read().strip()
+    comms = getattr(uut, f'c{rport}')
+
+    retry = 0
+    while retry < 3:
+        print(f'Link down: attempting to correct {retry}/3')
+        comms.TX_DISABLE = 1
+        time.sleep(0.5)
+        comms.TX_DISABLE = 0
+        time.sleep(0.5)
+        link_state = afhba404.get_link_state(lport)
+        if link_state.RPCIE_INIT:
+            print(f'Link Fixed {retry}/3')
+            return
+        retry += 1
+
+    time.sleep(5)
+    exit('Link down could not fix')
+
 def check_link(uut_def, dev_num):
     uut_name = uut_def['name']
     link_uut = read_knob("/dev/rtm-t.{}.ctrl/acq_ident".format(dev_num))
     if link_uut == uut_name:
         link_port = read_knob("/dev/rtm-t.{}.ctrl/acq_port".format(dev_num))
-        if link_port != get_comms(uut_def):            
+        if link_port != get_comms(uut_def):
             print(CMAG, "WARNING: json specifies uut {} port {}, we have {}, going with it".
                                         format(uut_name, get_comms(uut_def), link_port), CEND)
         return link_port
@@ -377,13 +407,14 @@ def check_link(uut_def, dev_num):
         print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CEND)
 
 
-    sys.exit(1)      
+    sys.exit(1)
 
 def config_auto(args, uut_def, dev_num):
     comms = check_link(uut_def, dev_num)
 
     uut_name = uut_def['name']
     uut = acq400_hapi.factory(uut_name)
+    check_lane_status(uut, dev_num)
 
     enum_sites(uut, uut_def)
     sod = True if 'sod' in uut_def['type'] else False
@@ -427,9 +458,9 @@ def get_args():
     if args.include_dio_in_aggregator:
         print("DEPRECATED: please define DI32 in config file instead")
 
-    return args 
+    return args
 
-def update_dev_num(dev_num, uut_def): 
+def update_dev_num(dev_num, uut_def):
     try:
         dev_num = int(uut_def['DEVNUM'])
     except:
