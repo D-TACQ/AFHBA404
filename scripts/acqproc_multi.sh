@@ -34,6 +34,8 @@ if [ -z "$ACQPROC_CONFIG" ] || [ ! -e $ACQPROC_CONFIG ]; then
 fi
 shift
 
+NOCONFIGURE=${NOCONFIGURE:-0}
+
 cat - >acqproc_multi.env <<EOF
 $(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
 EOF
