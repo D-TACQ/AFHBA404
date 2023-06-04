@@ -172,12 +172,16 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
 						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
-	if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
-		perror("ioctl AFHBA_START_AI_LLC");
-		exit(1);
-	}
-	if (G::verbose){
-		printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+	if (vi.len()){
+		if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
+			perror("ioctl AFHBA_START_AI_LLC");
+			exit(1);
+		}
+		if (G::verbose){
+			printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
+		}
+	}else{
+		nowait = true;
 	}
 
 	if (vo.len()){
