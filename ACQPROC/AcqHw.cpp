@@ -182,36 +182,28 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 
 	if (vo.len()){
 		struct XLLC_DEF xo_xllc_def;
-		if (vo.len()){
-			if (!zcopy){
-				xo_xllc_def = dev->xllc_def;
-				xo_xllc_def.pa += AO_OFFSET;
-				xo_xllc_def.len = vo.hwlen();
+		xo_xllc_def = dev->xllc_def;
+		xo_xllc_def.pa += AO_OFFSET;
+		xo_xllc_def.len = vo.hwlen();
 
-				if (vo.DO32){
-					int ll = xo_xllc_def.len/64;
-					xo_xllc_def.len = ++ll*64;
-					dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
-				}
-			}else{
-				xo_xllc_def= dev->xllc_def;
-				xo_xllc_def.len = vo.hwlen();
-			}
-			if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
-				perror("ioctl AFHBA_START_AO_LLC");
-				exit(1);
-			}
+		if (vo.DO32){
+			int ll = xo_xllc_def.len/64;
+			xo_xllc_def.len = ++ll*64;
+			dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
+		}
+		if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
+			perror("ioctl AFHBA_START_AO_LLC");
+			exit(1);
+		}
+		if (G::verbose){
+			printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
+		}
 
-			if (G::verbose){
-				printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
-			}
-
-			if (vo.DO32){
-				if(Env::getenv("DO32_HW_TRACE", 0)){
-				/* marker pattern for the PAD area for hardware trace */
-					for (int ii = 0; ii <= 0xf; ++ii){
-						dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
-					}
+		if (vo.DO32){
+			if(Env::getenv("DO32_HW_TRACE", 0)){
+			/* marker pattern for the PAD area for hardware trace */
+				for (int ii = 0; ii <= 0xf; ++ii){
+					dox[ii] = (ii<<24)|(ii<<16)|(ii<<8)|ii;
 				}
 			}
 		}
