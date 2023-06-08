@@ -194,7 +194,7 @@ def config_VO(args, uut, MSITES, COMMS='A'):
     for idx, site in enumerate(uut.DOSITES):
         uut.modules[site].mode = '0'
         uut.modules[site].lotide = '256'
-        uut.modules[site].byte_is_output = uut.DO_BYTE_IS_OUTPUT[idx]
+        uut.modules[site].byte_is_output = get_DO_BYTE(uut, idx)
         uut.modules[site].mode = '1'
         signal = signal2
 
@@ -238,7 +238,8 @@ def enum_sites(uut, uut_def, args):
                         uut.DISITES.append(site)
                     if 'DO32' in uut_def['VO'].keys():
                         uut.DOSITES.append(site)
-                        uut.DO_BYTE_IS_OUTPUT.append(DO_BYTE_IS_OUTPUT_DEFAULT)
+                        customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
+                        PR.Yellow(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
                 if uut.modules[site].get_knob('module_type') == '6B':
                     module_variant = int(
                         uut.modules[site].get_knob('module_variant'))
@@ -327,13 +328,18 @@ def customize_HP32(uut, uut_def):
     uut.HP32 = hp32
 
 def customize_DO_BYTE_IS_OUTPUT(uut, uut_def):
-    try:
-        do_dir_def = uut_def['VO']['DO_BYTE_IS_OUTPUT']
-        for idx, module_dir in enumerate(do_dir_def):
-            uut.DO_BYTE_IS_OUTPUT[idx] = module_dir
-    except NameError:
-        print("No custom DO_BYTE_IS_OUTPUT found, using default")
-        pass
+    if 'DO_BYTE_IS_OUTPUT' in uut_def['VO']:
+        uut.DO_BYTE_IS_OUTPUT = uut_def['VO']['DO_BYTE_IS_OUTPUT']
+        return
+    PR.Red('Warning: DO_BYTE_IS_OUTPUT not set using default')
+    uut.DO_BYTE_IS_OUTPUT = [DO_BYTE_IS_OUTPUT_DEFAULT]
+
+def get_DO_BYTE(uut, idx):
+    if uut.DO_BYTE_IS_OUTPUT:
+        if uut.DO_BYTE_IS_OUTPUT[idx]:
+            return uut.DO_BYTE_IS_OUTPUT[idx]
+        return uut.DO_BYTE_IS_OUTPUT[0]
+    return None
 
 def matchup_json_file(uut, uut_def, uut_name):
     agg_vector = calculate_vector_length(uut, ASITES=uut.AISITES, DSITES=uut.DISITES)
@@ -356,8 +362,6 @@ def matchup_json_file(uut, uut_def, uut_name):
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
 
     customize_HP32(uut, uut_def)
-    customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
-    PR.Green(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
     return None
 
 
