@@ -25,75 +25,75 @@ def mtype(mod):
         mt = "UN"
     return "{}{}".format(mt, 32 if mod.data32=='1' else 16)
 
-def get_vi(uut, conn, args):
+def get_VI(uut, conn, args):
     NC = { 'AI16': 0, 'AI32': 0, 'DI32': 0, 'SP32': 0 }
 
-    vi = {}
+    VI_cfg = {}
 
     for site in uut.sites:
         mod = uut.modules[site]
 
         mt = mod.MTYPE
         nchan = int(mod.NCHAN)
-        d32 = mod.data32 == '1'
+        D32 = mod.data32 == '1'
         is_adc = mod.is_adc.split(" ")[0] == '1'
 
         if is_adc:
-            NC["AI{}".format(32 if d32 else 16)] += nchan
+            NC["AI{}".format(32 if D32 else 16)] += nchan
         elif mt[0] == '6':
             NC['DI32'] += 1
 
-    len_vi = 0
+    len_VI = 0
     for key, value in NC.items():
         if value > 0:
-            len_vi += value * (2 if key == "AI16" else 4)
-            vi[key] = value
+            len_VI += value * (2 if key == "AI16" else 4)
+            VI_cfg[key] = value
 
-    vi['SP32'] = (16*4 - len_vi%64) // 4
+    VI_cfg['SP32'] = (16*4 - len_VI%64) // 4
 
-    xi_sites = 0
+    XI_sites = 0
     for site_cat in ('AISITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
-            vi[site_cat] = sc
-            xi_sites += len(sc)
-    vi['NXI'] = xi_sites
+            VI_cfg[site_cat] = sc
+            XI_sites += len(sc)
+    VI_cfg['NXI'] = XI_sites
 
-    return vi
+    return VI_cfg
 
-def get_vo(uut, conn, args):
+def get_VO(uut, conn, args):
     NC = { 'AO16': 0, 'AO32': 0, 'DO32': 0 }
 
-    vo = {}
+    VO_cfg = {}
 
     for site in uut.sites:
         mod = uut.modules[site]
 
         mt = mod.MTYPE
         nchan = int(mod.NCHAN)
-        d32 = mod.data32 == '1'
+        D32 = mod.data32 == '1'
 
         if mt[0] == '4':
-            NC["AO{}".format(32 if d32 else 16)] += nchan
+            NC["AO{}".format(32 if D32 else 16)] += nchan
         elif mt[0] == '6':
             NC['DO32'] += 1
 
-    len_vo = 0
+    len_VO = 0
     for key, value in NC.items():
         if value > 0:
-            len_vo += value * (2 if key == "AO16" else 4)
-            vo[key] = value
+            len_VO += value * (2 if key == "AO16" else 4)
+            VO_cfg[key] = value
 
-    xo_sites = 0
+    XO_sites = 0
     for site_cat in ('AOSITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
-            vo['DO_BYTE_IS_OUTPUT'] = args.b_output.split('/')
-            vo[site_cat] = sc
-            xo_sites += len(sc)
-    vo['NXO'] = xo_sites
+            VO_cfg['DO_BYTE_IS_OUTPUT'] = args.b_output.split('/')
+            VO_cfg[site_cat] = sc
+            XO_sites += len(sc)
+    VO_cfg['NXO'] = XO_sites
 
-    return vo
+    return VO_cfg
 
 def get_role(idx, values, args):
     if args.master:
@@ -132,8 +132,8 @@ def run_main(args):
             new_dev['type'] = 'pcs'
             new_dev['sync_role'] = get_role(idx, value, args)
             new_dev['COMMS'] = value.cx
-            new_dev['VI'] = get_vi(uut, value, args)
-            new_dev['VO'] = get_vo(uut, value, args)
+            new_dev['VI'] = get_VI(uut, value, args)
+            new_dev['VO'] = get_VO(uut, value, args)
             uuts.append(new_dev)
 
     if args.save_config:
