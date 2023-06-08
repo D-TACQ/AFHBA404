@@ -41,6 +41,7 @@ from __future__ import print_function
 import numpy
 import acq400_hapi
 from acq400_hapi import afhba404
+from acq400_hapi import PR
 import time
 import argparse
 import json
@@ -149,6 +150,7 @@ def config_distributor(args, uut, COMMS):
 
 
 def config_VI(args, uut, sod=False, COMMS='A'):
+    PR.Yellow('config_VI')
     uut.s0.SIG_SYNC_OUT_CLK_DX = 'd2'
     vis = []
     vis.extend(uut.AISITES)
@@ -163,12 +165,13 @@ def config_VI(args, uut, sod=False, COMMS='A'):
     if args.fp_sync_clk == 1:
         config_sync_clk(uut)
     if sod:
-        for site in AISITES:
+        for site in uut.AISITES:
             uut.modules[site].sod = 1
     config_aggregator(args, uut, COMMS)
 
 
 def config_VO(args, uut, MSITES, COMMS='A'):
+    PR.Yellow('config_VO')
     if len(MSITES):
         signal = acq400_hapi.sigsel(site=int(MSITES[0]))
         signal2 = signal
@@ -212,7 +215,7 @@ def load_json(json_file):
 DO_BYTE_IS_OUTPUT_DEFAULT = '1,1,0,0'
 # @@todo ... this is all backwards. Here we build the model from the ACTUAL UUT, but the goal is to build the model from the DATAFILE, then validate the actual HW.
 # temp fix: assume ALL DIO32 are DI if DI32 specified, assume ALL DIO32 are DO if DO32 specified.
-def enum_sites(uut, uut_def):
+def enum_sites(uut, uut_def, args):
     uut.AISITES = []
     uut.DISITES = []
     uut.AOSITES = []
@@ -291,11 +294,6 @@ def get_comms(uut_def):
     else:
         return 'A'
 
-CRED = "\x1b[1;31m"
-CBLU = "\x1b[1;34m"
-CMAG = "\x1b[1;35m"
-CEND = "\33[0m"
-
 def json_override_actual(uut_def, uut_name, sites, vx, st):
     print("json_override_actual( {} {} {} {})".format(uut_name, sites, vx, st))
     if len(sites) == 0:
@@ -314,12 +312,12 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
         elif sj.issubset(su):
             sites.clear()
             sites.extend(jsites)
-            print(CBLU, "INFO: UUT: {} using subset of available {} sites {}".format(uut_name, st, sites), CEND)
+            PR.Blue(f"INFO: UUT: {uut_name} using subset of available {st} sites {sites}")
         else:
-            print(CRED, "ERROR: UUT: {} JSON {} not in actual set.".format(uut_name, st), CEND)
+            PR.Red(f"ERROR: UUT: {uut_name} JSON {st} not in actual set.")
             sys.exit(1)
     else:
-        print(CRED, "ERROR: UUT: {} JSON {} lacks {} list.".format(uut_name, vx, st), CEND)
+        PR.Red(f"ERROR: UUT: {uut_name} JSON {vx} lacks {st} list.")
         sys.exit(1)
 
 def customize_HP32(uut, uut_def):
@@ -347,7 +345,7 @@ def matchup_json_file(uut, uut_def, uut_name):
     json_dist_vector = get_json_vx_len(uut_def, 'VO')
 
     if json_agg_vector > total_agg_vector:
-        print(CRED, "ERROR: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector), CEND)
+        PR.Red("ERROR: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector))
         sys.exit(1)
     if total_agg_vector != json_agg_vector:
         json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')
@@ -359,6 +357,7 @@ def matchup_json_file(uut, uut_def, uut_name):
 
     customize_HP32(uut, uut_def)
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
+    PR.Green(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
     return None
 
 
@@ -400,11 +399,10 @@ def check_link(uut_def, dev_num):
     if link_uut == uut_name:
         link_port = read_knob("/dev/rtm-t.{}.ctrl/acq_port".format(dev_num))
         if link_port != get_comms(uut_def):
-            print(CMAG, "WARNING: json specifies uut {} port {}, we have {}, going with it".
-                                        format(uut_name, get_comms(uut_def), link_port), CEND)
+            PR.Purple(f"WARNING: json specifies uut {uut_name} port {get_comms(uut_def)}, we have {link_port}, going with it")
         return link_port
     else:
-        print(CRED, "ERROR: json specifies uut {} but we have {}".format(uut_name, link_uut), CEND)
+        PR.Red(f"ERROR: json specifies uut {uut_name} but we have {link_uut}")
 
 
     sys.exit(1)
@@ -413,10 +411,11 @@ def config_auto(args, uut_def, dev_num):
     comms = check_link(uut_def, dev_num)
 
     uut_name = uut_def['name']
+    PR.Yellow(f"CONFIGURING {uut_name}")
+    comms = check_link(uut_def, dev_num)
     uut = acq400_hapi.factory(uut_name)
     check_lane_status(uut, dev_num)
-
-    enum_sites(uut, uut_def)
+    enum_sites(uut, uut_def, args)
     sod = True if 'sod' in uut_def['type'] else False
 
     matchup_json_file(uut, uut_def, uut_name)
@@ -469,6 +468,7 @@ def update_dev_num(dev_num, uut_def):
     return dev_num
 
 def run_main():
+    PR.Yellow('Starting llc-config-utility')
     args = get_args()
 
     json = load_json(args.json_file)
