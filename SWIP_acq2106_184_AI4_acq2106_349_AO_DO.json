@@ -1,0 +1,58 @@
+{
+    "AFHBA": {
+        "UUT": [
+            {
+                "DEVNUM": 1,
+                "name": "acq2106_184",
+                "type": "pcs",
+                "sync_role": "master",
+                "COMMS": "A",
+                "VI": {
+                    "AI16": 128,
+                    "SP32": 16,
+                    "AISITES": [
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "NXI": 4
+                },
+                "VO": {
+                    "NXO": 0
+                }
+            },
+            {
+                "DEVNUM": 0,
+                "name": "acq2106_349",
+                "type": "pcs,nowait",
+                "sync_role": "slave",
+                "COMMS": "A",
+                "VI": {
+                    "AI16": 0,
+                    "DI32": 1,
+                    "SP32": 15,
+                    "DIOSITES": [
+                        6
+                    ],
+                    "NXI": 1
+                },
+                "VO": {
+                    "AO16": 32,
+                    "DO32": 1,
+                    "DO_BYTE_IS_OUTPUT": [
+                        "1,1,1,1",
+                        "1,1,1,1"
+                    ],
+                    "AOSITES": [
+                        5
+                    ],
+                    "DIOSITES": [
+                        6
+                    ],
+                    "NXO": 2
+                }
+            }
+        ]
+    }
+}
