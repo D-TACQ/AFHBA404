@@ -23,8 +23,8 @@
                 }
             },
             {
-                "DEVNUM": 0,
-                "name": "acq2106_349",
+                "DEVNUM": 8,
+                "name": "acq2106_176",
                 "type": "pcs,nowait",
                 "sync_role": "slave",
                 "COMMS": "A",
@@ -38,7 +38,6 @@
                     "NXI": 1
                 },
                 "VO": {
-                    "AO16": 0,
                     "DO32": 1,
                     "DO_BYTE_IS_OUTPUT": [
                         "1,1,1,1",
@@ -47,7 +46,7 @@
                     "DIOSITES": [
                         6
                     ],
-                    "NXO": 2
+                    "NXO": 1
                 }
             }
         ]
