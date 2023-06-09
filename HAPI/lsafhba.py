@@ -96,6 +96,7 @@ def get_vo(uut, conn, args):
     return vo
 
 def get_role(idx, values, args):
+
     if args.master:
         if values.uut == args.master:
             return 'master'
@@ -109,10 +110,10 @@ def run_main(args):
     uuts = []
 
     for idx, value in conns.items():
-
         if args.lports:
             if value.dev not in args.lports.split(','):
                 continue
+
         uut = acq400_hapi.factory(value.uut)
 
         print(f"{value.dev} {value}")
