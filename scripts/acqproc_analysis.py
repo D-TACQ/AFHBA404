@@ -89,8 +89,15 @@ def collect_tlatch(args):
         filepath = args.src + "/" + args.name + "_VI.dat"
         print(filepath)
         data = np.fromfile(filepath, dtype=np.int32)
-
-    t_latch = data[int(args.nchan/2)::int(args.nchan/2+args.spad_len)]
+    if args.data32 == 0:
+        tlix = args.nchan//2
+        stride = args.nchan//2+args.spad_len
+    else:
+        tlix = args.nchan
+        stride = args.nchan+args.spad_len
+    
+    print("tlatch = data[{}::{}]".format(tlix, stride))
+    t_latch = data[tlix::stride]
     print("Finished collecting data")
     return t_latch, data
 
@@ -222,7 +229,18 @@ def run_analysis(args):
             args.dix_len = uut['VI']['DI32']
         except KeyError:
             args.dix_len = 0
-        args.nchan = uut['VI']['AI16'] + 2 * args.dix_len
+        try: 
+            args.nchan = uut['VI']['AI16'] + 2 * args.dix_len
+            args.data32 = 0
+        except KeyError:
+            try:
+                args.data32 = 1
+                args.nchan = uut['VI']['AI32'] + args.dix_len
+            except KeyError:
+                print("WARNING: no AI16 or AI32")
+                args.nchan = args.dix_len
+            
+            
         args.spad_len = uut['VI']['SP32']
         try:
             args.ao_len = uut['VO']['AO16']

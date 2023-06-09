@@ -241,9 +241,10 @@ def enum_sites(uut, uut_def, args):
                         customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
                         PR.Yellow(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
                 if uut.modules[site].get_knob('module_type') == '6B':
-                    module_variant = int(
-                        uut.modules[site].get_knob('module_variant'))
-                    if module_variant in [1, 2]:
+                    module_variant = int(uut.modules[site].get_knob('module_variant'))
+                    if module_variant in [20, 21]:
+                        uut.AISITES.append(site)
+                    elif module_variant in [1, 2]:
                         uut.PWMSITES.append(site)
 
                         if uut_def != None:
@@ -352,8 +353,9 @@ def matchup_json_file(uut, uut_def, uut_name):
     json_dist_vector = get_json_vx_len(uut_def, 'VO')
 
     if json_agg_vector > total_agg_vector:
-        PR.Red("ERROR: UUT: {} JSON VI {} greater than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vector))
+        PR.Red("ERROR: UUT: {} JSON VI {} > than actual possible len {}.".format(uut_name, json_agg_vector, total_agg_vec))
         sys.exit(1)
+
     if total_agg_vector != json_agg_vector:
         json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')
         json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DIOSITES')
@@ -363,8 +365,9 @@ def matchup_json_file(uut, uut_def, uut_name):
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
 
     customize_HP32(uut, uut_def)
-    customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
-    PR.Green(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
+    if len(uut.DOSITES) > 0:
+        customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
+        PR.Green(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
     return None
 
 

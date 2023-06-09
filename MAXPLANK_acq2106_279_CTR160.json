@@ -1,0 +1,21 @@
+{
+    "AFHBA": {
+        "UUT": [
+            {
+                "DEVNUM": 3,
+                "name": "acq2106_279",
+                "type": "pcs",
+                "sync_role": "none",
+                "COMMS": "A",
+                "VI": {
+                    "AI32": 160,
+                    "SP32": 16,
+                    "NXI": 5
+                },
+                "VO": {
+
+                }
+            }
+        ]
+    }
+}
