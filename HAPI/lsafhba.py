@@ -25,6 +25,7 @@ def mtype(mod):
         mt = "UN"
     return "{}{}".format(mt, 32 if mod.data32=='1' else 16)
 
+
 def get_VI(uut, conn, args):
     NC = { 'AI16': 0, 'AI32': 0, 'DI32': 0, 'SP32': 0 }
 
@@ -35,11 +36,10 @@ def get_VI(uut, conn, args):
 
         mt = mod.MTYPE
         nchan = int(mod.NCHAN)
-        D32 = mod.data32 == '1'
         is_adc = mod.is_adc.split(" ")[0] == '1'
 
         if is_adc:
-            NC["AI{}".format(32 if D32 else 16)] += nchan
+            NC["AI{}".format(32 if mod.data32 == '1' else 16)] += nchan
         elif mt[0] == '6':
             NC['DI32'] += 1
 
@@ -71,10 +71,9 @@ def get_VO(uut, conn, args):
 
         mt = mod.MTYPE
         nchan = int(mod.NCHAN)
-        D32 = mod.data32 == '1'
-
+     
         if mt[0] == '4':
-            NC["AO{}".format(32 if D32 else 16)] += nchan
+            NC["AO{}".format(32 if mod.data32 == '1' else 16)] += nchan
         elif mt[0] == '6':
             NC['DO32'] += 1
 
@@ -88,7 +87,7 @@ def get_VO(uut, conn, args):
     for site_cat in ('AOSITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
-            VO_cfg['DO_BYTE_IS_OUTPUT'] = args.b_output.split('/')
+            VO_cfg['DO_BYTE_IS_OUTPUT'] = args.b_output.split(' ')
             VO_cfg[site_cat] = sc
             XO_sites += len(sc)
     VO_cfg['NXO'] = XO_sites
@@ -109,10 +108,10 @@ def run_main(args):
     uuts = []
 
     for idx, value in conns.items():
-
         if args.lports:
             if value.dev not in args.lports.split(','):
                 continue
+
         uut = acq400_hapi.factory(value.uut)
 
         print(f"{value.dev} {value}")
@@ -154,7 +153,7 @@ def get_parser():
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--master', default=None, help='uut to use as master')
     parser.add_argument('--lports', default=None, help='local ports to use ie 1,2,3')
-    parser.add_argument('--b_output', default="1,1,0,0", help='DO_BYTE_IS_OUTPUT values 1,0,0,0/0,0,1,0/1,1,1,1')
+    parser.add_argument('--b_output', default="1,1,0,0", help='DO_BYTE_IS_OUTPUT values 1,0,0,0 0,0,1,0 1,1,1,1')
     return parser
 
 if __name__ == '__main__':
