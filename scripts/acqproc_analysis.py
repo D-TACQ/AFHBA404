@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This is a script intended to pull off the LLC T_LATCH data, calculate the delta times and plot them in a histogram.
@@ -86,7 +86,9 @@ def collect_tlatch(args):
         home = expanduser("~")
         data = np.fromfile(home + "/" + "PROJECTS/AFHBA404/" + args.name + "_VI.dat", dtype=np.int32)
     else:
-        data = np.fromfile(args.src + "/" + args.name + "_VI.dat", dtype=np.int32)
+        filepath = args.src + "/" + args.name + "_VI.dat"
+        print(filepath)
+        data = np.fromfile(filepath, dtype=np.int32)
 
     t_latch = data[int(args.nchan/2)::int(args.nchan/2+args.spad_len)]
     print("Finished collecting data")
@@ -142,7 +144,7 @@ def run_spad_analysis(args, data):
     axs.title.set_text("Maximum latency Histogram for uut:{}".format(args.name))
     axs.set_xlabel('Time in microseconds.')
     axs.set_ylabel('Frequency')
-    axs.set_yscale('log', nonposy='clip')
+    #axs.set_yscale('log', nonposy='clip')
     axs.text(.98, .95, "Mean: {}".format(np.round(np.mean(max_data), 3)), transform=axs.transAxes, ha="right", va="top")
     axs.text(.98, .9, "Min: {}".format(np.min(max_data)), transform=axs.transAxes, ha="right", va="top")
     axs.text(.98, .85, "Max: {}".format(np.max(max_data)), transform=axs.transAxes, ha="right", va="top")
