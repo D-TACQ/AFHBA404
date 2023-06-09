@@ -71,7 +71,7 @@ def get_VO(uut, conn, args):
 
         mt = mod.MTYPE
         nchan = int(mod.NCHAN)
-     
+
         if mt[0] == '4':
             NC["AO{}".format(32 if mod.data32 == '1' else 16)] += nchan
         elif mt[0] == '6':
@@ -109,7 +109,7 @@ def run_main(args):
 
     for idx, value in conns.items():
         if args.lports:
-            if value.dev not in args.lports.split(','):
+            if value.dev not in args.lports:
                 continue
 
         uut = acq400_hapi.factory(value.uut)
@@ -136,6 +136,9 @@ def run_main(args):
             uuts.append(new_dev)
 
     if args.save_config:
+        if args.lports:
+            uuts = sorted(uuts, key=lambda x:args.lports.index(str(x['DEVNUM'])))
+
         config = {}
         config['AFHBA'] = {}
         config['AFHBA']['UUT'] = uuts
@@ -147,12 +150,15 @@ def run_main(args):
             file.write(config)
             print(f"created {args.save_config}")
 
+def list_comma(string):
+    return string.split(',')
+
 def get_parser():
     parser = argparse.ArgumentParser(description='list all attached acq2x06 devices')
     parser.add_argument('--save_config', default=None, help='save configuration skeleton')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--master', default=None, help='uut to use as master')
-    parser.add_argument('--lports', default=None, help='local ports to use ie 1,2,3')
+    parser.add_argument('--lports', default=None, type=list_comma, help='local ports to use ie 1,2,3')
     parser.add_argument('--b_output', default="1,1,0,0", help='DO_BYTE_IS_OUTPUT values 1,0,0,0 0,0,1,0 1,1,1,1')
     return parser
 
