@@ -183,12 +183,14 @@ ctrl_c() {
 	if [ $PID_CP -ne 0 ]; then
 		echo kill $PID_CP
 		kill -9 $PID_CP
+		sudo pkill acqproc
 	fi
 	exit
 }
 
 control_program_with_analysis() {
-        control_program 
+        control_program & PID_CP=$!
+	wait 
         if $ANALYSIS; then
             analysis
         else
@@ -227,8 +229,10 @@ xall|*)
 	check_uut
 	[ $NOCONFIGURE -eq 0 ] && configure_uut
 	if [ $LLC_CALLBACKS -ne 0 ]; then
+		echo control_program_with_analysis
 		control_program_with_analysis
 	else
+		echo control_program vanilla
 		control_program & PID_CP=$!
         	control_script 
 		wait $PID_CP

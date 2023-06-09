@@ -318,8 +318,9 @@ def json_override_actual(uut_def, uut_name, sites, vx, st):
             PR.Red(f"ERROR: UUT: {uut_name} JSON {st} not in actual set.")
             sys.exit(1)
     else:
-        PR.Red(f"ERROR: UUT: {uut_name} JSON {vx} lacks {st} list.")
-        sys.exit(1)
+        PR.Yellow(f"WARNING: UUT: {uut_name} JSON {vx} lacks {st} list. DROP from set")
+        sites.clear()
+        pass
 
 def customize_HP32(uut, uut_def):
     hp32 = 0
@@ -359,7 +360,7 @@ def matchup_json_file(uut, uut_def, uut_name):
 
     if dist_vector != json_dist_vector:
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
-        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
+        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DOSITES')
 
     customize_HP32(uut, uut_def)
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
