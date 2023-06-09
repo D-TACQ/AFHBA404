@@ -363,8 +363,6 @@ def matchup_json_file(uut, uut_def, uut_name):
         json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
 
     customize_HP32(uut, uut_def)
-    customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
-    PR.Green(f"DO_BYTE_IS_OUTPUT {uut.DO_BYTE_IS_OUTPUT}")
     return None
 
 
