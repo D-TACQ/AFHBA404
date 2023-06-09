@@ -88,6 +88,7 @@ def get_vo(uut, conn, args):
     for site_cat in ('AOSITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
+            vo['DO_BYTE_IS_OUTPUT'] = args.b_output.split('/')
             vo[site_cat] = sc
             xo_sites += len(sc)
     vo['NXO'] = xo_sites
@@ -95,6 +96,11 @@ def get_vo(uut, conn, args):
     return vo
 
 def get_role(idx, values, args):
+
+    if args.master:
+        if values.uut == args.master:
+            return 'master'
+        return 'slave'
     if idx == 0:
         return 'master'
     return 'slave'
@@ -104,6 +110,9 @@ def run_main(args):
     uuts = []
 
     for idx, value in conns.items():
+        if args.lports:
+            if value.dev not in args.lports.split(','):
+                continue
 
         uut = acq400_hapi.factory(value.uut)
 
@@ -144,6 +153,9 @@ def get_parser():
     parser = argparse.ArgumentParser(description='list all attached acq2x06 devices')
     parser.add_argument('--save_config', default=None, help='save configuration skeleton')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
+    parser.add_argument('--master', default=None, help='uut to use as master')
+    parser.add_argument('--lports', default=None, help='local ports to use ie 1,2,3')
+    parser.add_argument('--b_output', default="1,1,0,0", help='DO_BYTE_IS_OUTPUT values 1,0,0,0/0,0,1,0/1,1,1,1')
     return parser
 
 if __name__ == '__main__':
