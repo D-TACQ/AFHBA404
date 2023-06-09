@@ -33,7 +33,7 @@
                     "DI32": 1,
                     "SP32": 15,
                     "NXI": 1,
-		    "DISITES": [
+		    "DIOSITES": [
                         6
 		    ]
                 },
@@ -42,7 +42,7 @@
                     "DO_BYTE_IS_OUTPUT": [
                         "1,1,1,1"
                     ],
-                    "DOSITES": [
+                    "DIOSITES": [
                         6
                     ],
                     "NXO": 1

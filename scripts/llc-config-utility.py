@@ -356,11 +356,11 @@ def matchup_json_file(uut, uut_def, uut_name):
         sys.exit(1)
     if total_agg_vector != json_agg_vector:
         json_override_actual(uut_def, uut_name, uut.AISITES, 'VI', 'AISITES')
-        json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DISITES')
+        json_override_actual(uut_def, uut_name, uut.DISITES, 'VI', 'DIOSITES')
 
     if dist_vector != json_dist_vector:
         json_override_actual(uut_def, uut_name, uut.AOSITES, 'VO', 'AOSITES')
-        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DOSITES')
+        json_override_actual(uut_def, uut_name, uut.DOSITES, 'VO', 'DIOSITES')
 
     customize_HP32(uut, uut_def)
     customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
