@@ -87,7 +87,19 @@ def get_VO(uut, conn, args):
     for site_cat in ('AOSITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
-            VO_cfg['DO_BYTE_IS_OUTPUT'] = args.b_output.split(' ')
+            if site_cat == 'DIOSITES':
+                VO_cfg['DO_BYTE_IS_OUTPUT'] = []
+                for site in sc:
+                    if args.byte_is_output:
+                        VO_cfg['DO_BYTE_IS_OUTPUT'].append(args.byte_is_output.pop(0))
+                    elif hasattr(uut.modules[site], 'byte_is_output'):
+                        byte_value = uut.modules[site].byte_is_output
+                        for char in ['2', '4', '8']:
+                            byte_value = byte_value.replace(char, '1')
+                        VO_cfg['DO_BYTE_IS_OUTPUT'].append(byte_value)
+                    if args.byte_is_output_all:
+                        VO_cfg['DO_BYTE_IS_OUTPUT'] = [args.byte_is_output_all]
+
             VO_cfg[site_cat] = sc
             XO_sites += len(sc)
     VO_cfg['NXO'] = XO_sites
@@ -153,13 +165,17 @@ def run_main(args):
 def list_comma(string):
     return string.split(',')
 
+def list_space(string):
+    return string.split(' ')
+
 def get_parser():
     parser = argparse.ArgumentParser(description='list all attached acq2x06 devices')
     parser.add_argument('--save_config', default=None, help='save configuration skeleton')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--master', default=None, help='uut to use as master')
     parser.add_argument('--lports', default=None, type=list_comma, help='local ports to use ie 1,2,3')
-    parser.add_argument('--b_output', default="1,1,0,0", help='DO_BYTE_IS_OUTPUT values 1,0,0,0 0,0,1,0 1,1,1,1')
+    parser.add_argument('--byte_is_output', default=None, type=list_space, help='List of values to map onto each DIO "1,0,0,0 0,0,1,0" ')
+    parser.add_argument('--byte_is_output_all', default=None, help='Value to set on all DIOs 1,0,1,0 ')
     return parser
 
 if __name__ == '__main__':
