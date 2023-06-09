@@ -50,7 +50,7 @@ CAPTURE_UUTS=$(python3 scripts/list_capture_uuts.py --json_file=${ACQPROC_CONFIG
 POST=${POST:-1000000} 	# Number of samples to capture
 CLK=${CLK:-50000} 		# Set desired clock speed here.
 VERBOSE=${VERBOSE:-0}
-#SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
+SYNC_ROLE_MODE=${SYNC_ROLE_MODE:-parallel} # serial: default, parallel, none
 AFFINITY=${AFFINITY:-0}        # cpu affinity. 0=none, 2=use cpu0, for example
 LOOP_FOREVER=${LOOP_FOREVER:-0} # set to one to loop forever
 THE_ACQPROC=${THE_ACQPROC:-./ACQPROC/acqproc}  # selects ACQPROC variant.
