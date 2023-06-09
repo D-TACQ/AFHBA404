@@ -30,6 +30,9 @@ def main():
         if "AI16" in uut['VI'].keys():
             if uut['VI']['AI16'] != 0:
                 uuts.append(uut['name'])
+        if "AI32" in uut['VI'].keys():
+            if uut['VI']['AI32'] != 0:
+                uuts.append(uut['name'])
     for item in uuts:
         print(item, end=' ')
 
