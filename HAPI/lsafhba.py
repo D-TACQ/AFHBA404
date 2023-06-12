@@ -12,6 +12,36 @@ import acq400_hapi
 import json
 
 
+class ByteIsOutputHandler:
+    def __init__(self, args):
+        if args.byte_is_output:
+            self.sites = args.byte_is_output.split(' ')
+        else:
+            self.sites = []
+
+    def __iter__(self):
+        self.ix = -1
+        return self
+
+    def __next__(self):
+        print("ByteIsOutputHandler.__next__ {} {}".format(self.ix, len(self.sites)))
+        if self.ix+1 < len(self.sites):
+            self.ix += 1
+        else:
+            self.ix = 0
+        return self.sites[self.ix]
+
+    def append(self, uut):
+        ''' append existing values from uut '''
+        for site in uut.get_site_types()['DIOSITES']:
+            cur_biso = uut.svc['s{}'.format(site)].byte_is_output
+            set_biso = ','.join(list(map(lambda x: '0' if x=='0' else '1', cur_biso.split(','))))
+            print(f"ByteIsOutputHandler.append({uut.uut}) sites:{site} cur_biso:{cur_biso} {set_biso}")
+            self.sites.append(set_biso)
+
+
+        
+        
 def mtype(mod):
 #    print("is_adc:{}".format(mod.is_adc))
     mt = "none"
@@ -87,7 +117,12 @@ def get_VO(uut, conn, args):
     for site_cat in ('AOSITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
-            VO_cfg['DO_BYTE_IS_OUTPUT'] = args.byte_is_output.split(' ')
+            if site_cat == 'DIOSITES':
+                biso = next(args.byte_is_output_iter)
+                try:
+                    VO_cfg['DO_BYTE_IS_OUTPUT'].append(biso)
+                except:
+                    VO_cfg['DO_BYTE_IS_OUTPUT'] = [ biso, ]
             VO_cfg[site_cat] = sc
             XO_sites += len(sc)
     VO_cfg['NXO'] = XO_sites
@@ -108,6 +143,8 @@ def get_role(idx, values, args):
 def run_main(args):
     conns = acq400_hapi.afhba404.get_connections()
     uuts = []
+    args.dio_byte_is_output_handler = ByteIsOutputHandler(args)
+    args.byte_is_output_iter = iter(args.dio_byte_is_output_handler)
 
     for idx, value in conns.items():
         if args.lports:
@@ -115,6 +152,9 @@ def run_main(args):
                 continue
 
         uut = acq400_hapi.factory(value.uut)
+        if not args.byte_is_output:
+            args.dio_byte_is_output_handler.append(uut)
+             
 
         print(f"{value.dev} {value}")
         if args.verbose > 0:
