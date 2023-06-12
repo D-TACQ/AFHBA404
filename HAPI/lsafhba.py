@@ -197,12 +197,15 @@ def list_comma(string):
     return string.split(',')
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='list all attached acq2x06 devices')
+    parser = argparse.ArgumentParser(description='list all attached acq2x06 devices', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-s', '--save_config', default=None, help='save configuration skeleton')
     parser.add_argument('-v', '--verbose', default=0, type=int, help='increase verbosity')
-    parser.add_argument('--master', default=None, help='uut to use as master')
-    parser.add_argument('--lports', default=None, type=list_comma, help='local ports to use ie 1,2,3')
-    parser.add_argument('-b', '--byte_is_output', default=None, help='DO_BYTE_IS_OUTPUT values eg 1,0,0,0 0,0,1,0 1,1,1,1 # default:None:get value from UUT, if more DIO4xx than elements, repeat first element')
+    parser.add_argument('-m', '--master', default=None, help='uut to use as master')
+    parser.add_argument('-l', '--lports', default=None, type=list_comma, help='local ports to use ie 1,2,3')
+    parser.add_argument('-b', '--byte_is_output', default=None, help=
+'''DO_BYTE_IS_OUTPUT values eg 1,0,0,0 0,0,1,0 1,1,1,1 
+   # default:None:get value from UUT, 
+   # if more DIO4xx than elements, repeat first element''')
     return parser
 
 if __name__ == '__main__':
