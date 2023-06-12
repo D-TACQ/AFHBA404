@@ -24,7 +24,7 @@ class ByteIsOutputHandler:
         return self
 
     def __next__(self):
-        print("ByteIsOutputHandler.__next__ {} {}".format(self.ix, len(self.sites)))
+#        print("ByteIsOutputHandler.__next__ {} {}".format(self.ix, len(self.sites)))
         if self.ix+1 < len(self.sites):
             self.ix += 1
         else:
@@ -36,7 +36,7 @@ class ByteIsOutputHandler:
         for site in uut.get_site_types()['DIOSITES']:
             cur_biso = uut.svc['s{}'.format(site)].byte_is_output
             set_biso = ','.join(list(map(lambda x: '0' if x=='0' else '1', cur_biso.split(','))))
-            print(f"ByteIsOutputHandler.append({uut.uut}) sites:{site} cur_biso:{cur_biso} {set_biso}")
+#            print(f"ByteIsOutputHandler.append({uut.uut}) sites:{site} cur_biso:{cur_biso} {set_biso}")
             self.sites.append(set_biso)
 
 
