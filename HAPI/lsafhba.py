@@ -98,10 +98,12 @@ def get_role(idx, values, args):
     if args.master:
         if values.uut == args.master:
             return 'master'
-        return 'slave'
-    if idx == 0:
+        else:
+            return 'slave'
+    elif idx == 0:
         return 'master'
-    return 'slave'
+    else:
+        return 'slave'
 
 def run_main(args):
     conns = acq400_hapi.afhba404.get_connections()
