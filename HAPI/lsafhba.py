@@ -118,11 +118,12 @@ def get_VO(uut, conn, args):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
             if site_cat == 'DIOSITES':
-                biso = next(args.byte_is_output_iter)
-                try:
-                    VO_cfg['DO_BYTE_IS_OUTPUT'].append(biso)
-                except:
-                    VO_cfg['DO_BYTE_IS_OUTPUT'] = [ biso, ]
+                for s in sc:
+                    biso = next(args.byte_is_output_iter)
+                    try:
+                        VO_cfg['DO_BYTE_IS_OUTPUT'].append(biso)
+                    except:
+                        VO_cfg['DO_BYTE_IS_OUTPUT'] = [ biso, ]
             VO_cfg[site_cat] = sc
             XO_sites += len(sc)
     VO_cfg['NXO'] = XO_sites
