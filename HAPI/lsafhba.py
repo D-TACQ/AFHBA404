@@ -73,6 +73,10 @@ def get_VI(uut, conn, args):
         elif mt[0] == '6':
             NC['DI32'] += 1
 
+    sc = uut.get_site_types()['AISITES']
+    if len(sc) == 0:
+        return VI_cfg, 'pcs,nowait'
+
     len_VI = 0
     for key, value in NC.items():
         if value > 0:
