@@ -237,8 +237,9 @@ def run_analysis(args):
                 args.data32 = 1
                 args.nchan = uut['VI']['AI32'] + args.dix_len
             except KeyError:
-                print("WARNING: no AI16 or AI32")
                 args.nchan = args.dix_len
+                print("WARNING: no AI16 or AI32")
+                return
             
             
         args.spad_len = uut['VI']['SP32']
