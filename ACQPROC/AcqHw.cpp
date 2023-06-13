@@ -36,6 +36,7 @@ struct Dev {
 	int devnum;
 	int fd;
 	char* host_buffer;
+	char* xo_host;
 	/** local buffer interface .. for archive. */
 	struct LBUF {
 		char* base;
@@ -50,10 +51,8 @@ struct Dev {
 	}
 };
 
-/* XO uses SAME kbuffer as AI, but 4K up */
+/* if VI in use, XO uses SAME kbuffer as AI, but 4K up */
 #define AO_OFFSET 0x1000
-
-#define XO_HOST	(dev->host_buffer+AO_OFFSET)
 
 
 void _get_connected(struct Dev* dev, unsigned vi_len)
@@ -180,6 +179,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		if (G::verbose){
 			printf("[%d] AI buf pa: 0x%08x len %d\n", dev->devnum, dev->xllc_def.pa, dev->xllc_def.len);
 		}
+		TLATCH0 = 0xdeadbeef;
 	}else{
 		nowait = true;
 	}
@@ -187,13 +187,18 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	if (vo.len()){
 		struct XLLC_DEF xo_xllc_def;
 		xo_xllc_def = dev->xllc_def;
-		xo_xllc_def.pa += AO_OFFSET;
+
+		if (dev->xllc_def.pa != RTM_T_USE_HOSTBUF){
+			assert(vi.len()!=0);
+			xo_xllc_def.pa += AO_OFFSET;
+		}else{
+			assert(vi.len()==0);
+		}
 		xo_xllc_def.len = vo.hwlen();
 
 		if (vo.DO32){
 			int ll = xo_xllc_def.len/64;
 			xo_xllc_def.len = ++ll*64;
-			dox = (unsigned *)(XO_HOST + vo_offsets.DO32);
 		}
 		if (ioctl(dev->fd, AFHBA_START_AO_LLC, &xo_xllc_def)){
 			perror("ioctl AFHBA_START_AO_LLC");
@@ -202,6 +207,9 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		if (G::verbose){
 			printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
 		}
+		dev->xo_host = dev->host_buffer + (vi.len()? AO_OFFSET: 0);
+		memset(dev->xo_host, 0, vo.len());
+		dox = (unsigned *)(dev->xo_host + vo_offsets.DO32);
 
 		if (vo.DO32){
 			if(Env::getenv("DO32_HW_TRACE", 0)){
@@ -212,7 +220,6 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			}
 		}
 	}
-	TLATCH0 = 0xdeadbeef;
 }
 
 
@@ -245,7 +252,7 @@ void ACQ_HW_BASE::action(SystemInterface& systemInterface)
 /** copy SI.field to VO */
 #define SITOVO(field) \
 	(vo.field && \
-	 memcpy(XO_HOST+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
+	 memcpy(dev->xo_host+vo_offsets.field, reinterpret_cast<char*>(systemInterface.OUT.field+vo_cursor.field), \
 			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
 /** copy SI.field to XO archive. */
