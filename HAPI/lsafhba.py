@@ -82,14 +82,19 @@ def get_VI(uut, conn, args):
     VI_cfg['SP32'] = (16*4 - len_VI%64) // 4
 
     XI_sites = 0
+    has_ai = False
     for site_cat in ('AISITES', 'DIOSITES'):
         sc = uut.get_site_types()[site_cat]
         if len(sc) > 0:
             VI_cfg[site_cat] = sc
             XI_sites += len(sc)
+            if site_cat == 'AISITES':
+                has_ai = True
+            
     VI_cfg['NXI'] = XI_sites
+    pcs_mode = 'pcs' if has_ai else 'pcs,nowait'
 
-    return VI_cfg
+    return VI_cfg, pcs_mode
 
 def get_VO(uut, conn, args):
     NC = { 'AO16': 0, 'AO32': 0, 'DO32': 0 }
@@ -171,10 +176,10 @@ def run_main(args):
             new_dev = {}
             new_dev['DEVNUM'] = int(value.dev)
             new_dev['name'] = value.uut
-            new_dev['type'] = 'pcs'
+            _vi, new_dev['type'] = get_VI(uut, value, args)
             new_dev['sync_role'] = get_role(idx, value, args)
             new_dev['COMMS'] = value.cx
-            new_dev['VI'] = get_VI(uut, value, args)
+            new_dev['VI'] = _vi
             new_dev['VO'] = get_VO(uut, value, args)
             uuts.append(new_dev)
 
