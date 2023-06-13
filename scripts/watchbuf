@@ -1,0 +1,5 @@
+#!/bin/sh
+DEV=${1:-0}
+SKIP=${2:-0}
+./mmap -f /dev/rtm-t.${DEV}.data/hb00 | dd bs=4096 skip=${SKIP} count=1 status=none | hexdump | head
+
