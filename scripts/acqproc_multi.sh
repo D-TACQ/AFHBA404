@@ -163,16 +163,13 @@ control_script() {
 
 
 configure_uut() {
-	# Setup is done here.
-
+	PYTHON scripts/llc-config-utility.py $ACQPROC_CONFIG
 	case $SYNC_ROLE_MODE in
 	n*)
 		echo "WARNING: omit sync_role";;
 	*)
         	PYTHON $HAPI_DIR/user_apps/acq400/sync_role.py --toprole="$TOPROLE" --fclk=$CLK $UUTS;;
 	esac 
-
-	PYTHON scripts/llc-config-utility.py $ACQPROC_CONFIG
 }
 
 PID_CP=0
