@@ -167,7 +167,7 @@ class UutWrapper:
 
             if self.args.check_spad > 0:
                 if not self.spad_enabled:
-                    exit(PR.Red(f'Error: Cannot check spad if no spad: {self.spad}'))
+                   die(f'Error: Cannot check spad if no spad: {self.spad}')
 
                 step = 1 if self.args.decimate is None else self.args.decimate
                 cmd = stream.get_checker_cmd(self.args, spad_len, data_columns, step)
@@ -221,19 +221,19 @@ class UutWrapper:
         try:
             self.api = acq400_hapi.factory(self.name)
         except Exception:
-            exit(PR.Red(f'Error: Connection failed {self.name}'))
+            die(f'Error: Connection failed {self.name}')
 
     def __set_id(self):
         hostname = self.api.s0.HN
         match = re.search(r'^.+_([0-9]{3})$', hostname)
         if not match:
-            exit(PR.Red(f'Error: {self.name} Hostname {hostname} is invalid'))
+            die(f'Error: {self.name} Hostname {hostname} is invalid')
         self.name = match.group()
         self.id = match.group(1).lstrip('0')
 
     def __data_builder(self, map, streams):
         if self.name not in streams:
-            exit(PR.Red(f'Error: {self.name} has no connections'))
+            die(f'Error: {self.name} has no connections')
 
         self.ports = self.__get_mapped_sites(map)
         
@@ -250,7 +250,7 @@ class UutWrapper:
         if 'ALL' in map:
             map[self.id] = map['ALL'].copy()
         if self.id not in map:
-            exit(PR.Red(f'Error: {self.name} has no valid map'))
+            die(f'Error: {self.name} has no valid map')
         for port in map[self.id]:
             out[port] = {}
             map[self.id][port] = map[self.id][port].split(',')
@@ -266,7 +266,7 @@ class UutWrapper:
                 if key in site_list:
                     out[port][key] = site_list[key]
             if not out[port]:
-                exit(PR.Red(f'Error: {self.name} has no valid sites'))
+                die(f'Error: {self.name} has no valid sites')
         return out
 
     def __get_aggregator_sitelist(self):
@@ -309,7 +309,7 @@ class Stream:
                 self.pid = pid
                 break
             if time.time() - time_start > 5:
-                exit(PR.Red(f'Error: afhba.{self.lport} failed to start'))
+                die(f'Error: afhba.{self.lport} failed to start')
             pid = afhba404.get_stream_pid(self.lport)
             time.sleep(0.5)
 
@@ -348,7 +348,7 @@ class Stream:
                 return
             retry += 1
 
-        exit(PR.Red(f'Fatal Error: Stream failed to die {lport}'))
+        die(f'Fatal Error: Stream failed to die {lport}')
 
 def stop_uuts(uut_collection):
     threads = []
@@ -376,7 +376,7 @@ def get_parsed_map(maps):
         uutname, port, sites = map.upper().split(':')
         uutname = uutname.lstrip('0')
         if port not in valid_ports:
-            exit(PR.Red(f'ERROR: Invalid port: {port}'))
+            die(f'ERROR: Invalid port: {port}')
         if uutname not in port_map:
             port_map[uutname] = {}
         if port == 'BOTH':
@@ -394,7 +394,7 @@ def read_knob(knob):
 
 def configure_host(uut_collection, args):
     if not os.path.ismount("/mnt"):
-        exit(PR.Red(f'Error: /mnt is not a ramdisk'))
+        die(f'Error: /mnt is not a ramdisk')
 
     if args.delete:
         cmd = 'sudo rm  -rf /mnt/afhba.*'
@@ -406,7 +406,7 @@ def configure_host(uut_collection, args):
 
     if not args.recycle:
         if args.secs:
-            exit(PR.Red(f'Error: --secs cannot be used if --recycle off'))
+            die(f'Error: --secs cannot be used if --recycle off')
         PR.Yellow('Warning: recycling disabled')
         total_streams = 0
         free_memory = int(getattr(psutil.virtual_memory(), 'free')/1024/1024)
@@ -416,10 +416,14 @@ def configure_host(uut_collection, args):
         PR.Blue(f'Memory needed: {memory_needed} MB')
         PR.Blue(f'Memory available: {free_memory} MB')
         if memory_needed > free_memory - 1024:
-            exit(PR.Red(f'Error: Needed memory exceeds safe usage'))
+            die(f'Error: Needed memory exceeds safe usage')
     if args.secs:
         args.t_mins, args.t_secs = divmod(args.secs, 60)
         args.nbuffers = 9999999999
+
+def die(message):
+    PR.Red(message)
+    os._exit(1)
 
 class ReleasesTriggerWhenReady:
     """ handles all trigger types from UI, enables them at the right time """
@@ -470,14 +474,14 @@ class ReleasesTriggerWhenReady:
                 self.trg_msg = f'Waiting to trigger {self.args.sig_gen}'
                 self.trg_action = self.sig_gen_trg_action
             else:
-                exit(PR.Red('duplicate trg_action sig_gen'))
+                die('duplicate trg_action sig_gen')
 
         elif self.args.wrtd_txi is not None:
             if self.trg_action is None:
                 self.trg_msg = f'Waiting to trigger wrtd_txi'
                 self.trg_action = self.wrtd_txi_trg_action
             else:
-                exit(PR.Red('duplicate trg_action wrtd_txi'))
+                die('duplicate trg_action wrtd_txi')
 
         elif self.args.mtrg is not None:
             if self.trg_action is None:
@@ -485,7 +489,7 @@ class ReleasesTriggerWhenReady:
                 self.trg_action = self.mtrg_trg_action
                 self.prep_mtrg()
             else:
-                exit(PR.Red('duplicate trg_action mtrg'))
+                die('duplicate trg_action mtrg')
 
         else:
             self.trg_action = self.null_trg_action
@@ -548,9 +552,8 @@ def hot_run_status_update_wrapper(SCRN, args, uut_collection):
                 sstate = stream.read_state()
                 sites = stream.sites_str
                 rport = stream.rport
-                SCRN.add(f'{{TAB}}{sites}:{rport}{{ORANGE}} --> {{RESET}}afhba.{lport:2}')
-                SCRN.add(f'{{TAB}}{{BOLD}}{sstate.rx_rate * args.buffer_len}MB/s Total Buffers: {int(sstate.rx) * args.buffer_len:,} Status: {sstate.STATUS}{{RESET}}')
-                SCRN.end()
+                SCRN.add_line(f'{{TAB}}{sites}:{rport}{{ORANGE}} --> {{RESET}}afhba.{lport:2}')
+                SCRN.add_line(f'{{TAB}}{{TAB}}{{BOLD}}{sstate.rx_rate * args.buffer_len}MB/s Total Buffers: {int(sstate.rx) * args.buffer_len:,} Status: {sstate.STATUS}{{RESET}}')
                 if args.check_spad:
                     SCRN.add_line(f'{{TAB}}{{TAB}}Spad Checking {stream.read_results()}')
 
