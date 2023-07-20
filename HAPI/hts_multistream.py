@@ -66,6 +66,7 @@ import acq400_hapi
 from acq400_hapi import PR
 from acq400_hapi.acq400_print import DISPLAY
 from acq400_hapi import afhba404
+import afhba_check_links
 import argparse
 import time
 import os
@@ -151,8 +152,11 @@ class UutWrapper:
     
     def initialize(self):
         for lport, stream in self.streams.items():
-
-            self.check_lane_status(lport, stream.rport)
+            
+            result = afhba_check_links.check_lane_status(self.name, lport, stream.rport, self.api, self.args.verbose)
+            if not result:
+                PR.Red('Link down: unable to fix')
+                os._exit(1)
 
             data_columns = int(sum(stream.sites.values()) / 2)
             spad_len = int(self.spad.split(',')[1])
@@ -172,31 +176,6 @@ class UutWrapper:
             if self.args.verbose > 0:
                 print(f"Cmd: {cmd}")
             stream.run(cmd)
-
-    def check_lane_status(self, lport, rport):
-        link_state = afhba404.get_link_state(lport)
-        if link_state.LANE_UP and link_state.RPCIE_INIT:
-            if self.args.verbose > 0:
-                PR.Green(f'{self.name} LANE_UP={link_state.LANE_UP} RPCIE_INIT={link_state.RPCIE_INIT}')
-            return
-        PR.Yellow(f'Warning: {self.name} LANE_UP={link_state.LANE_UP} RPCIE_INIT={link_state.RPCIE_INIT}')
-        comms = getattr(self.api, f'c{rport}')
-        if not hasattr(comms, 'TX_DISABLE'):
-            exit(PR.Red('Link down: could not fix (old firmware)'))
-        retry = 0
-        while retry < 3:
-            PR.Yellow(f'{self.name} Link down: attempting to correct {retry}/3')
-            comms.TX_DISABLE = 1
-            time.sleep(0.5)
-            comms.TX_DISABLE = 0
-            time.sleep(0.5)
-            link_state = afhba404.get_link_state(lport)
-            if link_state.RPCIE_INIT:
-                PR.Green(f'{self.name} Link Fixed {retry}/3')
-                return
-            retry += 1
-
-        exit(PR.Red('Link down: unable to fix'))
 
     def configure(self):
         if self.spad is not None:

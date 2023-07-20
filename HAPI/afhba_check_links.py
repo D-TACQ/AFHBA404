@@ -30,18 +30,21 @@ def check_lanes(uuts):
         if conn.uut in uuts or len(uuts) == 0:
             check_lane_status(conn.uut, conn.dev, conn.cx)
 
-def check_lane_status(uutname, lport, rport, uut=None):
+def check_lane_status(uutname, lport, rport, uut=None, verbose=True):
+    def output(msg):
+        if verbose:
+            print(msg)
     link_state = afhba404.get_link_state(lport)
     if link_state.LANE_UP and link_state.RPCIE_INIT:
-        print(f"[{uutname}:{rport} -> afhba.{lport}] Link Good")
+        output(f"[{uutname}:{rport} -> afhba.{lport}] Link Good")
         return True
     if not uut:
         uut = acq400_hapi.factory(uutname)
     comm_api = getattr(uut, f'c{rport}')
     if not hasattr(comm_api, 'TX_DISABLE'):
-        print(f"[{uutname}:{rport} -> afhba.{lport}] Link down: unable to fix (old firmware)")
+        output(f"[{uutname}:{rport} -> afhba.{lport}] Link down: unable to fix (old firmware)")
         return False
-    print(f"[{uutname}:{rport} -> afhba.{lport}] Link Down: attempting fix")
+    output(f"[{uutname}:{rport} -> afhba.{lport}] Link Down: attempting fix")
     attempt = 1
     while attempt <= 5:
         comm_api.TX_DISABLE = 1
@@ -50,11 +53,11 @@ def check_lane_status(uutname, lport, rport, uut=None):
         time.sleep(0.5)
         link_state = afhba404.get_link_state(lport)
         if link_state.RPCIE_INIT:
-            print(f'[{uutname}:{rport} -> afhba.{lport}] Link Fixed')
+            output(f'[{uutname}:{rport} -> afhba.{lport}] Link Fixed')
             return True
         attempt += 1
-    print(f'[{uutname}:{rport} -> afhba.{lport}] Link down: unable to fix')
-    return False
+    output(f'[{uutname}:{rport} -> afhba.{lport}] Link down: unable to fix')
+    return False  
 
 if __name__ == '__main__':
     run_main(get_parser().parse_args())
