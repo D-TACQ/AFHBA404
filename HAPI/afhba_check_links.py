@@ -8,7 +8,7 @@ import time
 """
 usage: afhba_check_link.py [-h] [uutnames ...]
 
-Afhba Link Checker
+Afhba Link Checker : checks Aurora link status, if it's down, resets optic link from the UUT with retry.
 
 positional arguments:
   uutnames    uuts to check leave empty to check all connections
@@ -61,3 +61,4 @@ def check_lane_status(uutname, lport, rport, uut=None, verbose=True):
 
 if __name__ == '__main__':
     run_main(get_parser().parse_args())
+
