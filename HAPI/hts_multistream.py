@@ -96,7 +96,9 @@ def get_parser():
     parser.add_argument('--mtrg', default=None, help='value:HDMI|EXT, works with free-running master trigger')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--hex_str', default=0, type=int, help='generate hexdump cmd')
-
+    parser.add_argument('--cpu_usage', default=0, help='display cpu usage and mean')
+    parser.add_argument('--auto', default=0, type=int, help='auto set nbuffer based on space')
+    
     parser.add_argument('uutnames', nargs='+', help="uuts")
     return parser
 
@@ -412,6 +414,9 @@ def configure_host(uut_collection, args):
         free_memory = int(getattr(psutil.virtual_memory(), 'free')/1024/1024)
         for uut_item in uut_collection:
             total_streams += len(uut_item.streams)
+        if args.auto:
+            args.nbuffers = int((free_memory - 2048) / total_streams)
+            PR.Blue(f'nbuffers auto set to {args.nbuffers}')
         memory_needed = total_streams * args.nbuffers
         PR.Blue(f'Memory needed: {memory_needed} MB')
         PR.Blue(f'Memory available: {free_memory} MB')
@@ -600,6 +605,9 @@ def hot_run(args, uut_collection):
     time_start = time.time()
     rate_limiter = RateLimiter(0.5)
 
+    usage_arr = []
+    psutil.cpu_percent()
+
     try:
         while True:
             SCRN.add_line('')
@@ -617,6 +625,11 @@ def hot_run(args, uut_collection):
             else:
                 SCRN.add("{0:.0f} secs ",time.time() - time_start)
                 SCRN.add("Max: {0}MB Buffer Length: {1}MB ", args.nbuffers * args.buffer_len, args.buffer_len)
+            
+            if args.cpu_usage and all_running:
+                cur_usage = psutil.cpu_percent()
+                usage_arr.append(cur_usage)
+                SCRN.add(f'CPU Usage {cur_usage}% ')
 
             if release_trigger_when_ready(all_armed) < 0:
                 break
@@ -651,6 +664,9 @@ def hot_run(args, uut_collection):
         stop_uuts(uut_collection)
         print(e)
         print(traceback.format_exc())
+    if len(usage_arr) > 1:
+        mean_usage = round(sum(usage_arr) / len(usage_arr))
+        print(f"Mean Usage {mean_usage}%")
 
     print('Run Done')
     time.sleep(1)
