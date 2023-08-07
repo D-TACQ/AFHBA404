@@ -97,7 +97,8 @@ def get_parser():
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--hex_str', default=0, type=int, help='generate hexdump cmd')
     parser.add_argument('--cpu_usage', default=0, help='display cpu usage and mean')
-
+    parser.add_argument('--auto', default=0, type=int, help='auto set nbuffer based on space')
+    
     parser.add_argument('uutnames', nargs='+', help="uuts")
     return parser
 
@@ -413,6 +414,9 @@ def configure_host(uut_collection, args):
         free_memory = int(getattr(psutil.virtual_memory(), 'free')/1024/1024)
         for uut_item in uut_collection:
             total_streams += len(uut_item.streams)
+        if args.auto:
+            args.nbuffers = int((free_memory - 2048) / total_streams)
+            PR.Blue(f'nbuffers auto set to {args.nbuffers}')
         memory_needed = total_streams * args.nbuffers
         PR.Blue(f'Memory needed: {memory_needed} MB')
         PR.Blue(f'Memory available: {free_memory} MB')
