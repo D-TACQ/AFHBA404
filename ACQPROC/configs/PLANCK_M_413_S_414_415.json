@@ -1,0 +1,84 @@
+{
+	"AFHBA": {
+		"UUT": [
+			{
+				"DEVNUM": 0,
+				"name": "acq2106_413",
+				"type": "pcs",
+				"sync_role": "master",
+				"COMMS": "A",
+				"VI": {
+					"AI32": 160,
+					"SP32": 16,
+					"NXI": 5
+				},
+				"VO": {
+					"D032": 5,
+					"DO_BYTE_IS_OUTPUT": [
+						"0,0,0,0"
+					],
+					"DIOSITES": [
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"NXO": 5
+				}
+			},
+			{
+				"DEVNUM": 1,
+				"name": "acq2106_414",
+				"type": "pcs",
+				"sync_role": "slave",
+				"COMMS": "A",
+				"VI": {
+					"AI32": 160,
+					"SP32": 16,
+					"NXI": 5
+				},
+				"VO": {
+					"D032": 5,
+					"DO_BYTE_IS_OUTPUT": [
+						"0,0,0,0"
+					],
+					"DIOSITES": [
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"NXO": 5
+				}
+			},
+			{
+				"DEVNUM": 2,
+				"name": "acq2106_415",
+				"type": "pcs",
+				"sync_role": "slave",
+				"COMMS": "A",
+				"VI": {
+					"AI32": 160,
+					"SP32": 16,
+					"NXI": 5
+				},
+				"VO": {
+					"D032": 5,
+					"DO_BYTE_IS_OUTPUT": [
+						"0,0,0,0"
+					],
+					"DIOSITES": [
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"NXO": 5
+				}
+			}
+		]
+	}
+}
