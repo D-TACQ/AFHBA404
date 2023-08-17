@@ -60,7 +60,7 @@ SINGLE_THREAD_CONTROL=${SINGLE_THREAD_CONTROL:-control_dup1}
 # The sync_role command can be changed to 'fpmaster' for external clk and trg.
 TOPROLE=${TOPROLE:-master}		# alt: fpmaster for front panel clk/trg.
 
-TOP=${TOP:-/home/dt100/PROJECTS}
+TOP=${TOP:-/home/$USER/PROJECTS}
 HAPI_DIR=$TOP/acq400_hapi
 AFHBA404_DIR=$TOP/AFHBA404/
 MDS_DIR=$TOP/ACQ400_MDSplus/
