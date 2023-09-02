@@ -49,6 +49,10 @@
 #include "gpumemdrv.h"
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,17,0)
+#define PDE_DATA(in)	pde_data(in)
+#endif
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0)
 #define SCHEDULE_FIFO	sched_set_fifo_low(current)
 #else
