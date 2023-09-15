@@ -251,6 +251,10 @@ def enum_sites(uut, uut_def, args):
                             if not "PW32" in uut_def['VO'].keys():
                                 print(
                                     "Warning: PWM site found, but no PWM specified in json.")
+                    elif module_variant in [0]:
+                        uut.DOSITES.append(site)
+                        uut.DISITES.append(site)
+                        customize_DO_BYTE_IS_OUTPUT(uut, uut_def)
                     elif uut_def != None:
                         if "PW32" in uut_def['VO'].keys():
                             print(
