@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 
 import acq400_hapi
@@ -27,14 +27,19 @@ def main():
     args = get_args()
     uut_config = load_json(args.json_file)
     for uut in uut_config['AFHBA']['UUT']:
+        def add():
+            if 'master' in uut['sync_role']:
+                uuts.insert(0, uut['name'])
+            else:
+                uuts.append(uut['name'])
+
         if "AI16" in uut['VI'].keys():
             if uut['VI']['AI16'] != 0:
-                uuts.append(uut['name'])
+                add()
         if "AI32" in uut['VI'].keys():
             if uut['VI']['AI32'] != 0:
-                uuts.append(uut['name'])
-    for item in uuts:
-        print(item, end=' ')
+                add()
+    print(" ".join(uuts))
 
 
 if __name__ == '__main__':

@@ -36,14 +36,10 @@ shift
 
 NOCONFIGURE=${NOCONFIGURE:-0}
 
-cat - >acqproc_multi.env <<EOF
-$(./scripts/acqproc_getconfig.py $ACQPROC_CONFIG)
-EOF
+
+./scripts/acqproc_getconfig.py $ACQPROC_CONFIG
 source acqproc_multi.env
-echo UUT1 $UUT1
-echo UUT2 $UUT2
-echo UUTS $UUTS
-echo DEVMAX $DEVMAX
+cat acqproc_multi.env
 
 LLC_CALLBACKS=${LLC_CALLBACKS:-0}
 CAPTURE_UUTS=$(python3 scripts/list_capture_uuts.py --json_file=${ACQPROC_CONFIG})
