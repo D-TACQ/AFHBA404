@@ -98,6 +98,7 @@ def get_parser():
     parser.add_argument('--hex_str', default=0, type=int, help='generate hexdump cmd')
     parser.add_argument('--cpu_usage', default=0, help='display cpu usage and mean')
     parser.add_argument('--auto', default=0, type=int, help='auto set nbuffer based on space')
+    parser.add_argument('--concat', default=0, type=int, help='concatenate buffers concat=2 means 3 buffers combined')
     
     parser.add_argument('uutnames', nargs='+', help="uuts")
     return parser
@@ -291,7 +292,7 @@ class Stream:
 
     def get_cmd(self, args):
         os.system(f"sudo mkdir -p {self.outroot} -m 0777")
-        cmd = f"sudo RTM_DEVNUM={self.lport} NBUFS={args.nbuffers} CONCAT=0 RECYCLE={args.recycle} OUTROOT={self.outroot} ./STREAM/rtm-t-stream-disk"
+        cmd = f"sudo RTM_DEVNUM={self.lport} NBUFS={args.nbuffers} CONCAT={args.concat} RECYCLE={args.recycle} OUTROOT={self.outroot} ./STREAM/rtm-t-stream-disk"
         return cmd
         
     def get_checker_cmd(self, args, spad_len, data_columns, step):
