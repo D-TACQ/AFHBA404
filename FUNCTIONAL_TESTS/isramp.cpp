@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 
 #include <errno.h>
+#include <signal.h>
+#include <time.h>
 
 /*
  * This file takes input from nc as below:
@@ -74,7 +76,7 @@ struct Calcs {
 	unsigned errors = 0;
 	unsigned error_report = 0;
 	unsigned xx1;
-};
+} G_calcs;
 
 int isramp(FILE* fp, Calcs& calcs){
 	int file_ec = 0;
@@ -152,6 +154,18 @@ void write_log(Calcs& calcs){
         fprintf(fp, "Total: %lld Errors %u \n", samples, calcs.errors);
 }
 
+void catch_int(int sig_num)
+{
+	static time_t last_time;
+	time_t now = time(0);
+
+	if (now-last_time < 1){
+		exit(1);
+	}else{
+		last_time = now;
+	}
+	print_report("isramp", G_calcs.errors, G_calcs);
+}
 int main(int argc, char* const argv[]) {
 	get_args(argc, argv);
 
@@ -160,13 +174,15 @@ int main(int argc, char* const argv[]) {
 	if (strcmp(G::fname, "-") != 0){
 		fp = fopen_read_or_die(G::fname);
 	}
-	Calcs calcs = {};
+
 	int file_ec;
 
+	signal(SIGINT, catch_int);
+
 	if (!G::stdin_is_list_of_fnames){
-		file_ec = isramp(fp, calcs);
+		file_ec = isramp(fp, G_calcs);
 		if (G::verbose){
-			print_report(G::fname, file_ec, calcs);
+			print_report(G::fname, file_ec, G_calcs);
 		}
 		if (file_ec < 0){
 			exit(1);
@@ -179,13 +195,13 @@ int main(int argc, char* const argv[]) {
 			if (len > 1){
 				fname[len-1] = '\0';
 				fp = fopen_read_or_die(fname);
-				file_ec = isramp(fp, calcs);
+				file_ec = isramp(fp, G_calcs);
 				fclose(fp);
 				if (G::verbose){
-					print_report(fname, file_ec, calcs);
+					print_report(fname, file_ec, G_calcs);
 				}
 				if (G::logname){
-					write_log(calcs);
+					write_log(G_calcs);
 				}
 				if (file_ec < 0){
 					exit(1);
