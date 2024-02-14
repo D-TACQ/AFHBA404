@@ -118,6 +118,14 @@ public:
 - CP32 : Calc Value, 32 bit, an intermediate calc result from the PCS. This is NOT sent to the UUT, but is stored in the raw output.
 - HP32 : HudP remote XO values, 32 bit
 
+### Rules for Vectors
+
+- the DMAC has a granularity of 64 bytes, therefore the length of ALL vectors MUST be a multiple of 64 bytes.
+- On VI, this achieved by setting the Scratch Pad Length. While SPAD is a convenient way to convey metadata (eg sample count, time in usecs etc), its primary purpose is the pad out the VI to the next 64 byte boundary.
+- On VO this is achieved by a PAD or "TCAN" value.
+- Both SPAD and TCAN are configured automatically by the acqproc setup scripts.
+
+
 
 
 ## sample config file, pcs1.json
