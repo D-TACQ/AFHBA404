@@ -276,7 +276,7 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
               phys_addr_t paddr, uint64_t size, unsigned prot)
 {
-        if (iommu_map(adev->iommu_dom, iova, paddr, size, prot)){
+        if (iommu_map(adev->iommu_dom, iova, paddr, size, prot, GFP_KERNEL)){
                 dev_err(pdev(adev), "iommu_map failed -- aborting.\n");
                 return -EFAULT;
         }else{
