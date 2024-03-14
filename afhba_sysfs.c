@@ -308,6 +308,37 @@ static ssize_t show_aurora_ext(
 }
 static DEVICE_ATTR(aurora_ext, (S_IRUGO), show_aurora_ext, 0);
 
+
+static ssize_t store_aurora_rate(
+	struct device * dev,
+	struct device_attribute *attr,
+	const char * buf, size_t count)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	u32 ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG(adev->sfp));
+	u32 rate = simple_strtoul(buf, 0, 0) << AFHBA_AURORA_CTRL_SFP_Rx_SHL;
+
+	rate &= AFHBA_AURORA_CTRL_SFP_R1|AFHBA_AURORA_CTRL_SFP_R0;
+	ctrl &= ~(AFHBA_AURORA_CTRL_SFP_R1|AFHBA_AURORA_CTRL_SFP_R0);
+
+	afhba_write_reg(adev, AURORA_CONTROL_REG(adev->sfp), ctrl|rate);
+	return count;
+}
+static ssize_t show_aurora_rate(
+	struct device * dev,
+	struct device_attribute *attr,
+	char * buf)
+{
+	struct AFHBA_DEV *adev = afhba_lookupDeviceFromClass(dev);
+	int ctrl = afhba_read_reg(adev, AURORA_CONTROL_REG(adev->sfp));
+
+	ctrl &= AFHBA_AURORA_CTRL_SFP_R1|AFHBA_AURORA_CTRL_SFP_R0;
+	return sprintf(buf, "%d\n", ctrl>>AFHBA_AURORA_CTRL_SFP_Rx_SHL);
+}
+
+static DEVICE_ATTR(aurora_rate, (S_IRUGO)|(S_IWUSR|S_IWGRP), show_aurora_rate, store_aurora_rate);
+
+
 static ssize_t store_comms_init(
 	struct device * dev,
 	struct device_attribute *attr,
@@ -573,6 +604,7 @@ static const struct attribute *dev_attrs[] = {
 	&dev_attr_reset_buffers.attr,
 	&dev_attr_aurora.attr,
 	&dev_attr_aurora_ext.attr,
+	&dev_attr_aurora_rate.attr,
 	&dev_attr_data_fifo_stat_push.attr,
 	&dev_attr_data_fifo_stat_pull.attr,
 	&dev_attr_desc_fifo_stat_push.attr,
