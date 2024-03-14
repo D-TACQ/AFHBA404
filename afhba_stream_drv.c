@@ -830,6 +830,7 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	enum { WAIT_INIT, WAIT_LANE_UP, WAIT_LANE_STILL_UP, CHECK_READ, TXEN } state = WAIT_INIT;
 	int ticks_in_state = 0;
+	u32 ctrl;
 #define CHANGE_STATE(s) state = (s); ticks_in_state = 0; continue
 
 	for ( ; ; msleep(MSLEEP_TO), ++ticks_in_state){
@@ -841,7 +842,8 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 
 		switch(state){
 		case WAIT_INIT:
-			afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_ENA);
+			ctrl = afhba_read_reg(adev, adev->ACR);
+			afhba_write_reg(adev, adev->ACR, ctrl|AFHBA_AURORA_CTRL_ENA);
 			CHANGE_STATE(WAIT_LANE_UP);
 			break;
 		case WAIT_LANE_UP:
@@ -869,13 +871,15 @@ static int _afs_comms_init(struct AFHBA_DEV *adev)
 			sdev->comms_init_done = _afs_check_read(adev) == 0;
 			if (afs_aurora_errors(adev) == -1 ){
 				dev_warn(pdev(adev), "%s bad aurora, TXDIS", __FUNCTION__);
-				afhba_write_reg(adev, adev->ACR, AFHBA_AURORA_CTRL_TXDIS);
+				ctrl = afhba_read_reg(adev, adev->ACR);
+				afhba_write_reg(adev, adev->ACR, ctrl|AFHBA_AURORA_CTRL_TXDIS);
 				CHANGE_STATE(TXEN);
 			}else{
 				return sdev->comms_init_done;
 			}
 		case TXEN:
-			afhba_write_reg(adev, adev->ACR, 0);
+			ctrl = afhba_read_reg(adev, adev->ACR);
+			afhba_write_reg(adev, adev->ACR, ctrl& ~AFHBA_AURORA_CTRL_TXDIS);
 			CHANGE_STATE(WAIT_INIT);
 		default:
 			dev_err(pdev(adev), "%s illegal state %d", __FUNCTION__, state);
