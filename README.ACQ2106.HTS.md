@@ -1,12 +1,8 @@
-README.ACQ2106.HTS
+# README.ACQ2106.HTS : High Throughput Streaming
 
 [Current HOWTO guide, with automated scripting:](https://github.com/D-TACQ/AFHBA404/releases/download/v2.7/hts_streaming_r2.pdf)
 
-High Throughput Streaming
-
-Use Case:
-
-ACQ2106+4xACQ425-16-2000 
+## Use Case: ACQ2106+4xACQ425-16-2000 
 
 Initial:
 ========
