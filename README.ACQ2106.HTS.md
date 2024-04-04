@@ -1,7 +1,6 @@
 README.ACQ2106.HTS
 
-Current HOWTO guide, with automated scripting:
-https://github.com/D-TACQ/AFHBA404/releases/download/v2.7/hts_streaming_r2.pdf
+[Current HOWTO guide, with automated scripting:](https://github.com/D-TACQ/AFHBA404/releases/download/v2.7/hts_streaming_r2.pdf)
 
 High Throughput Streaming
 
