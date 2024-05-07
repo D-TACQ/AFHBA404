@@ -22,7 +22,7 @@ SPAD_LEN = os.getenv("SPAD_LEN", 8)
 if AISITES != "1":
     for value in ["2","3","4","5","6"]:
         if AISITES == value:
-           print "Doing this can cause system issues. Set AI sites to '1,2' etc."
+           print("Doing this can cause system issues. Set AI sites to '1,2' etc.")
            quit()
 
 def hit_resets(svc):    
@@ -41,9 +41,9 @@ def init_ai(uut):
     spad_len = int(SPAD_LEN)
     uut.s0.spad = '1,{},0'.format(spad_len)
     uut.cA.spad = '1'
-    uut.cA.aggregator = 'sites={}'.format(AISITES)
+    uut.cA.aggregator = 'sites={} on'.format(AISITES)
     uut.cB.spad = '1'
-    uut.cB.aggregator = 'sites={}'.format(AISITES)
+    uut.cB.aggregator = 'sites={} on'.format(AISITES)
     uut.s0.run0 = '{}'.format(AISITES)
     # we need to calculate a new nchan based on the number of bolo sites in
     # the uut. uut assumes bolo has 8 channels, but post dsp each site has 
