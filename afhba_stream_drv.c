@@ -45,6 +45,13 @@
 
 #define REVID	"R1077"
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0)
+#include <linux/dma-direction.h>
+#else
+#define DMA_BIDIRECTIONAL PCI_DMA_BIDIRECTIONAL
+#define DMA_FROM_DEVICE PCI_DMA_FROMDEVICE
+#endif
+
 #define DEF_BUFFER_LEN 0x100000
 
 int RX_TO = 1*HZ;
@@ -933,7 +940,7 @@ static void mark_empty(struct device *dev, struct HostBuffer *hb){
 	pmark[0] = EMPTY1;
 	pmark[1] = EMPTY2;
 
-	dma_sync_single_for_device(dev, hb->pa+offset, mark_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_device(dev, hb->pa+offset, mark_len, DMA_FROM_DEVICE);
 }
 
 
@@ -943,7 +950,7 @@ static int is_marked_empty(struct device *dev, struct HostBuffer *hb){
 	u32 *pmark = (u32*)(hb->va + offset);
 	int is_empty;
 
-	dma_sync_single_for_cpu(dev, hb->pa+offset, mark_len, PCI_DMA_FROMDEVICE);
+	dma_sync_single_for_cpu(dev, hb->pa+offset, mark_len, DMA_FROM_DEVICE);
 
 	is_empty = pmark[0] == EMPTY1 && pmark[1] == EMPTY2;
 
@@ -1209,7 +1216,7 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 
 		hb->ibuf = ii;
 		hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-				buffer_len, PCI_DMA_BIDIRECTIONAL);
+				buffer_len, DMA_BIDIRECTIONAL);
 		hb->va = buf;
 		hb->len = buffer_len;
 

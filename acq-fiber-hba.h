@@ -66,6 +66,12 @@
 #include <uapi/linux/sched/types.h>
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0)
+#include <linux/dma-direction.h>
+#else
+#define DMA_FROM_DEVICE PCI_DMA_FROMDEVICE
+#endif
+
 #ifdef CONFIG_KERNEL_ASSERTS
 /* kgdb stuff */
 #define assert(p) KERNEL_ASSERT(#p, p)
