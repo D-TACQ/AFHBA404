@@ -313,7 +313,7 @@ static void init_buffers(struct AFHBA_DEV* adev)
 
 	hb->ibuf = 0;
 	hb->pa = dma_map_single(&adev->pci_dev->dev, buf,
-			buffer_len, PCI_DMA_FROMDEVICE);
+			buffer_len, DMA_FROM_DEVICE);
 	hb->va = buf;
 	hb->len = buffer_len;
 
