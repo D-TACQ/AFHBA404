@@ -25,11 +25,36 @@ namespace G {
 	bool stdin_is_list_of_fnames;
 	int verbose = 0;
 	char *logname = NULL;
+	int period_report_sec = 0;     // report every N seconds
+	int period_message_req;        // set by signal, cleared by report
 };
+
+void period_message_req_enable(int s)
+{
+	G::period_message_req = 1;
+//	printf("%s G::period_message_req: %d\n", __FUNCTION__, G::period_message_req);
+	alarm(G::period_report_sec);
+}
+
+
+#include <string>
+
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+    return buf;
+}
 
 void get_args(int argc, char* const argv[]){
     int opt;
-    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:L:")) != -1) {
+    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:L:p:")) != -1) {
 	switch(opt) {
 	case 'm':
 		G::maxcols = atoi(optarg);
@@ -56,11 +81,18 @@ void get_args(int argc, char* const argv[]){
 	case 'v':
 		G::verbose = atoi(optarg);
 		break;
+	case 'p':
+		G::period_report_sec = atoi(optarg);
+		if (G::period_report_sec){
+			signal(SIGALRM, period_message_req_enable);
+			alarm(G::period_report_sec);
+		}
+		break;
 	case 'L':
 		G::logname = optarg;
 		break;
 	default:
-	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE -L LOGNAME\n");
+	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE -L LOGNAME -p PERIOD_REPORT\n");
 	    exit(1);
 	}
     }
@@ -80,6 +112,10 @@ struct Calcs {
 
 int isramp(FILE* fp, Calcs& calcs){
 	int file_ec = 0;
+	Calcs previous_calcs = {};
+	unsigned errored_intervals = 0;
+	unsigned clean_intervals = 0;
+
 	for (unsigned xx; ; ++calcs.ii, calcs.xx1 = xx){
 		unsigned buffer[G::maxcols];
 		int nread = fread(buffer, sizeof(unsigned), G::maxcols, fp); // read  G::maxcols channels of data.
@@ -117,6 +153,25 @@ int isramp(FILE* fp, Calcs& calcs){
 			if (G::maxerrs && calcs.errors >= G::maxerrs){
 				return -file_ec;
 			}
+		}
+		if (G::period_message_req){
+			float mbps = 0;
+			const char* status = "CLEAN";
+			if (previous_calcs.ii){
+				mbps = (calcs.ii - previous_calcs.ii)*G::maxcols*sizeof(unsigned);
+				mbps /= (G::period_report_sec*0x100000);
+			}
+			if (calcs.errors > previous_calcs.errors){
+				errored_intervals++;
+				status = "DIRTY";	
+			}else{
+				clean_intervals++;
+			}	
+			printf("%s bytes: 0x%012llx %12llu %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n", 
+					currentDateTime().c_str(), calcs.ii, calcs.ii, mbps, calcs.errors, 
+					status, clean_intervals, errored_intervals);
+			G::period_message_req = 0;
+			previous_calcs = calcs;
 		}
 	}
 	return file_ec;
