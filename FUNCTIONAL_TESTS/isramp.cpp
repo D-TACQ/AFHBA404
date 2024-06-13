@@ -26,6 +26,7 @@ namespace G {
 	int verbose = 0;
 	char *logname = NULL;
 	int period_report_sec = 0;     // report every N seconds
+	int long_period_report = 0;
 	int period_message_req;        // set by signal, cleared by report
 };
 
@@ -54,7 +55,7 @@ const std::string currentDateTime() {
 
 void get_args(int argc, char* const argv[]){
     int opt;
-    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:L:p:")) != -1) {
+    while((opt = getopt(argc, argv, "b:m:c:s:i:E:N:v:L:p:P:")) != -1) {
 	switch(opt) {
 	case 'm':
 		G::maxcols = atoi(optarg);
@@ -81,6 +82,8 @@ void get_args(int argc, char* const argv[]){
 	case 'v':
 		G::verbose = atoi(optarg);
 		break;
+	case 'P':
+	 	G::long_period_report = 1;  // fall thru
 	case 'p':
 		G::period_report_sec = atoi(optarg);
 		if (G::period_report_sec){
@@ -168,20 +171,27 @@ int isramp(FILE* fp, Calcs& calcs){
 			}else{
 				clean_intervals++;
 			}	
-			printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n", 
+			printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s%c",
 					currentDateTime().c_str(), calcs.ii, calcs.ii, 
 					gb, mbps, 
-					calcs.errors, status, clean_intervals, errored_intervals);
+					calcs.errors, status, G::long_period_report? ' ': '\n');
+			if (G::long_period_report){
+				printf(" intervals: clean:%u dirty:%u\n", clean_intervals, errored_intervals);
+			}
+				
 			G::period_message_req = 0;
 			previous_calcs = calcs;
 		}
 	}
 	if (G::period_report_sec){
 		double gb = ((double)calcs.ii*G::maxcols*sizeof(unsigned)/0x40000000);
-		printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n",
-                		currentDateTime().c_str(), calcs.ii, calcs.ii, 
-                                gb, mbps, 
-                                calcs.errors, status, clean_intervals, errored_intervals);
+                printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s%c",
+                                currentDateTime().c_str(), calcs.ii, calcs.ii,
+                                gb, mbps,
+                                calcs.errors, status, G::long_period_report? ' ': '\n');
+                if (G::long_period_report){
+                        printf(" intervals: clean:%u dirty:%u\n", clean_intervals, errored_intervals);
+                }
 	}
 	return file_ec;
 }
