@@ -115,6 +115,8 @@ int isramp(FILE* fp, Calcs& calcs){
 	Calcs previous_calcs = {};
 	unsigned errored_intervals = 0;
 	unsigned clean_intervals = 0;
+	float mbps = 0;
+	const char* status = "CLEAN";
 
 	for (unsigned xx; ; ++calcs.ii, calcs.xx1 = xx){
 		unsigned buffer[G::maxcols];
@@ -155,8 +157,7 @@ int isramp(FILE* fp, Calcs& calcs){
 			}
 		}
 		if (G::period_message_req){
-			float mbps = 0;
-			const char* status = "CLEAN";
+			double gb = ((double)calcs.ii*G::maxcols*sizeof(unsigned)/0x40000000);
 			if (previous_calcs.ii){
 				mbps = (calcs.ii - previous_calcs.ii)*G::maxcols*sizeof(unsigned);
 				mbps /= (G::period_report_sec*0x100000);
@@ -167,12 +168,20 @@ int isramp(FILE* fp, Calcs& calcs){
 			}else{
 				clean_intervals++;
 			}	
-			printf("%s bytes: 0x%012llx %12llu %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n", 
-					currentDateTime().c_str(), calcs.ii, calcs.ii, mbps, calcs.errors, 
-					status, clean_intervals, errored_intervals);
+			printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n", 
+					currentDateTime().c_str(), calcs.ii, calcs.ii, 
+					gb, mbps, 
+					calcs.errors, status, clean_intervals, errored_intervals);
 			G::period_message_req = 0;
 			previous_calcs = calcs;
 		}
+	}
+	if (G::period_report_sec){
+		double gb = ((double)calcs.ii*G::maxcols*sizeof(unsigned)/0x40000000);
+		printf("%s bytes: 0x%012llx %12llu %6.3f GB %6.2f MB/s errors: %u %s intervals: clean:%u dirty:%u\n",
+                		currentDateTime().c_str(), calcs.ii, calcs.ii, 
+                                gb, mbps, 
+                                calcs.errors, status, clean_intervals, errored_intervals);
 	}
 	return file_ec;
 }
