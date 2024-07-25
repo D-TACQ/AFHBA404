@@ -3,8 +3,12 @@
 # AFHBA404
 http://www.d-tacq.com/resources/InstallationGuides/AFHBA404-installation-guide.pdf
 
+# We assume a default USER "dt100", GROUP "dt100" and also that "dt100" has access to sudo (ideally with no passwd).
+## it's completely possible to use another user, however some default may be adverse
+## NB: ./udev/d-tacq-afhba.hotplug assumes that all device nodes belong to user "dt100", site customisation is welcome.
 
 # Do this once:
+
 make
 sudo ./scripts/install-hotplug
 

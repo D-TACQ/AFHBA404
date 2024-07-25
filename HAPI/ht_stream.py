@@ -20,7 +20,9 @@ def run_main(args):
     if args.nbuffers == 0: args.nbuffers = 9999999999
 
     env = f"RTM_DEVNUM={lport} NBUFS={args.nbuffers} CONCAT={args.concat} RECYCLE={args.recycle} OUTROOT={outroot}"
-    os.system(f"{env} ./STREAM/rtm-t-stream-disk")
+    os.system(f"sudo {env} ./STREAM/rtm-t-stream-disk")
+# if no sudo
+#    os.system("./STREAM/rtm-t-stream-disk")
 
 def get_ports(args):
     lport = None
