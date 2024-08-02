@@ -92,7 +92,7 @@ def get_parser():
     parser.add_argument('-wr', '--wrtd_txi', default=None, help='Command first box to send this trigger when all units are in ARM state')
     parser.add_argument('-d0', '--SIG_SRC_TRG_0', default=None, help='Set trigger d0 source')
     parser.add_argument('-d1', '--SIG_SRC_TRG_1', default=None, help='Set trigger d1 source')
-    parser.add_argument('-rtmlen', '--RTM_TRANSLEN', default=None, help='Set rtm_translen for each uut')
+    parser.add_argument('-bl', '--RTM_TRANSLEN', default=None, help='Set burst length (RTM_TRANSLEN) for each uut')
     parser.add_argument('--mtrg', default=None, help='value:HDMI|EXT, works with free-running master trigger')
     parser.add_argument('--verbose', default=0, type=int, help='increase verbosity')
     parser.add_argument('--hex_str', default=0, type=int, help='generate hexdump cmd')
@@ -206,7 +206,11 @@ class UutWrapper:
 
         self.__setup_comms_aggregators()
         if self.args.verbose > 0:
-            PR.Yellow(f'Configuring {self.name}: rtm_translen {self.api.s1.RTM_TRANSLEN} ssb {self.api.s0.ssb} {self.args.buffer_len}MB buffers')
+            if self.args.RTM_TRANSLEN is not None:
+                PR.Yellow(f'Configuring {self.name}: rtm_translen {self.api.s1.RTM_TRANSLEN} ssb {self.api.s0.ssb} {self.args.buffer_len}MB buffers')
+            else:
+                PR.Yellow(f'Configuring {self.name}: ssb {self.api.s0.ssb} {self.args.buffer_len}MB buffers')
+
 
     def __setup_comms_aggregators(self):
         for lport, stream in self.streams.items():
