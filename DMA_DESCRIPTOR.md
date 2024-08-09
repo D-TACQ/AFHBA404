@@ -22,6 +22,7 @@ Note the LOW_LATENCY trades off bus efficiency to improve latency. The packet si
 Summary of sizes:
 
 HTS:  1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32786 KB
+
 LLC:  64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024 BYTES
 
 
