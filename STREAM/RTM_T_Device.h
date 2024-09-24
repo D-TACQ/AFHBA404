@@ -12,78 +12,43 @@
 #ifndef RTM_T_DEVICE_H_
 #define RTM_T_DEVICE_H_
 
-#include <map>
 #include <string>
+#include <vector>
 
 #include <fcntl.h>
 #include <unistd.h>
 
 class RTM_T_Device {
-	enum { CTRL_ROOT=-1, MINOR_REGREAD=253, MINOR_DMAREAD=254 };
+	std::string name_ctlroot;
+	std::string name_dmaread;
+	std::string name_regread;
+	std::vector<void *> host_buffers;
+	int dmaread_fd = -1;
+	int regread_fd = -1;
 
-	std::map<int, std::string> names;
-	std::map<int, void*> host_buffers;
-	std::map<int, int> handles;
+	inline int _open(const char *name, int mode = O_RDONLY);
+	inline void _close(void);
 
-	void _open(int id, int mode = O_RDWR){
-		int fp = open(names[id].c_str(), mode);
-
-		if (fp == -1){
-			perror(names[id].c_str());
-			_exit(errno);
-		}else{
-			handles[id] = fp;
-		}
-	}
-
-	void _close(void){
-		std::map<int, int>::const_iterator iter;
-
-		for (iter = handles.begin(); iter != handles.end(); ++iter){
-			close(iter->second);
-		}
-	}
-
-public:
+  public:
+	static constexpr int MAXBUF = 32; // maximum buffers per read
 	const unsigned devnum;
 	const unsigned nbuffers;
- 	const unsigned maxlen;
+	const unsigned maxlen;
 	const unsigned transfer_buffers;
 
 	RTM_T_Device(int _devnum);
-	virtual ~RTM_T_Device() {
-		_close();
-	}
-	const char *getDevice(void) {
-		return names[MINOR_DMAREAD].c_str();
-	}
-	const int getDeviceHandle(void) {
-		return handles[MINOR_DMAREAD];
-	}
-	const char *getRegsDevice(void) {
-		return names[MINOR_REGREAD].c_str();
-	}
+	virtual ~RTM_T_Device();
+	const char *getDevice(void) { return name_dmaread.c_str(); }
+	const int getDeviceHandle(void) { return dmaread_fd; }
+	const char *getRegsDevice(void) { return name_regread.c_str(); }
 	const void *getHostBufferMapping(int ibuf = 0) {
 		return host_buffers[ibuf];
 	}
-	void *getHostBufferMappingW(int ibuf = 0) {
-		return host_buffers[ibuf];
-	}
+	void *getHostBufferMappingW(int ibuf = 0) { return host_buffers[ibuf]; }
 
-	const char *getControlRoot(void) {
-		return names[CTRL_ROOT].c_str();
-	}
-	int getDevnum(void) const {
-		return devnum;
-	}
-	int next(int ibuf){
-		return ++ibuf == nbuffers? 0: ibuf;
-	}
-
-	enum {
-		MAXBUF = 32		 // maximum buffers per read
-	};
-
+	const char *getControlRoot(void) { return name_ctlroot.c_str(); }
+	int getDevnum(void) const { return devnum; }
+	int next(int ibuf) { return ++ibuf == nbuffers ? 0 : ibuf; }
 };
 
 #endif /* RTM_T_DEVICE_H_ */
