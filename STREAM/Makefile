@@ -1,7 +1,7 @@
 
 DEBUG = -g
 #DEBUG += -Og
-CXXFLAGS += -std=c++11 -fPIC -I.. -Ofast $(DEBUG)
+CXXFLAGS += -std=c++11 -fPIC -I.. -I../include -Ofast $(DEBUG)
 
 APPS = rtm-t-stream-disk  \
 	rtm-t-stream-disk-mux-AO-LLC rtm-t-stream-disk-mux-AO-STREAM \

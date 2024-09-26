@@ -74,7 +74,7 @@ flasherase:
 	cp mtd-utils/flash_erase .
 
 mmap:
-	cc -o mmap mmap.c -lpopt
+	cc -I./include -o mmap mmap.c -lpopt
 
 xiloader:
 	cc -o xiloader xiloader.c -lpopt
