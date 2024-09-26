@@ -9,8 +9,6 @@
  *  @brief interface to RTM_T Device (historic name for AFHBA404)
  */
 
-using namespace std;
-
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -39,11 +37,11 @@ RTM_T_Device::RTM_T_Device(int _devnum) :
 	char buf[120];
 
 	sprintf(buf, "/dev/rtm-t.%d", devnum);
-	names[MINOR_DMAREAD] = *new string(buf);
+	names[MINOR_DMAREAD] = buf;
 	_open(MINOR_DMAREAD);
 
 	sprintf(buf, "/dev/rtm-t.%d.regs", devnum);
-	names[MINOR_REGREAD] = * new string(buf);
+	names[MINOR_REGREAD] = buf;
 	_open(MINOR_REGREAD);
 
 	for (int ib = 0; ib < nbuffers; ++ib){
@@ -63,7 +61,7 @@ RTM_T_Device::RTM_T_Device(int _devnum) :
 	}
 
 	sprintf(buf, "/dev/rtm-t.%d.ctrl", devnum);
-	names[CTRL_ROOT] = * new string(buf);
+	names[CTRL_ROOT] = buf;
 }
 
 static int getKnob(const char* knob, unsigned* value)
@@ -117,5 +115,3 @@ static unsigned calc_maxlen(unsigned devnum)
 		exit(1);
 	}
 }
-
-
