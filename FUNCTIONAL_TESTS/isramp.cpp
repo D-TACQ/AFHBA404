@@ -66,9 +66,9 @@ void get_args(int argc, char* const argv[]){
 	case 'b':
 		G::bigendian = atoi(optarg);
 		if (G::bigendian) printf("Hello Moto\n");
+		break;
 	case 's':
 		G::step = atoi(optarg);
-		printf("%i\n", atoi(optarg));
 		break;
 	case 'i':
 		G::skip = atoi(optarg);
