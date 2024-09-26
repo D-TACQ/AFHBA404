@@ -1117,7 +1117,7 @@ static int queue_full_buffers(struct AFHBA_DEV *adev)
 	}
 
 	if (nrx){
-		if (ifilling > NBUFFERS){
+		if (ifilling > nbuffers){
 			dev_warn(pdev(adev), "ifilling > NBUFFERS?");
 			ifilling = 0;
 		}
@@ -2429,7 +2429,7 @@ int afs_open(struct inode *inode, struct file *file)
 	case MINOR_CATCHUP_HISTO:
 		return afs_histo_open(
 			inode, file,
-			adev->stream_dev->job.catchup_histo, NBUFFERS);
+			adev->stream_dev->job.catchup_histo, nbuffers);
 	default:
 		if (PD(file)->minor <= NBUFFERS_MASK){
 			return 0;
@@ -2683,9 +2683,14 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	int rc;
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
-	dev_info(pdev(adev), "afhba_stream_drv_init %s name:%s idx:%d %s", 
-		REVID, adev->name, adev->idx, FLAVOUR);
+	dev_info(pdev(adev), "%s %s name:%s idx:%d %s",
+		__FUNCTION__, REVID, adev->name, adev->idx, FLAVOUR);
 
+	if (nbuffers > NBUFFERS){
+		dev_err(pdev(adev), "%s limit nbuffers:%d to NBUFFERS:%d",
+				__FUNCTION__, nbuffers, NBUFFERS);
+		nbuffers = NBUFFERS;
+	}
 #ifdef CONFIG_GPU
 #warning CONFIG_GPU set
 	gpumem_init(adev);
@@ -2693,7 +2698,9 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	INIT_LIST_HEAD(&adev->iommu_map_list);
 	rc = afs_init_buffers(adev);
 	if (rc != 0){
-		dev_err(pdev(adev), "FAILED TO ALLOCATE buffers. Device is UNUSABLE. Please reboot and try again with smaller nbuffers");
+		dev_err(pdev(adev), "%s FAILED TO ALLOCATE buffers. Device is UNUSABLE. \n"
+				"Please reboot and try again with smaller nbuffers",
+				__FUNCTION__);
 		return rc;
 	}
 

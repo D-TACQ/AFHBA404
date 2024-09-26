@@ -10,10 +10,8 @@
 
 #include "rtm-t_ioctl.h"
 
-/* idea by John: make it a multiple of 3 to handle 96ch align case */
+/* idea by John: make default/maximum a multiple of 3 to handle 96ch align case. 66 because it's memorable */
 #define NBUFFERS	66
-
-#define NBUFFERS_FIFO	NBUFFERS
 
 #define NBUFFERS_MASK	127
 
