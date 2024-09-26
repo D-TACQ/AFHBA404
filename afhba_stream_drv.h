@@ -14,6 +14,7 @@
 #define NBUFFERS	66
 
 #define NBUFFERS_MASK	127
+#define MAXBUFFERS	 NBUFFERS_MASK	    /* some users want more buffers than 66 */
 
 #define BUFFER_LEN	0x100000
 
@@ -103,7 +104,7 @@ struct AFHBA_STREAM_DEV {
 		unsigned errors;
 		unsigned buffers_discarded;
 
-		unsigned catchup_histo[NBUFFERS];
+		unsigned catchup_histo[MAXBUFFERS];
 		int dma_started;
 
 		struct XLLC_DEF push_llc_def;

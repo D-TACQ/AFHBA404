@@ -2686,9 +2686,9 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "%s %s name:%s idx:%d %s",
 		__FUNCTION__, REVID, adev->name, adev->idx, FLAVOUR);
 
-	if (nbuffers > NBUFFERS){
-		dev_err(pdev(adev), "%s limit nbuffers:%d to NBUFFERS:%d",
-				__FUNCTION__, nbuffers, NBUFFERS);
+	if (nbuffers > MAXBUFFERS){
+		dev_err(pdev(adev), "%s limit nbuffers:%d to MAXBUFFERS:%d",
+				__FUNCTION__, nbuffers, MAXBUFFERS);
 		nbuffers = NBUFFERS;
 	}
 #ifdef CONFIG_GPU
