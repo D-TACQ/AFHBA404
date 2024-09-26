@@ -4,8 +4,7 @@ DEBUG = -g
 CXXFLAGS += -std=c++11 -fPIC -I.. -I../include -Ofast $(DEBUG)
 
 APPS = rtm-t-stream-disk  \
-	rtm-t-stream-disk-mux-AO-LLC rtm-t-stream-disk-mux-AO-STREAM \
-	librtm-t-stream.so
+	rtm-t-stream-disk-mux-AO-LLC rtm-t-stream-disk-mux-AO-STREAM 
 
 apps: $(APPS)
 
@@ -22,9 +21,6 @@ rtm-t-stream-disk-mux-AO-STREAM: rtm-t-stream-disk.o RTM_T_Device.o InlineDataHa
 	
 amx_dummy: amx_dummy.o RTM_T_Device.o
 	$(CXX) $(DEBUG) -o $@ $^ -lpopt
-
-librtm-t-stream.so: rtm-t-stream.o RTM_T_Device.o
-	$(CXX) $(DEBUG) -shared -o librtm-t-stream.so rtm-t-stream.o RTM_T_Device.o -lpopt
 
 clean:
 	rm -f *.o $(APPS)
