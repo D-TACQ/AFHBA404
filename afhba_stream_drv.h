@@ -104,7 +104,7 @@ struct AFHBA_STREAM_DEV {
 		unsigned errors;
 		unsigned buffers_discarded;
 
-		unsigned catchup_histo[MAXBUFFERS];
+		unsigned *catchup_histo;
 		int dma_started;
 
 		struct XLLC_DEF push_llc_def;

@@ -2683,6 +2683,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 	int rc;
 	adev->stream_dev = kzalloc(sizeof(struct AFHBA_STREAM_DEV), GFP_KERNEL);
 
+
 	dev_info(pdev(adev), "%s %s name:%s idx:%d %s",
 		__FUNCTION__, REVID, adev->name, adev->idx, FLAVOUR);
 
@@ -2691,6 +2692,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 				__FUNCTION__, nbuffers, MAXBUFFERS);
 		nbuffers = NBUFFERS;
 	}
+	adev->stream_dev->job.catchup_histo = kzalloc(sizeof(unsigned), nbuffers);
 #ifdef CONFIG_GPU
 #warning CONFIG_GPU set
 	gpumem_init(adev);
@@ -2720,5 +2722,6 @@ int afhba_stream_drv_del(struct AFHBA_DEV* adev)
 	dev_info(pdev(adev), "afhba_stream_drv_del()");
 	afs_init_dma_clr(adev);
 	stopWork(adev);
+	kfree(adev->stream_dev->job.catchup_histo);
 	return 0;
 }
