@@ -20,7 +20,7 @@ namespace G {
 	int step = 1; // Default step. For sample counter in spad step = 1
 	int bigendian = 0;
 	int maxerrs = 0;
-	int ignore_first_entry = 0;
+	int skip = 0;
 	const char* fname = "-";
 	bool stdin_is_list_of_fnames;
 	int verbose = 0;
@@ -71,7 +71,7 @@ void get_args(int argc, char* const argv[]){
 		printf("%i\n", atoi(optarg));
 		break;
 	case 'i':
-		G::ignore_first_entry = atoi(optarg);
+		G::skip = atoi(optarg);
 		break;
 	case 'E':
 		G::maxerrs = atoi(optarg);
@@ -95,7 +95,7 @@ void get_args(int argc, char* const argv[]){
 		G::logname = optarg;
 		break;
 	default:
-	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE -L LOGNAME -p PERIOD_REPORT\n");
+	    fprintf(stderr, "USAGE -b BIGENDIAN -m MAXCOLS -c COUNTCOL -s STEP -E MAXERRORS -N STDIN_IS_LIST_OF_FNAMES -v VERBOSE -L LOGNAME -p PERIOD_REPORT -i SKIP\n");
 	    exit(1);
 	}
     }
@@ -135,7 +135,7 @@ int isramp(FILE* fp, Calcs& calcs){
 		}
 		if (xx == calcs.xx1 + G::step) {
 			calcs.error_report = 0;
-		} else if (G::ignore_first_entry && calcs.ii==0){
+		} else if (G::skip > calcs.ii){
 			;
 		} else {
 			file_ec++;
