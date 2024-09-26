@@ -2723,5 +2723,6 @@ int afhba_stream_drv_del(struct AFHBA_DEV* adev)
 	afs_init_dma_clr(adev);
 	stopWork(adev);
 	kfree(adev->stream_dev->job.catchup_histo);
+	kfree(adev->stream_dev);
 	return 0;
 }
