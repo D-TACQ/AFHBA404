@@ -147,12 +147,13 @@ int isramp(FILE* fp, Calcs& calcs){
 			}
 			if (++calcs.error_report < 5){
 				if (!G::logname){
-					printf("%s: %d: %012llx 0x%08x 0x%08x **ERROR** Sample jump: %8d, %10ld bytes. Interval: %8llu, %10llu bytes\n",
-							G::fname,
-							calcs.error_report,
-							calcs.ii, calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned),
-							calcs.ii-calcs.previous_error, (calcs.ii-calcs.previous_error)*G::maxcols*sizeof(unsigned));
-					calcs.previous_error = calcs.ii;
+                                        printf("%s: %d |"
+					      " **ERROR** found at 0x%012llx, %8llu samples, %10llu bytes |"
+					      " Previous:0x%08x Actual:0x%08x | Jump: %8d samples, %10ld bytes.\n",
+                                                        G::fname, calcs.error_report,
+                                                        calcs.ii, calcs.ii, (calcs.ii)*G::maxcols*sizeof(unsigned),
+                                                        calcs.xx1, xx, xx - calcs.xx1, (xx-calcs.xx1)*G::maxcols*sizeof(unsigned)
+				        );
 				}
 			}
 			if (G::maxerrs && calcs.errors >= G::maxerrs){
