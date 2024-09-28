@@ -2692,7 +2692,7 @@ int afhba_stream_drv_init(struct AFHBA_DEV* adev)
 				__FUNCTION__, nbuffers, MAXBUFFERS);
 		nbuffers = NBUFFERS;
 	}
-	adev->stream_dev->job.catchup_histo = kzalloc(sizeof(unsigned), nbuffers);
+	adev->stream_dev->job.catchup_histo = kzalloc(sizeof(unsigned)*nbuffers, GFP_KERNEL);
 #ifdef CONFIG_GPU
 #warning CONFIG_GPU set
 	gpumem_init(adev);
