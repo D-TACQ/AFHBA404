@@ -1583,6 +1583,15 @@ static struct file_operations afs_fops_histo = {
 };
 
 
+static void clear_job(struct JOB *job)
+{
+	unsigned* tmp = job->catchup_histo;
+
+	memset(job, 0, sizeof(struct JOB));
+	job->catchup_histo = tmp;
+	memset(job->catchup_histo, 0, sizeof(unsigned)*nbuffers);
+}
+
 static int rtm_t_start_stream(struct AFHBA_DEV *adev, unsigned buffers_demand)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1590,7 +1599,7 @@ static int rtm_t_start_stream(struct AFHBA_DEV *adev, unsigned buffers_demand)
 
 	dev_dbg(pdev(adev), "01");
 	afs_dma_reset(adev, DMA_PUSH_SEL);
-	memset(job, 0, sizeof(struct JOB));
+	clear_job(job);
 
 	job->buffers_demand = buffers_demand;
 	if (unlikely(list_empty_careful(&sdev->bp_empties.list))){
