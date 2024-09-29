@@ -29,6 +29,17 @@ static unsigned calc_nbuffers(unsigned devnum);
 static unsigned calc_maxlen(unsigned devnum);
 static unsigned calc_transfer_buffers(unsigned devnum);
 
+void RTM_T_Device::_open(int id, int mode){
+        int fd = open(names[id].c_str(), mode);
+        if (fd == -1){
+                perror(names[id].c_str());
+                _exit(errno);
+        }else{
+                handles[id] = fd;
+        }
+}
+
+
 RTM_T_Device::RTM_T_Device(int _devnum) :
 	devnum(_devnum%100), nbuffers(calc_nbuffers(devnum)),
 	maxlen(calc_maxlen(devnum)),
@@ -62,6 +73,15 @@ RTM_T_Device::RTM_T_Device(int _devnum) :
 
 	sprintf(buf, "/dev/rtm-t.%d.ctrl", devnum);
 	names[CTRL_ROOT] = buf;
+}
+
+RTM_T_Device::~RTM_T_Device() {
+	for (auto host_buffer: host_buffers){
+		::munmap(host_buffer.second, maxlen);
+	}
+	for (auto handle: handles){
+		::close(handle.second);
+	}
 }
 
 static int getKnob(const char* knob, unsigned* value)

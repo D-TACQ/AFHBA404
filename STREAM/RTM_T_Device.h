@@ -25,35 +25,17 @@ class RTM_T_Device {
 	std::map<int, void*> host_buffers;
 	std::map<int, int> handles;
 
-	void _open(int id, int mode = O_RDWR){
-		int fp = open(names[id].c_str(), mode);
+	void _open(int id, int mode = O_RDWR);
 
-		if (fp == -1){
-			perror(names[id].c_str());
-			_exit(errno);
-		}else{
-			handles[id] = fp;
-		}
-	}
-
-	void _close(void){
-		std::map<int, int>::const_iterator iter;
-
-		for (iter = handles.begin(); iter != handles.end(); ++iter){
-			close(iter->second);
-		}
-	}
-
-public:
+	public:
 	const unsigned devnum;
 	const unsigned nbuffers;
  	const unsigned maxlen;
 	const unsigned transfer_buffers;
 
 	RTM_T_Device(int _devnum);
-	virtual ~RTM_T_Device() {
-		_close();
-	}
+	virtual ~RTM_T_Device();
+
 	const char *getDevice(void) {
 		return names[MINOR_DMAREAD].c_str();
 	}
