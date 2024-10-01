@@ -1,7 +1,7 @@
 
-CXXFLAGS=-O2 -std=c++11 
+CXXFLAGS=-O2 -std=c++11 -I../include
 #CXXFLAGS+=-fopenmp
-CFLAGS+=-O2 -std=c99
+CFLAGS+=-O2 -std=c99 -I../include
 
 all: hbfarm425 checkramp checkramp480 multisitecheckramp checkES isramp pcmp
 

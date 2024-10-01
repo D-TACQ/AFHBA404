@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <assert.h>
-#include "../local.h"
+#include "local.h"
 
 #include <iostream>
 #include <string>
