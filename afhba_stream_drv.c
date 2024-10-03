@@ -778,11 +778,11 @@ static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 		snprintf(buf, maxbuf, "acq1102_%03d.comms%X",
                                 z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
                 return 1;
-	}else if ((z_ident&0x2f060000) == 0x21060000){
+	}else if (acq_ident == 0x21060000){
 		snprintf(buf, maxbuf, "acq2106_%03d.comms%X",
 				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
 		return 1;
-	}else if ((z_ident&0x2f060000) == 0x22060000){
+	}else if (acq_ident == 0x22060000){
 		snprintf(buf, maxbuf, "acq2206_%03d.comms%X",
 				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
 		return 1;
