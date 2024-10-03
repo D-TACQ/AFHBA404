@@ -16,7 +16,7 @@ for d in /dev/rtm-t.?.ctrl /dev/rtm-t.1?.ctrl; do
                 ID=${IDP[0]}
 		if [ "x$ID" != "x" ] &&
 		   [ "$ID" != "acq2106_65535" ] && 
-		   [ "$ID" != "${ID#acq2106_*}" ] || [ "$ID" != "${ID#acq2206_*}" ] || [ "$ID" != "${ID#z7io_*}" ]; then
+		   [ "$ID" != "${ID#acq2106_*}" ] || [ "$ID" != "${ID#acq2206_*}" ] || [ "$ID" != "${ID#z7io_*}" ] || [ "$ID" != "${ID#acq1102_*}" ]; then
 			if [ $verbose -eq 0 ]; then
 				echo "$(hostname) $DN ${IDP[@]}"
 			else
