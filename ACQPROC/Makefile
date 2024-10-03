@@ -1,5 +1,5 @@
 
-CXXFLAGS+=-I. -I../include -std=c++11 -O3
+CXXFLAGS+=-I. -I.. -I../include -std=c++11 -O3
 
 APPS=acqproc acqproc_custom acqproc_broadcast_trigger acqproc_network acqproc_hpr
 

@@ -8,8 +8,8 @@
  */
 
 extern "C" {
-#include "../local.h"
-#include "../rtm-t_ioctl.h"
+#include "local.h"
+#include "rtm-t_ioctl.h"
 #include "afhba-llcontrol.h"
 
 }
