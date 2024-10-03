@@ -772,7 +772,13 @@ static void _afs_pcie_mirror_init(struct AFHBA_DEV *adev)
 
 static int is_valid_z_ident(unsigned z_ident, char buf[], int maxbuf)
 {
-	if ((z_ident&0x2f060000) == 0x21060000){
+	unsigned acq_ident = z_ident&0xff0f0000;
+
+	if (acq_ident == 0x11020000){
+		snprintf(buf, maxbuf, "acq1102_%03d.comms%X",
+                                z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
+                return 1;
+	}else if ((z_ident&0x2f060000) == 0x21060000){
 		snprintf(buf, maxbuf, "acq2106_%03d.comms%X",
 				z_ident&0x0ffff, (z_ident&0x00f00000)>>20);
 		return 1;
