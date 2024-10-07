@@ -160,8 +160,12 @@ class UutWrapper:
             if not result:
                 PR.Red('Link down: unable to fix')
                 os._exit(1)
+            
+            data_columns = 0
+            for site, chans in stream.sites.items():
+                channels_per_column  = 1 if self.api[site].data32 == '1' else 2
+                data_columns += chans // channels_per_column 
 
-            data_columns = int(sum(stream.sites.values()) / 2)
             spad_len = int(self.spad.split(',')[1])
 
             if self.args.hex_str:
