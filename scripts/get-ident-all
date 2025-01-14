@@ -12,19 +12,26 @@ for d in /dev/rtm-t.?.ctrl /dev/rtm-t.1?.ctrl; do
 	d1=${d%*.ctrl}
 	DN=${d1#*.}
 	if [ -e /dev/rtm-t.$DN.ctrl/acq_ident_port ]; then
-                read -ra IDP <<< $(cat /dev/rtm-t.$DN.ctrl/acq_ident_port)
-                ID=${IDP[0]}
+		read -ra IDP <<< $(cat /dev/rtm-t.$DN.ctrl/acq_ident_port)
+		ID=${IDP[0]}
+
 		if [ "x$ID" != "x" ] &&
 		   [ "$ID" != "acq2106_65535" ] && 
-		   [ "$ID" != "${ID#acq2106_*}" ] || [ "$ID" != "${ID#acq2206_*}" ] || [ "$ID" != "${ID#z7io_*}" ] || [ "$ID" != "${ID#acq1102_*}" ]; then
+		   [ "$ID" != "${ID#acq2106_*}" ] || [ "$ID" != "${ID#acq2206_*}" ] || [ "$ID" != "${ID#z7io_*}" ] || [ "$ID" != "${ID#acq?102_*}" ]; then
+		   
+			if [ "$ID" != "${ID#acq?102_*}" ]; then
+				ID="acq1102_${ID: -3}"
+			fi
+			PORT=${IDP[1]}
+			READ=${IDP[2]}
+
 			if [ $verbose -eq 0 ]; then
-				echo "$(hostname) $DN ${IDP[@]}"
+				echo "$(hostname) $DN $ID $PORT $READ"
 			else
-				PORT=${IDP[1]}
-                                case ${IDP[2]} in
+				case $READ in
 				+)	READ=REG;;
-                                -)      READ=CACHE;;
-                                *)      READ=ERR;;
+				-)	READ=CACHE;;
+				*)	READ=ERR;;
 				esac
 				echo "host=$(hostname) hdev=afhba.$DN hport=${PORTS[$DN]} node=/dev/rtm-t.${DN} uut=$ID uport=$PORT read=$READ"
 			fi
@@ -33,4 +40,3 @@ for d in /dev/rtm-t.?.ctrl /dev/rtm-t.1?.ctrl; do
 done
 
 exit 0
-
