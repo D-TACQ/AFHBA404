@@ -1,2 +1,3 @@
 mount -t ramfs dram /mnt
+chmod 777 /mnt
 
