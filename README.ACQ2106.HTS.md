@@ -7,16 +7,19 @@
 Initial:
 ========
 ```bash
-./scripts/load
+sudo ./scripts/load
 dmesg -c  ** see bootlog at end
 ```
 There's automated AMON (Aurora MONitor) polling to handle link up, link down.
 
 Examples stream to a ramdisk. To set up the ramdisk:
 ```bash
-./scripts/mount-ramdisk
+sudo ./scripts/mount-tmpfs-ramdisk
 ```
-
+Make ramdisk readable for user, eg user dt100:
+```
+sudo chown -R dt100.dt100 /mnt
+```
 
 Running a shot:
 ===============

@@ -19,4 +19,4 @@ OSSHARE=${OSSHARE%*G}
 MAX_SIZE=$(grep  MemTotal /proc/meminfo | awk "{ print int(\$2/1048576)-$OSSHARE }")G
 SIZE=${1:-${MAX_SIZE}}
 
-echo mount -o size=$SIZE -t tmpfs ramdisk /mnt
+mount -o size=$SIZE -t tmpfs ramdisk /mnt
