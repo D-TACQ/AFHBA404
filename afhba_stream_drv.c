@@ -431,10 +431,14 @@ u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff, int* from_cache)
 
 void _afs_write_comreg(struct AFHBA_DEV *adev, int regoff, u32 value)
 {
-	u32* dma_regs = (u32*)(adev->mappings[adev->remote_com_bar].va + COMMON_BASE);
-	void* va = &dma_regs[regoff];
-	DEV_DBG(pdev(adev), "%04lx = %08x", va-adev->remote, value);
-	writel(value, va);
+	if (adev->remote_com_bar == NO_BAR){
+		dev_err(pdev(adev), "adev->remote_com_bar == NO_BAR : use PORT A");
+	}else{
+		u32* dma_regs = (u32*)(adev->mappings[adev->remote_com_bar].va + COMMON_BASE);
+		void* va = &dma_regs[regoff];
+		DEV_DBG(pdev(adev), "%04lx = %08x", va-adev->remote, value);
+		writel(value, va);
+	}
 }
 
 void _afs_write_dmareg(struct AFHBA_DEV *adev, int regoff, u32 value)

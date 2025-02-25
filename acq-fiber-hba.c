@@ -30,7 +30,7 @@
 
 char afhba_driver_name[] = "afhba";
 char afhba__driver_string[] = "D-TACQ ACQ-FIBER-HBA Driver for ACQ400";
-char afhba__driver_version[] = "B1113";
+char afhba__driver_version[] = "B1114";
 char afhba__copyright[] = "Copyright (c) 2010/2014 D-TACQ Solutions Ltd";
 
 
@@ -489,6 +489,7 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 		adev2->peer = adev;
 		adev2->sfp = SFP_A+ib;
 		adev2->ACR = AURORA_CONTROL_REGA + ib*0x10;
+		adev2->remote_com_bar = MAP_COUNT_4G4-1;
 		if ((rc = _afhba_probe(adev2, REMOTE_BAR+ib, _init)) != 0){
 			dev_err(pdev(adev2), "ERROR failed to create device %d", ib);
 				return rc;
