@@ -153,7 +153,7 @@ module_param(oldschool,int,0644);
 MODULE_PARM_DESC(oldschool, "set 1 to force DOORBELL clear");
 
 
-#if 0
+#ifdef CONFIG_X86_IOMMU
 #define IOMMU_READ	(1 << 0)
 #define IOMMU_WRITE	(1 << 1)
 #define IOMMU_CACHE	(1 << 2) /* DMA cache coherency */
@@ -279,7 +279,8 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 	}
 }
 
-#if 0
+#ifdef CONFIG_X86_IOMMU
+#warning X86_IOMMU is defined
 int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
               phys_addr_t paddr, uint64_t size, unsigned prot)
 {
@@ -1726,7 +1727,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-#if 0
+#ifdef CONFIG_X86_IOMMU
 	if (adev->iommu_dom && host_llc_use_iommu_map){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
@@ -1765,7 +1766,8 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-#if 0
+
+#ifdef CONFIG_X86_IOMMU
 // trying to test regular x86 transfer with intel_iommu=1
 	if (host_llc_use_iommu_map && adev->iommu_dom){
 		int rc;
@@ -1795,7 +1797,8 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 int iommu_init(struct AFHBA_DEV *adev)
 {
         int rc = 0;
-#if 0
+
+#ifdef CONFIG_X86_IOMMU
         if (!iommu_present(&pci_bus_type)){
                 return 0;
         }else if (adev->iommu_dom){
@@ -1816,7 +1819,6 @@ int iommu_init(struct AFHBA_DEV *adev)
                         adev->iommu_dom->geometry.aperture_end,
                         adev->iommu_dom->geometry.force_aperture
                         );
-#if 0
         rc = iommu_domain_window_enable(adev->iommu_dom, 0, 0, 1ULL << 36,
         					 IOMMU_READ | IOMMU_WRITE);
         if (rc < 0) {
@@ -1827,7 +1829,6 @@ int iommu_init(struct AFHBA_DEV *adev)
 		dev_info(pdev(adev), "%s iommu_domain_window_enable() SUCCESS", __FUNCTION__);
 	}
 
-#endif
         if ((rc = iommu_attach_device(adev->iommu_dom, &adev->pci_dev->dev)) != 0){
                 dev_warn(pdev(adev), "%s %d IGNORE iommu_attach_device() FAIL rc %d\n",
                                 __FUNCTION__,__LINE__, rc);
@@ -1922,13 +1923,13 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	}
 
 	if (sdev->user) kfree(sdev->user);
-#if 0
+#ifdef CONFIG_X86_IOMMU
 	if (adev->iommu_dom){
 		afhba_free_iommu(adev);
 	}
-#endif
 #ifdef CONFIG_GPU
 	afhba_free_gpumem(adev);
+#endif
 #endif
 	afhba_onCloseAction(adev);
 	return afhba_release(inode, file);

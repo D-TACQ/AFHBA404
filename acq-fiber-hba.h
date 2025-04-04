@@ -49,6 +49,15 @@
 #include "gpumemdrv.h"
 #endif
 
+/* single arg class_create appears to have been back-ported to 5.14 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,17,0)
+*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define CLASS_CREATE(name) class_create(name)
+#else
+#define CLASS_CREATE(name) class_create(THIS_MODULE, name)
+#endif
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
 #define PDE_DATA(in)	pde_data(in)
 #endif

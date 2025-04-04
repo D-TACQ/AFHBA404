@@ -6,6 +6,8 @@
 # to build everything for gpu: GPU=1 make
 # to clean everything for gpu: GPU=1 make clean
 #
+# to build for IOMMU on x86 (did not work for me, YMMV_
+# X86_IOMMU=1 make
 
 obj-m += afhba.o
 #obj-m += afhbaspi.o
@@ -22,11 +24,17 @@ ifeq ($(GPU),1)
 # enable next two lines for GPU
 EXTRA_CFLAGS += -I/usr/src/nvidia-460.32.03/nvidia/
 KBUILD_EXTRA_SYMBOLS := /home/dt100/NVIDIA-Linux-x86_64-460.32.03/kernel/Module.symvers
-EXTRA_CFLAGS += -DCONFIG_GPU
+EXTRA_CFLAGS += -DCONFIG_GPU -DCONFIG_X86_IOMMU
 EXTRA_GPU = afhba_gpu.o
 GPU_APPS = gpu_apps
 GPU_APPS_CLEAN = gpu_apps_clean
 endif
+
+ifeq ($(X86_IOMMU),1)
+EXTRA_CFLAGS += -DCONFIG_X86_IOMMU
+endif
+
+
 
 
 # default build is the local kernel.
