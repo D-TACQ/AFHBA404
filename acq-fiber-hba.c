@@ -604,7 +604,8 @@ int __init afhba_init_module(void)
 	     afhba__driver_version,
 	     afhba__copyright);
 
-	afhba_device_class = class_create(THIS_MODULE, "afhba");
+//	afhba_device_class = class_create(THIS_MODULE, "afhba");
+        afhba_device_class = class_create("afhba");
 	rc = pci_register_driver(&afhba_driver);
 	return rc;
 }

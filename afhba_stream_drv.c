@@ -279,7 +279,7 @@ static int _write_ram_descr(struct AFHBA_DEV *adev, unsigned offset, int idesc, 
 	}
 }
 
-
+#if 0
 int afhba_iommu_map(struct AFHBA_DEV *adev, unsigned long iova,
               phys_addr_t paddr, uint64_t size, unsigned prot)
 {
@@ -317,7 +317,7 @@ void afhba_free_iommu(struct AFHBA_DEV *adev)
                 kfree(saved_mapping);
         }
 }
-
+#endif
 
 static int validate_dma_descriptor_ram(
 		struct AFHBA_DEV *adev, unsigned offset, unsigned max_id, int phase)
@@ -1726,7 +1726,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
-
+#if 0
 	if (adev->iommu_dom && host_llc_use_iommu_map){
 		int rc;
 		size_t size = (xllc_def->len/PAGE_SIZE + (xllc_def->len&(PAGE_SIZE-1))!=0)*PAGE_SIZE;
@@ -1742,7 +1742,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 								__FUNCTION__, xllc_def->pa, rc);
 		}
 	}
-
+#endif
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 	afs_load_llc_single_dma(adev, DMA_PUSH_SEL, xllc_def->pa, xllc_def->len);
 	spin_lock(&sdev->job_lock);
@@ -1765,6 +1765,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 	if (xllc_def->pa == RTM_T_USE_HOSTBUF){
 		xllc_def->pa = sdev->hbx[0].pa;
 	}
+#if 0
 // trying to test regular x86 transfer with intel_iommu=1
 	if (host_llc_use_iommu_map && adev->iommu_dom){
 		int rc;
@@ -1778,6 +1779,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 					__FUNCTION__, xllc_def->pa, rc);
 		}
 	}
+#endif
 	afs_dma_reset(adev, DMA_PULL_SEL);
 	afs_load_llc_single_dma(adev, DMA_PULL_SEL, xllc_def->pa, xllc_def->len);
 	return 0;
@@ -1793,7 +1795,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 int iommu_init(struct AFHBA_DEV *adev)
 {
         int rc = 0;
-
+#if 0
         if (!iommu_present(&pci_bus_type)){
                 return 0;
         }else if (adev->iommu_dom){
@@ -1833,6 +1835,7 @@ int iommu_init(struct AFHBA_DEV *adev)
                 return -rc;
         }
         dev_info(pdev(adev), "%s iommu_attach_device() SUCCESS", __FUNCTION__);
+#endif
         return rc;
 }
 
@@ -1919,10 +1922,11 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	}
 
 	if (sdev->user) kfree(sdev->user);
-
+#if 0
 	if (adev->iommu_dom){
 		afhba_free_iommu(adev);
 	}
+#endif
 #ifdef CONFIG_GPU
 	afhba_free_gpumem(adev);
 #endif
