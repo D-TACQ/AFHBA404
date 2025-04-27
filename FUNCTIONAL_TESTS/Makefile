@@ -3,7 +3,9 @@ CXXFLAGS=-O2 -std=c++11 -I../include
 #CXXFLAGS+=-fopenmp
 CFLAGS+=-O2 -std=c99 -I../include
 
-all: hbfarm425 checkramp checkramp480 multisitecheckramp checkES isramp pcmp
+APPS = hbfarm425 checkramp checkramp480 multisitecheckramp checkES isramp pcmp
+
+all: $(APPS)
 
 clean:
 	rm -f hbfarm425 checkramp
@@ -15,9 +17,11 @@ multisitecheckramp:
 pcmp: pcmp.cpp
 	g++ $(CXXFLAGS) pcmp.cpp -o pcmp -lpopt
 
-myinstall:
-	cp hbfarm425 checkramp checkramp480 multisitecheckramp ~/bin
+install: all
+	cp $(APPS) /usr/local/bin
 
-install:
-	cp hbfarm425 checkramp /usr/local/bin
+install_user: all
+	cp $(APPS) $(HOME)/bin
+
+
 	
