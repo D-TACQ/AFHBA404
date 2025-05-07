@@ -91,7 +91,7 @@ THCHAN0=0 THCHAN1=32 VERBOSE=0 RTPRIO=10 NTRIGGERS=1 HW=1 ./ACQPROC/acqproc_broa
 ## Run with hardware
  ```
  ./scripts/acqproc_config_freerunning_acq435 --acq435SR 100000 @ACQPROC/configs/news32.json
- RTPRIO=10 NTRIGGERS=1 HW=N ./acqproc_broadcast_trigger configs/news32.json 1000000
+ RTPRIO=10 NTRIGGERS=1 HW=1 ./acqproc_broadcast_trigger configs/news32.json 1000000
 
  ```
 ### Example: SR=100kHz, HW=1, signal=5kHz
