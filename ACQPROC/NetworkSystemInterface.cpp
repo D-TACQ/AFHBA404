@@ -31,7 +31,7 @@ protected:
 	virtual void receivePacket()
 	{
 		if (A_PACKET_IS_WAITING){
-			fread(OUT.AO16, AO16_count(), sizeof(short), fp_in);
+			int nread = fread(OUT.AO16, AO16_count(), sizeof(short), fp_in);
 		}
 	}
 public:

@@ -230,7 +230,7 @@ static ssize_t show_buffer_len(
 static DEVICE_ATTR(buffer_len, (S_IRUGO|S_IWUSR|S_IWGRP), show_buffer_len, store_buffer_len);
 
 
-char* getFlags(u32 stat, char buf[], int maxbuf)
+static char* getFlags(u32 stat, char buf[], int maxbuf)
 {
 	int cursor = 0;
 #define STRCAT(lbl, value)  	cursor += snprintf(buf+cursor, maxbuf-cursor, "%s=%d ", (lbl), (value))

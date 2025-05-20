@@ -317,7 +317,7 @@ static int iommu_proc_open(struct inode *inode, struct file *file)
         return single_open(file, iommu_proc_show, file);
 }
 
-int addIommuMapProcFile(struct AFHBA_DEV *adev)
+static int addIommuMapProcFile(struct AFHBA_DEV *adev)
 {
 	PROC_OPS(iommu_proc_fops, iommu_proc_open, seq_read, seq_lseek, single_release);
 

@@ -90,7 +90,7 @@ static int minor2bar(struct AFHBA_DEV *adev, int iminor)
 }
 #define VALID_BAR(bar)	((bar) != NO_BAR)
 
-
+static
 ssize_t bar_read(
 	struct file *file, char *buf, size_t count, loff_t *f_pos, int BAR)
 {
@@ -125,7 +125,7 @@ ssize_t bar_read(
 
 
 
-ssize_t bar_write(
+static ssize_t bar_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos,
 	int BAR, int OFFSET)
 {
@@ -157,7 +157,7 @@ ssize_t bar_write(
 	return count;
 }
 
-int afhba_open(struct inode *inode, struct file *file)
+static int afhba_open(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDevice(MAJOR(inode->i_rdev));
 
@@ -187,18 +187,20 @@ int afhba_open(struct inode *inode, struct file *file)
 		}
 	}
 }
-ssize_t afhba_read(struct file *file, char __user *buf, size_t count, loff_t *f_pos)
+static ssize_t afhba_read(struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 {
 	struct AFHBA_DEV *adev = DEV(file);
 	return bar_read(file, buf, count, f_pos, minor2bar(adev, PD(file)->minor));
 }
 
-ssize_t afhba_write(
+static ssize_t afhba_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos)
 {
 	return bar_write(file, buf, count, f_pos, REGS_BAR, 0);
 }
-int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
+
+#ifdef PGMCOMOUT
+static int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	int bar = minor2bar(adev, PD(file)->minor);
@@ -219,8 +221,9 @@ int afhba_mmap_bar(struct file* file, struct vm_area_struct* vma)
 		return 0;
 	}
 }
+#endif
 
-int afhba_mmap_hb(struct file* file, struct vm_area_struct* vma)
+static int afhba_mmap_hb(struct file* file, struct vm_area_struct* vma)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct HostBuffer* hb = adev->hb1;
@@ -250,7 +253,7 @@ int afhba_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
-void afhba_map(struct AFHBA_DEV *adev)
+static void afhba_map(struct AFHBA_DEV *adev)
 {
 	struct pci_dev *dev = adev->pci_dev;
 	int imap;
@@ -327,7 +330,7 @@ static void init_buffers(struct AFHBA_DEV* adev)
 }
 
 
-struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
+static struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
 {
 	static int idx;
 	struct AFHBA_DEV *adev = kzalloc(sizeof(struct AFHBA_DEV), GFP_KERNEL);
@@ -342,7 +345,7 @@ struct AFHBA_DEV *adevCreate(struct pci_dev *dev)
 	return adev;
 }
 
-void adevDelete(struct AFHBA_DEV* adev)
+static void adevDelete(struct AFHBA_DEV* adev)
 {
 	kfree(adev);
 }
@@ -351,7 +354,7 @@ void adevDelete(struct AFHBA_DEV* adev)
 
 #define AFHBA_PCI_CMD (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY)
 
-void force_busmaster_mode(struct AFHBA_DEV* adev)
+static void force_busmaster_mode(struct AFHBA_DEV* adev)
 {
 	u16 cmd;
 
@@ -365,7 +368,7 @@ void force_busmaster_mode(struct AFHBA_DEV* adev)
 	}
 }
 
-int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
+static int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 		int (*stream_drv_init)(struct AFHBA_DEV* adev))
 {
 	static struct file_operations afhba_fops = {
@@ -431,7 +434,7 @@ int _afhba_probe(struct AFHBA_DEV* adev, int remote_bar,
 	return rc;
 }
 
-int null_stream_drv_init(struct AFHBA_DEV* adev)
+static int null_stream_drv_init(struct AFHBA_DEV* adev)
 {
 	dev_warn(pdev(adev), "null_stream_drv_init STUB");
 	return 0;
@@ -439,7 +442,7 @@ int null_stream_drv_init(struct AFHBA_DEV* adev)
 #define STREAM		afhba_stream_drv_init
 #define NOSTREAM	null_stream_drv_init
 
-int afhba2_probe(struct AFHBA_DEV *adev)
+static int afhba2_probe(struct AFHBA_DEV *adev)
 {
 	int rc;
 	dev_info(pdev(adev), "AFHBA 4G 2-port firmware detected");
@@ -463,7 +466,7 @@ int afhba2_probe(struct AFHBA_DEV *adev)
 		return rc;
 	}
 }
-int afhba4_probe(struct AFHBA_DEV *adev)
+static int afhba4_probe(struct AFHBA_DEV *adev)
 {
 	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
 	int rc;
@@ -497,7 +500,7 @@ int afhba4_probe(struct AFHBA_DEV *adev)
 	}
 	return 0;
 }
-int afhba_mtca_probe(struct AFHBA_DEV *adev)
+static int afhba_mtca_probe(struct AFHBA_DEV *adev)
 {
 	int (*_init)(struct AFHBA_DEV* adev) = afhba4_stream? STREAM: NOSTREAM;
 
@@ -514,7 +517,7 @@ int afhba_mtca_probe(struct AFHBA_DEV *adev)
 	return _afhba_probe(adev, REMOTE_BAR, _init);
 }
 
-int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
+static int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 {
 	struct AFHBA_DEV *adev = adevCreate(dev);
 
@@ -550,7 +553,7 @@ int afhba_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 		return -ENODEV;
 	}
 }
-void afhba_remove (struct pci_dev *dev)
+static void afhba_remove (struct pci_dev *dev)
 {
 	struct AFHBA_DEV *adev = afhba_lookupDevicePci(dev);
 
@@ -595,7 +598,7 @@ static struct pci_driver afhba_driver = {
 	.remove = afhba_remove
 };
 
-int __init afhba_init_module(void)
+static int __init afhba_init_module(void)
 {
 	int rc;
 
@@ -609,7 +612,7 @@ int __init afhba_init_module(void)
 	return rc;
 }
 
-void afhba_exit_module(void)
+static void afhba_exit_module(void)
 {
 	class_destroy(afhba_device_class);
 	pci_unregister_driver(&afhba_driver);

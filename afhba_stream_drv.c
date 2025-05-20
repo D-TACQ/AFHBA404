@@ -194,7 +194,7 @@ static int getAFDMAC_Order(int len)
 	return order;
 }
 
-void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
+static void init_descriptors_ht(struct AFHBA_STREAM_DEV *sdev)
 {
 	int ii;
 
@@ -398,7 +398,7 @@ int afhba_onCloseAction(struct AFHBA_DEV* adev) {
 	return rc;
 }
 
-u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
+static u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
 {
 	u32* dma_regs = (u32*)(adev->remote + ZYNQ_BASE);
 	void* va = &dma_regs[regoff];
@@ -410,7 +410,7 @@ u32 _afs_read_zynqreg_raw(struct AFHBA_DEV *adev, int regoff)
 }
 
 #define FROM_CACHE_NOCHECK 0
-u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff, int* from_cache)
+static u32 _afs_read_zynqreg(struct AFHBA_DEV *adev, int regoff, int* from_cache)
 {
 	int _from_cache = 0;
 	u32 rv;
@@ -491,7 +491,7 @@ static void afs_load_push_descriptor(struct AFHBA_DEV *adev, int idesc)
 	}
 }
 
-void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
+static void afs_load_pull_descriptor(struct AFHBA_DEV *adev, int idesc)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	if (sdev->pull_descr_ram){
@@ -1010,7 +1010,7 @@ static void queue_free_buffers(struct AFHBA_DEV *adev)
         }
 }
 
-struct HostBuffer* hb_from_descr(struct AFHBA_DEV *adev, u32 inflight_descr)
+static struct HostBuffer* hb_from_descr(struct AFHBA_DEV *adev, u32 inflight_descr)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	int ii;
@@ -1158,7 +1158,7 @@ static void init_histo_buffers(struct AFHBA_STREAM_DEV* sdev)
 	}
 }
 
-int afs_init_buffers(struct AFHBA_DEV* adev)
+static int afs_init_buffers(struct AFHBA_DEV* adev)
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
 	struct HostBuffer *hb;
@@ -1263,7 +1263,8 @@ int afs_init_buffers(struct AFHBA_DEV* adev)
 	return 0;
 }
 
-irqreturn_t afs_cos_isr(int irq, void *data)
+#ifdef PGMCOMOUT
+static irqreturn_t afs_cos_isr(int irq, void *data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
@@ -1274,13 +1275,14 @@ irqreturn_t afs_cos_isr(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-irqreturn_t afs_null_isr(int irq, void* data)
+static irqreturn_t afs_null_isr(int irq, void* data)
 {
 	struct AFHBA_DEV* adev = (struct AFHBA_DEV*)data;
 
 	dev_info(pdev(adev), "afs_null_isr %d", irq);
 	return IRQ_HANDLED;
 }
+#endif
 
 // static int hook_interrupts(struct AFHBA_DEV* adev)
 // {
@@ -1405,13 +1407,13 @@ static void check_fifo_status(struct AFHBA_DEV* adev)
 #endif
 }
 
-int job_is_go(struct JOB* job)
+static int job_is_go(struct JOB* job)
 {
 	return !job->please_stop && job->buffers_queued < job->buffers_demand;
 }
 
 
-int load_buffers(struct AFHBA_DEV* adev)
+static int load_buffers(struct AFHBA_DEV* adev)
 /* return 0 on success */
 {
 	struct AFHBA_STREAM_DEV* sdev = adev->stream_dev;
@@ -1426,7 +1428,7 @@ int load_buffers(struct AFHBA_DEV* adev)
        	}
 }
 
-int start_job(struct AFHBA_DEV* adev)
+static int start_job(struct AFHBA_DEV* adev)
 /* returns 0 on success */
 {
 	int retry = 0;
@@ -1563,7 +1565,7 @@ static void stopWork(struct AFHBA_DEV *adev)
 	}
 }
 
-ssize_t afs_histo_read(
+static ssize_t afs_histo_read(
 	struct file *file, char *buf, size_t count, loff_t *f_pos)
 {
 	unsigned *the_histo = PD(file)->private;
@@ -1627,7 +1629,7 @@ static int rtm_t_start_stream(struct AFHBA_DEV *adev, unsigned buffers_demand)
 	return 0;
 }
 
-int afs_histo_open(struct inode *inode, struct file *file, unsigned *histo, int hcount)
+static int afs_histo_open(struct inode *inode, struct file *file, unsigned *histo, int hcount)
 {
 	file->f_op = &afs_fops_histo;
 	PD(file)->private = histo;
@@ -1668,7 +1670,7 @@ int afs_reset_buffers(struct AFHBA_DEV *adev)
 }
 
 
-void afs_stop_llc_push(struct AFHBA_DEV *adev)
+static void afs_stop_llc_push(struct AFHBA_DEV *adev)
 {
 	DEV_DBG(pdev(adev), "afs_stop_llc_push()");
 	DEV_DBG(pdev(adev), "afs_dma_set_recycle(0)");
@@ -1677,25 +1679,25 @@ void afs_stop_llc_push(struct AFHBA_DEV *adev)
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 }
 
-void afs_stop_llc_pull(struct AFHBA_DEV *adev)
+static void afs_stop_llc_pull(struct AFHBA_DEV *adev)
 {
 	dev_info(pdev(adev), "afs_stop_llc_pull()");
 	afs_dma_reset(adev, DMA_PULL_SEL);
 }
 
-void afs_stop_stream_push(struct AFHBA_DEV *adev)
+static void afs_stop_stream_push(struct AFHBA_DEV *adev)
 {
 	dev_info(pdev(adev), "afs_stop_stream_push()");
 	afs_dma_reset(adev, DMA_PUSH_SEL);
 }
 
-void afs_stop_stream_pull(struct AFHBA_DEV *adev)
+static void afs_stop_stream_pull(struct AFHBA_DEV *adev)
 {
 	dev_info(pdev(adev), "afs_stop_stream_pull()");
 	afs_dma_reset(adev, DMA_PULL_SEL);
 }
 
-int push_dma_timeout(struct AFHBA_DEV *adev)
+static int push_dma_timeout(struct AFHBA_DEV *adev)
 /* called with job_lock ON */
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1713,7 +1715,7 @@ int push_dma_timeout(struct AFHBA_DEV *adev)
 	}
 	return 0;
 }
-long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
+static long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
@@ -1756,7 +1758,7 @@ long afs_start_ai_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 
 
 
-long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
+static long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 
@@ -1794,7 +1796,7 @@ long afs_start_ao_llc(struct AFHBA_DEV *adev, struct XLLC_DEF* xllc_def)
  *  lazy init : will return quickly if not required or already done.
  * MUST be AFTER buffer allocation.
  */
-int iommu_init(struct AFHBA_DEV *adev)
+static int iommu_init(struct AFHBA_DEV *adev)
 {
         int rc = 0;
 
@@ -1841,7 +1843,7 @@ int iommu_init(struct AFHBA_DEV *adev)
 }
 
 
-int afs_dma_open(struct inode *inode, struct file *file)
+static int afs_dma_open(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1880,7 +1882,7 @@ int afs_dma_open(struct inode *inode, struct file *file)
 }
 
 
-int afs_dma_release(struct inode *inode, struct file *file)
+static int afs_dma_release(struct inode *inode, struct file *file)
 {
 	struct AFHBA_DEV *adev = PD(file)->dev;
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
@@ -1935,7 +1937,7 @@ int afs_dma_release(struct inode *inode, struct file *file)
 	return afhba_release(inode, file);
 }
 
-ssize_t afs_dma_read(
+static ssize_t afs_dma_read(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 /** returns when buffer[s] available
  * data is buffer index as array of unsigned
@@ -2037,7 +2039,7 @@ static unsigned int afs_dma_poll(struct file* file, poll_table *poll_table)
 	return mask;
 }
 
-ssize_t afs_dma_read_poll(
+static ssize_t afs_dma_read_poll(
 	struct file *file, char __user *buf, size_t count, loff_t *f_pos)
 /** returns when buffer[s] available
  * data is buffer index as array of unsigned
@@ -2102,7 +2104,7 @@ read99:
 
 
 
-ssize_t afs_dma_write(
+static ssize_t afs_dma_write(
 	struct file *file, const char *buf, size_t count, loff_t *f_pos)
 /** write completed data.
  * data is array of full buffer id's
@@ -2177,7 +2179,7 @@ write99:
 }
 
 
-int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
+static int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
 /* descriptors are power of 2 * 1K .. attempt to fit in 2 descs.. */
 {
 	int nblocks = ab->buffers[0].len/1024;
@@ -2203,7 +2205,7 @@ int fix_dma_buff_size(struct AB *ab, struct XLLC_DEF *xdef)
 	printk("ERROR: fix_dma_descriptors BUFFER TOO LONG");
 	return 0;
 }
-long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
+static long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
@@ -2239,7 +2241,7 @@ long afs_start_AI_AB(struct AFHBA_DEV *adev, struct AB *ab)
 }
 
 
-long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel)
+static long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel)
 {
 	struct AFHBA_STREAM_DEV *sdev = adev->stream_dev;
 	struct JOB* job = &sdev->job;
@@ -2287,7 +2289,7 @@ long afs_start_ABN(struct AFHBA_DEV *adev, struct ABN *abn, enum DMA_SEL dma_sel
 }
 
 
-long afs_dma_ioctl(struct file *file,
+static long afs_dma_ioctl(struct file *file,
                         unsigned int cmd, unsigned long arg)
 /** **ioctl** entry point */
 {
@@ -2378,7 +2380,7 @@ long afs_dma_ioctl(struct file *file,
 
 }
 
-int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
+static int afs_mmap_host(struct file* file, struct vm_area_struct* vma)
 /**
  * **mmap** the host buffer.
  */
@@ -2428,7 +2430,7 @@ static struct file_operations afs_fops_dma_poll = {
 };
 
 
-int afs_open(struct inode *inode, struct file *file)
+static int afs_open(struct inode *inode, struct file *file)
 /** **open** entry point */
 {
 	struct AFHBA_DEV *adev = DEV(file);
@@ -2680,7 +2682,7 @@ static const struct attribute *dev_attrs[] = {
 };
 
 
-void afs_create_sysfs(struct AFHBA_DEV *adev)
+static void afs_create_sysfs(struct AFHBA_DEV *adev)
 {
 	const struct attribute ** attrs = dev_attrs;
 	int rc;
