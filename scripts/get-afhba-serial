@@ -1,3 +1,4 @@
 #!/bin/bash
-sudo lspci -vv | grep -i Xilinx -A 37 | grep Serial | awk '{print $7}'
+#sudo lspci -vv | grep -i Xilinx -A 50 | grep Serial | awk '{print $7}'
+sudo lspci -vv  | grep "Device Serial Number af-ba" | awk '{print $7}'
 
