@@ -311,7 +311,7 @@ class Stream:
         return cmd
         
     def run(self, cmd):
-        self.process = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.process = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         time_start = time.time()
         pid = afhba404.get_stream_pid(self.lport)
         while True:
