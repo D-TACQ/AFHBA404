@@ -39,6 +39,7 @@
 
 
 #include "afhba-llcontrol-common.h"
+#include <sys/time.h>
 
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 
@@ -236,6 +237,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	int ab = 0;
 	int rtfails = 0;
 	unsigned pollcat = 0;
+    struct timeval t0, t1;
 
 	mlockall(MCL_CURRENT);
 	memset(bufferAB[0], 0, VI_LEN);
@@ -260,6 +262,8 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		control(0, ai_buffer);
         if (ib){
             pollcat_stats(pollcat, 0);
+        }else{
+            gettimeofday(&t0, 0);
         }
 		TLATCH(ai_buffer)[1] = ib != 0? pollcat: 0;
 		TLATCH(ai_buffer)[2] = ib != 0? difftime_us(): 0;
@@ -269,6 +273,15 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			print_sample(ib*samples_buffer, TLATCH(ai_buffer)[0]);
 		}
 	}
+    gettimeofday(&t1, 0);
+    { 
+        struct timeval tt;
+        double run_time;
+        timersub(&t1, &t0, &tt);
+        run_time = tt.tv_sec + tt.tv_usec/1000000;
+        fprintf(stderr, "run time %.3fs ", run_time);
+    }
+
     pollcat_stats(0, 1);
 	if (rtfails){
 		fprintf(stderr, "ERROR: rtfails:%d\n", rtfails);
