@@ -218,6 +218,7 @@ void setup_logging(int devnum)
 
 }
 
+int tlatch_action_step = 1;
 void check_tlatch_action(void *local_buffer)
 {
 	static unsigned tl0;
@@ -225,7 +226,7 @@ void check_tlatch_action(void *local_buffer)
 	short *ai_buffer = (short*)local_buffer;
 
 	unsigned tl1 = *TLATCH(local_buffer);
-	if (tl1 != tl0+1){
+	if (tl0==0 && tl1!=1 || tl0!=0 && tl1 != tl0+tlatch_action_step){
 		if (++errcount < 100){
 			printf("%d => %d\n", tl0, tl1);
 		}else if (errcount == 100){

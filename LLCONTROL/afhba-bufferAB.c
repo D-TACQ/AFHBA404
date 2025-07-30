@@ -66,7 +66,7 @@ int G_POLARITY = 1;
 /** env POLARITY=-1 negates feedback this is usefult to know that the 
  *  software is in fact doing something 					 */
 
-
+int yield;
 
 #define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
 #undef NSHORTS
@@ -95,15 +95,19 @@ void (*G_control)(short *ao, short *ai) = control_none;
 
 
 int mon_chan = 0;
+int nprint;
 
 void ui(int argc, char* argv[])
 {
 	if (getenv("LOG_FILE")){
 		log_file = getenv("LOG_FILE");
 	}
-        if (getenv("RTPRIO")){
+    if (getenv("RTPRIO")){
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
-        }
+    }
+    if (getenv("YIELD")){
+        yield = atoi(getenv("YIELD"));
+    }
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
 	}
@@ -125,9 +129,9 @@ void ui(int argc, char* argv[])
 		G_POLARITY = atoi(getenv("POLARITY"));
 		fprintf(stderr, "G_POLARITY set %d\n", G_POLARITY);
 	}
-        if (getenv("AFFINITY")){
-                setAffinity(strtol(getenv("AFFINITY"), 0, 0));
-        }
+    if (getenv("AFFINITY")){
+        setAffinity(strtol(getenv("AFFINITY"), 0, 0));
+    }
 
 	if (getenv("SPADLONGS")){
 		spadlongs = atoi(getenv("SPADLONGS"));
@@ -137,6 +141,7 @@ void ui(int argc, char* argv[])
 
 	if (argc > 1){
 		nsamples = atoi(argv[1]);
+        nprint = nsamples/10;
 	}
 	if (argc > 2){
 		samples_buffer = atoi(argv[2]);
@@ -146,6 +151,7 @@ void ui(int argc, char* argv[])
 		const char* acts = getenv("ACTION");
 		if (strcmp(acts, "check_tlatch") == 0){
 			G_action = check_tlatch_action;
+            tlatch_action_step = samples_buffer;
 		}
 	}
 }
@@ -185,7 +191,7 @@ void setup()
 
 void print_sample(unsigned sample, unsigned tl)
 {
-	if (sample%10000 == 0){
+	if (sample%nprint == 0){
 		printf("[%10u] %10u\n", sample, tl);
 	}
 }
@@ -201,6 +207,24 @@ void control_none(short *xo, short *ai)
 #define MARKER 0xdeadc0d1
 
 
+void pollcat_stats(unsigned pollcat, unsigned print)
+{
+    static unsigned npolls = 0;
+    static unsigned minpoll = 999999999;
+    static unsigned maxpoll = -1000;
+    static unsigned long long totpoll;
+
+    if (print){
+        fprintf(stderr, "pollcat stats yield:%d rtprio:%d npolls:%u min:%u max:%u,0x%08x mean:%llu\n",
+                yield, sched_fifo_priority,
+                npolls, minpoll, maxpoll, maxpoll, totpoll/npolls);
+    }else{
+        ++npolls;
+        if (pollcat < minpoll) minpoll = pollcat;
+        if (pollcat > maxpoll) maxpoll = pollcat;
+        totpoll += pollcat;
+    }
+}
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
@@ -210,10 +234,9 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	int nbuffers = nsamples/samples_buffer;
 	int ab = 0;
 	int rtfails = 0;
-	int pollcat = 0;
+	unsigned pollcat = 0;
 
 	mlockall(MCL_CURRENT);
-	memset(bufferAB[0], 0, VI_LEN/2);
 	memset(bufferAB[0], 0, VI_LEN);
 	memset(bufferAB[1], 0, VI_LEN);
 	EOB(bufferAB[0]) = MARKER;
@@ -226,8 +249,12 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		}
 
 		while((tl1 = EOB(bufferAB[ab])) == MARKER){
-			sched_yield();
-			++pollcat;
+            if (yield){
+                sched_yield();
+            }
+            if (ib){
+    			pollcat_stats(++pollcat, 0);
+            }
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		EOB(bufferAB[ab]) = MARKER;
@@ -237,9 +264,10 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		action(ai_buffer);
 
 		if (verbose){
-			print_sample(ib, tl1);
+			print_sample(ib*samples_buffer, TLATCH(ai_buffer)[0]);
 		}
 	}
+    pollcat_stats(0, 1);
 	if (rtfails){
 		fprintf(stderr, "ERROR: rtfails:%d\n", rtfails);
 	}
