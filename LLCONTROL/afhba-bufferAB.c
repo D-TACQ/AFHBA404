@@ -241,7 +241,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	memset(bufferAB[1], 0, VI_LEN);
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
-	for (ib = 0; ib <= nbuffers; ++ib, tl1, ab = !ab, pollcat = 0){
+	for (ib = 0; ib <= nbuffers; ++ib, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
 			EOB(bufferAB[ab]) = MARKER;
