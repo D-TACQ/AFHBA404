@@ -228,7 +228,6 @@ void pollcat_stats(unsigned pollcat, unsigned print)
 void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 {
 	short* ai_buffer = calloc(NSHORTS, sizeof(short));
-	unsigned tl1;
 	unsigned ib;
 	int println = 0;
 	int nbuffers = nsamples/samples_buffer;
@@ -248,17 +247,17 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 			++rtfails;
 		}
 
-		while((tl1 = EOB(bufferAB[ab])) == MARKER){
+		for(; EOB(bufferAB[ab]) == MARKER; ++pollcat){
             if (yield){
                 sched_yield();
-            }
-            if (ib){
-    			pollcat_stats(++pollcat, 0);
             }
 		}
 		memcpy(ai_buffer, bufferAB[ab], VI_LEN);
 		EOB(bufferAB[ab]) = MARKER;
 		control(0, ai_buffer);
+        if (ib){
+            pollcat_stats(pollcat, 0);
+        }
 		TLATCH(ai_buffer)[1] = ib != 0? pollcat: 0;
 		TLATCH(ai_buffer)[2] = ib != 0? difftime_us(): 0;
 		action(ai_buffer);
