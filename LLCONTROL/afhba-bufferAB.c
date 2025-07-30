@@ -42,8 +42,7 @@
 
 #define HB_LEN  0x100000		/* 1MB HOST BUFFERSW */
 
-#define BUFFER_AB_OFFSET 0x040000	/* BUFFERB starts here */
-#define XO_OFF  0x080000		/* XO buffer at this offset */
+#define BUFFER_AB_OFFSET 0x080000	/* BUFFERB starts here */
 
 #define LOG_FILE	"afhba.%d.log"
 
@@ -66,7 +65,7 @@ int G_POLARITY = 1;
 /** env POLARITY=-1 negates feedback this is usefult to know that the 
  *  software is in fact doing something 					 */
 
-int yield;
+int G_yield;
 
 #define NSHORTS1 (nchan + spadlongs*sizeof(unsigned)/sizeof(short))
 #undef NSHORTS
@@ -106,7 +105,7 @@ void ui(int argc, char* argv[])
 		sched_fifo_priority = atoi(getenv("RTPRIO"));
     }
     if (getenv("YIELD")){
-        yield = atoi(getenv("YIELD"));
+        G_yield = atoi(getenv("YIELD"));
     }
 	if (getenv("VERBOSE")){
 		verbose = atoi(getenv("VERBOSE"));
@@ -169,6 +168,10 @@ void setup()
 		exit(1);
 	}
 
+    if (VI_LEN > BUFFER_AB_OFFSET){
+        fprintf(stderr, "ERROR: VI_LEN %08lx > BUFFER_AB_OFFSET %08x\n", VI_LEN, BUFFER_AB_OFFSET);
+        exit(1);
+    }
 	ab_def.buffers[0].pa = xllc_def.pa;
 	ab_def.buffers[1].pa = BUFFER_AB_OFFSET;
 	ab_def.buffers[0].len =
@@ -211,13 +214,12 @@ void pollcat_stats(unsigned pollcat, unsigned print)
 {
     static unsigned npolls = 0;
     static unsigned minpoll = 999999999;
-    static unsigned maxpoll = -1000;
+    static unsigned maxpoll = 0;
     static unsigned long long totpoll;
 
     if (print){
-        fprintf(stderr, "pollcat stats yield:%d rtprio:%d npolls:%u min:%u max:%u,0x%08x mean:%llu\n",
-                yield, sched_fifo_priority,
-                npolls, minpoll, maxpoll, maxpoll, totpoll/npolls);
+        fprintf(stderr, "pollcat stats yield:%d rtprio:%d npolls:%u min:%u max:%u mean:%llu\n",
+                G_yield, sched_fifo_priority, npolls, minpoll, maxpoll, totpoll/npolls);
     }else{
         ++npolls;
         if (pollcat < minpoll) minpoll = pollcat;
@@ -240,6 +242,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 	memset(bufferAB[1], 0, VI_LEN);
 	EOB(bufferAB[0]) = MARKER;
 	EOB(bufferAB[1]) = MARKER;
+    
 	for (ib = 0; ib <= nbuffers; ++ib, ab = !ab, pollcat = 0){
 		/* WARNING: RT: software MUST get there first, or we lose data */
 		if (EOB(bufferAB[ab]) != MARKER){
@@ -248,7 +251,7 @@ void run(void (*control)(short *ao, short *ai), void (*action)(void*))
 		}
 
 		for(; EOB(bufferAB[ab]) == MARKER; ++pollcat){
-            if (yield){
+            if (G_yield){
                 sched_yield();
             }
 		}
