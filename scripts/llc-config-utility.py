@@ -143,8 +143,8 @@ def config_distributor(args, uut, COMMS):
     uut.s0.dssb = ao_vector + TCAN*4
 
     if uut.HP32:
-        uut.s10.slice_off = ao_vector
-        uut.s10.slice_len = uut.HP32*4
+        uut.s10.slice_off = ao_vector//4
+        uut.s10.slice_len = uut.HP32
 
     return None
 
