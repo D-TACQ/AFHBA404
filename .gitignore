@@ -70,6 +70,7 @@ pwm_set_channel
 pwm_set_duty
 Module.symvers
 
+# and a bunch of build-time products NOT for git
 .acq-fiber-hba.o.d
 ACQPROC/acqproc
 ACQPROC/acqproc_broadcast_trigger
@@ -80,3 +81,14 @@ STREAM/rtm-t-stream-disk
 STREAM/librtm-t-stream.so
 mmap
 xiloader
+*.dat
+ACQPROC/acqproc_hpr
+ACQPROC/acqproc_network
+FUNCTIONAL_TESTS/isramp
+FUNCTIONAL_TESTS/pcmp
+HAPI/__pycache__/
+LLCONTROL/afhba-bufferAB
+LLCONTROL/afhba-llcontrol-cpucopy-AIAO-AO
+STREAM/rtm-t-stream-disk-mux-AO-LLC
+STREAM/rtm-t-stream-disk-mux-AO-STREAM
+runtime.json
