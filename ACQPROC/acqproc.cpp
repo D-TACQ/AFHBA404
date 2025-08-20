@@ -104,7 +104,7 @@ void configure_ctrl_c_closedown() {
 }
 
 void run_shot(HBA& hba, SystemInterface& si){
-	hba.start_shot();
+	hba.start_shot(si);
 
 	si.trigger();
 

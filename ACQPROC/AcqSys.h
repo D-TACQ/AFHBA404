@@ -84,14 +84,20 @@ public:
 /** abstract model of an ACQ2106 box. */
 class ACQ: public IO
 {
+
 protected:
 	ACQ(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets, VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
         virtual ~ACQ();
+
+        virtual void initVO(SystemInterface& systemInterface) {}
+        /*< set initial VO area for possible output prior to trigger */
+
 
 	bool nowait;			/**< newSample doesn't block for new Tlatch (eg bolo in set with non bolo uuts). */
 	unsigned wd_mask;		/**< watchdog mask. */
 	int pollcount;
 	int devnum;				/**< AFHBA404 device numbers 0..N. */
+
 public:
 	const VI vi_offsets; 	/**< byte offset for each Input type in Local Vector In */
 	const VO vo_offsets; 	/**< byte offset for each Output type in Local Vector Out */
@@ -102,6 +108,8 @@ public:
 
 	virtual bool newSample(int sample);
 	/*< checks host buffer for new sample, if so copies to lbuf and reports true */
+	virtual void init(SystemInterface& systemInterface) {}
+	/*< initVO and prepare DMA */
 	virtual void action(SystemInterface& systemInterface) {}
 	/*< early stage action */
 	virtual void action2(SystemInterface& systemInterface) {}
@@ -140,7 +148,7 @@ public:
 	static HBA& create(const char* json_def, int _maxsam);
 	static HBA& instance() { return *the_hba; }
 
-	virtual void start_shot();
+	virtual void start_shot(SystemInterface& systemInterface);
 	virtual void processSample(SystemInterface& systemInterface, int sample);
 	/**< core run time function, processSample. */
 

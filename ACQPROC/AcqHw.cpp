@@ -60,10 +60,14 @@ void _get_connected(struct Dev* dev, unsigned vi_len)
 
 }
 
-void HBA::start_shot()
+void HBA::start_shot(SystemInterface& systemInterface)
 {
 	mlockall(MCL_CURRENT);
 	goRealTime();
+
+	for (auto uut : uuts){
+		uut->init(systemInterface);
+	}
 }
 
 
@@ -135,12 +139,16 @@ protected:
 		clear_mapping(dev->fd, dev->host_buffer);
 	}
 
-
+	void updateVO(SystemInterface& systemInterface);
+	/**< gather outputs defined in SI to VO for DMA fetch */
 
 	virtual void arm(int nsamples);
 	/**< prepare to run a shot nsamples long, arm the UUT. */
 	virtual unsigned tlatch(void);
 	/**< returns latest tlatch from lbuf */
+	virtual void initVO(SystemInterface& systemInterface) {
+		updateVO(systemInterface);
+	}
 	virtual void action(SystemInterface& systemInterface);
 	/**< on newSample, copy VO from SI, copy VI to SI */
 	virtual void action2(SystemInterface& systemInterface);
@@ -150,7 +158,8 @@ protected:
 /** concrete base class. */
 class ACQ_HW: public ACQ_HW_BASE
 {
-
+protected:
+	virtual void startDMA();
 public:
 	ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor);
@@ -158,7 +167,8 @@ public:
 	{}
 	virtual bool newSample(int sample);
 	/**< checks host buffer for new sample, if so copies to lbuf and reports true */
-
+	virtual void init(SystemInterface& systemInterface);
+	/*< initVO and prepare DMA */
 };
 
 /* TLATCH now uses the dynamic set value */
@@ -171,6 +181,12 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		ACQ_HW_BASE(devnum, _name, _vi, _vo, _vi_offsets,
 						_vo_offsets, sys_vi_cursor, sys_vo_cursor)
 {
+	dev->xo_host = dev->host_buffer + (vi.len()? AO_OFFSET: 0);
+	memset(dev->xo_host, 0, vo.len());
+	dox = (unsigned *)(dev->xo_host + vo_offsets.DO32);
+}
+
+void ACQ_HW::startDMA() {
 	if (vi.len()){
 		if (ioctl(dev->fd, AFHBA_START_AI_LLC, &dev->xllc_def)){
 			perror("ioctl AFHBA_START_AI_LLC");
@@ -207,9 +223,7 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 		if (G::verbose){
 			printf("[%d] AO buf pa: 0x%08x len %d\n", dev->devnum, xo_xllc_def.pa, xo_xllc_def.len);
 		}
-		dev->xo_host = dev->host_buffer + (vi.len()? AO_OFFSET: 0);
-		memset(dev->xo_host, 0, vo.len());
-		dox = (unsigned *)(dev->xo_host + vo_offsets.DO32);
+
 
 		if (vo.DO32){
 			if(Env::getenv("DO32_HW_TRACE", 0)){
@@ -222,13 +236,16 @@ ACQ_HW::ACQ_HW(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 	}
 }
 
+void ACQ_HW::init(SystemInterface& systemInterface) {
+	initVO(systemInterface);
+	startDMA();
+}
 
 /** copy VI.field to SI.field */
 #define VITOSI(field) \
 	(vi.field && \
 	 memcpy(reinterpret_cast<char*>(systemInterface.IN.field+vi_cursor.field), dev->lbuf_vi.cursor+vi_offsets.field, \
 			vi.field*sizeof(systemInterface.IN.field[0])))
-
 
 
 void ACQ_HW_BASE::action(SystemInterface& systemInterface)
@@ -248,7 +265,6 @@ void ACQ_HW_BASE::action(SystemInterface& systemInterface)
 	((unsigned*)dev->lbuf_vi.cursor+vi_offsets.SP32)[SPIX::POLLCOUNT] = pollcount;
 	VITOSI(SP32);
 }
-
 /** copy SI.field to VO */
 #define SITOVO(field) \
 	(vo.field && \
@@ -261,23 +277,27 @@ void ACQ_HW_BASE::action(SystemInterface& systemInterface)
 	 memcpy(dev->lbuf_vo.cursor+vo_offsets.field, (char*)systemInterface.OUT.field+vo_cursor.field, \
 			 vo.field*sizeof(systemInterface.OUT.field[0])))
 
-/** in slack time, copy SI.OUT to VO archive cursor.
- * @@todo make it optional in case it takes too long */
-void ACQ_HW_BASE::action2(SystemInterface& systemInterface) {
+void ACQ_HW_BASE::updateVO(SystemInterface& systemInterface) {
 	SITOVO(AO16);
 	SITOVO(DO32);
 	if (pw32_double_buffer) SITOVO(PW32);
 	SITOVO(HP32);
+}
 
-	SITOVO2(AO16);
-	SITOVO2(DO32);
-	SITOVO2(PW32);
-	SITOVO2(CC32);
-	SITOVO2(HP32);
+
+/** in slack time, copy SI.OUT to VO archive cursor.
+ * @@todo make it optional in case it takes too long */
+void ACQ_HW_BASE::action2(SystemInterface& systemInterface) {
+	updateVO(systemInterface);
 	if (++sample < HBA::maxsam){
 		dev->lbuf_vi.cursor += vi.len();
 		dev->lbuf_vo.cursor += vo.len();
 	}
+	SITOVO2(AO16);
+	SITOVO2(DO32);
+	if (pw32_double_buffer) SITOVO2(PW32);
+	SITOVO2(CC32);
+	SITOVO2(HP32);
 	pollcount = 0;
 }
 
@@ -329,6 +349,8 @@ protected:
 	}
 	unsigned *tl0_array;
 	int verbose;
+
+	virtual void startDMA();
 public:
 	ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offsets,
 			VO _vo_offsets, VI& sys_vi_cursor, VO& sys_vo_cursor, int nbuffers);
@@ -345,6 +367,11 @@ ACQ_HW_MULTI::ACQ_HW_MULTI(int devnum, string _name, VI _vi, VO _vo, VI _vi_offs
 		nb(_nbuffers),
 		tl0_array(new unsigned[_nbuffers]),
 		verbose(Env::getenv("ACQ_HW_MULTI_VERBOSE", 0))
+{
+
+}
+
+void ACQ_HW_MULTI::startDMA()
 {
 	struct ABN abn;
 	int ib;

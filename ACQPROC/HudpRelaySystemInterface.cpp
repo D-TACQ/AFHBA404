@@ -66,6 +66,10 @@ public:
 		DUP1(_dup1)
 	{
 		if (G::verbose) printf("%s::%s DUP1:%d\n", __FILE__, PFN, DUP1);
+
+         for (int ii = 4; ii < HP32_count(); ++ii){
+             OUT.HP32[ii] = 0x12340000 + ii;           /* distinctive HudP pattern:    AI->AO (assumed), ii: "channel index number" */
+         }
 	}
 	const int DUP1;		// Duplicate this input
 	Actor& trigger;   	// HOST initiates pull trigger
