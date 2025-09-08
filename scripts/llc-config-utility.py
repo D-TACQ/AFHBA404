@@ -120,16 +120,17 @@ def config_aggregator(args, uut, COMMS):
 
 
 def config_distributor(args, uut, COMMS):
+    TCAN_MAX = 256
     TOTAL_SITES = (uut.AOSITES + uut.DOSITES + uut.PWMSITES)
     ao_vector = calculate_vector_length(uut, ASITES=uut.AOSITES, DSITES=uut.DOSITES, PWMSITES=uut.PWMSITES)
     xo_vector_sz = ao_vector + uut.HP32*4
     TCAN = uut.HP32 + calculate_tcan(xo_vector_sz)
-    if TCAN > 16:
-        print("ERROR: TCAN request:{} MAX TCAN 16".format(TCAN))
+    if TCAN > TCAN_MAX:
+        print(f"ERROR: TCAN request:{TCAN} > {TCAN_MAX}")
         sys.exit(1)
     elif TCAN == 16 and uut.HP32 == 0:
         # If the TCAN is 16 then we're just taking up space for no reason, so
-        # set it to zero. The reason we don't need this for SPAD is that we
+        # set it to zero. The reason we don't use this for SPAD is that we
         # encode some useful information in there.
         TCAN = 0
 
