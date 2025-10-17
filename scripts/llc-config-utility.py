@@ -120,17 +120,18 @@ def config_aggregator(args, uut, COMMS):
 
 
 def config_distributor(args, uut, COMMS):
-    TCAN_MAX = 256
+    TCAN_LIMIT = 256   # found empirically why? @@todo
     TOTAL_SITES = (uut.AOSITES + uut.DOSITES + uut.PWMSITES)
     ao_vector = calculate_vector_length(uut, ASITES=uut.AOSITES, DSITES=uut.DOSITES, PWMSITES=uut.PWMSITES)
     xo_vector_sz = ao_vector + uut.HP32*4
-    TCAN = uut.HP32 + calculate_tcan(xo_vector_sz)
-    if TCAN > TCAN_MAX:
-        print(f"ERROR: TCAN request:{TCAN} > {TCAN_MAX}")
+    TCAN = calculate_tcan(xo_vector_sz)
+    print(f"pgm: {TCAN} = {uut.HP32} + {calculate_tcan(xo_vector_sz)}")
+    if TCAN+uut.HP32 > TCAN_LIMIT:
+        print("ERROR: TCAN request:{} MAX TCAN {}".format(TCAN, TCAN_LIMIT))
         sys.exit(1)
     elif TCAN == 16 and uut.HP32 == 0:
         # If the TCAN is 16 then we're just taking up space for no reason, so
-        # set it to zero. The reason we don't use this for SPAD is that we
+        # set it to zero. The reason we don't need this for SPAD is that we
         # encode some useful information in there.
         TCAN = 0
 
@@ -140,7 +141,7 @@ def config_distributor(args, uut, COMMS):
     print('{} Distributor settings: sites={} pad={} comms={} on'.format(
         uut.uut, TOTAL_SITES, TCAN, COMMS))
     uut.s0.distributor = 'sites={} pad={} comms={} on'.format(
-        TOTAL_SITES, TCAN, COMMS)
+        TOTAL_SITES, TCAN+uut.HP32, COMMS)
     uut.s0.dssb = ao_vector + TCAN*4
 
     if uut.HP32:
