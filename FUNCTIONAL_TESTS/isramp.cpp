@@ -106,6 +106,7 @@ void get_args(int argc, char* const argv[]){
 
 
 struct Calcs {
+	unsigned long long samples = 0;
 	unsigned long long ii = 0;
 	unsigned long long previous_error = 0;
 	unsigned errors = 0;
@@ -128,6 +129,7 @@ int isramp(FILE* fp, Calcs& calcs){
 		if (nread != G::maxcols){
 			break;
 		}
+		G_calcs.samples++;
 		xx = buffer[G::countcol];
 
 		if (G::bigendian){
@@ -208,13 +210,13 @@ FILE* fopen_read_or_die(const char* fname){
 
 void print_report(const char* fname, int file_ec, Calcs& calcs)
 {
-	unsigned long long samples = calcs.ii/G::step;
+	unsigned long long samples = calcs.samples;
 	printf("%s status:%s cumulative: samples:%lld errors:%u error_rate:%.2f\n",
 			fname, file_ec? "ERR": "OK", samples, calcs.errors, 100.0*calcs.errors/samples);
 }
 
 void write_log(Calcs& calcs){
-	unsigned long long samples = calcs.ii/G::step;
+	unsigned long long samples = calcs.samples;
         static FILE *fp;
         if (fp == 0){
                 char filename[300];
