@@ -68,7 +68,7 @@ def init_ao(uut, slave=False):
         uut.svc[aom].lotide = 256
         # uut.s0.distributor = "sites={} comms=2 pad=0 on".format(AOSITES)
         uut.s0.distributor = "sites={} comms=A pad=0 on".format(AOSITES)
-        print "DEBUG -- distributor"
+        print("DEBUG -- distributor")
 
     if PWMSITES != "":
         for pwmsite in PWMSITES.split(','):
@@ -76,10 +76,10 @@ def init_ao(uut, slave=False):
             uut.svc[pwm].pwm_clkdiv = "%x" % (1000)
     if DOSITES != "":
 
-        print "configuring for DO"
+        print("configuring for DO")
         for site in DOSITES.split(','):
             dom = "s{}".format(site)
-            print "dom = ", dom
+            print("dom = ", dom)
             # uut.svc[dom].clkdiv = 1
             uut.svc[dom].mode = "0"
             uut.svc[dom].lotide = "256"
@@ -95,7 +95,7 @@ def init_ao(uut, slave=False):
         #TCAN = str(16 - 1)
         TCAN = "15"
         # TCAN = str(0)
-        print "XOSITES = {}, TCAN = {}, XOCOMMS = {}".format(XOSITES, TCAN, XOCOMMS)
+        print("XOSITES = {}, TCAN = {}, XOCOMMS = {}".format(XOSITES, TCAN, XOCOMMS))
         uut.s0.distributor = "sites={} pad={} comms={} on".format(XOSITES, TCAN, XOCOMMS)
 
     print("init_ao() done {} {}".format(uut.uut, aom))

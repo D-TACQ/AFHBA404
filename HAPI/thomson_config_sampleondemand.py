@@ -96,7 +96,7 @@ def init_ai(uut):
     uut.cA.aggregator = 'sites={}'.format(AISITES)
     uut.cB.spad = '1'
     uut.cB.aggregator = 'sites={}'.format(AISITES)
-    print "TRG set now Sample On Demand SOD"
+    print("TRG set now Sample On Demand SOD")
     uut.s1.sod = '1'
     uut.s1.trg = '0,0,0'
     uut.s1.clk = '1,0,1'
