@@ -71,7 +71,7 @@ RTM_T_Device::RTM_T_Device(int _devnum)
   regread_fd = _open(name);
   host_buffers.reserve(nbuffers);
   for (int ib = 0; ib < nbuffers; ++ib) {
-    sprintf(name, "/dev/rtm-t.%u.data/hb%04d", devnum, ib);
+    sprintf(name, "/dev/rtm-t.%u.data/hb%02d", devnum, ib);
     const int fd = _open(name);
     void *const va = mmap(0, maxlen, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);
