@@ -241,7 +241,7 @@ static char* getFlags(u32 stat, char buf[], int maxbuf)
 	STRCAT("HARD_ERR", 	(stat & AFHBA_AURORA_STAT_HARD_ERR) != 0);
 	STRCAT("SOFT_ERR",	(stat & AFHBA_AURORA_STAT_SOFT_ERR) != 0);
 	STRCAT("FRAME_ERR",	(stat & AFHBA_AURORA_STAT_FRAME_ERR) != 0);
-	STRCAT("CHANNEL_UP",	(stat & AFHBA_AURORA_STAT_FRAME_ERR) != 0);
+	STRCAT("CHANNEL_UP",	(stat & AFHBA_AURORA_STAT_CHANNEL_UP) != 0);
 	STRCAT("LANE_UP",	(stat & AFHBA_AURORA_STAT_LANE_UP) != 0);
 	return buf;
 }
