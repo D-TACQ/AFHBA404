@@ -36,20 +36,47 @@ Typical use case:
 
 For modern use of LLC, see [ACQPROC-README](./ACQPROC-README.md)
 
-### 2. Device driver
+### 2. Device Driver Installation
 
-Download from git:
+#### Install prerequisites:
+
+(Debian / Ubuntu)
 <pre>
-mkdir PROJECTS
-cd PROJECTS
-git clone https://github.com/D-TACQ/AFHBA404.git
+sudo apt install build-essential
+sudo apt install libpopt-dev
+</pre>
+
+(Fedora / RHEL / CentOS / Rocky)
+<pre>
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y popt-devel
+</pre>
+
+#### Clone repo:
+<pre>
+mkdir ~/PROJECTS
+cd ~/PROJECTS
+git clone https://github.com/D-TACQ/AFHBA404
 cd AFHBA404
 </pre>
-Now refer to INSTALL
+
+#### Compile and setup udev
 <pre>
 make
 sudo ./scripts/install-hotplug
 </pre>
+
+#### Install Driver (Rerun every Boot)
+<pre>
+sudo ./scripts/loadNIRQ
+</pre>
+
+#### Setup Ramdisk (Optional)
+<pre>
+sudo ./scripts/mount-ramdisk
+</pre>
+
+For more detailed instructions refer to INSTALL
 
 ### 3. Check AFHBA404 firmware
 <pre>
