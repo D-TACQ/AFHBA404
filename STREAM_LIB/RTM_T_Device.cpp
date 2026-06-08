@@ -64,7 +64,7 @@ RTM_T_Device::RTM_T_Device(int _devnum)
 
   sprintf(name, "/dev/rtm-t.%u", devnum);
   name_dmaread = name;
-  dmaread_fd = _open(name, O_RDWR);
+  dmaread_fd = _open(name);
 
   sprintf(name, "/dev/rtm-t.%u.regs", devnum);
   name_regread = name;
