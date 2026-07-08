@@ -98,5 +98,5 @@ crw-rw-r--. 1 dt100 dt100 247,  3 Apr 15 08:40 hb03
 # OPERATION
 
 see specific examples in
-README.ACQ2106.HTS
-LLCONTROL.README*
+README.ACQ2106.HTS.md
+LLCONTROL.README*.md

@@ -21,7 +21,7 @@ More typical usage:
 
 AFHBA404 may also be used to send a common trigger to multiple ACQ2106.
 
-See README.ACQ2106.HTS and STREAM/ for details.
+See README.ACQ2106.HTS.md and STREAM/ for details.
 
 #### 1.2 LLC Low Latency Control
 
@@ -130,7 +130,7 @@ network software to connect to the UUT by name.
 For further details, please refer to
 * [INSTALL](./INSTALL)
 * [README.ACQ2106.HTS](./README.ACQ2106.HTS.md)
-* [LLCONTROL/README.AFHBA404](./LLCONTROL/README.AFHBA404)
+* [LLCONTROL/README.AFHBA404](./LLCONTROL/README.AFHBA404.md)
 * Code Documentation: https://d-tacq.github.io/AFHBA404/html/index.html
 
 
