@@ -128,9 +128,9 @@ Ideally, the HOSTPC has a DNS system (/etc/hosts if no DNS) that will allow
 network software to connect to the UUT by name.
 
 For further details, please refer to
-* INSTALL
-* README.ACQ2106.HTS
-* LLCONTROL/README.AFHBA404
+* [INSTALL](./INSTALL)
+* [README.ACQ2106.HTS](./README.ACQ2106.HTS.md)
+* [LLCONTROL/README.AFHBA404](./LLCONTROL/README.AFHBA404)
 * Code Documentation: https://d-tacq.github.io/AFHBA404/html/index.html
 
 
