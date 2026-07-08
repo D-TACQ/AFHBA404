@@ -1,11 +1,10 @@
 # README.ACQ2106.HTS : High Throughput Streaming
 
-[Current HOWTO guide, with automated scripting:](https://github.com/D-TACQ/AFHBA404/releases/download/v2.7/hts_streaming_r2.pdf)
+[Current HOWTO guide, with automated scripting](https://github.com/D-TACQ/AFHBA404/releases/download/v2.7/hts_streaming_r2.pdf)
 
-## Use Case: ACQ2106+4xACQ425-16-2000 
+# Use Case: ACQ2106+4xACQ425-16-2000 
 
-Initial:
-========
+# Initial
 ```bash
 sudo ./scripts/load
 dmesg -c  ** see bootlog at end
@@ -21,8 +20,7 @@ Make ramdisk readable for user, eg user dt100:
 sudo chown -R dt100.dt100 /mnt
 ```
 
-Running a shot:
-===============
+# Running a shot
 
 The data rate is too high for a single AFHBA, use two cables, two AFHBA
 ```bash
@@ -46,9 +44,9 @@ INTCLKDIV=50 SIMULATE=1 ./scripts/hts-test-harness-AI1
 ```
 => full rate from one module. 
 
-Checklist: 
+# Checklist
 
-1. Is AFHBA Present: eg
+## 1. Is AFHBA Present?
 
 ```bash
 [root@tatooine AFHBA]# lspci -v | grep Xilinx -A 10
@@ -79,12 +77,11 @@ Unique ID : 6c-68-aa-20-f9-55-08
 AFHBA firmware revision: 0d
 ```
 
-2. After loading the device driver, but before running a shot
+## 2. After loading the device driver, but before running a shot
 
 Check the bootlog using dmesg
 
-Example Bootlog with 2 x AFHBA in one chassis
-=============================================
+Example Bootlog with 2 x AFHBA in one chassis:
 
 ```bash
 afhba D-TACQ ACQ-FIBER-HBA Driver for ACQ400 B1026 Jun 22 2015
@@ -119,8 +116,7 @@ afhba 0000:02:00.0: [1] Z_IDENT 1:0x21b60010 2:0x21b60010 acq2106_016.commsB
 afhba 0000:02:00.0: aurora initial s:0x00002b67 m:0x60000070 e:0x00000060
 ```
 
-Did the ramdisk mount work?
-===========================
+## 3. Did the ramdisk mount work?
 
 ```bash
 [root@tatooine AFHBA]# mount
@@ -129,10 +125,9 @@ dram on /mnt type ramfs (rw)
 ```
 
 
-3. Check interrupt assignments worked:
+## 4. Check interrupt assignments worked
 
 Example Interrupt listing:
-=========================
 
 ```bash
 [root@endor ~]# grep afhba /proc/interrupts  | cut -c-20,70-
@@ -146,8 +141,7 @@ Example Interrupt listing:
  105:          0     0  IR-PCI-MSI-edge      afhba.1-spare
 ```
 
-Example Link Fail and restart
-=============================
+## 5. Example Link Fail and restart
 
 ```bash
 afhba 0000:0c:00.0: aurora link down!
@@ -158,11 +152,11 @@ afhba 0000:0c:00.0: aurora link up!
 afhba 0000:0c:00.0: [0] Z_IDENT 1:0xdeadc0de 2:0x21b60007 acq2106_007.commsB
 ```
 stream-to-ramdisk processes will time out. 
-The controller ./scripts/hts-test-harness-AI4 can be <ctrl-C> aborted and re-run without problem.
+
+The controller `./scripts/hts-test-harness-AI4` can be `<Ctrl-C>` aborted and re-run without problem.
 
 
-Example Stream Start
-====================
+## 6. Example Stream Start
 
 ```bash
 [root@tatooine AFHBA]# ./scripts/stream-to-ramdisk
@@ -172,12 +166,11 @@ stream to /mnt/afhba.0
 init_defaults using 64 buffers
 ```
 
-
-FAQ:
-===
+# FAQ
 
 1. Runs for a few seconds and FAILS?
-In our experience, if we forget to mount the ramdisk, data is streamed to the local disk instead. The high data rate overwhelms the disk and the computer can lock up completely. You may see a message like "RT Throttling set" .. that's a sure sign that the disk system is working too hard..
 
-
+In our experience, if we forget to mount the ramdisk, data is streamed to the local disk instead. 
+The high data rate overwhelms the disk and the computer can lock up completely. 
+You may see a message like "RT Throttling set" .. that's a sure sign that the disk system is working too hard..
 

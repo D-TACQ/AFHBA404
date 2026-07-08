@@ -56,19 +56,13 @@ dt100@jakku:~$ lspci -v | grep -A 10 Xil
 </pre>
 
 3. Build and load host side driver:
-https://github.com/petermilne/AFHBA404
+https://github.com/D-TACQ/AFHBA404
 
 ### Power up the ACQ2106 and check that you can log in to it
 1. Connect ACQ2106 to Ethernet.
 2. Connect to the console
-3. Power up and log in
-
-This is described in
-http://www.d-tacq.com/resources/d-tacq-4G-acq4xx-UserGuide.pdf
-#5 "Power Up Guide"
-
-3.4 It's _essential_  that ACQ2106 is visible on Ethernet from HOST
-let IP = ACQ2106 IP ADDRESS
+3. Power up and log in (This is described in http://www.d-tacq.com/resources/d-tacq-4G-acq4xx-UserGuide.pdf #5 "Power Up Guide")
+4. It's _essential_  that ACQ2106 is visible on Ethernet from HOST let IP = ACQ2106 IP ADDRESS
 
 ### Connect fiber-optics
 Example connects PORTB on ACQ2106 to PORTD on AFHBA404
@@ -77,11 +71,14 @@ Any combination will do
 ## Install HOST SIDE SOFTWARE
 
 git clone from 
-https://github.com/petermilne/AFHBA404.git
+https://github.com/D-TACQ/AFHBA404.git
 
 or select the "Download Zip" option and unzip:
-https://github.com/petermilne/AFHBA404/archive/master.zip
+https://github.com/D-TACQ/AFHBA404/archive/master.zip
+
+<pre>
 wget http://www.d-tacq.com/swrel/afhba-1409182241.tar
+</pre>
 
 On the host:
 
