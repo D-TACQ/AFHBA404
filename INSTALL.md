@@ -3,29 +3,34 @@
 # AFHBA404
 http://www.d-tacq.com/resources/InstallationGuides/AFHBA404-installation-guide.pdf
 
-# We assume a default USER "dt100", GROUP "dt100" and also that "dt100" has access to sudo (ideally with no passwd).
-## it's completely possible to use another user, however some default may be adverse
-## NB: ./udev/d-tacq-afhba.hotplug assumes that all device nodes belong to user "dt100", site customisation is welcome.
+We assume a default USER "dt100", GROUP "dt100" and also that "dt100" has access to sudo (ideally with no passwd).
 
-# Do this once:
+It's completely possible to use another user, however some default may be adverse
 
+NB: ./udev/d-tacq-afhba.hotplug assumes that all device nodes belong to user "dt100", site customisation is welcome.
+
+# Do this once
+
+<pre>
 make
 sudo ./scripts/install-hotplug
-
+</pre>
 
 # Do this every boot
-
+<pre>
 ./scripts/loadNIRQ
+</pre>
 
 # for HTSTREAM
-
+<pre>
 ./scripts/mount-ramdisk
-
+</pre>
 
 # Faultfinding checklist
 
 1. Is the device visible on PCI-Express?.
 
+<pre>
 [root@hoth AFHBA404]# lspci | grep Xil
 03:00.0 Memory controller: Xilinx Corporation Device adc1
 
@@ -43,9 +48,11 @@ sudo ./scripts/install-hotplug
 	Capabilities: [48] MSI: Enable- Count=1/16 Maskable- 64bit-
 	Capabilities: [60] Express Endpoint, MSI 00
 	Capabilities: [100] Device Serial Number 45-e1-14-07-52-e0-b8-04
+</pre>
 
 2. Did the device driver load correctly?
 
+<pre>
 afhba D-TACQ ACQ-FIBER-HBA Driver for ACQ400 B1104
 Copyright (c) 2010/2014 D-TACQ Solutions Ltd
 afhba 0000:03:00.0: AFHBA: subdevice : 4104
@@ -72,9 +79,11 @@ auroraB     device                latstat               z_mod_id
 buffer_len  dma_ctrl_pull         power
 comms_init  dma_ctrl_push         pull_dma_timeouts
 com_trg     dma_latest_pull_desc  push_dma_timeouts
+</pre>
 
+3. Did the hotplug work?
 
-3. Did the hotplug work?.
+<pre>
 [root@hoth AFHBA404]# ls -l /dev/rtm-t.0* | head -n 20
 crw-rw-r--. 1 dt100 dt100 247, 254 Apr 15 08:40 /dev/rtm-t.0
 crw-rw-r--. 1 dt100 dt100 247, 246 Apr 15 08:40 /dev/rtm-t.0.catchup_histo
@@ -91,12 +100,10 @@ crw-rw-r--. 1 dt100 dt100 247,  0 Apr 15 08:40 hb00
 crw-rw-r--. 1 dt100 dt100 247,  1 Apr 15 08:40 hb01
 crw-rw-r--. 1 dt100 dt100 247,  2 Apr 15 08:40 hb02
 crw-rw-r--. 1 dt100 dt100 247,  3 Apr 15 08:40 hb03
-
-
-
+</pre>
 
 # OPERATION
 
-see specific examples in
-README.ACQ2106.HTS.md
-LLCONTROL.README*.md
+see specific examples in:
+* [README.ACQ2106.HTS.md](./README.ACQ2106.HTS.md)
+* LLCONTROL/README*.md (e.g. [LLCONTROL/README.AFHBA404](./LLCONTROL/README.AFHBA404.md))
