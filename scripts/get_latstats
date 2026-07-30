@@ -25,13 +25,13 @@ def show_stats(devnum):
     sys.stdout.write(line.rstrip())
 
     for ii in range(0, len(args)):
-	count = int(args[ii])
-	if ii != 0:
-		sys.stdout.write(",")
-	if count == 65535:
-		sys.stdout.write("%9s:%6s" % (names[ii], "ERR"))
-	else:
-		sys.stdout.write(fmts[ii] % (names[ii], count*ktick[ii]))
+        count = int(args[ii])
+        if ii != 0:
+            sys.stdout.write(",")
+        if count == 65535:
+            sys.stdout.write("%9s:%6s" % (names[ii], "ERR"))
+        else:
+            sys.stdout.write(fmts[ii] % (names[ii], count*ktick[ii]))
 
     sys.stdout.write("\n")
 

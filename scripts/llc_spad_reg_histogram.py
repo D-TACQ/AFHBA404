@@ -1,30 +1,33 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import acq400_hapi
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import os
+# from collections import Counter
 
+def main(args):
 
-def main():
-
-    parser = argparse.ArgumentParser(description='llc latency histogram test')
-    parser.add_argument('--file', default="./afhba.0.log", type=str,
-    help='Which data file to analyse')
-    parser.add_argument('uut', nargs=1, help="uut ")
-    args = parser.parse_args()
-
-    uut = acq400_hapi.Acq400(args.uut[0])
+    uut = acq400_hapi.Acq400(args.uutname)
     print("Reading data")
     data = np.fromfile(args.file, dtype=np.uint16)
-    print("Received data")
+    print("Data read in")
 
     data = np.frombuffer(data.tobytes(), dtype=np.uint16)
-    nchan = uut.nchan()
+
+    data_size = 4 if uut.s0.data32 == '1' else 2
+    ssb = int(uut.s0.ssb)
+    spadstart = int(uut.s0.spadstart)
+    spadlen = (ssb - spadstart) // 4
+    nchan = ssb // data_size
+    nchan_log = (ssb - spadstart) // data_size + spadlen
+
+    print(f"[{args.uutname}] adc_chans={spadstart // data_size} spad_chans={spadlen} nchan={nchan} nchan_log={nchan_log} ssb={ssb} data_size={data_size}")
 
     # get data_end by taking nchan and subtracting the spad, then subtracting 1.
-    data_end = nchan - (2 * int(uut.s0.spad.split(",")[1])) - 1
+    data_end = nchan - (2 * spadlen) - 1
 
     latest_spad_offset = 9
     mean_spad_offset = 10
@@ -57,33 +60,42 @@ def main():
     min_data = min_data.astype(float) * 15 /1000
     max_data = max_data.astype(float) * 15 /1000
 
-    fig, axs = plt.subplots(1, 5, sharey=False, sharex=False, tight_layout=True)
+    print("Overall Mean    = {:.2f}us" .format(np.mean(mean_data)))
+    print("Maximum Latency = {:.2f}us" .format(np.max(max_data)))
+    print("Minimum Latency = {:.2f}us" .format(np.min(min_data)))
 
+    fig, axs = plt.subplots(1, 1, sharey=False, sharex=False, tight_layout=True, figsize=(11.7, 8.27))
     num_bins = np.arange(min(latest_data), max(latest_data), (max(latest_data) - min(latest_data))/np.sqrt(len(latest_data)))
-    axs[0].hist(latest_data, bins=num_bins)
-    axs[0].title.set_text("histogram of latest data")
+    axs.hist(latest_data, bins=num_bins)
+    axs.title.set_text("D-TACQ LLC Latency Histogram, AO Fetch to Update")
 
-    num_bins = np.arange(min(mean_data), max(mean_data), (max(mean_data) - min(mean_data))/np.sqrt(len(mean_data)))
-    axs[1].hist(mean_data, bins=num_bins)
-    axs[1].title.set_text("histogram of average data")
+    axs.text(.98, .9, "Min: {:.2f}us".format(np.min(min_data)), transform=axs.transAxes, ha="right", va="top")
+    axs.text(.98, .85, "Max: {:.2f}us".format(np.max(max_data)), transform=axs.transAxes, ha="right", va="top")
+    axs.text(.98, .80, "Mean: {:.2f}us".format(np.mean(mean_data)), transform=axs.transAxes, ha="right", va="top")
 
-    num_bins = np.arange(min(min_data), max(min_data), (max(min_data) - min(min_data))/np.sqrt(len(min_data)))
-    axs[2].hist(min_data, bins=num_bins)
-    axs[2].title.set_text("histogram of min data")
+    plt.xlabel('Time(us)')
+    plt.ylabel('Frequency')
 
-    num_bins = np.arange(min(max_data), max(max_data), (max(max_data) - min(max_data))/np.sqrt(len(max_data)))
-    axs[3].hist(max_data, bins=num_bins)
-    axs[3].title.set_text("histogram of max data")
+    axs.set_xlabel('Latency (us)')
+    axs.set_ylabel('Count')
 
-    num_bins = np.arange(min(latest_data), max(latest_data), (max(latest_data)-min(latest_data))/np.sqrt(len(latest_data)))
-    axs[4].hist(latest_data, bins=num_bins)
-    axs[4].title.set_text('histogram of latest data on a log scale')
-    axs[4].set_yscale('log', nonposy='clip')
+    filename = f"{args.uutname}_llc_histogram.png"
+    filepath = os.path.join(args.root, filename)
+    plt.savefig(filepath, format='png', dpi=300, bbox_inches="tight")
+    print(f"Plot saved to {filepath}")
 
     plt.show()
     return None
 
 
-if __name__ == '__main__':
-    main()
+def get_parser():
+    parser = argparse.ArgumentParser(description='llc latency histogram test')
 
+    parser.add_argument('--file', default="./afhba.0.log", type=str, help='Which data file to analyse')
+    parser.add_argument('--root', default="./", type=str, help='dir to save image')
+
+    parser.add_argument('uutname', help="uut hostname")
+    return parser
+
+if __name__ == '__main__':
+    main(get_parser().parse_args())
