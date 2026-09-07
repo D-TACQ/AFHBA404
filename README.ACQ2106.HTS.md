@@ -17,7 +17,7 @@ sudo ./scripts/mount-tmpfs-ramdisk
 ```
 Make ramdisk readable for user, eg user dt100:
 ```
-sudo chown -R dt100.dt100 /mnt
+sudo chown -R dt100:dt100 /mnt
 ```
 
 # Running a shot
